@@ -1,0 +1,8 @@
+###> holycode-pm ###
+# Claude Code per-user permissions (may contain tokens) + auto-updating settings
+.claude/settings.local.json
+.claude/settings.json
+# Client documents (privacy)
+.project-management/client-input/*
+!.project-management/client-input/README.md
+###< holycode-pm ###

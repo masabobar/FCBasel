@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Bash(pnpm install)",
+      "Bash(pnpm *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(npx prisma *)",
+      "Bash(prisma *)",
+      "Read(**)",
+      "Edit(**)",
+      "Write(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "SlashCommand(*)",
+      "Skill(*)",
+      "TodoWrite",
+      "AskUserQuestion",
+      "WebFetch(*)",
+      "WebSearch(*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)"
+    ],
+    "ask": []
+  },
+  "defaultMode": "acceptEdits",
+  "_comment": "Permissions-only template. Copy to settings.local.json (per-user, gitignored). Claude should NEVER modify settings.json automatically — see .claude/rules/permissions.md (after /holycode-pm:setup bootstraps rules into .claude/rules/). NOTE: no hooks block here on purpose — plugin users get the file-size + CHANGELOG hooks automatically via the plugin's hooks/hooks.json (${CLAUDE_PLUGIN_ROOT}), so a $CLAUDE_PROJECT_DIR/hooks block here would point at scripts that don't exist in the project and error on every Write/Edit/Stop. Standalone (non-plugin) users who copied the repo's hooks/ into their project can add the hooks block manually — see hooks/README.md."
+}
