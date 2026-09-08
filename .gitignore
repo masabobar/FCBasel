@@ -6,3 +6,32 @@
 .project-management/client-input/*
 !.project-management/client-input/README.md
 ###< holycode-pm ###
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+build/
+dist/
+.react-router/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+
+# Editor / OS
+.DS_Store
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.vscode/*
+!.vscode/extensions.json
+.idea/
