@@ -10,10 +10,12 @@
 import { createMockBaselineRepository } from "../mock/baseline";
 import { createMockHero1Repository } from "../mock/hero1";
 import { createMockHero2Repository } from "../mock/hero2";
+import { createMockHero3Repository } from "../mock/hero3";
 import {
   type BaselineRepository,
   type Hero1Repository,
   type Hero2Repository,
+  type Hero3Repository,
 } from "./types";
 
 export const baselineRepository: BaselineRepository =
@@ -22,3 +24,5 @@ export const baselineRepository: BaselineRepository =
 export const hero1Repository: Hero1Repository = createMockHero1Repository();
 
 export const hero2Repository: Hero2Repository = createMockHero2Repository();
+
+export const hero3Repository: Hero3Repository = createMockHero3Repository();

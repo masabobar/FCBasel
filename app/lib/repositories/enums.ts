@@ -133,6 +133,63 @@ export const MONTH_LABEL: Record<MonthKey, string> = {
   [MonthKey.DECEMBER]: "Dec",
 };
 
+/* ----------------------------------------------------- DEPARTMENT TYPE -- */
+
+/**
+ * Whether a department EARNS money or SPENDS it.
+ *
+ * LOAD-BEARING, NOT DECORATION. It is the only thing that says what a variance
+ * MEANS: for a revenue department an actual above budget is money earned, while
+ * for the Marketing cost centre the same arithmetic is an overspend. A tile that
+ * colours "variance > 0" green without reading this renders Marketing's +410 as
+ * a success in front of the owner, which is why no consumer is asked to make
+ * that inference itself - see {@link VarianceJudgement} and
+ * `varianceJudgement` in `./derive.ts`.
+ */
+export const DepartmentType = {
+  REVENUE: "REVENUE",
+  COST: "COST",
+} as const;
+
+export type DepartmentType =
+  (typeof DepartmentType)[keyof typeof DepartmentType];
+
+/** The tag shown against a department name in the Hero 3 table. */
+export const DEPARTMENT_TYPE_LABEL: Record<DepartmentType, string> = {
+  [DepartmentType.REVENUE]: "Revenue",
+  [DepartmentType.COST]: "Cost",
+};
+
+/* --------------------------------------------------- VARIANCE JUDGEMENT -- */
+
+/**
+ * Whether a variance is GOOD or BAD news, once the department's
+ * {@link DepartmentType} has been taken into account.
+ *
+ * This exists so the good/bad decision is made ONCE, in `./derive.ts`, and is
+ * then carried as data. A component reads this key and picks a colour; it never
+ * re-derives the judgement from the sign of the number, because the sign alone
+ * does not carry the answer.
+ */
+export const VarianceJudgement = {
+  /** Ahead: revenue above budget, or spend below it. */
+  FAVOURABLE: "FAVOURABLE",
+  /** Behind: revenue below budget, or spend above it (an overspend). */
+  ADVERSE: "ADVERSE",
+  /** Exactly on budget - neither. */
+  NEUTRAL: "NEUTRAL",
+} as const;
+
+export type VarianceJudgement =
+  (typeof VarianceJudgement)[keyof typeof VarianceJudgement];
+
+/** How a judgement is worded when a tile spells it out rather than colouring it. */
+export const VARIANCE_JUDGEMENT_LABEL: Record<VarianceJudgement, string> = {
+  [VarianceJudgement.FAVOURABLE]: "Favourable",
+  [VarianceJudgement.ADVERSE]: "Adverse",
+  [VarianceJudgement.NEUTRAL]: "On budget",
+};
+
 /* ------------------------------------------------------- PARTNER ROLES -- */
 
 /** What a commercial partner is to the club. */

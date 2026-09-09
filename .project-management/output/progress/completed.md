@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 9 stories
-**Total Points:** 20 / 116
+**Total Completed:** 10 stories
+**Total Points:** 22 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 20 points/day
+**Average Velocity:** 22 points/day
 **Phases Completed:** Phase 1a (2026-09-09)
 
 ---
@@ -264,36 +264,36 @@ Reference Guide definitive for the experience.
 
 ---
 
-## Format
-
-When stories are completed, they will be logged here with:
-- Story ID and title
-- Completion date and time
-- Time taken (hours)
-- Story points
-- Who completed it
-- Files changed (count)
-- Tests added (count)
-- Commit SHA
-- Notes
-
-**Example Entry:**
-
-```markdown
-### US-0NN: Example story (N pts)
-**Completed:** 2026-09-09 14:32
-**Time Taken:** 1.2 hours
+### US-010: Hero 3 dataset - departmental performance (2 pts)
+**Completed:** 2026-09-09
 **By:** AI
-**Files Changed:** 4
-**Tests Added:** 6 (unit: 6)
-**Commit:** abc1234
-**Notes:** Token set matches E2 exactly; Guide precedence applied for surface/text/pos divergences
+**Files Changed:** 6 (2 new, 4 modified) + 5 tracking docs
+**Tests Added:** 44 (unit: 44) - 348/348 green, 100% stmts / 98.7% branches of `app/**`
+**Commit:** see phase-1b progress log
+**Notes:** Fourth pass through the US-007 recipe; the new idea is that a TAG carries meaning.
 
 **What Was Done:**
-- Defined the colour, type, spacing, radii and motion token set
-- Enforced colour discipline: series identity in red/blue, variance in pos/neg with sign and arrow
-- Verified no colour outside the token set is reachable
-```
+- Six departments, CHF thousands, Revenue or Cost: Sponsoring 21,000/21,840/104%; Ticketing
+  24,000/24,360/102%; Hospitality 7,200/6,840/95%; Merchandising 9,800/9,050/92%; Events
+  3,600/3,780/105%; Marketing **(Cost)** 3,400/3,810/84%
+- **Revenue vs Cost is modelled so a consumer cannot get it wrong.** `DepartmentType` and
+  `VarianceJudgement` are enums; `varianceJudgement` decides good-or-bad ONCE from the type, so
+  Marketing's +410 is `ADVERSE` (an overspend) where Sponsoring's +840 is `FAVOURABLE`. Both
+  directions tested, plus a test proving a naive "variance > 0 is good" rule misreads one department
+- **The flag is derived, not stored** - the Guide's `flag: true` did not survive the port, and
+  `departmentsNeedingAttention` finds exactly one row both over budget *and* behind target
+- **Totals and variances derived:** `totalBudget` / `totalActual` not ported; `departmentTotals`
+  gives 69,000 -> 69,680, +680, +0.99% shown as +1.0% through the same `percentChange` the baseline
+  uses (one `oneDecimal` rule), and the narrative's -7.7% / +12.1% with it. The one stored figure is
+  `blendedTargetPercent: 96` - a measured attainment no arithmetic over the rows gives (97.0 / 99.7)
+- **The follow-up reconciles with the table:** activations 240 + paid social 150 + agency retainer
+  20 = 410, exactly Marketing's derived variance (the retainer is a Guide addition beyond the
+  Specification, per the approved scope decision). Conversion 2.2% vs 2.6% derives 84.6% attainment,
+  -0.4 percentage *points* and a -15.4% relative shortfall
+- **Scope label is data**, as in US-009: Ticketing's 24,360 exceeds Hero 2's 7,830 because it
+  includes the season-ticket base. Both narratives **verbatim** (checked against `DATA.hero3`:
+  identical, 270 / 468 chars, ASCII), pinned by text, length and range. Guardrail held on the
+  dataset closest to the line: departments, never people - no salary, headcount or named individual
 
 ---
 

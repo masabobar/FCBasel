@@ -28,14 +28,14 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets (10 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (3/5) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (4/5) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-007 | Persona baseline datasets (4 tiles) | 2 | ✅ Completed |
 | US-008 | Hero 1 dataset — shirt sales, badges, printed names | 2 | ✅ Completed |
 | US-009 | Hero 2 dataset — ticket revenue year on year | 2 | ✅ Completed |
-| US-010 | Hero 3 dataset — departmental performance | 2 | 📋 Todo |
+| US-010 | Hero 3 dataset — departmental performance | 2 | ✅ Completed |
 | US-011 | Formatters & cross-hero reconciliation | 2 | 📋 Todo |
 
 **Technical Notes:**
@@ -77,9 +77,9 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 - **Risk Level:** Low (mechanical work — every figure is pinned in the specification)
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 6 / 10 (60%)
-- **Completed Stories:** 3 / 5
-- **Tests Passing:** 304 / 304 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 3
+- **Completed Story Points:** 8 / 10 (80%)
+- **Completed Stories:** 4 / 5
+- **Tests Passing:** 348 / 348 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 4
 
 ---
 
@@ -208,6 +208,49 @@ addition the Build Specification never mentions, and the tile draws it.
 - Guardrail held and tested: fixtures are clubs, and no squad name, salary or performance figure
   appears anywhere in the dataset.
 - 31 tests added (304/304 green), coverage 100% statements / 98.4% branches over `app/**`; lint,
+  format, typecheck and build all clean. Security triage: no security-relevant changes (static local
+  data, no endpoint, no dependency, no environment variable, no user input, no network call).
+
+### 2026-09-09 — US-010: Hero 3 dataset, departmental performance (2 pts) ✅
+
+Fourth pass through the US-007 recipe, and the one where a *tag* carried the meaning. New
+`DepartmentType` (REVENUE / COST) and `VarianceJudgement` enums with their label maps in `enums.ts`,
+domain types plus `Hero3Repository` in `types.ts`, derived figures in `derive.ts`, fixtures and the
+implementation in `app/lib/mock/hero3.ts`, one line of selection in `index.server.ts`.
+
+- **Revenue vs Cost is modelled so a consumer cannot get it wrong.** The sign of a variance does not
+  carry its meaning: Sponsoring's +840 is money earned, Marketing's +410 is an overspend. Each row
+  therefore carries its `type` *and* a derived `judgement` (`FAVOURABLE` / `ADVERSE` / `NEUTRAL`)
+  decided once in `varianceJudgement`, so a tile reads a key and picks a colour instead of inferring
+  from the number. Tested in both directions, including a test that shows a naive "variance > 0 is
+  good" rule would misread exactly one department — Marketing.
+- **The flag is derived, not stored.** The Reference Guide carries `flag: true` on the Marketing row;
+  it did not survive the port. `departmentsNeedingAttention` finds the departments both over budget
+  *and* behind target from the figures, and a test asserts there is exactly one and that it is
+  Marketing. Four departments are over budget and three are behind target on their own — only the
+  conjunction is rare, which is what makes the narrative's claim worth checking.
+- **Nothing else derivable is stored either.** `totalBudget` / `totalActual` are not ported:
+  `departmentTotals` produces 69,000 → 69,680, +680, and +0.99% displayed as +1.0% through the same
+  `percentChange` the baseline band uses (now the app's single `oneDecimal` rounding rule). The
+  narrative's two quoted variances are derived too: Merchandising -7.65% → -7.7% ("7.7% under") and
+  Marketing +12.06% → +12.1% ("12% over"). The one stored figure is `blendedTargetPercent: 96` — a
+  measured club-level attainment that no arithmetic over the six rows reproduces (their plain mean is
+  97.0, budget-weighted 99.7), pinned by a test so nobody later "fixes" it into a mean.
+- **The follow-up reconciles with the table above it.** Match activations 240 + paid social 150 +
+  agency retainer 20 = 410, *exactly* Marketing's derived variance — asserted. The agency retainer is
+  a Reference Guide addition the Specification never mentions, included per the approved full-JSX
+  scope decision; without it the drivers would not add up to the overspend they explain. The
+  conversion gap (2.2% against a 2.6% plan) derives three distinct numbers: 84.6% attainment (the
+  "~85% of target"), -0.4 percentage *points*, and a -15.4% relative shortfall.
+- **The scope label is data, as in US-009.** "Full-year departmental totals … Ticketing includes the
+  season-ticket base, so it exceeds the sum of Hero 2's shown fixtures" — 24,360 here against Hero
+  2's 7,830 is intended, and now stated on the tile rather than left to be reconciled in the room.
+- **Both narratives verbatim**, extracted from the source and compared programmatically (both
+  identical, 270 / 468 characters, pure printable ASCII), then pinned in the suite by exact text,
+  exact length and an ASCII-range check.
+- Guardrail held and tested on the dataset closest to the line: departments, never people. No salary,
+  wage, bonus, headcount, FTE, payroll or named individual appears anywhere in it.
+- 44 tests added (348/348 green), coverage 100% statements / 98.7% branches over `app/**`; lint,
   format, typecheck and build all clean. Security triage: no security-relevant changes (static local
   data, no endpoint, no dependency, no environment variable, no user input, no network call).
 

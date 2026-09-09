@@ -12,27 +12,35 @@
  * and stay correct when the fixtures are replaced by a database.
  */
 
-import { KitVariant } from "./enums";
+import { DepartmentType, KitVariant, VarianceJudgement } from "./enums";
 import {
   type AttendanceSummary,
   type BadgeSponsorShare,
   type ComparisonSeries,
+  type ConversionGap,
+  type Department,
   type FixtureRevenue,
   type Hero1Period,
   type HomeMatch,
   type KitUnits,
   type MonthlyRevenue,
+  type SpendDriver,
 } from "./types";
 
 /** How the club is written in a scoreline. */
 export const CLUB_SHORT_NAME = "FCB";
+
+/** The app's ONE rounding rule for a displayed percentage: one decimal. */
+function oneDecimal(value: number): number {
+  return Number(value.toFixed(1));
+}
 
 /** Percentage change, rounded to one decimal as the hero band displays it. */
 export function percentChange(current: number, previous: number): number {
   if (previous === 0) {
     return 0;
   }
-  return Number((((current - previous) / previous) * 100).toFixed(1));
+  return oneDecimal(((current - previous) / previous) * 100);
 }
 
 function sum(values: readonly number[]): number {
@@ -263,4 +271,172 @@ export function fixtureDeclines(
 /** Total revenue lost across the declining fixtures - the tile's badge. */
 export function declineTotal(fixtures: readonly FixtureRevenue[]): number {
   return sum(fixtureDeclines(fixtures).map((decline) => decline.drop));
+}
+
+/* ------------------------------------------ HERO 3 DEPARTMENTAL BUDGETS -- */
+
+/** Target attainment at which a department is exactly on target. */
+export const ON_TARGET_PERCENT = 100;
+
+/** Actual minus budget, signed, CHF thousands. Never stored. */
+export function departmentVariance(department: Department): number {
+  return department.actual - department.budget;
+}
+
+/** That variance as a percentage of budget, signed, to one decimal. */
+export function departmentVariancePercent(department: Department): number {
+  return percentChange(department.actual, department.budget);
+}
+
+/**
+ * Whether a variance is GOOD NEWS or BAD NEWS.
+ *
+ * THIS IS THE POINT OF THE REVENUE / COST TAG. The sign of a variance does not
+ * carry its meaning: Sponsoring's +840 is money earned, and Marketing's +410 is
+ * an OVERSPEND. A tile that paints "variance > 0" green would show the Marketing
+ * cost centre as a success and then sit directly above a follow-up that calls it
+ * the club's one problem department.
+ *
+ * So the decision is made here, once, from the department's
+ * {@link DepartmentType}, and travels as data on {@link DepartmentPerformance}.
+ * No consumer is asked to work it out from the number.
+ */
+export function varianceJudgement(department: Department): VarianceJudgement {
+  const variance = departmentVariance(department);
+  if (variance === 0) {
+    return VarianceJudgement.NEUTRAL;
+  }
+  const favourable =
+    department.type === DepartmentType.REVENUE ? variance > 0 : variance < 0;
+  return favourable ? VarianceJudgement.FAVOURABLE : VarianceJudgement.ADVERSE;
+}
+
+/**
+ * A department row with everything a tile needs to draw it.
+ *
+ * `overBudget` is the plain arithmetic - the actual exceeded the budgeted line -
+ * and is TRUE for four of the six departments, three of them happily. What it
+ * MEANS is `judgement`. The two fields are separate on purpose: one is a fact,
+ * the other is the reading of it.
+ */
+export interface DepartmentPerformance extends Department {
+  /** Actual minus budget, signed, CHF thousands. */
+  readonly variance: number;
+  /** The same movement as a percentage of budget, signed, one decimal. */
+  readonly variancePercent: number;
+  /** Good news or bad, with the Revenue / Cost tag taken into account. */
+  readonly judgement: VarianceJudgement;
+  /** The actual came in above the budgeted line. A fact, not a verdict. */
+  readonly overBudget: boolean;
+  /** Attainment of its own outcome target fell short of 100%. */
+  readonly behindTarget: boolean;
+  /** BOTH of the above - the case the Marketing follow-up interrogates. */
+  readonly needsAttention: boolean;
+}
+
+/** One department's derived row. */
+export function departmentPerformance(
+  department: Department,
+): DepartmentPerformance {
+  const overBudget = departmentVariance(department) > 0;
+  const behindTarget = department.targetPercent < ON_TARGET_PERCENT;
+  return {
+    ...department,
+    variance: departmentVariance(department),
+    variancePercent: departmentVariancePercent(department),
+    judgement: varianceJudgement(department),
+    overBudget,
+    behindTarget,
+    needsAttention: overBudget && behindTarget,
+  };
+}
+
+/** Every department's derived row, in the order the table lists them. */
+export function departmentPerformanceRows(
+  departments: readonly Department[],
+): DepartmentPerformance[] {
+  return departments.map(departmentPerformance);
+}
+
+/** The club-wide budget position under the department table. */
+export interface DepartmentTotals {
+  /** Sum of the budgets, CHF thousands. */
+  readonly budget: number;
+  /** Sum of the actuals, CHF thousands. */
+  readonly actual: number;
+  /** Actual minus budget, signed. */
+  readonly variance: number;
+  /** The same movement as a percentage of budget, signed, one decimal. */
+  readonly variancePercent: number;
+}
+
+/**
+ * Totals for the department table. The ONLY way to obtain the 69,000 / 69,680 /
+ * +680 headline - the Reference Guide stores `totalBudget` and `totalActual`,
+ * and neither is ported, so the footer row cannot outlive an edit to the rows.
+ *
+ * These are ARITHMETIC ACROSS MIXED SIGNS: five revenue departments and one cost
+ * centre. The club-level `variancePercent` is therefore a movement against the
+ * total budgeted position, not a profit figure, and is never a judgement -
+ * judgement lives per department, where the Revenue / Cost tag is.
+ */
+export function departmentTotals(
+  departments: readonly Department[],
+): DepartmentTotals {
+  const budget = sum(departments.map((department) => department.budget));
+  const actual = sum(departments.map((department) => department.actual));
+  return {
+    budget,
+    actual,
+    variance: actual - budget,
+    variancePercent: percentChange(actual, budget),
+  };
+}
+
+/**
+ * The departments that are both over budget AND behind target, in table order.
+ *
+ * Derived rather than carried as a stored `flag`, so the follow-up's subject is
+ * always whatever the figures say it is. On the seeded data that is exactly one
+ * department: Marketing & Communications.
+ */
+export function departmentsNeedingAttention(
+  departments: readonly Department[],
+): DepartmentPerformance[] {
+  return departmentPerformanceRows(departments).filter(
+    (department) => department.needsAttention,
+  );
+}
+
+/** Total overspend across the named drivers - the follow-up's badge. */
+export function driverTotal(drivers: readonly SpendDriver[]): number {
+  return sum(drivers.map((driver) => driver.amount));
+}
+
+/** How far webshop conversion fell short of plan, three ways. */
+export interface ConversionShortfall {
+  /** Achieved as a percentage of plan, one decimal: 84.6 for 2.2 against 2.6. */
+  readonly attainmentPercent: number;
+  /** Achieved minus planned, in PERCENTAGE POINTS, one decimal: -0.4. */
+  readonly gapPoints: number;
+  /** The relative shortfall, one decimal: -15.4%. */
+  readonly changePercent: number;
+}
+
+/**
+ * The conversion gap behind Marketing's paid-social overspend.
+ *
+ * Percentage POINTS and percentage CHANGE are different numbers (-0.4 and
+ * -15.4) and both get quoted about conversion figures, so they are named apart
+ * here rather than left for a component to compute one and label it the other.
+ */
+export function conversionShortfall(gap: ConversionGap): ConversionShortfall {
+  return {
+    attainmentPercent:
+      gap.planPercent === 0
+        ? 0
+        : oneDecimal((gap.actualPercent / gap.planPercent) * 100),
+    gapPoints: oneDecimal(gap.actualPercent - gap.planPercent),
+    changePercent: percentChange(gap.actualPercent, gap.planPercent),
+  };
 }

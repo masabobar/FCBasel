@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 9 — **Phase 1a complete, Phase 1b under way**
-**Story Points:** 20
-**Time Worked:** ~5.8 hours
-**Files Changed:** 82
-**Tests Added:** 304
+**Stories Completed:** 10 — **Phase 1a complete, Phase 1b under way**
+**Story Points:** 22
+**Time Worked:** ~6.3 hours
+**Files Changed:** 88
+**Tests Added:** 348
 
 ---
 
@@ -134,6 +134,30 @@
   baseline band's `Intl`-derived month names. Both narratives verbatim, pinned by text, length and
   an ASCII-range check. 31 tests added (304/304 green), coverage 100% statements / 98.4% branches of
   `app/**`, and lint / format / typecheck / build all clean.
+- **US-010 — Hero 3 dataset: departmental performance.** Six departments in CHF thousands
+  (69,000 -> 69,680, +680 / +1.0% derived) as one `Hero3` object with `primary` and `followUp`. The
+  new idea here is that a TAG carries the meaning of a number: above budget is money earned for the
+  five revenue departments and an **overspend** for the Marketing cost centre, so `DepartmentType`
+  and `VarianceJudgement` are enums, `varianceJudgement` decides good-or-bad once from the type, and
+  every row carries the verdict as data — Marketing's +410 comes back `ADVERSE` where Sponsoring's
+  +840 comes back `FAVOURABLE`. Both directions are tested, and one test proves that a naive
+  "variance > 0 is good" rule would misread exactly one department, which is the failure the tag
+  exists to prevent. Marketing being the only department both over budget *and* behind target is
+  derived by `departmentsNeedingAttention` rather than read from the Guide's `flag: true`, and four
+  departments are over budget and three behind target on their own, so only the conjunction is rare.
+  Totals are derived through the same `percentChange` the baseline band uses (now a single
+  `oneDecimal` rounding rule), as are the narrative's -7.7% and +12.1%; the one stored figure is
+  `blendedTargetPercent: 96`, a measured club-level attainment that no arithmetic over the six rows
+  reproduces (plain mean 97.0, budget-weighted 99.7), pinned by test so it cannot be "fixed" into a
+  mean. The follow-up reconciles with the table: activations 240 + paid social 150 + agency retainer
+  20 = 410, exactly Marketing's derived variance, and the conversion gap (2.2% against a 2.6% plan)
+  yields 84.6% attainment, -0.4 percentage points and a -15.4% relative shortfall as three separate
+  named numbers. The scope label states that Ticketing includes the season-ticket base, which is why
+  its 24,360 legitimately exceeds Hero 2's 7,830. Both narratives verbatim, compared
+  programmatically against the source (identical, 270 / 468 characters, printable ASCII) and pinned
+  by text, length and range. Guardrail held on the dataset closest to the line — departments, never
+  people. 44 tests added (348/348 green), coverage 100% statements / 98.7% branches of `app/**`, and
+  lint / format / typecheck / build all clean.
 
 ---
 
@@ -160,6 +184,9 @@
 - ✅ US-009 — Hero 2 dataset: ticket revenue year on year (2 pts) — all 5 acceptance criteria met and
   deliberately exceeded (the twelve-month series, per the user's approved scope decision).
   Phase 1b: 3/5 stories.
+- ✅ US-010 — Hero 3 dataset: departmental performance (2 pts) — all 5 acceptance criteria met,
+  including the derived Revenue/Cost judgement and the derived over-budget-and-behind-target flag.
+  Phase 1b: 4/5 stories.
 
 ---
 
@@ -180,9 +207,10 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 1b — seed data (4 pts remaining). US-010 (Hero 3: departmental performance) is next; the
-  repository pattern, the enum source of truth, the primary/followUp hero shape and the scope-label
-  convention are all now in place, and Hero 3's Revenue/Cost tagging is the one new idea in it
+- Phase 1b — seed data (2 pts remaining). US-011 (formatters & cross-hero reconciliation) closes
+  the phase: the `CHF` / `%` / signed-variance formatters, a millions helper for the department
+  table, tabular numerals, and a reconciliation pass over the four datasets now seeded — every
+  figure appearing in two tiles must come from one constant
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -197,7 +225,7 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phase 1a is complete and Phase 1b is 3/5; continue with `/holycode-pm:execute-work story US-010`.
+- Phase 1a is complete and Phase 1b is 4/5; continue with `/holycode-pm:execute-work story US-011`.
 
 ---
 

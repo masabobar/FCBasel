@@ -9,8 +9,8 @@
 
 **Project:** FC Basel — Intelligence Platform Prototype
 **Current Phase:** Phase 1b - Dummy Data Model & Seed Datasets
-**Overall Progress:** 17% (9/45 items completed)
-**Story Points Completed:** 20/116
+**Overall Progress:** 19% (10/45 items completed)
+**Story Points Completed:** 22/116
 
 ---
 
@@ -25,7 +25,7 @@
 
 ### Phase 1b: Dummy Data Model & Seed Datasets (Current)
 - **Status:** 🔄 In Progress
-- **Progress:** 3/5 stories · **Points:** 6/10
+- **Progress:** 4/5 stories · **Points:** 8/10
 - **Epics:** Epic 3 (E3 Seed Datasets)
 
 ### Phase 2a: Dashboard Shell & Persona Baseline
@@ -67,7 +67,7 @@
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets
 - **Phase:** 1b · **Stories:** 5 (US-007 to US-011) · **Points:** 10
-- **Completed:** 3/5 · **Status:** In Progress
+- **Completed:** 4/5 · **Status:** In Progress
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline
 - **Phase:** 2a · **Stories:** 5 (US-012 to US-016) · **Points:** 16
@@ -93,9 +93,9 @@
 
 ## Active Work
 
-**Currently In Progress:** None — Phase 1b at 3/5
+**Currently In Progress:** None — Phase 1b at 4/5
 **Blocked Stories:** None
-**Next Up:** US-010 — Hero 3 dataset (US-007, US-008 and US-009 are complete)
+**Next Up:** US-011 — Formatters & cross-hero reconciliation (US-007 to US-010 are complete)
 
 ---
 

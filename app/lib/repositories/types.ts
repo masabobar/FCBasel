@@ -13,6 +13,7 @@
  */
 
 import {
+  type DepartmentType,
   type KitVariant,
   type MonthKey,
   type PartnerRole,
@@ -282,6 +283,107 @@ export interface Hero2 {
   readonly followUp: Hero2FollowUp;
 }
 
+/* ---------------------------------------------------------- HERO 3 DATA -- */
+
+/**
+ * One department's full-year budget position, in CHF THOUSANDS (21,000 is
+ * CHF 21M). Formatting is US-011's job.
+ *
+ * A DEPARTMENT, NEVER A PERSON. This is the dataset closest to the
+ * named-individual guardrail and it stays firmly on the aggregate side of it:
+ * no salary, no headcount attributed to anyone, no individual target
+ * attainment. Adding any of those would cross the line these rows do not.
+ *
+ * WHAT IS STORED HERE AND WHAT IS NOT:
+ *   - `budget`, `actual` and `targetPercent` are MEASUREMENTS - each carries
+ *     information nothing else holds. `targetPercent` in particular is not
+ *     `actual / budget`: Marketing sits at 84% of an OUTCOME target while
+ *     spending 12% above its budget, so the two are independent facts.
+ *   - the variance, its percentage and whether it is good or bad news are
+ *     DERIVED in `./derive.ts` (`departmentPerformance`) and never stored.
+ */
+export interface Department {
+  readonly name: string;
+  /** Earns money or spends it - see {@link DepartmentType}. */
+  readonly type: DepartmentType;
+  readonly typeLabel: string;
+  /** Full-year budget, CHF thousands. */
+  readonly budget: number;
+  /** Full-year actual, CHF thousands. */
+  readonly actual: number;
+  /**
+   * Attainment of the department's own outcome target, in percent. 100 is on
+   * target; below 100 is behind. INDEPENDENT of the budget figures above.
+   */
+  readonly targetPercent: number;
+}
+
+/** One component of Marketing's overspend, CHF thousands. */
+export interface SpendDriver {
+  readonly name: string;
+  /** Amount above plan, CHF thousands. */
+  readonly amount: number;
+}
+
+/**
+ * Webshop conversion, achieved against planned, in percent.
+ *
+ * The percentages are the measurements; the shortfall between them and the
+ * attainment they represent are derived (`conversionShortfall`).
+ */
+export interface ConversionGap {
+  readonly actualPercent: number;
+  readonly planPercent: number;
+}
+
+/** The Hero 3 tile as first shown: every department, budget against actual. */
+export interface Hero3Primary {
+  /**
+   * What the figures cover, stated on the tile. THIS ONE MATTERS: Hero 3 is
+   * full-year departmental totals and its Ticketing figure INCLUDES the
+   * season-ticket base, so it legitimately exceeds the sum of Hero 2's eight
+   * shown fixtures. Intended, not inconsistent - but only if the tile says so.
+   */
+  readonly scopeLabel: string;
+  /** The six departments, in the order the table lists them. */
+  readonly departments: readonly Department[];
+  /**
+   * The club-wide blended attainment of the departmental outcome targets, in
+   * percent.
+   *
+   * STORED BECAUSE IT IS A MEASUREMENT, NOT A SUM. Unlike the budget and actual
+   * totals - which are derived and must always equal the rows above them - this
+   * is a Finance-supplied club-level figure that no arithmetic over the six
+   * rows reproduces (their plain mean is 97.0, their budget-weighted mean 99.7).
+   * It sits beside `targetPercent` as the same kind of fact, one level up.
+   */
+  readonly blendedTargetPercent: number;
+  /** Hand-authored copy. Verbatim from the Reference Guide - never paraphrased. */
+  readonly narrative: string;
+}
+
+/**
+ * The escalation shown when the user asks why Marketing is over budget AND
+ * behind target.
+ *
+ * WHICH department that is stays derived (`departmentsNeedingAttention`), so
+ * the follow-up cannot end up interrogating a department the table no longer
+ * flags.
+ */
+export interface Hero3FollowUp {
+  /** Where the overspend went. Sums to Marketing's variance. */
+  readonly drivers: readonly SpendDriver[];
+  /** The webshop conversion the paid-social spend was chasing. */
+  readonly conversion: ConversionGap;
+  readonly narrative: string;
+}
+
+/** Hero 3 as ONE object - see {@link Hero1} for why the two travel together. */
+export interface Hero3 {
+  readonly primary: Hero3Primary;
+  readonly followUp: Hero3FollowUp;
+}
+
 /* -------------------------------------------------------- REPOSITORIES -- */
 
 /**
@@ -323,4 +425,20 @@ export interface Hero2Repository {
   fixture(opponent: string): Promise<FixtureRevenue | null>;
   /** The twelve months of the season, July first. */
   monthly(): Promise<MonthlyRevenue[]>;
+}
+
+/**
+ * Hero 3: full-year departmental performance, plus the Marketing follow-up.
+ *
+ * The interface returns MEASUREMENTS only. Variances, totals, the good/bad
+ * judgement and which department needs attention all come from `./derive.ts` -
+ * there is deliberately no `totals()` method to read a stored figure from.
+ */
+export interface Hero3Repository {
+  /** The whole hero - primary and follow-up in one object. */
+  hero(): Promise<Hero3>;
+  /** The six departments, in the order the table lists them. */
+  departments(): Promise<Department[]>;
+  /** One department by name, or `null` when the name is not shown. */
+  department(name: string): Promise<Department | null>;
 }

@@ -107,7 +107,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** Full-year budget vs actual vs % of target by department, plus the causal
     follow-up data for Marketing.
   - **Acceptance Criteria:**
@@ -124,7 +124,10 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
       exceeds the sum of Hero 2's shown fixtures — intended, not inconsistent
   - **Dependencies:** US-001
   - **Notes:** Revenue vs Cost tagging is load-bearing — above budget is good for a revenue
-    department, overspend for the Marketing cost centre.
+    department, overspend for the Marketing cost centre. Delivered with the good/bad reading as a
+    derived `VarianceJudgement` per row, and the "over budget **and** behind target" flag derived
+    rather than stored. `blendedTargetPercent: 96` is the one stored figure — a measured club-level
+    attainment no arithmetic over the six rows reproduces (plain mean 97.0, budget-weighted 99.7).
 
 - **US-011**: Formatters & cross-hero reconciliation
   - **Story Points:** 2
@@ -150,7 +153,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
 
 **By Priority:** P0: 5 stories, 10 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 3 stories, 6 points · 🔄 0 · 📋 2 stories, 4 points · ⏸️ 0
+**By Status:** ✅ 4 stories, 8 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 0
 
 ---
 
