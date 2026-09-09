@@ -4,10 +4,13 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { AppShell } from "./components/chrome/app-shell";
 import { PromptBar } from "./components/chrome/prompt-bar";
 import { SuggestionChips } from "./components/chrome/suggestion-chips";
+import { EmptyStatePanel } from "./components/heroes/empty-state-panel";
+import { FallbackPanel } from "./components/heroes/fallback-panel";
 import { InsightSections } from "./components/heroes/insight-sections";
 import { ThinkingPanel } from "./components/heroes/thinking-panel";
 import { selectChip, suggestionChips } from "./lib/dashboard/chips";
 import { askQuestion } from "./lib/dashboard/intents";
+import { CanvasPanel, useCanvasPanel } from "./lib/dashboard/use-canvas-panel";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 import { useThinking } from "./lib/dashboard/use-thinking";
 
@@ -75,10 +78,20 @@ export function Layout({ children }: { children: ReactNode }) {
  * meet only at the two dashboard actions they both end in, and they are kept
  * apart BY TYPE: neither function will accept the other's argument.
  *
- * AN OFF-SCRIPT QUESTION IS NOT AN ERROR HERE. `askQuestion` returns `null`
- * when nothing clears its threshold, and today that leaves the canvas exactly
- * as it was — the chips above the field are still the way forward. US-032 hangs
- * the fallback panel on that same return value.
+ * AN OFF-SCRIPT QUESTION IS NOT AN ERROR HERE, AND IT IS NOT NOTHING EITHER
+ * (US-032). `askQuestion` returns `null` when nothing clears its threshold,
+ * and that return value is handed straight to `useCanvasPanel`, which raises
+ * the graceful fallback: the copy, and the three prepared questions again,
+ * inside the panel. No beat precedes it — `askQuestion` calls no dashboard
+ * action for a miss — so the answer to an off-script question is immediate.
+ * Nothing is removed, nothing says "error", and the screen always has a next
+ * step.
+ *
+ * EXACTLY ONE TRANSIENT PANEL IS ON THE CANVAS, and `useCanvasPanel` is where
+ * that is decided: thinking, fallback, empty state, or none of the three. The
+ * empty state is the canvas BEFORE anything has been asked, so Reset brings it
+ * back for free — it is derived from the session list, exactly as the chip row
+ * is.
  *
  * `key={generation}` IS THE RESET WIRING. A half-typed question is the one
  * piece of state that cannot be derived from `sections`, which is precisely
@@ -91,6 +104,7 @@ export default function App() {
   const dashboard = useDashboard();
   const { sections, focus, generation, reset } = dashboard;
   const { beat, busy, actions } = useThinking(dashboard);
+  const canvas = useCanvasPanel(dashboard, beat !== null);
 
   return (
     <AppShell
@@ -100,7 +114,9 @@ export default function App() {
           key={generation}
           busy={busy}
           onSubmit={(question) => {
-            askQuestion(question, actions);
+            // The matcher's own return value is the fallback's trigger: a
+            // `null` raises the panel, a match clears it.
+            canvas.record(askQuestion(question, actions));
           }}
         >
           <SuggestionChips
@@ -113,6 +129,10 @@ export default function App() {
       <Outlet />
       <InsightSections sections={sections} focus={focus} />
       {beat && <ThinkingPanel beat={beat} />}
+      {canvas.panel === CanvasPanel.FALLBACK && (
+        <FallbackPanel onSelect={(chip) => selectChip(chip, actions)} />
+      )}
+      {canvas.panel === CanvasPanel.EMPTY && <EmptyStatePanel />}
     </AppShell>
   );
 }

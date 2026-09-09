@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 3a - Conversation *(4/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
+**Current Phase:** Phase 3a - Conversation *(5/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 70% | 100% | 🟢 On Track |
+| **Overall Progress** | 72% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
-| **Stories Completed** | 31/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 81/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 32/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 83/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 31
-**Currently Working On:** US-032 — Graceful fallback panel (2 pts)
-**Story Points Completed Today:** 81
+**Stories Completed Today:** 32
+**Currently Working On:** US-033 — Follow-up context gating (3 pts)
+**Story Points Completed Today:** 83
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -153,22 +153,25 @@
   combinations, and **US-015 criterion ② is thereby satisfied** with no reset code touched. **A tap
   bypasses scoring by TYPE.** Surface reused, not restated. 57 tests, 1498 green.
 
-- ✅ **US-030 — Intent normalisation, scoring & tie-breaking (5 pts)** — **the riskiest story in the
-  build: an off-script paraphrase, typed live.** A **faithful port of the approved reference
-  algorithm**, pinned rather than trusted (an oracle asserts identical scores *and* winners over a
-  90-phrase corpus): normalise → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** →
-  **strictly-greater** over an ordered config. **34 paraphrases**, each canonical prompt beating its
-  own follow-up by an asserted margin; a three-way 2/2/2 tie resolves to Hero 1; one input yields
-  **one** match or `null` — never two heroes. No `fetch`, no model, no dependency. 89 tests, 1587.
+- ✅ **US-030 — Intent normalisation, scoring & tie-breaking (5 pts)** — **the riskiest story: an
+  off-script paraphrase, typed live.** A faithful port of the approved algorithm, pinned by an oracle
+  over a 90-phrase corpus: normalise → **+2/+1** → threshold **2 hero / 3 follow-up** →
+  **strictly-greater**. One input yields **one** match or `null`. No model, no dependency. 89, 1587.
 
 - ✅ **US-031 — Thinking beat (2 pts)** — **the pause that makes the answer feel earned, and it is
-  stagecraft: no request is made** (scanned). **Ordering asserted, not assumed:** at `1150ms - 1` the
-  panel is up and there is no section; at `1150ms` the section is there and the panel is gone —
-  mutating it to land immediately fails 22 tests. Both question paths pause because `useThinking`
-  returns the `ChipActions` the matcher and the chips already took, so **neither module changed** and
-  a chip tap still bypasses scoring by type. **Still ONE timer** (a scan pins the only two places in
-  `app/**` that may create one), so **US-015 criterion ④ is now satisfied**: Reset mid-beat leaves no
-  panel, no section and no timer. Reduced motion: 260ms, chips at final state. 91 tests, 1678.
+  stagecraft: no request is made** (scanned). **Ordering asserted:** at `1150ms - 1` the panel is up
+  with no section; at `1150ms` the section is there and the panel gone. Both paths pause via the
+  `ChipActions` both already took, so **neither module changed**. **Still ONE timer**, closing
+  US-015 ④. Reduced motion: 260ms, chips at final state. 91 tests, 1678.
+
+- ✅ **US-032 — Graceful fallback panel (2 pts)** — **the catch for anything off-script.** Two panels,
+  never conflated: the **fallback**, its copy asserted **byte-identical** (straight apostrophe,
+  closing *hyphen*) against a literal *and* the backlog, re-surfacing the three prepared questions
+  with **US-029's own chip components** (no `<button>` in the file); and the **empty state** — club
+  red at **4.5% derived from `--color-red`**, matching hairline, bold navy heading, lighter subtext,
+  red gradient badge. **Criterion ② asserted as an ABSENCE:** 18 blame/error words out of the copy,
+  the panel *and* the source; no alert role, no red semantics, **the question never echoed** (no
+  question prop exists). No beat precedes it, and `canvasPanelFor` returns ONE panel. 125, 1803.
 
 ---
 
@@ -182,12 +185,13 @@ builds the choreography that stands in for the AI, and its first story put a que
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-032: Graceful fallback panel | 📋 Next | Dead-end prevention for anything off-script. A no-match shows NO beat, so the panel is the whole of the answer |
+| US-033: Follow-up context gating | 📋 Next | A follow-up resolves only if its parent hero has been shown; otherwise the parent renders first and the follow-up chip is offered |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-032: Graceful fallback panel | 2026-09-09 | 2 |
 | US-031: Thinking beat | 2026-09-09 | 2 |
 | US-030: Intent normalisation, scoring & tie-breaking | 2026-09-09 | 5 |
 | US-029: Suggestion chips & chip lifecycle | 2026-09-09 | 3 |
@@ -217,8 +221,6 @@ builds the choreography that stands in for the AI, and its first story put a que
 | US-005: Tile card anatomy | 2026-09-09 | 2 |
 | US-004: Self-hosted FCB crest | 2026-09-09 | 1 |
 | US-003: Design token set | 2026-09-09 | 3 |
-| US-002: Developer tooling & local DX | 2026-09-09 | 2 |
-| US-001: Environment & deployment setup | 2026-09-09 | 3 |
 
 ---
 
@@ -247,8 +249,8 @@ builds the choreography that stands in for the AI, and its first story put a que
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 99.82% stmts / 98.20% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1441/1441 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 99.84% stmts / 98.32% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
+| Passing Tests | 1803/1803 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -257,14 +259,12 @@ builds the choreography that stands in for the AI, and its first story put a que
 > Coverage is measured over `app/**` only, and the suite is substantive rather than hollow: it pins
 > every hex, the type scale and the colour discipline, fails the build if `app/app.css` and
 > `app/lib/tokens.ts` disagree, and asserts that no reduced-motion path strands an element at zero.
-> The data suites pin the Specification figures, prove every total is *derived*, force the badge
-> segments to sum exactly at every total from 0 to 2,000 (US-020 re-proves it on screen), show that a
-> naive "variance > 0 is good" rule misreads exactly one department, and
-> (US-011) sweep every number in all six narratives. The component suites test the same way: variance
-> stays distinguishable with the colour *removed* (US-017); US-021's and US-019's review decisions are
-> read back off the rendered element, US-022's source cannot even NAME a good/bad verdict and
-> US-023's cannot contain bar geometry; US-013 scans for a literal figure; US-016 and US-020 prove
-> ONE control moves two things. The gate is three-part: `tsc`, ESLint 9 and Prettier, via husky.
+> The data suites pin the Specification figures, prove every total is *derived* and sweep every number
+> in all six narratives (US-011). The component suites test the same way: variance stays
+> distinguishable with the colour *removed* (US-017), review decisions are read back off the rendered
+> element (US-019/US-021), US-022's source cannot NAME a verdict, US-013 scans for a literal figure,
+> and US-032 proves an ABSENCE — no blame word, no alert role, no echoed input. The gate is
+> three-part: `tsc`, ESLint 9 and Prettier, via husky.
 
 ---
 
@@ -276,7 +276,7 @@ builds the choreography that stands in for the AI, and its first story put a que
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
-| Phase 3a: Conversation | 🔄 Active | 4/6 | 12/17 | 71% |
+| Phase 3a: Conversation | 🔄 Active | 5/6 | 14/17 | 82% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
@@ -297,4 +297,4 @@ builds the choreography that stands in for the AI, and its first story put a que
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-**Last Auto-Update:** US-031 completed at 2026-09-09 — **Phase 3a is at 4/6 · 12/17 pts**, and an answer no longer appears the instant it is asked. The thinking beat is the prototype's one moment of theatre and the Reference Guide is explicit about why it stays: *"the thinking delay is fake latency, not a query. Keep it — it is what makes the result feel earned."* So it is exactly that and nothing more — a fixed `setTimeout` scheduled through `useDashboard`'s single pending timer, with **no request made** anywhere in the three new modules (`fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, `sendBeacon`, `axios` and dynamic `import()` all scanned, no dependency added). **The ordering is asserted rather than assumed:** on a fake clock, one millisecond before the delay elapses the panel is on screen and there is NO section; at the delay the section is there and the panel is gone — and mutating the runner to land the answer immediately fails **22** tests. **Both question paths pause, and neither module changed to make that true:** `useThinking(dashboard)` wraps the hook's two actions and hands back a `ChipActions`, which is the interface `askQuestion` and `selectChip` already took, so a tapped chip waits exactly as a typed question does while a chip tap still bypasses US-030's scoring **by type**. An off-script question shows **no beat at all** — it never reaches the hook — which is precisely US-032's input. **There is still exactly ONE timer in the application:** no `setTimeout` in any new file, and a scan of every `.ts`/`.tsx` under `app/` pins the only two places one may be created. A second chip tap mid-beat therefore *replaces* the beat rather than racing it (one panel, one timer, one answer), and `busy` closes the field and the send button for the beat's length so a second submit is a no-op — removing US-028's guard fails that test. **This closes US-015 criterion ④, the last of its five:** Reset pressed mid-beat leaves no panel, no section and **no timer** (asserted on `vi.getTimerCount()`), the cancelled answer never arrives however far the clock is advanced, and the screen is usable again immediately — proved by mutation twice over (deleting `cancelPending()` fails 4 tests, deleting the beat's `generation` clear fails 4 more). **The panel is the reference's, verbatim:** the per-flow message and ordered source list for all six flows, a sweeping gold scan line, and the source chips lighting up one by one at 150 / 370 / 590ms — every flow's last chip landing before the answer does. A follow-up asked before its parent shows the PARENT's beat, so the panel can never promise something the dashboard is not about to give. **Reduced motion shortens the beat to ~260ms and renders the animations at their final state:** the source chips are VISIBLE rather than stranded at `opacity: 0`, with nothing inline that could override the stylesheet, and the sweep hides because a finished sweep has no meaningful end state. **No new keyframe and no new token** — US-006's four are reused and `app/app.css` still holds exactly four `@keyframes`. Announced politely via `role="status"`; the sweep and glyph are `aria-hidden`. **Next is US-032** — the graceful fallback panel, the catch for everything off-script
+**Last Auto-Update:** US-032 completed at 2026-09-09 — **Phase 3a is at 5/6 · 14/17 pts**, and the screen can no longer dead-end. This is one of the three behaviours the backlog marks untouchable at any cost, because the owner typing something unprepared is the live, unrecoverable moment — so the story built **two distinct panels and never conflates them**. **The fallback** answers a typed question that matched nothing: `askQuestion` returning `null` is handed straight to `useCanvasPanel`, the panel goes up in the SAME commit (**no thinking beat precedes it** — `vi.getTimerCount()` is 0, because a beat promises an answer and none is coming), and it carries the client-approved copy **byte-identical** — asserted as UTF-8 bytes against a retyped literal *and* against the acceptance criterion in the backlog itself, with the straight apostrophe in "I've" and the closing **hyphen** (never an em or en dash) pinned by code point. **Criterion ② is asserted as an absence, not a hope:** eighteen blame/error words ("sorry", "error", "invalid", "understand", "unfortunately", "failed", "try again", …) are proved out of the copy, out of the rendered panel *and* out of the source; there is no `role="alert"`, no `aria-live="assertive"`, no `aria-invalid` and no red error semantics anywhere near it — the surface is the neutral white panel, because red never means "bad" in this product. **The typed question is never echoed back:** the panel has no question prop at all (its props are asserted exactly), so an `<img onerror>` payload creates no element and appears nowhere in the panel's markup — A03 closed structurally rather than by escaping. **The next step is always there:** the three prepared questions are re-surfaced INSIDE the panel using **US-029's own chip components** — same `data-slot`, same classes as the row above the field, no `<button>` in the new file — drawn from the frozen `HERO_CHIPS`, so a follow-up chip can never point at an answer that is not on screen, and a tap from the panel resolves through the chip path. **The empty state** is the other panel: the canvas before anything has been asked, the recorded review feedback rendered as the club red at **4.5% DERIVED from `--color-red`** (`bg-red/4.5` compiles to `color-mix(… var(--color-red) 4.5% …)` = `rgba(211,1,12,0.045)`; the literal and every hex are absent by scan), a matching red hairline, a **bold navy heading**, a lighter one-line subtext and a **red gradient icon badge**, decorative. **All three panels are mutually exclusive by construction:** `canvasPanelFor` returns ONE of thinking / fallback / empty / none, asserted over every combination and in the DOM at each of the four canvas states. **Reset returns to the empty state**, and the fallback is otherwise *derived*: the hook holds the section list the miss was asked against, so any answer drops the panel with no clearing code at all. No new timer, no keyframe, no token, no dependency. 125 new tests, **1803 green**. **Next is US-033** — follow-up context gating, the last story in Phase 3a

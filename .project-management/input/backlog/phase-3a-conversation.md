@@ -65,20 +65,15 @@ off-script question never breaks the demo. This choreography is what stands in f
     - Chips use an 11px corner radius with a lift-and-tint hover; follow-up chips use the
       gold-tinted variant
   - **Dependencies:** US-028
-  - **Implementation:** `app/lib/dashboard/chips.ts` (the labels and the derivation, pure) and
-    `app/components/chrome/suggestion-chips.tsx` (the row), mounted by `app/root.tsx` into US-028's
-    `children` slot above the field. **The row is DERIVED from `sections`, never stored:**
-    `suggestionChips(sections)` returns the three hero chips always, plus one follow-up chip per
-    section still at `PRIMARY` — so criterion ③'s removal is not implemented anywhere, the phase
-    flip simply stops deriving it. Asserted over all 27 hero × phase combinations as a pure
-    function. **A tap bypasses scoring by TYPE:** `selectChip` takes a chip and reads its `heroId`,
-    US-030's matcher will take a `string` through `onSubmit`, and a source scan rejects any scoring
-    vocabulary in the chip module. Surface reused, not restated — `CHIP_SURFACE_CLASS` and the
-    shared `.fcb-chip` rule carry the 11px radius and the lift; only the tint is new, gold for the
-    follow-up variant (a wash and a border, never a fill). Kind is not colour alone: a trend glyph
-    plus a visually hidden "Follow-up:" in the accessible name. **This also closes US-015
-    criterion ②** — Reset restores the baseline sections and the row follows for free, proven end
-    to end on the real `App`. 57 new tests, 1498 total green.
+  - **Implementation:** `app/lib/dashboard/chips.ts` (labels + derivation, pure) and
+    `app/components/chrome/suggestion-chips.tsx` (the row), mounted into US-028's `children` slot.
+    **The row is DERIVED from `sections`, never stored:** three hero chips always, plus one follow-up
+    per section still at `PRIMARY` — so criterion ③'s removal is implemented nowhere, the phase flip
+    stops deriving it. Asserted over all 27 hero × phase combinations. **A tap bypasses scoring by
+    TYPE** (`selectChip` takes a chip; a source scan rejects any scoring vocabulary in the module).
+    Surface reused, not restated — the shared `.fcb-chip` rule carries the 11px radius and the lift;
+    only the tint is new, gold for the follow-up (a wash and a border, never a fill), and kind is
+    never colour alone. **This also closes US-015 criterion ②.** 57 new tests, 1498 green.
 
 - **US-030**: Intent normalisation, scoring & tie-breaking
   - **Story Points:** 5
@@ -101,23 +96,17 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Notes:** Highest-risk story in the build — the owner typing an off-script paraphrase is the
     live moment everything else protects. Test several variations per hero.
   - **Implementation:** `app/lib/dashboard/intents.ts` (static config + normalise + score + match +
-    the `askQuestion` seam), wired to US-028's `onSubmit` in `app/root.tsx`. **A faithful port of the
-    approved reference algorithm, verified rather than trusted:** normalise (lowercase, strip
-    `/.,?!'"()`, collapse whitespace, trim, pad — which is also why `25/26` becomes the `2526`
-    keyword) → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** → **strictly-greater**
-    comparison over an ordered config, so a tie resolves to the earlier intent. An **oracle** test
-    re-implements the reference formula and asserts identical scores *and* winners over a 90-phrase
-    corpus. **34 paraphrases across the three heroes** (the three named among them), each canonical
-    chip label beating its own follow-up by an asserted margin (8v4, 4v0, 10v1); `why is marketing
-    high?` lands on Hero 3's follow-up at exactly 3. Tie-break proven to a **three-way** 2/2/2
-    (`shirt ticket budget` → Hero 1) and to two hero-vs-follow-up ties; corpus-wide one input yields
-    ONE `{heroId, kind}` or `null` — two heroes never render. `sales` alone falls through, as do
-    gibberish, empty and whitespace. **The reference's two rough edges are documented and PINNED as
-    the current contract** — strong keywords prefix-match (`kitchen`, `gateway`), weak keywords
-    substring-match (`overall`, `recover`, `nameplate`) — so tightening them stays a deliberate
-    decision. The chip path is untouched and still separated BY TYPE (`@ts-expect-error` cases both
-    ways). Golden rule scanned: two internal imports, no `fetch`, no model, no embedding, no
-    fuzzy-match library, no `new RegExp`, no SQL, no dependency added. 89 new tests, 1587 green.
+    the `askQuestion` seam), wired to US-028's `onSubmit`. **A faithful port of the approved
+    algorithm, verified rather than trusted:** normalise → **+2 strong / +1 weak** → threshold
+    **2 hero / 3 follow-up** → **strictly-greater** over an ordered config, so a tie resolves to the
+    earlier intent; an **oracle** test asserts identical scores *and* winners over a 90-phrase
+    corpus. **34 paraphrases**, each canonical chip label beating its own follow-up by an asserted
+    margin (8v4, 4v0, 10v1). Tie-break proven to a **three-way** 2/2/2 (→ Hero 1); one input yields
+    ONE `{heroId, kind}` or `null`. `sales` alone, gibberish, empty and whitespace fall through.
+    **The reference's two rough edges are documented and PINNED** (strong keywords prefix-match,
+    weak keywords substring-match), so tightening them stays a deliberate decision. The chip path is
+    untouched and separated BY TYPE. Golden rule scanned: no `fetch`, model, embedding, fuzzy-match
+    library, `new RegExp`, SQL or dependency. 89 new tests, 1587 green.
 
 - **US-031**: Thinking beat
   - **Story Points:** 2
@@ -157,7 +146,7 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Dead-end prevention — the catch for anything off-script.
   - **Acceptance Criteria:**
     - If no intent scores above threshold, a friendly panel appears reading *"I can pull that
@@ -169,6 +158,23 @@ off-script question never breaks the demo. This choreography is what stands in f
       (`rgba(211,1,12,0.045)`) with a matching hairline border, a bold navy heading, a lighter
       one-line subtext and a red gradient icon badge
   - **Dependencies:** US-030
+  - **Implementation:** `app/components/heroes/fallback-panel.tsx`,
+    `app/components/heroes/empty-state-panel.tsx` and `app/lib/dashboard/use-canvas-panel.ts`
+    (which transient panel is on the canvas), wired in `app/root.tsx`. **Two panels, never
+    conflated.** The copy is **byte-identical** — asserted as UTF-8 bytes against a retyped literal
+    AND against the criterion above, straight apostrophe and closing HYPHEN pinned by code point.
+    **Criterion 2 is asserted as an ABSENCE:** eighteen blame/error words out of the copy, the
+    rendered panel and the source; no `role="alert"`, no assertive region, no red/negative token.
+    **The question is never echoed** — no question prop exists, so an `<img onerror>` payload creates
+    no element and appears nowhere in the markup. **No beat precedes it** (`getTimerCount()` is 0).
+    The next step is **US-029's own chips** over the frozen `HERO_CHIPS` (reuse proved on the class
+    strings; no `<button>` in the file). The **empty state** is the review feedback: club red at
+    **4.5% DERIVED from `--color-red`** (`bg-red/4.5`, no rgba literal, no hex), matching hairline,
+    bold navy heading, lighter one-line subtext, red gradient badge. **The three panels are mutually
+    exclusive by construction** (`canvasPanelFor` returns ONE value) and **Reset returns to the empty
+    state**; otherwise the fallback is derived from the list the miss was asked against, so any
+    answer drops it with no clearing code. No new timer, keyframe, token or dependency. 125 tests,
+    1803 green.
 
 - **US-033**: Follow-up context gating
   - **Story Points:** 3
@@ -195,7 +201,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **By Priority:** P0: 6 stories, 17 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 4 stories, 12 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 0
+**By Status:** ✅ 5 stories, 14 points · 🔄 0 · 📋 1 story, 3 points · ⏸️ 0
 
 ---
 

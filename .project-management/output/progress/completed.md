@@ -6,10 +6,10 @@
 
 ## Summary
 
-**Total Completed:** 31 stories
-**Total Points:** 81 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 81 points/day
-**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (4/6)**
+**Total Completed:** 32 stories
+**Total Points:** 83 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 83 points/day
+**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (5/6)**
 
 ---
 
@@ -202,98 +202,98 @@ Condensed to keep this log inside its 300-line limit; full detail in
   proven with an `<img onerror>` string. **One seam:** no real-Chrome pass until US-035/037/039
   mount it
 
-## Phase 3a: Conversational Interface — in progress (3/6 stories · 10/17 pts)
+## Phase 3a: Conversational Interface — in progress (5/6 stories · 14/17 pts)
 
 ### US-028: Persistent prompt bar (2 pts)
 **Completed:** 2026-09-09 — **it opens Phase 3a** · 48 tests (1441 green), 100% lines · all 4
 criteria met. Condensed; full detail in [`../phases/phase-3a.md`](../phases/phase-3a.md).
 
 - **ONE field, and the field IS the typing area** — icon and send button are siblings of the
-  `<input>` inside the single bordered element, `:focus-within` ring on that same element. **The
-  reported nested box is rejected structurally:** a test fails on any bordered/ringed descendant
-- **A real HTML `<form>`** (the reference avoided one only for its sandbox), so Enter and the button
-  are ONE code path. **Criterion 4 without a second clock:** a submit CONSUMES the question through
-  a mirrored ref written *before* `onSubmit`, so three rapid Enters yield exactly one call
+  `<input>` inside the single bordered element. **The reported nested box is rejected structurally:**
+  a test fails on any bordered/ringed descendant
+- **A real HTML `<form>`**, so Enter and the button are ONE code path. **Criterion 4 without a second
+  clock:** a submit CONSUMES the question through a mirrored ref written *before* `onSubmit`
 - **`fixed`, not `sticky`** — the shell clips sideways overflow, and fixed leaves the PAGE scrolling
-- **Security triage — the A03 user-input trigger FIRES and is closed:** the value is rendered only
-  as an input `value`, never as markup; no injection sink, URL, storage key or built selector; an
-  `<img onerror>` payload reaches the callback verbatim and creates no element
+- **Security triage — A03 FIRES and is closed:** the value is rendered only as an input `value`,
+  never as markup; no injection sink, URL, storage key or built selector
 
 ### US-029: Suggestion chips & chip lifecycle (3 pts)
 **Completed:** 2026-09-09 · 57 tests (1498 green), 100% lines · `app/lib/dashboard/chips.ts` +
 `app/components/chrome/suggestion-chips.tsx`, wired through US-028's `children`. Condensed; full
 detail in [`../phases/phase-3a.md`](../phases/phase-3a.md).
 
-- **THE ROW IS DERIVED, NOT STORED.** `suggestionChips(sections)` returns the three hero chips
-  always plus one follow-up chip per section still at `PRIMARY`, so criterion ③'s removal is
-  implemented *nowhere* — the phase flip stops deriving it. Proven over **all 27** hero × phase
-  combinations. **US-015 criterion ② is thereby satisfied** with no reset code touched
-- **A tap bypasses scoring BY TYPE:** `selectChip` takes a chip and reads its `heroId`; a source
-  scan rejects any scoring vocabulary in the module, and a `@ts-expect-error` case guards the seam
-- Surface reused, not restated; only the gold follow-up tint is new — a wash and a border, never a
-  fill. Kind is not colour alone: a trend glyph plus a hidden "Follow-up:" in the accessible name
-- **Security triage — no security-relevant changes detected** (a chip carries a hero id from a
-  closed enum, never text)
+- **THE ROW IS DERIVED, NOT STORED.** Three hero chips always plus one follow-up per section still
+  at `PRIMARY`, so criterion ③'s removal is implemented *nowhere*. Proven over **all 27** hero ×
+  phase combinations, and **US-015 criterion ② is thereby satisfied** with no reset code touched
+- **A tap bypasses scoring BY TYPE** (`selectChip` takes a chip; a source scan rejects any scoring
+  vocabulary, and a `@ts-expect-error` case guards the seam)
+- Surface reused, not restated; only the gold follow-up tint is new, and kind is never colour alone.
+  **Security triage — no security-relevant changes detected**
 
 ### US-030: Intent normalisation, scoring & tie-breaking (5 pts)
 **Completed:** 2026-09-09 · 89 tests (1587 green), 100% lines · `app/lib/dashboard/intents.ts`,
-wired to US-028's `onSubmit`. **The highest-risk story in the build** — the owner typing an
-off-script paraphrase is the live, unrecoverable moment. Condensed; full detail in
+wired to US-028's `onSubmit`. **The highest-risk story in the build.** Condensed; full detail in
 [`../phases/phase-3a.md`](../phases/phase-3a.md).
 
-- **A FAITHFUL PORT OF THE APPROVED REFERENCE ALGORITHM, VERIFIED RATHER THAN TRUSTED.** normalise
-  → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** → **strictly-greater** over an
-  ordered static config, so the order IS the tie-break. A test re-implements the reference formula as
-  an **oracle** and asserts identical scores *and* winners across a 90-phrase corpus
-- **Paraphrase tolerance is the acceptance, so it is table-driven:** 34 phrasings across the three
-  heroes (the three named among them), each canonical chip label beating its own follow-up by an
-  asserted margin (8v4, 4v0, 10v1). Tie-breaks proven to a **three-way** 2/2/2 → Hero 1; corpus-wide
-  one input yields **one** match or `null` — **two heroes never render**. `sales` alone resolves to
-  nothing, and off-script/gibberish/empty fall through to `null` — US-032's input, never an error
-- **The two inherited rough edges are PINNED AS THE CURRENT CONTRACT** (strong keywords prefix-match,
-  weak keywords substring-match), with tightening flagged as a deliberate future decision
-- **Golden rule by scan:** two internal imports, no `fetch`, model, embedding, fuzzy-match library,
-  `new RegExp`, SQL or dependency added. **Security triage — A03 FIRES and is closed:** the typed
-  string is scored and discarded, never markup, a URL, a query, a selector, a storage key or a log
-  line; an `<img onerror>` payload scores 0 and creates no element
+- **A FAITHFUL PORT OF THE APPROVED ALGORITHM, VERIFIED RATHER THAN TRUSTED.** normalise → **+2
+  strong / +1 weak** → threshold **2 hero / 3 follow-up** → **strictly-greater** over an ordered
+  config, so the order IS the tie-break; an **oracle** test asserts identical scores *and* winners
+  across a 90-phrase corpus
+- **Paraphrase tolerance is table-driven:** 34 phrasings, each canonical chip label beating its own
+  follow-up by an asserted margin (8v4, 4v0, 10v1); a three-way 2/2/2 resolves to Hero 1; one input
+  yields **one** match or `null`. `sales` alone, gibberish and empty fall through — US-032's input
+- **The two inherited rough edges are PINNED AS THE CONTRACT** (prefix / substring matching)
+- **Golden rule by scan** (no `fetch`, model, embedding, fuzzy library, `new RegExp`, SQL, or
+  dependency). **Security triage — A03 FIRES and is closed:** the string is scored and discarded,
+  never markup, a URL, a query, a selector, a storage key or a log line
 
 ### US-031: Thinking beat (2 pts)
+**Completed:** 2026-09-09 · 91 tests (1678 green), 100% lines · `app/lib/dashboard/thinking.ts`,
+`use-thinking.ts`, `app/components/heroes/thinking-panel.tsx`. Condensed; full detail in
+[`../phases/phase-3a.md`](../phases/phase-3a.md).
 
-**Completed:** 2026-09-09 · **Tests:** 91 new (1678 green) · **Coverage:** 100% lines, 99.83% stmts
-· **Files:** `app/lib/dashboard/thinking.ts`, `app/lib/dashboard/use-thinking.ts`,
-`app/components/heroes/thinking-panel.tsx` (all new), `app/root.tsx`,
-`tests/unit/thinking-beat.test.tsx` + `tests/unit/support/thinking-harness.ts` (new),
-`tests/unit/root.test.tsx`, `tests/unit/suggestion-chips.test.tsx` · all 4 criteria met, **plus
-US-015 criterion ④**.
+- **STAGECRAFT, NOT A QUERY.** A fixed delay and six authored copy blocks — **no request is made**
+  anywhere in the three new modules (scanned), no dependency added
+- **THE ORDERING IS ASSERTED.** At `1150ms - 1` the panel is up with NO section; at `1150ms` the
+  section is there and the panel gone. Landing the answer immediately fails **22** tests
+- **BOTH PATHS PAUSE AND NEITHER MODULE CHANGED** — `useThinking` returns the `ChipActions` the
+  matcher and the chips already took, so a chip tap still bypasses scoring **by type**. A no-match
+  calls neither action, so an off-script question shows **no beat** (US-032's input)
+- **STILL ONE TIMER**, so **US-015 criterion ④ is satisfied**: Reset mid-beat leaves no panel, no
+  section and no timer, proved by mutation twice over
+- Per-flow copy verbatim for all six flows; reduced motion ~260ms with animations at final state.
+  No new keyframe, token, hex or dependency. **Security triage — nothing security-relevant**
 
-- **STAGECRAFT, NOT A QUERY (criterion 4).** A fixed delay and six hand-authored copy blocks —
-  **no request is made** anywhere in the three new modules (`fetch`, `XMLHttpRequest`, `WebSocket`,
-  `EventSource`, `sendBeacon`, `axios` and dynamic `import()` all scanned), no dependency added
-- **THE BEAT COMES BEFORE THE TILES, AND THE ORDERING IS ASSERTED (criterion 1).** On a fake clock:
-  at `1150ms - 1` the panel is up and there is NO section; at `1150ms` the section is there and the
-  panel is gone. Mutating the runner to land the answer immediately fails **22** tests
-- **BOTH QUESTION PATHS PAUSE AND NEITHER MODULE CHANGED.** `useThinking(dashboard)` wraps the two
-  dashboard actions and returns the `ChipActions` that `askQuestion` and `selectChip` already took,
-  so a tapped chip waits as a typed question does — while a chip tap still bypasses scoring **by
-  type**. A no-match calls neither action, so an off-script question shows **no beat** (US-032's input)
-- **STILL ONE TIMER.** Scheduled through `useDashboard`'s `schedule`; no `setTimeout` in any new
-  file, and a scan of every `.ts`/`.tsx` under `app/` pins the only two places one may be created. A
-  second chip tap mid-beat *replaces* the beat rather than racing it, and `busy` closes the field for
-  its length so a second submit is a no-op (removing US-028's guard fails that test)
-- **US-015 CRITERION ④ IS NOW SATISFIED — the last of its five.** Reset mid-beat leaves no panel, no
-  section and **no timer** (`vi.getTimerCount()`), and the cancelled answer never arrives however far
-  the clock runs. Proved by mutation twice: deleting `cancelPending()` fails 4 tests, deleting the
-  beat's `generation` clear fails 4
-- **Per-flow copy verbatim for all six flows** (message + ordered sources), a sweeping scan line, and
-  source chips staggered at 150 / 370 / 590ms — every flow's last chip landing before the answer. A
-  follow-up without its parent shows the PARENT's beat, so the panel never over-promises
-- **Reduced motion: ~260ms (asserted genuinely shorter) with animations at final state** — the source
-  chips VISIBLE, not stranded at `opacity: 0`, nothing inline able to override the stylesheet, and
-  the sweep hidden for want of a meaningful end state. **No new keyframe, token, hex or dependency**;
-  US-006's four keyframes are reused. `role="status"` + `aria-live="polite"`; sweep and glyph hidden
-- **Security triage — no security-relevant changes detected.** No endpoint, route, storage,
-  `innerHTML`, URL, env var or logging; the typed string never reaches the beat, which renders only
-  its own static copy selected by a `HeroId` and a `ChipKind`
+### US-032: Graceful fallback panel (2 pts)
+
+**Completed:** 2026-09-09 · **Tests:** 125 new (1803 green) · **Coverage:** 100% lines, 99.84% stmts
+/ 98.32% branches · **Files:** `app/components/heroes/fallback-panel.tsx`,
+`app/components/heroes/empty-state-panel.tsx`, `app/lib/dashboard/use-canvas-panel.ts` (all new),
+`app/root.tsx`, `tests/unit/graceful-fallback.test.tsx` (new), `tests/unit/root.test.tsx` · all 4
+criteria met. **One of the three behaviours the backlog marks untouchable at any cost.**
+
+- **TWO DISTINCT PANELS, NEVER CONFLATED.** The **fallback** answers a typed question that matched
+  nothing; the **empty state** is the canvas before anything has been asked
+- **THE COPY IS BYTE-IDENTICAL (criterion 1)** — asserted as UTF-8 bytes against a retyped literal
+  *and* against the acceptance criterion in the backlog itself, with the straight apostrophe in
+  "I've" and the closing **hyphen** pinned by code point; smart quotes and em/en dashes absent
+- **CRITERION ② IS ASSERTED AS AN ABSENCE.** Eighteen blame/error words proved out of the copy, the
+  rendered panel *and* the source; no `role="alert"`, no assertive region, no `aria-invalid`, no red
+  or negative token — the fallback wears the neutral panel surface, because red never means "bad"
+- **THE NEXT STEP IS ALWAYS THERE:** US-029's own `SuggestionChips` over the frozen `HERO_CHIPS`
+  (never the derived row), reuse proved by the panel chip's `className` equalling the prompt row's,
+  and no `<button>` in the file. Tapping one answers
+- **NO BEAT PRECEDES IT** (`getTimerCount()` is 0 — the panel is up in the submit's own commit), and
+  the three panels are **mutually exclusive by construction**: `canvasPanelFor` returns ONE value,
+  asserted over every combination and in the DOM at each of the four canvas states
+- **THE EMPTY STATE IS THE RECORDED REVIEW FEEDBACK:** club red at **4.5% DERIVED from
+  `--color-red`** (`bg-red/4.5`; no rgba literal, no hex), matching hairline, bold navy heading,
+  lighter one-line subtext, red gradient icon badge. A labelled region, not a live region
+- **Reset returns to the empty state** (the `generation` seam); otherwise the fallback is derived
+  from the section list the miss was asked against, so any answer drops it with no clearing code
+- **Security triage — A03 considered and closed:** the question is read and discarded by the matcher
+  and **never reaches either panel**, as markup or as text; no `innerHTML`, URL, request, storage,
+  selector or logging in the three new modules; no dependency, endpoint, timer or keyframe added
 
 ---
 

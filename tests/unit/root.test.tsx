@@ -251,9 +251,11 @@ describe("App", () => {
     );
   });
 
-  it("leaves the canvas alone for an off-script question", async () => {
-    // No match is not an error and not a dead end: nothing is removed, and the
-    // chips above the field are still the way forward (US-032 adds the panel).
+  it("answers an off-script question with the fallback panel", async () => {
+    // No match is not an error and not a dead end: nothing is removed, and
+    // US-032's panel re-offers the prepared questions on the canvas as well as
+    // in the row above the field — hence two of each chip.
+    // `tests/unit/graceful-fallback.test.tsx` owns the panel itself.
     const user = userEvent.setup();
     renderApp();
 
@@ -267,8 +269,11 @@ describe("App", () => {
     ).toHaveLength(0);
     expect(screen.getByText("child route")).toBeInTheDocument();
     expect(
+      document.querySelector('[data-slot="fallback-panel"]'),
+    ).toBeInTheDocument();
+    expect(
       screen.getAllByRole("button", { name: /Shirt sales by kit/ }),
-    ).toHaveLength(1);
+    ).toHaveLength(2);
   });
 
   it("treats a script payload as an ordinary unmatched question", async () => {
