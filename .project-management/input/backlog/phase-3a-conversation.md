@@ -84,7 +84,7 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Story Points:** 5
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The keyword matcher that resolves a free-typed question to a scripted flow.
   - **Acceptance Criteria:**
     - Input normalised: lowercased, trimmed, punctuation stripped, space-padded for word matching
@@ -100,6 +100,24 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Dependencies:** US-028
   - **Notes:** Highest-risk story in the build — the owner typing an off-script paraphrase is the
     live moment everything else protects. Test several variations per hero.
+  - **Implementation:** `app/lib/dashboard/intents.ts` (static config + normalise + score + match +
+    the `askQuestion` seam), wired to US-028's `onSubmit` in `app/root.tsx`. **A faithful port of the
+    approved reference algorithm, verified rather than trusted:** normalise (lowercase, strip
+    `/.,?!'"()`, collapse whitespace, trim, pad — which is also why `25/26` becomes the `2526`
+    keyword) → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** → **strictly-greater**
+    comparison over an ordered config, so a tie resolves to the earlier intent. An **oracle** test
+    re-implements the reference formula and asserts identical scores *and* winners over a 90-phrase
+    corpus. **34 paraphrases across the three heroes** (the three named among them), each canonical
+    chip label beating its own follow-up by an asserted margin (8v4, 4v0, 10v1); `why is marketing
+    high?` lands on Hero 3's follow-up at exactly 3. Tie-break proven to a **three-way** 2/2/2
+    (`shirt ticket budget` → Hero 1) and to two hero-vs-follow-up ties; corpus-wide one input yields
+    ONE `{heroId, kind}` or `null` — two heroes never render. `sales` alone falls through, as do
+    gibberish, empty and whitespace. **The reference's two rough edges are documented and PINNED as
+    the current contract** — strong keywords prefix-match (`kitchen`, `gateway`), weak keywords
+    substring-match (`overall`, `recover`, `nameplate`) — so tightening them stays a deliberate
+    decision. The chip path is untouched and still separated BY TYPE (`@ts-expect-error` cases both
+    ways). Golden rule scanned: two internal imports, no `fetch`, no model, no embedding, no
+    fuzzy-match library, no `new RegExp`, no SQL, no dependency added. 89 new tests, 1587 green.
 
 - **US-031**: Thinking beat
   - **Story Points:** 2
@@ -158,7 +176,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **By Priority:** P0: 6 stories, 17 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 5 stories, 15 points · ⏸️ 0
+**By Status:** ✅ 3 stories, 10 points · 🔄 0 · 📋 3 stories, 7 points · ⏸️ 0
 
 ---
 

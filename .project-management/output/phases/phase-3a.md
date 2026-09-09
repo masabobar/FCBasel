@@ -1,7 +1,7 @@
 # Phase 3a: Conversational Interface & Interaction Model
 
 **Duration:** 2026-09-12 to 2026-09-13 (~8.7 AI-hours)
-**Status:** Active (2/6 stories)
+**Status:** Active (3/6 stories)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-13
 **Actual Completion:** —
@@ -30,13 +30,13 @@ the demo.
 
 ### Epic 6: E5 — Conversational Interface & Interaction Model (17 story points)
 
-**Priority:** P0 · **Status:** In Progress (2/6 · 5/17 pts) · **Dependencies:** US-003, US-006, US-014
+**Priority:** P0 · **Status:** In Progress (3/6 · 10/17 pts) · **Dependencies:** US-003, US-006, US-014
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-028 | Persistent prompt bar | 2 | ✅ Completed |
 | US-029 | Suggestion chips & chip lifecycle | 3 | ✅ Completed |
-| US-030 | Intent normalisation, scoring & tie-breaking | 5 | 📋 Todo |
+| US-030 | Intent normalisation, scoring & tie-breaking | 5 | ✅ Completed |
 | US-031 | Thinking beat | 2 | 📋 Todo |
 | US-032 | Graceful fallback panel | 2 | 📋 Todo |
 | US-033 | Follow-up context gating | 3 | 📋 Todo |
@@ -86,9 +86,9 @@ the demo.
 > paraphrases" is judged, not asserted.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 5 / 17 (29%)
-- **Completed Stories:** 2 / 6
-- **Tests Passing:** 1498 / 1498 · **Coverage:** 100% lines (`app/**`) · **Commits:** 2
+- **Completed Story Points:** 10 / 17 (59%)
+- **Completed Stories:** 3 / 6
+- **Tests Passing:** 1587 / 1587 · **Coverage:** 100% lines (`app/**`) · **Commits:** 3
 
 ---
 
@@ -107,9 +107,9 @@ E7 rather than following it.
 
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
-| A paraphrase the owner uses fails to match | High | Medium | Generous keyword sets; several variations tested per hero; fallback always catches | AI | Open |
-| A follow-up steals its parent hero's phrasing | High | Medium | Follow-up threshold is 3, not 2 — requires a strong *and* a weak term | AI | Open |
-| Two intents score equally and both render | High | Low | Deterministic tie-break by intent order; never two heroes from one input | AI | Open |
+| A paraphrase the owner uses fails to match | High | Medium | Generous keyword sets; 8-14 phrasings tested per hero in US-030; fallback always catches | AI | Mitigated |
+| A follow-up steals its parent hero's phrasing | High | Medium | Threshold 3 vs 2, plus heroes ordered first so a tie goes to the hero; both pinned | AI | Mitigated |
+| Two intents score equally and both render | High | Low | Strictly-greater comparison over an ordered config; three-way tie and corpus-wide single-match invariant asserted | AI | Mitigated |
 | Thinking beat reads as slowness rather than effort | Medium | Low | Fixed ~600-1200ms; tuned on the demo hardware in US-043 | AI | Open |
 | Rapid submits overlap and corrupt state | Medium | Medium | Debounced in US-028: a submit consumes the question through a mirrored ref and `busy` disables the field; three rapid Enters yield one call | AI | Mitigated |
 
@@ -187,9 +187,59 @@ coverage 99.82% stmts / 98.22% branches / 100% lines.
 - **Seams left:** the derived row is the state US-033 will read for typed-input gating, and
   `onSubmit` / `busy` are still untouched for US-030 / US-031.
 
+### 2026-09-09 — US-030 Intent normalisation, scoring & tie-breaking (5 pts) ✅
+
+`app/lib/dashboard/intents.ts` (config + normalise + score + match + the `askQuestion` seam), wired
+in `app/root.tsx` to US-028's `onSubmit`. 89 new tests (1587 green), coverage 100% lines, 99.83%
+stmts / 98.26% branches.
+
+- **THE REFERENCE ALGORITHM WAS PORTED FAITHFULLY AND PINNED, per the approved decision.** normalise
+  (lowercase, strip `/.,?!'"()`, collapse whitespace, trim, pad) → +2 strong / +1 weak → threshold 2
+  hero / 3 follow-up → **strictly-greater** comparison over an ordered config, so a tie resolves to
+  the earlier intent. A test re-implements the reference formula as an **oracle** (redundant disjunct
+  included) and asserts identical scores *and* identical winners across a 90-phrase corpus, so the
+  port is verified rather than trusted. `25/26` → `2526` preserved.
+- **Two inherited rough edges are DOCUMENTED AND PINNED AS THE CURRENT CONTRACT**, with a comment
+  saying tightening them is a deliberate future decision: strong keywords match a word **prefix**
+  (`kit` hits `kitchen`, `gate` hits `gateway` — each a full 2), weak keywords match **any
+  substring** (`over` hits `overall`/`recover`, `name` hits `nameplate`). The same leniency is what
+  makes `kits`, `kit-sales` and `shirts?` resolve with no keyword of their own, and the 1-point weight
+  keeps a stray substring below every threshold (`recover the nameplate` → no match).
+- **Paraphrase tolerance is the acceptance, so it is table-driven:** 14 phrasings for Hero 1
+  (including the three named — `kit sales`, `how are shirts selling`, `trikot`), 10 for Hero 2, 10 for
+  Hero 3. Each canonical chip label resolves to its own hero with an asserted **margin** over that
+  hero's follow-up (8 vs 4, 4 vs 0, 10 vs 1), so the prepared question can never read as the
+  deep-dive. The loose `why is marketing high?` edge lands on Hero 3's follow-up at **exactly 3**
+  while Hero 3's primary scores 0.
+- **Tie-break proven, not asserted:** `kit gate` (2/2 → Hero 1), `trikot budget` (Hero 1 over Hero
+  3), `ticket budget` (Hero 2 over Hero 3), `shirt ticket budget` (**three-way** 2/2/2 → Hero 1), and
+  two hero-vs-own-follow-up ties (`budgets marketing why` 4/4, `which fixtures matchday` 5/5) that go
+  to the hero. `over target` carries both threshold halves on one input: 2 matches the hero, the same
+  2 does not match the follow-up. Corpus-wide invariant: the return is one `{heroId, kind}` or `null`
+  — never two heroes.
+- **`sales` alone resolves to nothing** (1 < 2), like nine other lone common words; off-script,
+  gibberish, empty and whitespace all fall through to `null`, which is US-032's input and not an
+  error.
+- **The chip path was not touched.** `askQuestion` takes a `string`, `selectChip` takes a chip, and a
+  `@ts-expect-error` case in each suite fails typecheck if either seam loosens. US-029's source scan
+  still passes.
+- **Golden rule enforced by scan:** the module imports only `../repositories/enums` and `./chips`
+  (asserted exactly), and contains no `fetch`/`WebSocket`/`axios`, no model, embedding or fuzzy-match
+  reference, no `new RegExp`, no SQL, no `eval`/dynamic `import()`; `package.json` is unchanged and
+  scanned for AI/fuzzy-match packages.
+- **Security triage — A03 user-input trigger FIRES and is covered.** The typed string is lowercased
+  into a local, tested against the fixed keyword list with `String.includes`, and discarded; only a
+  `HeroId` and a `ChipKind` escape. It never becomes markup, a URL, a query, a DOM selector, a
+  storage key, a React key or a log line (all scanned), and no regex is built from it, so no pattern
+  injection. An `<img onerror>` payload scores 0 everywhere, returns `null` and creates no element on
+  the real `App`.
+- **Seams left:** `askQuestion` returns the match so US-032 can hang the fallback on `null`, and
+  `INTENT_REQUIRES_PARENT` is the parent-gating flag US-033 reads. `busy` is still untouched
+  (US-031).
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** Active (2/6 stories · 5/17 pts)
+**Phase Status:** Active (3/6 stories · 10/17 pts)
 **Previous:** [Phase 2b](phase-2b.md) · **Next:** [Phase 3b — Heroes](phase-3b.md)

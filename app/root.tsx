@@ -6,6 +6,7 @@ import { PromptBar } from "./components/chrome/prompt-bar";
 import { SuggestionChips } from "./components/chrome/suggestion-chips";
 import { InsightSections } from "./components/heroes/insight-sections";
 import { selectChip, suggestionChips } from "./lib/dashboard/chips";
+import { askQuestion } from "./lib/dashboard/intents";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 
 import "./app.css";
@@ -44,22 +45,29 @@ export function Layout({ children }: { children: ReactNode }) {
  * control renders in `TopBar`, the behaviour lives in `useDashboard`, and this
  * is the one place the two meet.
  *
- * THE PROMPT BAR IS MOUNTED, AND HALF ITS MEANING IS NOW WIRED.
- * US-028 mounted the bar with three seams named; US-029 fills the first of
- * them. `children` holds the suggestion-chip row, and the chips are DERIVED
+ * THE PROMPT BAR IS MOUNTED, AND BOTH QUESTION PATHS ARE NOW WIRED.
+ * US-028 mounted the bar with three seams named; US-029 filled `children` with
+ * the suggestion-chip row, and US-030 fills `onSubmit`. The chips are DERIVED
  * from `sections` by `suggestionChips` rather than kept in state of their own —
  * which is what makes US-015 criterion 2 hold without a line of reset logic:
  * Reset restores `BASELINE_SECTIONS`, the derivation runs again, and the row is
- * back to exactly the three hero chips. The two remaining seams still belong to
- * later stories: `onSubmit` (US-030's matcher for TYPED text) and `busy`
- * (US-031, while the thinking beat scheduled through `schedule` is in flight).
+ * back to exactly the three hero chips. One seam is still a later story's:
+ * `busy` (US-031, while the thinking beat scheduled through `schedule` is in
+ * flight).
  *
  * A CHIP TAP AND A TYPED QUESTION ARE TWO DIFFERENT PATHS, and this is the one
  * place both are visible. A chip carries the hero it means, so `selectChip`
  * calls `showHero` / `showFollowUp` straight away — no normalising, no keyword
- * scoring, no threshold (US-029 criterion 2). US-030's matcher will hang off
- * `onSubmit`, which carries a `string`. They meet only at the two dashboard
- * actions they both end in.
+ * scoring, no threshold (US-029 criterion 2). A typed question is a `string`
+ * and goes through `askQuestion`, which normalises it, scores it against the
+ * static intent config and resolves at most ONE hero (US-030). The two paths
+ * meet only at the two dashboard actions they both end in, and they are kept
+ * apart BY TYPE: neither function will accept the other's argument.
+ *
+ * AN OFF-SCRIPT QUESTION IS NOT AN ERROR HERE. `askQuestion` returns `null`
+ * when nothing clears its threshold, and today that leaves the canvas exactly
+ * as it was — the chips above the field are still the way forward. US-032 hangs
+ * the fallback panel on that same return value.
  *
  * `key={generation}` IS THE RESET WIRING. A half-typed question is the one
  * piece of state that cannot be derived from `sections`, which is precisely
@@ -76,7 +84,12 @@ export default function App() {
     <AppShell
       onReset={reset}
       promptBar={
-        <PromptBar key={generation}>
+        <PromptBar
+          key={generation}
+          onSubmit={(question) => {
+            askQuestion(question, { showHero, showFollowUp });
+          }}
+        >
           <SuggestionChips
             chips={suggestionChips(sections)}
             onSelect={(chip) => selectChip(chip, { showHero, showFollowUp })}

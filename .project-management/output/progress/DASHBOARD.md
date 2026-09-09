@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 3a - Conversation *(2/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
+**Current Phase:** Phase 3a - Conversation *(3/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 64% | 100% | 🟢 On Track |
+| **Overall Progress** | 68% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
-| **Stories Completed** | 29/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 74/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 30/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 79/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 29
-**Currently Working On:** US-030 — Intent normalisation, scoring & tie-breaking (5 pts)
-**Story Points Completed Today:** 74
+**Stories Completed Today:** 30
+**Currently Working On:** US-031 — Thinking beat (2 pts)
+**Story Points Completed Today:** 79
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -143,31 +143,31 @@
   metric chrome), because advice must never read as one more metric. **Verbatim is tested byte for
   byte** on US-039's string, and **criterion 3 is order**, so the tests assert the narrative precedes
   every chart in the section. 35 tests, 1393.
-- ✅ **US-028 — Persistent prompt bar (2 pts)** — **Phase 3a opens**, and with it the only user input
-  in the product. **ONE field, and the field itself is the typing area:** the search icon and the
-  send button are siblings of the `<input>` inside the single bordered element, the focus ring is
-  `:focus-within` on that same element, and a test walks the field's subtree and fails on any
-  descendant carrying a border or a ring — the nested box was the reported defect. A real HTML
-  `<form>` was used (the reference build avoided one only because its sandbox swallowed submits), so
-  Enter and the embedded button are **one** code path. **Debounce without a second clock:** a submit
-  consumes the question, clearing a mirrored ref *before* the callback, so three rapid Enters yield
-  exactly one call, and `busy` closes the field for US-031's beat. Empty and whitespace-only are
-  no-ops, chips untouched. `fixed`, not `sticky`, because the shell clips overflow; the canvas
-  reserves the strip. XSS pass-through proven with an `<img onerror>` payload. 48 tests, 1441.
+- ✅ **US-028 — Persistent prompt bar (2 pts)** — **Phase 3a opens**, and with it the only user
+  input in the product. **ONE field, and the field itself is the typing area** (icon and send button
+  are siblings of the `<input>` inside the single bordered element; a test fails on any bordered
+  descendant — the nested box was the reported defect). A real `<form>`, so Enter and the button are
+  one code path. **Debounce without a second clock:** a submit clears a mirrored ref *before* the
+  callback, so three rapid Enters yield one call. `fixed`, not `sticky`. 48 tests, 1441.
 
 - ✅ **US-029 — Suggestion chips & chip lifecycle (3 pts)** — **the screen can now be ASKED a
-  question.** The three hero prompts sit in the bar's `children` row, and **the row is DERIVED, not
-  stored:** `suggestionChips(sections)` (`app/lib/dashboard/chips.ts`) returns the three hero chips
-  always plus one follow-up chip per answer still at `primary`, so criterion ③'s "removed once shown"
-  is implemented *nowhere* — the phase flip stops deriving it. Proven as a pure function over **all
-  27** hero × phase combinations. **US-015 criterion ② is thereby satisfied** with no reset code
-  touched: Reset restores the baseline sections and the row follows, driven end to end on the real
-  `App`. **A tap bypasses scoring by TYPE** — `selectChip` takes a chip and reads its `heroId`, while
-  US-030's matcher will take a `string`; a source scan rejects any scoring vocabulary in the module.
-  Surface reused, not restated (`CHIP_SURFACE_CLASS` + the shared `.fcb-chip` rule); only the tint is
-  new, gold for the follow-up variant — a wash and a border, never a fill, and still no gold ring.
-  Kind is not colour alone: a trend glyph and a hidden "Follow-up:" in the accessible name. 57 tests,
-  1498 green.
+  question.** **The row is DERIVED, not stored:** `suggestionChips(sections)` returns the three hero
+  chips always plus one follow-up chip per answer still at `primary`, so criterion ③'s "removed once
+  shown" is implemented *nowhere* — the phase flip stops deriving it. Proven over **all 27** hero ×
+  phase combinations, and **US-015 criterion ② is thereby satisfied** with no reset code touched. **A
+  tap bypasses scoring by TYPE** (`selectChip` takes a chip, the matcher takes a `string`). Surface
+  reused, not restated; only the gold follow-up tint is new. 57 tests, 1498 green.
+
+- ✅ **US-030 — Intent normalisation, scoring & tie-breaking (5 pts)** — **the riskiest story in the
+  build, and the one the whole prototype exists to protect: an off-script paraphrase, typed live.**
+  `app/lib/dashboard/intents.ts` is a **faithful port of the approved reference algorithm**, pinned
+  rather than trusted (an oracle test asserts identical scores *and* winners over a 90-phrase
+  corpus): normalise → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** →
+  **strictly-greater** over an ordered config, so a tie goes to the earlier intent. **34 paraphrases
+  across the three heroes**, each canonical prompt beating its own follow-up by an asserted margin
+  (8v4, 4v0, 10v1); a **three-way** 2/2/2 tie resolves to Hero 1; one input yields **one** match or
+  `null` — never two heroes. The two inherited over-matches are **pinned as the current contract**.
+  No `fetch`, no model, no dependency — scanned. 89 tests, 1587.
 
 ---
 
@@ -181,12 +181,13 @@ builds the choreography that stands in for the AI, and its first story put a que
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-030: Intent normalisation, scoring & tie-breaking | 📋 Next | **The riskiest story in the build.** The typed path only — the chip path is done and deliberately separate |
+| US-031: Thinking beat | 📋 Next | The staged pause before tiles render. Stagecraft, not a query — it schedules through `useDashboard`'s one timer |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-030: Intent normalisation, scoring & tie-breaking | 2026-09-09 | 5 |
 | US-029: Suggestion chips & chip lifecycle | 2026-09-09 | 3 |
 | US-028: Persistent prompt bar | 2026-09-09 | 2 |
 | US-024: Recommendation panel & narrative caption strip | 2026-09-09 | 2 |
@@ -273,7 +274,7 @@ builds the choreography that stands in for the AI, and its first story put a que
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
-| Phase 3a: Conversation | 🔄 Active | 1/6 | 2/17 | 12% |
+| Phase 3a: Conversation | 🔄 Active | 3/6 | 10/17 | 59% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
@@ -296,4 +297,4 @@ builds the choreography that stands in for the AI, and its first story put a que
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
 
-**Last Auto-Update:** US-029 completed at 2026-09-09 — **Phase 3a is at 2/6 · 5/17 pts**, and the prototype can now be DRIVEN: three suggestion chips in the prompt bar's chip row are the first way to ask a question from the screen. **The row is derived, not stored, and that is the whole story.** `suggestionChips(sections)` is a pure function — the three hero chips always (criteria ① and ④), plus one gold-tinted follow-up chip for each answer still at phase `primary` — so criterion ③'s "the chip is removed once that follow-up has been shown" is implemented in no line of code at all: `withFollowUpShown` flips the phase and the chip simply stops being derived. It is proved as a function over **all 27** combinations of three heroes × {absent, primary, withFollowUp}, plus non-mutation and a no-`useState` scan of `root.tsx`. **US-015's criterion ② is therefore now SATISFIED** — the seam its own note described, closed without touching one line of reset code: Reset restores `BASELINE_SECTIONS`, the derivation runs again, and the row is exactly the three hero chips with every follow-up gone (driven end to end on the real `App`: chips tapped, follow-ups taken, Reset pressed, row usable again immediately). **A chip tap bypasses scoring by TYPE, not by discipline:** `selectChip(chip, actions)` takes a `SuggestionChip` and reads its `heroId`, US-030's matcher will take a `string` through `onSubmit`, the two paths meet only at `showHero`/`showFollowUp`, a source scan fails on any scoring vocabulary in the chip module, and a `@ts-expect-error` case breaks typecheck if the argument ever loosens to a string. **Nothing about the chip surface was restated:** the row imports US-026's `CHIP_SURFACE_CLASS`, the 11px radius and the one-pixel lift stay in the shared `.fcb-chip` rule, and the component declares no radius, no transition and no `rounded-full`. Only the tint is new — gold for the follow-up variant, one of its three sanctioned accent uses, as a wash and a border and never a fill. Kind is not colour alone (trend glyph plus a hidden "Follow-up:" in the accessible name), labels render verbatim with no truncation or re-casing, and the row is one tab stop per chip with no trap. **Security triage: no security-relevant changes detected** — a chip carries a hero id from a closed enum, not text. **Next is US-030** — intent normalisation, scoring and tie-breaking, for TYPED input only
+**Last Auto-Update:** US-030 completed at 2026-09-09 — **Phase 3a is at 3/6 · 10/17 pts**, and a freely TYPED question now resolves to a hero. This was the riskiest story in the build: the owner ignoring the chips and typing their own wording is the live, unrecoverable moment everything else protects, and its acceptance is qualitative — so **the test suite is the deliverable as much as the code is**, 89 tests pinning the matcher input by input and score by score. `app/lib/dashboard/intents.ts` is a **faithful port of the approved reference algorithm**: normalise (lowercase, strip `/.,?!'"()`, collapse whitespace, trim, pad — which is also why `25/26` becomes the `2526` keyword) → **+2 per strong keyword, +1 per weak** → threshold **2 for a hero, 3 for a follow-up** so a follow-up cannot steal its parent's simpler phrasings → **strictly-greater** comparison over an ordered static config, which is what makes the tie-break deterministic (Hero 1 > Hero 2 > Hero 3 > follow-ups). The port is **verified, not trusted**: a test re-implements the reference formula as an oracle, redundant disjunct included, and asserts identical scores *and* identical winners over a 90-phrase corpus. **Paraphrase tolerance is the acceptance, so it is table-driven** — 14 phrasings for Hero 1 (the three named among them: `kit sales`, `how are shirts selling`, `trikot`), 10 each for Heroes 2 and 3; each canonical chip label resolves to its own hero with an asserted **margin** over that hero's follow-up (8v4, 4v0, 10v1), and the loose `why is marketing high?` lands on Hero 3's follow-up at **exactly the threshold of 3** while Hero 3's primary scores 0. **Tie-breaks are proven, not asserted:** `kit gate` 2/2 → Hero 1, `trikot budget` → Hero 1 over Hero 3, `ticket budget` → Hero 2 over Hero 3, `shirt ticket budget` a **three-way** 2/2/2 → Hero 1, and two hero-vs-own-follow-up ties (4/4, 5/5) that go to the hero; `over target` carries both threshold halves on one input. Corpus-wide, one input yields **one** `{heroId, kind}` or `null` — **two heroes never render from one question**. `sales` alone resolves to nothing (1 < 2), like nine other lone common words, and off-script, gibberish, empty and whitespace all fall through to `null`, which is US-032's input rather than an error. **The two inherited rough edges are documented and PINNED as the current contract** — strong keywords prefix-match (`kit` hits `kitchen`, `gate` hits `gateway`), weak keywords substring-match (`over` hits `overall`/`recover`, `name` hits `nameplate`) — with a comment saying tightening them is a deliberate future decision, and the tests are the tripwire. The chip path was not touched: `askQuestion` takes a `string`, `selectChip` takes a chip, and a `@ts-expect-error` case in each suite breaks typecheck if either seam loosens. **Security triage — the A03 user-input trigger FIRES and is covered:** the typed string is lowercased into a local, tested against the fixed keyword list with `String.includes` and discarded, only a `HeroId` and a `ChipKind` escape, and it never becomes markup, a URL, a query, a selector, a storage key, a React key or a log line (all scanned) — nor is any regex built from it. **Golden rule enforced by scan:** two internal imports and nothing else, no `fetch`, no model call, no embedding, no fuzzy-match library, no SQL, no dependency added. **Next is US-031** — the thinking beat, which is stagecraft and not a query

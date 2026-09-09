@@ -8,6 +8,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PROMPT_BAR_CLEARANCE_CLASS } from "../../app/components/chrome/app-shell";
 import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
+import { InsightPhase } from "../../app/lib/dashboard/sections";
+import { HeroId } from "../../app/lib/repositories/enums";
 import App, { Layout } from "../../app/root";
 
 const ROOT_SOURCE = readFileSync(
@@ -181,6 +183,103 @@ describe("App", () => {
     expect(
       screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
     ).toHaveValue("");
+  });
+
+  it("wires the prompt bar's onSubmit to the intent matcher (US-030)", () => {
+    // The TYPED path. A chip tap resolves by type through `selectChip`; a typed
+    // question is a string and goes through `askQuestion`, which is the only
+    // thing in the app that scores text.
+    expect(ROOT_SOURCE).toMatch(/onSubmit=\{\(question\) => \{/);
+    expect(ROOT_SOURCE).toMatch(
+      /askQuestion\(question, \{ showHero, showFollowUp \}\)/,
+    );
+  });
+
+  it("answers a typed paraphrase with the hero it resolves to", async () => {
+    // The live moment the whole prototype protects: off-script wording, typed,
+    // and the right hero arrives.
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.type(
+      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      "how are shirts selling{Enter}",
+    );
+
+    const sections = document.querySelectorAll('[data-slot="insight-section"]');
+    expect(sections).toHaveLength(1);
+    expect(sections[0]).toHaveAttribute("data-hero-id", HeroId.HERO_1);
+    expect(sections[0]).toHaveAttribute("data-phase", InsightPhase.PRIMARY);
+  });
+
+  it("renders exactly ONE section for a question that names two heroes", async () => {
+    // Criterion 4: two heroes never render from one input. "shirt ticket
+    // budget" ties all three heroes at 2, and Hero 1 takes the tie.
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.type(
+      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      "shirt ticket budget{Enter}",
+    );
+
+    const sections = document.querySelectorAll('[data-slot="insight-section"]');
+    expect(sections).toHaveLength(1);
+    expect(sections[0]).toHaveAttribute("data-hero-id", HeroId.HERO_1);
+  });
+
+  it("sharpens the section in place when a follow-up is typed", async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const input = screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL });
+
+    await user.type(input, "department budgets{Enter}");
+    await user.type(input, "why is marketing high?{Enter}");
+
+    const sections = document.querySelectorAll('[data-slot="insight-section"]');
+    expect(sections).toHaveLength(1);
+    expect(sections[0]).toHaveAttribute("data-hero-id", HeroId.HERO_3);
+    expect(sections[0]).toHaveAttribute(
+      "data-phase",
+      InsightPhase.WITH_FOLLOW_UP,
+    );
+  });
+
+  it("leaves the canvas alone for an off-script question", async () => {
+    // No match is not an error and not a dead end: nothing is removed, and the
+    // chips above the field are still the way forward (US-032 adds the panel).
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.type(
+      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      "show me player injuries{Enter}",
+    );
+
+    expect(
+      document.querySelectorAll('[data-slot="insight-section"]'),
+    ).toHaveLength(0);
+    expect(screen.getByText("child route")).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("button", { name: /Shirt sales by kit/ }),
+    ).toHaveLength(1);
+  });
+
+  it("treats a script payload as an ordinary unmatched question", async () => {
+    // A03: the typed string is scored and discarded. It never becomes markup,
+    // so the payload creates no element and resolves to no hero.
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.type(
+      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      '<img src=x onerror="alert(1)">{Enter}',
+    );
+
+    expect(document.querySelector("img[src='x']")).toBeNull();
+    expect(
+      document.querySelectorAll('[data-slot="insight-section"]'),
+    ).toHaveLength(0);
   });
 
   it("renders the crest as the first item of the app bar", () => {

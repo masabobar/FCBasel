@@ -6,10 +6,10 @@
 
 ## Summary
 
-**Total Completed:** 29 stories
-**Total Points:** 74 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 74 points/day
-**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (2/6)**
+**Total Completed:** 30 stories
+**Total Points:** 79 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 79 points/day
+**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (3/6)**
 
 ---
 
@@ -202,89 +202,92 @@ Condensed to keep this log inside its 300-line limit; full detail in
   proven with an `<img onerror>` string. **One seam:** no real-Chrome pass until US-035/037/039
   mount it
 
-## Phase 3a: Conversational Interface — in progress (2/6 stories · 5/17 pts)
+## Phase 3a: Conversational Interface — in progress (3/6 stories · 10/17 pts)
 
 ### US-028: Persistent prompt bar (2 pts)
-**Completed:** 2026-09-09 — **it opens Phase 3a** · 48 tests (1441 green), 99.82% stmts / 98.20%
-branches / 100% lines · all 4 criteria met. The product's first and only user input.
+**Completed:** 2026-09-09 — **it opens Phase 3a** · 48 tests (1441 green), 100% lines · all 4
+criteria met. Condensed; full detail in [`../phases/phase-3a.md`](../phases/phase-3a.md).
 
-Condensed to keep this log inside its 300-line limit; full detail in
-[`../phases/phase-3a.md`](../phases/phase-3a.md).
-
-- **ONE field, and the field IS the typing area.** The icon and the send button are siblings of the
-  `<input>` inside the single bordered element, the `:focus-within` ring on that same element with
-  the input's own outline suppressed. **The reported nested box is rejected structurally:** a test
-  walks the field's subtree and fails on any descendant carrying a border or a ring. The field wears
-  `rounded-pill`, deliberately not `.fcb-chip` — that stays with US-026 and US-029
-- **A real HTML `<form>` was chosen** (the reference build avoided one only because its sandbox
-  swallowed submissions), so Enter and the embedded button are ONE code path; a press on the field's
-  padding focuses the input through `mousedown` + `preventDefault`
-- **Criterion 4 without a second clock, because US-015 owns the only one.** A submit CONSUMES the
-  question — the cleared value is written to a mirrored ref *before* `onSubmit` — so a re-entrant
-  submit reads an empty draft; `busy` also disables both controls. Three rapid Enters, a
-  triple-click and a latching harness each yield exactly ONE call; `setTimeout` scan-rejected
-- **Empty and whitespace-only input are no-ops**, chips untouched. **`fixed`, not `sticky`:** the
-  shell clips sideways overflow, which makes it a scroll container as tall as the dashboard, so a
-  sticky bar would settle at the bottom of the CONTENT; fixed also leaves the PAGE scrolling, which
-  US-015's `scrollToTop` and US-014's auto-scroll depend on
-- Accessibility: a visually hidden `<label>` (the placeholder is guidance, never the name), an
-  `aria-label` on send, `aria-hidden` glyphs, a named `search` region with `aria-busy`
-- **Security triage — the user-input trigger FIRES (A03) and is closed:** the typed value is
-  rendered only as an input `value`, never as markup; no `dangerouslySetInnerHTML`, `innerHTML`,
-  `eval`, or template-built URL, request, storage key or selector (the one selector is a fixed
-  constant); an `<img onerror>` payload reaches the callback verbatim and creates no element.
-  Cleared: route/IDOR, raw SQL, SSRF, upload, dependency change (none), env/secret, logging, CSRF,
-  storage. **One seam:** no real-Chrome pass until US-029 to US-032 give it something to answer with
+- **ONE field, and the field IS the typing area** — icon and send button are siblings of the
+  `<input>` inside the single bordered element, `:focus-within` ring on that same element. **The
+  reported nested box is rejected structurally:** a test fails on any bordered/ringed descendant
+- **A real HTML `<form>`** (the reference avoided one only for its sandbox), so Enter and the button
+  are ONE code path. **Criterion 4 without a second clock:** a submit CONSUMES the question through
+  a mirrored ref written *before* `onSubmit`, so three rapid Enters yield exactly one call
+- **`fixed`, not `sticky`** — the shell clips sideways overflow, so a sticky bar would settle at the
+  bottom of the content; fixed also leaves the PAGE scrolling, which US-014/US-015 depend on
+- **Security triage — the A03 user-input trigger FIRES and is closed:** the value is rendered only
+  as an input `value`, never as markup; no injection sink, URL, storage key or built selector; an
+  `<img onerror>` payload reaches the callback verbatim and creates no element
 
 ### US-029: Suggestion chips & chip lifecycle (3 pts)
+**Completed:** 2026-09-09 · 57 tests (1498 green), 100% lines · `app/lib/dashboard/chips.ts` +
+`app/components/chrome/suggestion-chips.tsx`, wired through US-028's `children`. Condensed; full
+detail in [`../phases/phase-3a.md`](../phases/phase-3a.md).
 
-**Completed:** 2026-09-09 · **Tests:** 57 new (1498 green) · **Coverage:** 99.82% stmts / 98.22%
-branches / 100% lines / 100% funcs · **Files:** `app/lib/dashboard/chips.ts` (new),
-`app/components/chrome/suggestion-chips.tsx` (new), `app/root.tsx`, plus two source-scan regexes
-widened in `tests/unit/root.test.tsx` / `baseline-reset.test.tsx` for the new composition.
+- **THE ROW IS DERIVED, NOT STORED.** `suggestionChips(sections)` returns the three hero chips
+  always plus one follow-up chip per section still at `PRIMARY`, so criterion ③'s removal is
+  implemented *nowhere* — the phase flip stops deriving it. Proven over **all 27** hero × phase
+  combinations. **US-015 criterion ② is thereby satisfied** with no reset code touched
+- **A tap bypasses scoring BY TYPE:** `selectChip` takes a chip and reads its `heroId`; a source
+  scan rejects any scoring vocabulary in the module, and a `@ts-expect-error` case guards the seam
+- Surface reused, not restated (`CHIP_SURFACE_CLASS` + the shared `.fcb-chip` rule); only the gold
+  follow-up tint is new — a wash and a border, never a fill, and still no gold ring. Kind is not
+  colour alone: a trend glyph plus a hidden "Follow-up:" in the accessible name
+- **Security triage — no security-relevant changes detected** (a chip carries a hero id from a
+  closed enum, never text)
 
-- **THE ROW IS DERIVED, NOT STORED — and every other property follows from that.**
-  `suggestionChips(sections)` is a pure function: the three hero chips always, in `HERO_IDS` order,
-  plus one follow-up chip per section still at `PRIMARY`. So criterion ③ ("the chip is removed once
-  that follow-up has been shown") is implemented in **no line of code**: `withFollowUpShown` flips
-  the phase and the chip stops being derived. Asserted as a function over **all 27** combinations of
-  three heroes × {absent, primary, withFollowUp}, plus non-mutation of the input, a fresh array per
-  call, and a scan for `let` / `var` / `useState` / `useRef` / `useMemo` in the module (none)
-- **US-015 CRITERION ② IS NOW SATISFIED — through the seam its own note described, with no reset
-  code touched.** Reset restores `BASELINE_SECTIONS`; the derivation runs again; the row is exactly
-  the three hero chips with every follow-up gone. Driven end to end on the real `App` (not a
-  harness — the chips are the first thing that lets `App` ask a question): two heroes tapped → 5
-  chips, Reset → 3 hero labels, 0 follow-up chips, 0 sections, and the row usable again on the very
-  next tap. A half-run (one follow-up taken, one not) resets identically, and the MECHANISM is
-  asserted too: `root.tsx` derives `chips={suggestionChips(sections)}` and declares no `useState`
-- **A chip tap bypasses scoring by TYPE, not by discipline.** `selectChip(chip, actions)` takes a
-  `SuggestionChip` and reads its `heroId`; US-030's matcher will take a `string` through `onSubmit`.
-  The two paths meet only at `showHero` / `showFollowUp`. A source scan fails on
-  `score|threshold|keyword|normalis|tie-break|toLowerCase` anywhere in the chip module, a
-  `@ts-expect-error` case breaks `pnpm typecheck` if the argument ever loosens to `string`, and a
-  chip with a nonsense label still resolves to its own hero
-- **The chip surface is reused, never restated.** `CHIP_SURFACE_CLASS` comes from US-026's segmented
-  control; the 11px radius and the one-pixel lift stay in the shared `.fcb-chip` rule in
-  `app/app.css`. The component contains no `11px`, no `radius-chip`, no `rounded-full` /
-  `rounded-pill`, and no transition of its own — reduced motion is the stylesheet's global block
-  collapsing that transition to ~1ms, so a hover lands on its target state with no travel
-- **Only the TINT is new**, as a closed table keyed by chip kind: white with a blue hover tint for a
-  hero chip, and the **gold-tinted variant** for a follow-up — one of gold's three sanctioned accent
-  uses (colour discipline rule 4), as a `bg-gold/10` wash plus an `accent-follow-up` border, never a
-  fill, and **still no gold ring** anywhere. No hex and no arbitrary Tailwind value in the file
-- **Accessibility:** real `type="button"` buttons with accessible names; kind is not carried by
-  colour alone (the reference's trend glyph plus a visually hidden "Follow-up:" in the accessible
-  name); one tab stop per chip in DOM order with **no roving tabindex and no trap** — Tab walks the
-  row and continues into the prompt field, Enter and Space activate. Labels render **verbatim**: no
-  truncation, no ellipsis, no case transform, and `whitespace-nowrap` is deliberately absent so a
-  long label wraps inside its chip rather than pushing the row past the shell's clipped overflow
-- **Security triage — no security-relevant changes detected.** No new user input (a chip carries a
-  hero id from a closed enum, never text), no `dangerouslySetInnerHTML` / `innerHTML`, no URL,
-  request, storage key or selector built from anything, no dependency or lockfile change, no
-  endpoint, env var, secret or logging. Considered and cleared: A01 (no route or resource id), A03
-  (no injection sink; the app's only user input is still US-028's field), A06 (no dependency
-  change), A10 (no `fetch`). **One seam, as with US-028:** no real-Chrome pass yet — the chips are
-  verified in Chrome once US-031/US-032 give a tap something to answer with
+### US-030: Intent normalisation, scoring & tie-breaking (5 pts)
+
+**Completed:** 2026-09-09 · **Tests:** 89 new (1587 green) · **Coverage:** 100% lines, 99.83% stmts
+/ 98.26% branches · **Files:** `app/lib/dashboard/intents.ts` (new), `app/root.tsx`,
+`tests/unit/intent-matching.test.ts` (new), `tests/unit/root.test.tsx` · all 7 criteria met.
+
+**The highest-risk story in the build.** The owner typing an off-script paraphrase is the live,
+unrecoverable moment everything else in the prototype exists to protect, and the acceptance is
+qualitative — so the **test suite is the deliverable as much as the code**: 89 tests pin the matcher
+input by input and score by score.
+
+- **A FAITHFUL PORT OF THE APPROVED REFERENCE ALGORITHM, VERIFIED RATHER THAN TRUSTED.** normalise
+  (lowercase → strip `/.,?!'"()` → collapse whitespace → trim → pad one space each side, which is
+  also why `25/26` becomes the `2526` keyword) → **+2 per strong keyword, +1 per weak** → threshold
+  **2 for a hero, 3 for a follow-up** → **strictly-greater** comparison over an ordered config. A
+  test re-implements the reference formula as an **oracle** (redundant disjunct included) and asserts
+  identical scores *and* identical winners across a 90-phrase corpus
+- **Static config, criterion 7:** six definitions (hero id from the shared `HeroId`, kind from
+  US-029's `ChipKind`, strong/weak keyword sets), the threshold and the **parent-gating flag**
+  (`INTENT_REQUIRES_PARENT`, which US-033 reads) held per kind. **The order IS the tie-break**
+- **Paraphrase tolerance is the acceptance, so it is table-driven:** 14 phrasings for Hero 1
+  (including the three named — `kit sales`, `how are shirts selling`, `trikot`), 10 for Hero 2, 10
+  for Hero 3. Each canonical chip label resolves to its own hero with an asserted **margin** over
+  that hero's follow-up (8v4, 4v0, 10v1); the loose `why is marketing high?` lands on Hero 3's
+  follow-up at **exactly 3** while Hero 3's primary scores 0
+- **Tie-break proven, not asserted:** `kit gate` 2/2 → Hero 1, `trikot budget` → Hero 1 over Hero 3,
+  `ticket budget` → Hero 2 over Hero 3, `shirt ticket budget` a **three-way** 2/2/2 → Hero 1, and
+  two hero-vs-own-follow-up ties (4/4, 5/5) that go to the hero. `over target` carries both
+  threshold halves on one input (2 matches the hero, the same 2 does not match the follow-up).
+  Corpus-wide, one input yields **one** `{heroId, kind}` or `null` — **two heroes never render**
+- **`sales` alone resolves to nothing** (1 < 2), like nine other lone common words; off-script,
+  gibberish, empty and whitespace all fall through to `null` — US-032's input, never an error
+- **The two inherited rough edges are DOCUMENTED AND PINNED AS THE CURRENT CONTRACT**, with a
+  comment saying tightening them is a deliberate future decision: strong keywords match a word
+  **prefix** (`kit` hits `kitchen`, `gate` hits `gateway`), weak keywords match **any substring**
+  (`over` hits `overall`/`recover`, `name` hits `nameplate`). The same leniency is what makes `kits`,
+  `kit-sales` and `shirts?` resolve with no keyword of their own
+- **The chip path was not touched.** `askQuestion` takes a `string`, `selectChip` takes a chip, and a
+  `@ts-expect-error` case in each suite fails typecheck if either seam loosens
+- **The golden rule is enforced by scan:** the module imports only `../repositories/enums` and
+  `./chips` (asserted exactly), with no `fetch`/`WebSocket`/`axios`, no model, embedding or
+  fuzzy-match reference, no `new RegExp`, no SQL, no `eval`/dynamic `import()`, and no dependency
+  added (`package.json` scanned)
+- **Security triage — the A03 user-input trigger FIRES and is closed:** the typed string is
+  lowercased into a local, tested against the fixed keyword list with `String.includes`, and
+  discarded; only a `HeroId` and a `ChipKind` escape. It never becomes markup, a URL, a query, a DOM
+  selector, a storage key, a React key or a log line (all scanned), and no regex is built from it, so
+  no pattern injection. An `<img onerror>` payload scores 0 everywhere, returns `null` and creates no
+  element on the real `App`. Cleared: A01 (no route or resource id), A06 (no dependency change), A10
+  (no `fetch`), plus SQL, upload, env/secret, logging, CSRF and storage. **One seam:** no real-Chrome
+  pass yet — the typed path is verified in Chrome once US-031/US-032 give it a rendered answer
 
 ---
 
