@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 2
-**Story Points:** 5
-**Time Worked:** ~1.5 hours
-**Files Changed:** 34
-**Tests Added:** 8
+**Stories Completed:** 3
+**Story Points:** 8
+**Time Worked:** ~2.5 hours
+**Files Changed:** 42
+**Tests Added:** 96
 
 ---
 
@@ -32,6 +32,16 @@
   was proven with throwaway commits that were then reset away: a lint error blocked the commit, and
   a badly formatted file landed already formatted and class-sorted. `pnpm lint` clean, `pnpm
   typecheck` clean, 8/8 tests green, `pnpm audit` clean with the US-001 `qs` override retained.
+- **US-003 — Design token set.** One token set, published twice on purpose: Tailwind v4 CSS custom
+  properties in `app/app.css` (`@theme static`) for utilities and `var()`, and a typed object in
+  `app/lib/tokens.ts` for the hand-built SVG charts that need strings rather than classes. A parity
+  test parses the stylesheet, resolves the `var()` aliases and fails on drift in either direction.
+  Reference Guide values win on the three known divergences (surface `#F1F4F9`, text `#161A20`,
+  positive variance `#0E9F6E`), and the Specification-only gold ring for new tiles was not
+  introduced. Colour discipline is encoded rather than documented — series-identity tokens, variance
+  tokens as the only good/bad carriers, `varianceNegative` deliberately separate from `red`, and
+  gold restricted to two accent roles, each backed by a test. 96/96 tests green, coverage 100% of
+  `app/**`, and lint / format / typecheck / build all clean.
 
 ---
 
@@ -41,6 +51,8 @@
   deploy AC is deferred to the human.
 - ✅ US-002 — Developer tooling & local DX (2 pts) — all 4 acceptance criteria met and verified by
   execution, including the pre-commit hook.
+- ✅ US-003 — Design token set (3 pts) — all 6 acceptance criteria met; CSS and TypeScript halves
+  held in lockstep by a drift test.
 
 ---
 
@@ -61,8 +73,9 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- US-003 — Design token set (3 pts) — blocks all visual work
 - US-004 — Self-hosted FCB crest (1 pt) — trademarked asset, commit it, never hotlink
+- US-005 — Tile card anatomy (2 pts) — consumes the US-003 tokens; no per-hero copies
+- US-006 — Tile-insertion motion (3 pts) — fade-and-rise only, no gold ring
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from

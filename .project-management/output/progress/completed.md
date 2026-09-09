@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 2 stories
-**Total Points:** 5 / 116
+**Total Completed:** 3 stories
+**Total Points:** 8 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 5 points/day
+**Average Velocity:** 8 points/day
 
 ---
 
@@ -57,6 +57,33 @@
   class-sorted *inside* the committed blob
 - `pnpm lint` clean, `pnpm typecheck` clean, 8/8 tests green, `pnpm audit` clean
 
+### US-003: Design token set (3 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 8 (3 code, 5 tracking docs)
+**Tests Added:** 88 (unit: 88)
+**Commit:** see phase-1a progress log
+**Notes:** All 6 acceptance criteria met. Guide precedence applied to the three known divergences:
+surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`. No new-tile gold ring introduced.
+
+**What Was Done:**
+- Defined the colour, type, spacing, radii, shadow and motion set once as Tailwind v4 CSS custom
+  properties in `app/app.css` (`@theme static`, so every variable is emitted for `var()` use)
+- Mirrored the same values as a typed object in `app/lib/tokens.ts`, because the hand-built SVG
+  charts in Phase 2b need strings for stroke, fill and gradient stops
+- Guarded the pair with a parity test that parses the stylesheet, resolves `var()` aliases and fails
+  on any drift in either direction — the highest-value test in the story
+- Encoded colour discipline in the token names: `seriesPrimary`/`seriesSecondary`/`seriesCurrent`/
+  `seriesPrevious` for identity, `variancePositive`/`varianceNegative` as the only good/bad tokens,
+  `accentTargetHit`/`accentFollowUp` as gold's only two consumers — each asserted by a test
+- Kept `varianceNegative` a separate token from `red` despite the shared hex, so red can never drift
+  into meaning "bad"; stated the discipline in a comment block at both definition sites
+- Added typography roles (`.tile-title`, `.kpi-number`, `.chart-axis-label`, `.narrative-caption`)
+  so US-005 references a role rather than restating "uppercase, 700, 0.04em"; `.kpi-number` carries
+  `tabular-nums` so animated digits do not jitter
+- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (96/96) and `pnpm build` all clean;
+  coverage 100% of `app/**`
+
 ---
 
 ## Format
@@ -75,7 +102,7 @@ When stories are completed, they will be logged here with:
 **Example Entry:**
 
 ```markdown
-### US-003: Design token set (3 pts)
+### US-0NN: Example story (N pts)
 **Completed:** 2026-09-09 14:32
 **Time Taken:** 1.2 hours
 **By:** AI

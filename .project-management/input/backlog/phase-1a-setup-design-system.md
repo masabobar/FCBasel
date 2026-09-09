@@ -5,7 +5,7 @@
 **Duration:** Day 1 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (2/6 completed)
+**Status:** In Progress (3/6 completed)
 
 > **Global guardrails apply to every story here** — see [`../constraints.md`](../constraints.md) §2.
 > No integration, no runtime model, no auth, no persistence, no salary/named-individual data.
@@ -64,7 +64,7 @@
 
 **Priority:** P0
 **Total Story Points:** 9
-**Status:** Not Started (0/4 completed)
+**Status:** In Progress (1/4 completed)
 **Source:** Build Specification E2; Reference Implementation Guide §4.
 
 > Getting this right is most of what sells the illusion to an audience that knows FC Basel
@@ -76,22 +76,24 @@
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** A single token set — colours, type scale, spacing, radii, shadows, motion —
     applied consistently across shell, tiles and charts. No other colours may be introduced.
   - **Acceptance Criteria:**
-    - Colour tokens defined exactly: red `#D3010C`, redVivid `#FF1433`, blue `#004093`,
+    - ✅ Colour tokens defined exactly: red `#D3010C`, redVivid `#FF1433`, blue `#004093`,
       navy `#0E2356`, gold `#FBD500`, bg `#FFFFFF`, surface, border, text, muted, pos, neg
-    - Typography: Helvetica Neue / Arial / system stack; 400 body, 700 bold; headings and tile
+    - ✅ Typography: Helvetica Neue / Arial / system stack; 400 body, 700 bold; headings and tile
       titles uppercase, weight 700, letter-spacing ~0.04em
-    - Type scale: tile title 13px, KPI number 30px/700, chart axis 12px, body 14px, caption 13px
-    - **Colour discipline enforced:** red and blue carry series identity; variance uses only
+    - ✅ Type scale: tile title 13px, KPI number 30px/700, chart axis 12px, body 14px, caption 13px
+    - ✅ **Colour discipline enforced:** red and blue carry series identity; variance uses only
       pos/neg tokens plus an explicit sign and arrow; red never means "bad"
-    - Gold appears only as target-hit marks and the follow-up accent (see US-006 — no new-tile ring)
-    - A design needing a colour outside the set is not permitted — choose the nearest token
+    - ✅ Gold appears only as target-hit marks and the follow-up accent (see US-006 — no new-tile ring)
+    - ✅ A design needing a colour outside the set is not permitted — choose the nearest token
   - **Dependencies:** US-001
   - **Notes:** Where the Build Specification and the Reference Guide disagree on a hex value, the
     Guide wins (see [`../scope.md`](../scope.md) §10). Divergences: surface, text, pos.
+    Delivered as `app/app.css` (`@theme static`) + `app/lib/tokens.ts`, kept in lockstep by a
+    parity test. Guide values used: surface `#F1F4F9`, text `#161A20`, pos `#0E9F6E`.
 
 - **US-004**: Self-hosted FCB crest
   - **Story Points:** 1
@@ -150,7 +152,7 @@
 
 **By Priority:** P0: 6 stories, 14 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 2 stories, 5 points · 🔄 0 · 📋 4 stories, 9 points · ⏸️ 0
+**By Status:** ✅ 3 stories, 8 points · 🔄 0 · 📋 3 stories, 6 points · ⏸️ 0
 
 ---
 

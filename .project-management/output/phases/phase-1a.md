@@ -47,11 +47,11 @@ every later epic references rather than restates.
 
 ### Epic 2: E2 — FCB Brand Theming & Design System (9 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** Todo · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (1/4) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
-| US-003 | Design token set | 3 | 📋 Todo |
+| US-003 | Design token set | 3 | ✅ Done |
 | US-004 | Self-hosted FCB crest | 1 | 📋 Todo |
 | US-005 | Tile card anatomy | 2 | 📋 Todo |
 | US-006 | Tile-insertion motion & reduced-motion support | 3 | 📋 Todo |
@@ -90,12 +90,12 @@ every later epic references rather than restates.
 - **Risk Level:** Low
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 5 / 14 (36%)
-- **Completed Stories:** 2 / 6
-- **Tests Passing:** 8 / 8
-- **Code Coverage:** 100% of `app/**` (small surface — 4 statements, 4 functions)
-- **Linter:** ESLint 9 flat config — clean (0 errors, 0 warnings across 11 files)
-- **Commits:** 2
+- **Completed Story Points:** 8 / 14 (57%)
+- **Completed Stories:** 3 / 6
+- **Tests Passing:** 96 / 96
+- **Code Coverage:** 100% of `app/**` (21 statements, 7 functions)
+- **Linter:** ESLint 9 flat config — clean (0 errors, 0 warnings)
+- **Commits:** 3
 
 ---
 
@@ -118,7 +118,7 @@ every later epic references rather than restates.
 |------|--------|-------|------------|-------|--------|
 | Railway setup consumes more than the ~3 h budgeted | Medium | Low | Zero-config app: no env vars, no database, no migrations; `railway.json` committed so the deploy is one command | Human+AI | Open (human step) |
 | Crest asset unavailable or format-awkward | Medium | Low | Self-host from the committed copy; the build must never depend on the live CDN | AI | Open |
-| Token drift — a colour introduced outside the set | High | Medium | Not permitted by spec; choose the nearest token. Verified in US-044 brand QA | AI | Open |
+| Token drift — a colour introduced outside the set | High | Medium | Not permitted by spec; choose the nearest token. US-003 pins the hex set with a test and fails the suite on any CSS/TS divergence. Re-verified in US-044 brand QA | AI | Mitigated |
 | Reduced-motion path leaves a value stuck at zero | Medium | Medium | Grow hook returns `true` immediately under reduced motion | AI | Open |
 
 ---
@@ -181,6 +181,41 @@ the committed blob.
   7 new devDependencies). **`pnpm audit`: no known vulnerabilities**; the `qs: ">=6.16.0"` override
   from US-001 is retained. All additions are dev-only tooling that never ships in the server bundle.
   No secrets, env vars, HTTP handlers, database, user input or uploads — no other trigger applies.
+
+### 2026-09-09 — US-003 Design token set (3 pts) ✅
+
+One token set, published twice on purpose. `app/app.css` carries it as Tailwind v4 CSS custom
+properties inside `@theme static`, so utilities are generated and `var(--…)` resolves at runtime;
+`app/lib/tokens.ts` carries the same values as a typed object, because the hand-built SVG charts in
+Phase 2b need strings for stroke, fill and gradient stops and cannot use a class. Every hex is
+written exactly once — the semantic aliases are `var()` references in CSS and constant references in
+TypeScript — and `tests/unit/tokens.test.ts` parses the stylesheet, resolves those references and
+fails on any divergence. That drift test is the load-bearing one in this story.
+
+Values follow the Reference Guide's `T` object, which wins over the Specification on the three known
+divergences (`scope.md` §10): **surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`**.
+The Specification-only gold ring for new tiles was **not** introduced — gold exists solely as
+`accentTargetHit` and `accentFollowUp`.
+
+Colour discipline is encoded, not merely documented: `seriesPrimary`/`seriesSecondary`/
+`seriesCurrent`/`seriesPrevious` name identity, `variancePositive`/`varianceNegative` are the only
+tokens permitted to mean good/bad, and `varianceNegative` is deliberately a *separate* token from
+`red` even though they share a hex, so red can never drift into meaning "bad". Tests assert each of
+those relationships plus that gold has exactly two consumers. Typography roles (`.tile-title`,
+`.kpi-number`, `.chart-axis-label`, `.narrative-caption`) are defined once in the components layer,
+so US-005 references a role instead of restating "uppercase, 700, 0.04em"; `.kpi-number` carries
+`tabular-nums` so count-up animations do not jitter.
+
+- **Tests:** 88 added (96 total, all passing) — exact-hex assertions, Guide-precedence assertions,
+  colour-discipline relationships, the type scale, and full CSS↔TS parity in both directions.
+- **Coverage:** 100% of `app/**` (21/21 statements, 7/7 functions) — above the 80% gate.
+- **Gates:** `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` all clean.
+  Emitted CSS verified in `build/client/assets/root-*.css`: aliases resolve, `.tile-title` and
+  `.kpi-number` ship as written.
+- **Security triage:** every trigger in `.claude/rules/security-review.md` §1 considered — no
+  dependency or lockfile change, no HTTP handler or route, no raw SQL, no `dangerouslySetInnerHTML`,
+  no `fetch`, no upload, no env var, no auth, no logging, no user input. **No security-relevant
+  changes detected** (§4).
 
 ---
 
