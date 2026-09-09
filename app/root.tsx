@@ -87,6 +87,14 @@ export function Layout({ children }: { children: ReactNode }) {
  * Nothing is removed, nothing says "error", and the screen always has a next
  * step.
  *
+ * A FOLLOW-UP ASKED COLD IS NEITHER OF THOSE THINGS (US-033). It matched, so
+ * there is no fallback; and it is gated, so the PARENT hero renders first and
+ * the follow-up is then offered as a chip in the row below - the chips are
+ * derived from `sections`, and the parent arriving at `primary` is itself the
+ * offer. Both question paths reach that gate through the same two actions, so
+ * the typed path and the tapped path are gated by one rule in one place
+ * (`lib/dashboard/follow-up-gate.ts`), and this file needs no branch for it.
+ *
  * EXACTLY ONE TRANSIENT PANEL IS ON THE CANVAS, and `useCanvasPanel` is where
  * that is decided: thinking, fallback, empty state, or none of the three. The
  * empty state is the canvas BEFORE anything has been asked, so Reset brings it

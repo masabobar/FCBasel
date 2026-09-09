@@ -119,7 +119,14 @@ export function findSection(
   return sections.find((section) => section.heroId === heroId);
 }
 
-/** Whether this hero has already been shown — US-033's gating question. */
+/**
+ * Whether this hero has already been shown: US-033's gating question, and the
+ * ONE source of truth for it.
+ *
+ * `./follow-up-gate.ts` reads it to gate a follow-up, and `./chips.ts` filters
+ * the same list to decide whether the follow-up chip is offered, so gating and
+ * chip visibility are two readings of one list rather than two states.
+ */
 export function hasSection(sections: InsightSections, heroId: HeroId): boolean {
   return findSection(sections, heroId) !== undefined;
 }
@@ -171,10 +178,13 @@ export function withHeroShown(
  * The flip is the whole point — the follow-up sharpens the section already on
  * screen instead of appending a second one about the same question.
  *
- * A follow-up for a hero that has not been shown is left alone here: deciding
- * what to do about it is US-033's gating, not this list's business. The hook
- * that drives this module shows the parent hero first, which is what US-033
- * builds its chip offer on top of.
+ * NO GATE HERE, ON PURPOSE. A follow-up for a hero that has not been shown maps
+ * over the list and changes nothing, because deciding what to do about that is
+ * not this list's business: `./follow-up-gate.ts` takes the decision and
+ * `./use-dashboard.ts` calls {@link withHeroShown} instead, so the parent
+ * renders first and lands at {@link InsightPhase.PRIMARY}, which is the state
+ * `./chips.ts` derives the follow-up chip from. That is US-033 criterion 3: a
+ * follow-up FLIPS its parent section and never appends a second one.
  */
 export function withFollowUpShown(
   sections: InsightSections,

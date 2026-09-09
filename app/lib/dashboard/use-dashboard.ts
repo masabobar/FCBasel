@@ -3,9 +3,9 @@ import { flushSync } from "react-dom";
 
 import { animateReflow, scrollToTop } from "../motion";
 import { type HeroId } from "../repositories/enums";
+import { isFollowUpGated } from "./follow-up-gate";
 import {
   BASELINE_SECTIONS,
-  hasSection,
   type InsightSections,
   withBaselineRestored,
   withFollowUpShown,
@@ -207,13 +207,18 @@ export function useDashboard(): DashboardState {
 
   const showFollowUp = useCallback(
     (heroId: HeroId) => {
-      // A follow-up for a hero that has not been shown yet renders the parent
-      // first — never an error and never nothing. Offering the follow-up chip
-      // afterwards is US-033's half of that behaviour.
+      // THE GATE (US-033), decided in `./follow-up-gate.ts` and nowhere else.
+      // A follow-up for a hero that has not been shown yet renders the PARENT
+      // first: never an error and never nothing. The parent lands at `primary`,
+      // which is exactly the state US-029's chip row derives a follow-up chip
+      // from, so the follow-up is then offered for the presenter to tap.
+      //
+      // Read from `committed.current`, the same list the chip row was derived
+      // from, so the gate and the chip can never disagree about this hero.
       reveal(heroId, (current) =>
-        hasSection(current, heroId)
-          ? withFollowUpShown(current, heroId)
-          : withHeroShown(current, heroId),
+        isFollowUpGated(current, heroId)
+          ? withHeroShown(current, heroId)
+          : withFollowUpShown(current, heroId),
       );
     },
     [reveal],

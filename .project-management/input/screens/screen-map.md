@@ -1,7 +1,7 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.10.0
-**Last Updated:** 2026-09-09
+**Version:** 1.11.0
+**Last Updated:** 2026-09-10
 **Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-031 — the **Thinking** state is now BUILT: every answer waits behind a fixed staged delay, and the transient panel that fills it is the first of the three. Still no API: the delay is a `setTimeout`, not a request)*
 **Status:** Approved
 
@@ -44,7 +44,7 @@ The three inert items are deliberate: they imply a fuller product without preten
 | **Path** | `/` (single route) |
 | **Auth** | Public — no authentication model exists in the prototype |
 | **Stories** | US-012, US-013, US-014, US-015, US-016, US-028 to US-039 |
-| **Status** | *(generated)* In Progress (6/17 completed — US-012 shell, US-013 baseline row, US-014 insertion machinery, US-015 reset, US-016 hero band, US-028 prompt bar; matcher and hero content pending) |
+| **Status** | *(generated)* In Progress (11/17 completed — US-012 shell, US-013 baseline row, US-014 insertion machinery, US-015 reset, US-016 hero band, US-028 prompt bar, US-029 chips, US-030 matcher, US-031 thinking beat, US-032 fallback/empty panels, US-033 follow-up gating. **The conversational layer is complete**; only the six Phase 3b hero-content stories remain) |
 
 **Description:** The persona's dashboard. On arrival it already looks lived-in — four baseline tiles,
 not an empty canvas. The user types a business question or taps a suggestion chip; after a staged
@@ -92,7 +92,7 @@ each is the last item on the canvas grid, so the states above are exclusive rath
 | Baseline row | Webshop revenue KPI, Last home match KPI, Top Products, Active Partners | US-013, US-016 | ✅ Built — `app/components/dashboard/baseline-row.tsx` (+ `app/components/tiles/partner-tile.tsx`, `app/lib/dashboard/baseline.ts`), mounted by `app/routes/_index.tsx`. Four tiles as **direct children of the canvas grid** (3 + 3 + 6 columns, then a full-width partner strip at `lg`), composing `KpiTile`, `HBarTile` and the `Card` shell — no new tile kind and no second grid. No figure is re-typed in a component: a source scan enforces it. **Top Products' period filter is now wired (US-016):** its `action` slot holds a light `Segmented` driving its own period, independent of the band's, so the five figures recalculate and the same bar elements transition |
 | Insight sections | One per answered question — section head, narrative, cards, optional follow-up (recommendation panel) | US-014, US-024, US-034 to US-039 | 🔄 Built (US-014, US-024) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. **US-024 finished the section's two insight elements:** the prominent narrative line under the section header is US-005's caption strip in its `section` variant (AI glyph, wraps, never truncated), and the follow-up's advice is `app/components/tiles/recommendation-panel.tsx` — a gold-accented `aside`, structurally not a tile. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | ✅ **Built** — all three exist (`app/components/heroes/{thinking,fallback,empty-state}-panel.tsx`), each a `col-span-full` grid item on the same canvas, reusing US-006's motion classes with no new keyframe. **They are MUTUALLY EXCLUSIVE by construction:** `canvasPanelFor` in `app/lib/dashboard/use-canvas-panel.ts` returns ONE of thinking / fallback / empty / none — thinking wins over a recorded miss, a miss beats the empty state, and the empty state is the baseline — asserted over every combination and in the DOM at each of the four canvas states. A no-match shows NO beat, so the fallback is the whole of that answer |
-| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029, US-032 | 🔄 Built (US-028, US-029) — `app/components/chrome/prompt-bar.tsx`, mounted by `app/root.tsx` through a new `promptBar` slot on the shell and **pinned to the foot of the screen** (`fixed`, because the shell clips overflow and a sticky bar would settle at the bottom of the dashboard instead; the canvas reserves the strip so no tile hides under it). **ONE bordered field** with the search icon and send button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, a press on the padding focusing the input, a real `<form>` so Enter and the button share one submit path, empty input a no-op, and rapid submits collapsing to one without a second timer. **US-029 filled the `children` slot with the suggestion-chip row** — the three hero prompts, always, plus one gold-tinted follow-up chip per answer still at `primary`, all **derived** from `useDashboard`'s `sections` by `app/lib/dashboard/chips.ts` and rendered by `app/components/chrome/suggestion-chips.tsx`. There is no chip state, so Reset restores the row for free (**US-015 criterion ② is now met**) and a follow-up chip disappears the moment its phase flips. A tap resolves straight to `showHero` / `showFollowUp` from the chip's own hero id — no scoring in that path, by type. The chips are the FIRST way to ask a question from this screen. **US-030 filled `onSubmit`** (the typed path) and **US-031 filled `busy`** — the field and the send button are disabled for the length of the thinking beat, so no second question can start an overlapping render. All three of US-028's seams are now wired. **US-032 re-uses this row inside the fallback panel** (the frozen three hero chips, the same components), so the prepared questions are reachable on the canvas as well as above the field. **Still to come:** US-033 reads this derived visibility for typed-input gating |
+| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029, US-032 | 🔄 Built (US-028, US-029) — `app/components/chrome/prompt-bar.tsx`, mounted by `app/root.tsx` through a new `promptBar` slot on the shell and **pinned to the foot of the screen** (`fixed`, because the shell clips overflow and a sticky bar would settle at the bottom of the dashboard instead; the canvas reserves the strip so no tile hides under it). **ONE bordered field** with the search icon and send button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, a press on the padding focusing the input, a real `<form>` so Enter and the button share one submit path, empty input a no-op, and rapid submits collapsing to one without a second timer. **US-029 filled the `children` slot with the suggestion-chip row** — the three hero prompts, always, plus one gold-tinted follow-up chip per answer still at `primary`, all **derived** from `useDashboard`'s `sections` by `app/lib/dashboard/chips.ts` and rendered by `app/components/chrome/suggestion-chips.tsx`. There is no chip state, so Reset restores the row for free (**US-015 criterion ② is now met**) and a follow-up chip disappears the moment its phase flips. A tap resolves straight to `showHero` / `showFollowUp` from the chip's own hero id — no scoring in that path, by type. The chips are the FIRST way to ask a question from this screen. **US-030 filled `onSubmit`** (the typed path) and **US-031 filled `busy`** — the field and the send button are disabled for the length of the thinking beat, so no second question can start an overlapping render. All three of US-028's seams are now wired. **US-032 re-uses this row inside the fallback panel** (the frozen three hero chips, the same components), so the prepared questions are reachable on the canvas as well as above the field. **US-033 COMPLETED THE REGION:** it reads this same derived visibility as its gate rather than storing a copy, so a follow-up typed before its parent renders the **parent** first and the follow-up chip then appears in this row for the user to tap. A source scan pins `hasSection` to exactly two readers, so the row and the gate can never disagree. **Region fully built** |
 
 > The **canvas grid** row is new in 1.1.0. It was implicit before — US-012 made it a real region
 > with its own component, and US-013/US-014 both insert into it rather than owning a grid each.
@@ -144,6 +144,16 @@ each is the last item on the canvas grid, so the states above are exclusive rath
 > criterion ② is satisfied by construction rather than by a clear step. A chip tap carries a hero
 > id, never text, so it cannot reach US-030's matcher.
 >
+> 1.11.0 records US-033 and **closes Phase 3a**: the **Prompt bar region is fully Built**, and no
+> region, route, loader or request was added. The one structural fact a later story must not undo:
+> **"which heroes have been shown" is the session section list and nothing else.** US-033's gate
+> (`app/lib/dashboard/follow-up-gate.ts`) reads it through `hasSection`, and US-029's chip row
+> filters the same list, so gating and chip visibility are two readings of ONE state — pinned by a
+> source scan that fails if any third module asks the question. A follow-up typed before its parent
+> therefore renders the **parent** first and the follow-up chip appears in the row below; it is a
+> two-step offer, never an error, never nothing, and never the fallback panel. Reset re-gates every
+> follow-up for free, because the list is the baseline again.
+>
 > 1.4.0 records US-013: the **Baseline row region and the Baseline state are Built**. No region and
 > no route was added — the four tiles are grid items on the canvas that already existed. The region's
 > contents line is corrected: it listed only Top Products and Active Partners, but US-013's
@@ -159,9 +169,12 @@ each is the last item on the canvas grid, so the states above are exclusive rath
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-09, after US-032)
+## 4. Drift Report (hand-checked 2026-09-10, after US-033)
 
 - **Stories referencing screens not in this map:** *(none)*
+- **Routes added by US-033:** *(none)*. One pure module and two call sites — no route, no loader, no
+  request, no storage: the gate is a function of the in-memory section list and a static flag, and
+  the typed question never reaches it.
 - **Routes added by US-032:** *(none)*. Two components and a hook, no route, no loader, no request:
   the fallback panel renders its own authored copy plus US-029's chips, and the empty state renders
   two authored strings. The typed question reaches neither — it is scored and discarded by

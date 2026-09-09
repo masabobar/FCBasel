@@ -1,15 +1,16 @@
 # Daily Work Summary
 
-**Date:** 2026-09-09 (Wednesday) · **Last Updated:** 2026-09-09
+**Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 32 — **Phases 1a, 1b, 2a and 2b ALL complete (2b closed by US-024, 11/11 ·
-29/29); Phase 3a open at 5/6 · 14/17 after US-028 to US-032**
-**Story Points:** 83
-**Time Worked:** ~22.1 hours · **Files Changed:** 254 · **Tests Added:** 1803
+**Stories Completed:** 33 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
+with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are unblocked.
+**Story Points:** 86
+**Time Worked:** ~22.9 hours · **Files Changed:** 261 · **Tests Added:** 1849
 
 ---
 
@@ -96,55 +97,52 @@
 - **US-023 — Driver / breakdown tile.** `DriverTile`, `DriverTotalBadge` and the pure
   `rankDrivers` / `driverTotal`, for all three causal follow-ups. **It draws no bars, and the tests
   keep it that way:** every row is US-021's `HBarRow` through `HBarTile`, and a source scan rejects
-  bar geometry, the width constants, the motion hooks, local state and even a second `Card`. What it
-  adds: tie-stable magnitude ranking (equal to US-009's `fixtureDeclines`, so Luzern precedes Sion),
-  a total **derived from the rows on screen** so the `-CHF 400k total` badge cannot disagree, and a
-  note line. Two shared seams widened rather than forked. 43 tests, 1358/1358.
+  bar geometry, the width constants, the motion hooks and local state. It adds tie-stable ranking, a
+  total **derived from the rows on screen**, and a note line. 43 tests, 1358/1358.
 - **US-024 — Recommendation panel & narrative caption strip.** The last story of Phase 2b. **The
-  strip was reused, not rebuilt** (US-005's `CardCaption` gained a `section` placement), and **the
-  panel is structurally not a tile** — an `aside`, a gold bar down the SIDE, no metric chrome, told
-  apart from a `Card` by test. **Verbatim asserted byte for byte**, and **criterion 3 is order**, so
-  the narrative comes before every chart. 35 tests, 1393.
+  strip was reused, not rebuilt**, and **the panel is structurally not a tile** — an `aside`, told
+  apart from a `Card` by test. **Verbatim asserted byte for byte**; the narrative comes before every
+  chart. 35 tests, 1393.
 - **US-028 — Persistent prompt bar. Phase 3a opens.** The product's only user input. **ONE bordered
-  field IS the typing area** — a test rejects any descendant border or ring (the nested box was the
-  reported defect). **A real `<form>`**, so Enter and the button share one path, and **debounce with
-  no second clock**: a submit consumes the question. XSS pass-through proven. 48 tests, 1441.
+  field IS the typing area** — a test rejects any descendant border or ring. **A real `<form>`**, so
+  Enter and the button share one path; **debounce with no second clock**. 48 tests, 1441.
 - **US-029 — Suggestion chips & chip lifecycle. The screen can now be ASKED a question (2/6 ·
   5/17).** **THE ROW IS DERIVED, NOT STORED:** criterion ③'s "removed once shown" is implemented in
   **no line of code** — the phase flip stops deriving it. Proved over **all 27** hero × phase
-  combinations, and **US-015's criterion ② is thereby SATISFIED**. **A tap bypasses scoring by
-  TYPE.** Surface reused, not restated. 57 tests, 1498/1498.
+  combinations; **US-015's criterion ② is thereby SATISFIED**. 57 tests, 1498/1498.
 - **US-030 — Intent normalisation, scoring & tie-breaking. A freely TYPED question now resolves
   (3/6 · 10/17), and this was the riskiest story in the build.** The acceptance is qualitative, so
-  **the suite is the deliverable as much as the code**: 89 tests pinning the matcher input by input.
-  **A FAITHFUL PORT, VERIFIED NOT TRUSTED:** normalise → **+2 / +1** → threshold **2 hero / 3
-  follow-up** → **strictly-greater** over an ordered config, with an **oracle** test asserting
-  identical scores *and* winners over a 90-phrase corpus. **34 paraphrases**, each prompt beating
-  its own follow-up by a margin; a **three-way** 2/2/2 tie goes to Hero 1; one input yields **one**
+  **the suite is the deliverable as much as the code. A FAITHFUL PORT, VERIFIED NOT TRUSTED:**
+  normalise → **+2 / +1** → threshold **2 hero / 3 follow-up** → **strictly-greater** over an
+  ordered config, with an **oracle** test asserting identical scores *and* winners over a 90-phrase
+  corpus. **34 paraphrases**; a **three-way** 2/2/2 tie goes to Hero 1; one input yields **one**
   match or `null`. **The two inherited over-matches are PINNED.** No model, no dependency — scanned.
   89 tests, 1587/1587.
 - **US-031 — Thinking beat. The answer no longer appears the instant it is asked, and it is
-  stagecraft rather than a query.** `thinking.ts` (the six beats and two delays), `use-thinking.ts`
-  (the runner) and `thinking-panel.tsx`, wired in `root.tsx`. **No request is made** (scanned).
-  **THE ORDERING IS ASSERTED:** at `1150ms - 1` the panel is up with NO section; at `1150ms` the
-  section is there and the panel gone — landing it immediately fails **22** tests. **Both paths pause
-  and neither module changed:** `useThinking` returns the `ChipActions` the matcher and the chips
-  already took, and a no-match calls neither action, so an off-script question shows **no beat**
-  (US-032's input). **Still ONE timer**, so **US-015 criterion ④ is satisfied**, proved by mutation
-  twice over. Reduced motion 260ms, chips at final state. No new keyframe. 91 tests, 1678/1678.
-- **US-032 — Graceful fallback panel. The screen can no longer dead-end (5/6 · 14/17)**, and this is
-  one of the three behaviours the backlog marks untouchable at any cost. `fallback-panel.tsx`,
-  `empty-state-panel.tsx` and `use-canvas-panel.ts`, wired in `root.tsx`. **Two panels, never
-  conflated.** **The copy is byte-identical:** UTF-8 bytes against a retyped literal *and* against
-  the criterion in the backlog, straight apostrophe and closing **hyphen** pinned by code point.
-  **Criterion ② is asserted as an ABSENCE:** eighteen blame/error words out of the copy, the panel
-  *and* the source; no `role="alert"`, no assertive region, no red semantics. **The question is never
-  echoed** (no question prop exists, so an `<img onerror>` payload creates no element). **No beat
-  precedes it** (`getTimerCount()` is 0), and the next step is always there — **US-029's own chips**
-  over the frozen `HERO_CHIPS`, reuse proved on the class strings. **The empty state** is the review
-  feedback: club red at **4.5% derived from `--color-red`** (no rgba literal, no hex), matching
-  hairline, bold navy heading, lighter subtext, red gradient badge. **The three panels are mutually
-  exclusive by construction** and **Reset returns to the empty state**. 125 tests, 1803/1803.
+  stagecraft rather than a query.** `thinking.ts`, `use-thinking.ts` and `thinking-panel.tsx`, wired
+  in `root.tsx`. **No request is made** (scanned). **THE ORDERING IS ASSERTED:** at `1150ms - 1` the
+  panel is up with NO section; at `1150ms` the section is there and the panel gone — landing it
+  immediately fails **22** tests. **Both paths pause and neither module changed**, and a no-match
+  calls neither action, so an off-script question shows **no beat**. **Still ONE timer**, so
+  **US-015 criterion ④ is satisfied**, proved by mutation twice over. 91 tests, 1678/1678.
+- **US-032 — Graceful fallback panel. The screen can no longer dead-end (5/6 · 14/17)**, one of the
+  three behaviours the backlog marks untouchable. **Two panels, never conflated.** **The copy is
+  byte-identical:** UTF-8 bytes against a retyped literal *and* the backlog criterion, apostrophe and
+  closing **hyphen** pinned by code point. **Criterion ② asserted as an ABSENCE:** 18 blame words out
+  of copy, panel *and* source; no alert role, no red semantics; **the question is never echoed**.
+  **No beat precedes it**, and the next step is always there. **The three panels are mutually
+  exclusive by construction.** 125 tests, 1803/1803.
+- **US-033 (2026-09-10) — Follow-up context gating. PHASE 3a CLOSES at 6/6 · 17/17.**
+  `follow-up-gate.ts` holds the rule as two pure functions read by BOTH the answer
+  (`use-dashboard.ts`) and the beat (`use-thinking.ts`). **Stated plainly: the behaviour was already
+  correct at HEAD** — `withFollowUpShown` alone is a no-op for an absent hero, but no caller ever
+  invoked it ungated, so reverting the wiring fails only the 2 source-scan tests. The story is
+  therefore the rule made explicit and proved, and the dead end is guarded by **mutation** (the
+  ungated call fails 10 tests). **The two-step runs on the real `App` for all three heroes:** cold
+  typed follow-up → PARENT at `primary` → chip offered → tap → phase flips, one section never two.
+  **Criterion ④ by source scan** — `hasSection` has exactly two readers, so gating and chip
+  visibility are two readings of ONE list and Reset re-gates for free. **Criterion ⑤ twice** — as a
+  property over all 27 sessions and on the real `App`. 46 tests, 1849/1849.
 
 ---
 
@@ -156,52 +154,46 @@
 - ✅ **Phase 1b — US-007 to US-011 (10 pts), closed 5/5.** Every criterion met, and US-007 to US-009
   exceeded theirs. US-010 derives the Revenue/Cost judgement rather than storing it; US-011 adds one
   display layer, one rounding rule, and a reconciliation suite that found **no drift**.
-- ✅ US-012 / US-014 / US-015 (8 pts) — the shell (all 5 criteria), insertion (all 7, dedupe proven
-  in Chrome) and Reset (3 of 5 then; the chips and the beat were seams, both now closed by US-029 and
-  US-031). **Phase 2a then 3/5 · 8/16.**
+- ✅ US-012 / US-014 / US-015 (8 pts) — the shell (all 5), insertion (all 7, dedupe proven in
+  Chrome) and Reset (3 of 5 then; ①②④ later closed by US-013/US-029/US-031). **Then 3/5 · 8/16.**
 - ✅ US-027 — Motion & animation hooks (3 pts) — all 4 acceptance criteria met, including the two
   subtle ones: count-up continues from the current displayed value, and nothing is stranded at zero
   under reduced motion. **Phase 2b opens here: 1/11 stories, 3/29 points.**
 - ✅ US-017 / US-021 — the KPI tile and the shared bar row (5 pts) — all criteria met; the delta
   chip's meaning survives with the colour removed, and US-021's two review decisions are read back
   off the rendered element for the *five* tiles that share the row.
-- ✅ US-013 — Baseline dashboard, four pre-existing tiles (3 pts) — all 4 criteria met, **plus**
-  US-015's deferred criterion ①. Every figure traces to the US-007 repository through a loader.
+- ✅ US-013 — Baseline dashboard (3 pts) — all 4 criteria met, **plus US-015's deferred criterion ①**.
 - ✅ US-025 / US-026 — the line chart and the segmented control (5 pts) — all criteria met: one chart
-  serves the navy band and Hero 2 (stroke replays on a re-key, fully drawn under reduced motion), and
-  one control renders in a card's `action` slot *and* a section header, its 11px radius from
-  `--radius-chip` with `rounded-full` rejected by test. **US-016 unblocked.**
+  serves the navy band and Hero 2, and one control renders in a card's `action` slot *and* a section
+  header, its 11px radius with `rounded-full` rejected by test. **US-016 unblocked.**
 - ✅ **US-016 — Hero band: webshop trend & attendance ring (5 pts). All 6 criteria met, and Phase 2a
   is CLOSED at 5/5 · 16/16.** One control drives the chart and the ring; a filter change counts from
   the figure on screen, redraws the line and sweeps the arc. 92 tests, 1090/1090 green.
 - ✅ US-018 / US-019 / US-020 — the three chart geometries (9 pts) — all criteria met: bars keyed by
-  category and proven by a re-rank test; Hero 2's full density with the axis gutter and headroom
-  derived as **geometry, not padding**; and a donut whose segments sum exactly.
+  category, proven by a re-rank test; the axis gutter and headroom derived as **geometry, not
+  padding**; a donut whose segments sum exactly.
 - ✅ US-022 / US-023 — the department table and the driver tile (5 pts) — all criteria met. **The
-  trap is the story:** Marketing's +410 reads ADVERSE from US-010's `varianceJudgement`, and a scan
-  stops it being re-derived from the sign. US-023 adds **no second bar row**. **Then 10/11 · 27/29.**
+  trap is the story:** Marketing's +410 reads ADVERSE from US-010's `varianceJudgement`, and US-023
+  adds **no second bar row**. **Then 10/11 · 27/29.**
 - ✅ US-024 — Recommendation panel & narrative caption strip (2 pts) — all 3 criteria met: a callout
-  that is **structurally** not a data tile, the AI strip **reused** from US-005, and the narrative
-  asserted in DOM order **before** the charts. **Phase 2b CLOSED: 11/11 · 29/29.**
+  **structurally** not a data tile, the AI strip **reused** from US-005, the narrative asserted in
+  DOM order **before** the charts. **Phase 2b CLOSED: 11/11 · 29/29.**
 
 - ✅ US-028 — Persistent prompt bar (2 pts) — all 4 criteria met: one field with the icon and send
-  button embedded and **no inner bordered box** (asserted structurally), a press on the padding
-  focusing the input, Enter *and* the button submitting through one real form while empty input is a
-  no-op, and rapid submits collapsing to one call. **Phase 3a opens: 1/6 · 2/17.**
+  button embedded and **no inner bordered box** (asserted structurally), Enter *and* the button
+  submitting through one real form, empty input a no-op, rapid submits collapsing to one call.
+  **Phase 3a opens: 1/6 · 2/17.**
 
 - ✅ US-029 — Suggestion chips & chip lifecycle (3 pts) — all 5 criteria met: exactly three chips on
   load with the labels verbatim, a tap resolving **directly** to its hero with no scoring in the
-  path (enforced by type and by a source scan), a follow-up chip appearing once its hero renders and
-  gone once that follow-up is shown, the three hero chips present throughout, and US-026's 11px
-  lift-and-tint surface reused with a gold-tinted variant. **It also closes US-015's criterion ②.**
-  **Phase 3a: 2/6 stories, 5/17 points.**
+  path, a follow-up chip appearing once its hero renders and gone once that follow-up is shown, and
+  US-026's 11px surface reused. **It also closes US-015's criterion ②.** **Phase 3a: 2/6 · 5/17.**
 
 - ✅ US-030 — Intent normalisation, scoring & tie-breaking (5 pts) — all 7 criteria met: normalised,
   scored **+2 strong / +1 weak**, the highest above **threshold 2 hero / 3 follow-up** winning, ties
-  broken deterministically so **two heroes never render from one input**, tolerance table-driven at 34
-  phrasings, `sales` alone falling through, definitions held as static config with the parent-gating
-  flag US-033 will read. Pinned by an **oracle** test over a 90-phrase corpus.
-  **Phase 3a: 3/6 stories, 10/17 points.**
+  broken deterministically so **two heroes never render from one input**, tolerance table-driven at
+  34 phrasings, definitions held as static config with the parent-gating flag US-033 reads. Pinned
+  by an **oracle** test over a 90-phrase corpus. **Phase 3a: 3/6 stories, 10/17 points.**
 
 - ✅ US-031 — Thinking beat (2 pts) — all 4 criteria met: every successful match holds the panel for
   a fixed 1150ms **before** the section renders (asserted on a fake clock, both sides of the
@@ -218,6 +210,14 @@
   injuries" and gibberish land there identically; and before any question the empty state shows the
   branded-red panel at **4.5% derived from the red token**, bold navy heading, lighter one-line
   subtext, red gradient icon badge. **Phase 3a: 5/6 stories, 14/17 points.**
+
+- ✅ US-033 — Follow-up context gating (3 pts, 2026-09-10) — all 5 criteria met: a typed follow-up
+  resolves to the deep-dive only once its parent has been shown; otherwise the **parent renders
+  first and the follow-up chip is then offered** to tap, never an error and never nothing; the
+  follow-up **flips** its parent section rather than appending; the section list drives **both**
+  gating and chip visibility (pinned by source scan to one predicate with two readers); and each
+  hero runs start-to-follow-up alone, so the presenter can show just one.
+  **PHASE 3a COMPLETE: 6/6 stories, 17/17 points.**
 
 *(Condensed to keep this log inside its 300-line limit — full detail in
 [`completed.md`](completed.md) and [`../phases/phase-3a.md`](../phases/phase-3a.md).)*
@@ -241,59 +241,58 @@
 **Immediate Focus:**
 - **Phases 1a, 1b, 2a and 2b are all closed** (69 points): seven tile kinds, four chart geometries,
   the segmented control, the motion hooks and the two insight elements, no per-hero copy anywhere.
-- **Phase 3a is open at 5/6, and the demo choreography is whole apart from gating:** a question
-  arrives by chip or by typing, waits through the beat and lands — and anything off-script now meets
-  the fallback instead of silence. Next **US-033 gates the follow-ups**, reading
-  `INTENT_REQUIRES_PARENT` plus the visibility US-029 derives: an ungated follow-up renders its
-  PARENT first and then offers the follow-up chip. Then Phase 3b is composition only — every hero
-  beat assembles existing components and supplies the pre-authored strings, which US-024 proved
-  render verbatim.
+- **PHASE 3a IS CLOSED (6/6 · 17/17), and the demo choreography is whole:** a question arrives by
+  chip or by typing, waits through the beat and lands; anything off-script meets the fallback
+  instead of silence; and a follow-up asked cold renders its parent and then offers the chip.
+- **Next: US-034 — Hero 1 primary (3 pts)**, opening Phase 3b. All three hero stories declared
+  US-033 as a dependency and are now unblocked. Phase 3b is composition only — every hero beat
+  assembles existing components and supplies the pre-authored strings, which US-024 proved render
+  verbatim.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
-3a + 3b, the demo itself (33 pts, 14 done).
+3a (17 pts, done) + 3b, the demo itself (16 pts, 0 done).
 
 ---
 
 ## Notes
 
 - **The deadline is this week.** Sponsor showing first, owner audience the following week. ~52
-  AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope (the P1
-  cut set is worth only ~0.82 days at 8h/day).
-- Phases 1a, 1b, 2a and 2b are all complete and Phase 3a is open (81/116 points); continue with
-  `/holycode-pm:execute-work story US-032`.
-- **US-028's three seams are now ALL filled:** `children` (US-029's chips), `onSubmit` (US-030's
-  matcher) and `busy` (US-031's beat) — plus `key={generation}`, which is how a half-typed question
-  clears with Reset. **There is exactly one timer in the app and a test pins it there:** a story that
-  grows its own submit path, its own timer or its own chip styling is a review finding.
+  AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
+- Phases 1a, 1b, 2a, 2b and 3a are all complete (86/116 points); continue with
+  `/holycode-pm:execute-work story US-034`.
+- **US-028's three seams are now ALL filled:** `children` (US-029), `onSubmit` (US-030) and `busy`
+  (US-031), plus `key={generation}` for a half-typed question. **There is exactly one timer in the
+  app and a test pins it there:** a story growing its own submit path, timer or chip styling is a
+  review finding.
 - **US-029 settled the rule for anything the chip row or a panel needs to know: DERIVE IT FROM
-  `sections`** — which is why Reset restores the row for free. US-033 must read that same derived
-  visibility rather than storing a copy. **The chip path and the typed path are separate by TYPE:** a
-  chip tap reaching US-030's scoring is a review finding.
+  `sections`** — which is why Reset restores the row for free, and **US-033 did exactly that**: its
+  gate reads the same list, pinned by a source scan to one predicate with two readers. A second
+  registry of "heroes shown", or a chip tap reaching US-030's scoring, is a review finding.
 - **US-021 is the reuse test for the whole epic, and US-023/US-024 both passed it:** widen the shared
-  seam when a consumer needs a little more, and let a source scan prove the new file holds no copy of
-  what it reused. A second bar row, or a second AI caption element, is a review finding.
+  seam when a consumer needs a little more, and let a source scan prove the new file holds no copy
+  of what it reused. A second bar row or AI caption element is a review finding.
 - **US-024 set the verbatim contract Phase 3b depends on** (the test that matters is `toBe`, not
   "contains" — US-032 took it to UTF-8 bytes), and the narrative is stated BEFORE the charts.
 - **The motion hooks are the shared contract for Phase 2b:** reimplementing `useCountUp` or
   `useGrow` anywhere is a review finding.
 - **Two shared pieces US-017 left:** `DeltaChip` is the *only* variance chip, and `app/lib/cn.ts`
-  protects named size tokens — through `cn` only. **All of US-015's seams are now closed** (US-013,
-  US-029, US-031), so all five of its criteria are met.
+  protects named size tokens. **All of US-015's seams are closed** (① US-013, ② US-029, ④ US-031),
+  so all five of its criteria are met — re-confirmed when US-033 closed Phase 3a.
 - **US-030 settled how the matcher may change:** its two over-matches are the asserted contract, so
-  tightening either is a deliberate decision, never a tidy-up. **US-032 is the catch behind it:**
-  every `null` reaches a panel that offers the three prepared questions, and its absence assertions
-  (no blame word, no alert role, no echoed input) are the requirement, not a style note.
+  tightening either is a deliberate decision, never a tidy-up. **US-032 is the catch behind it** and
+  its absence assertions (no blame word, no alert role, no echoed input) are the requirement, not a
+  style note. **US-033 added the third rule: gating is decided in one module, for both paths.**
 - **US-013 set the no-hardcoded-figure pattern:** figures reach a component only through a
-  loader-provided view model, and a test scans component sources for a literal figure.
+  loader-provided view model; a test scans for a literal figure.
 - **US-025's chart is the only line chart**: a second `smoothPath` anywhere is a review finding.
 - **Keying geometry by NAME is the epic's settled pattern** (US-018/019/020, kept by US-022/023),
-  proved by a **re-rank** test since an index key is invisible while the order holds.
-- **US-026's `Segmented` is the only period control**, the period stays the CALLER's state, and its
-  11px radius is reviewed: `rounded-full` on it or on US-029's chips is a review finding.
+  proved by a **re-rank** test.
+- **US-026's `Segmented` is the only period control**, the period stays the CALLER's state, and
+  `rounded-full` on it or on US-029's chips is a review finding.
 - **US-016's band is first in the cut order and was built to stay cuttable:** one grid item, no
   shared state, no import from the baseline row.
 - Three shell guardrails are *tests*: the app bar's text equals the role labels, the status file
-  holds no timer, and the prompt field's subtree may carry no border.
+  holds no timer, the prompt field's subtree may carry no border.
 
 ---
 

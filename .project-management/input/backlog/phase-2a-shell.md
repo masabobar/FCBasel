@@ -153,10 +153,16 @@ grow when a question is asked.
     (`withBaselineRestored` in `app/lib/dashboard/sections.ts`) driven by `reset` on
     `use-dashboard.ts`, wired to the app bar's existing US-012 control through `AppShell`'s
     `onReset` in `app/root.tsx`. Which criteria are met now and which are a seam:
-    - **① Partly — seam-only for the four tiles (US-013).** Every hero section is cleared and the
-      session returns to `BASELINE_SECTIONS`, the single named constant that is *also*
-      `useDashboard`'s initial state. Nothing in the reset path says "empty"; US-013 lists its
-      tiles in that one constant and load-state and reset-state stay identical for free.
+    - **① ✅ NOW SATISFIED BY US-013 (2026-09-09, in the Phase 2b run).** It was seam-only here:
+      every hero section was cleared and the session returned to `BASELINE_SECTIONS`, the single
+      named constant that is *also* `useDashboard`'s initial state, with nothing in the reset path
+      saying "empty". US-013 closed it by the **second** of the two routes this note offered — the
+      four tiles are static route chrome (`components/dashboard/baseline-row.tsx`, rendered above
+      and outside the session list), so no question can remove them and Reset therefore cannot fail
+      to restore them: load state and post-reset state are the same DOM by construction.
+      `tests/unit/baseline-reset.test.tsx` drives insert → Reset and compares the canvas
+      `innerHTML` to its load state. **All five of US-015's criteria are now met** (① US-013,
+      ② US-029, ③/⑤ here, ④ US-031); re-confirmed when US-033 closed Phase 3a.
     - **② ✅ NOW SATISFIED BY US-029 (2026-09-09).** It was seam-only here, with the intended
       wiring recorded in the hook: a chip row **derived** from `sections` (initial chips at the
       baseline, follow-up chips from the sections on screen), restored by reset with no reset logic

@@ -1,18 +1,19 @@
 # Weekly Progress Report
 
 **Week:** 2026-09-07 - 2026-09-13, 2026 (Week 37)
-**Last Updated:** 2026-09-09
+**Last Updated:** 2026-09-10
 
 ---
 
 ## Week Summary
 
-**Stories Completed:** 27
-**Story Points:** 69/116 (60%)
-**Current Phase:** Phase 3a - Conversation, **not started**
+**Stories Completed:** 33
+**Story Points:** 86/116 (74%)
+**Current Phase:** Phase 3b - Scripted Hero Flows, **open at 0/6**
 *(Phases 1a, 1b, 2a and 2b all completed 2026-09-09 — 2a closed by US-016, 2b by US-024 at 11/11 ·
-29/29; US-013 and US-016 were built inside the Phase 2b run)*
-**Team Velocity:** 69 pts/day (one day of data — not yet a trend)
+29/29. **Phase 3a closed 2026-09-10 by US-033 at 6/6 · 17/17**, which unblocks all three Phase 3b
+hero stories)*
+**Team Velocity:** 43 pts/day (two days of data — 83 then 3)
 
 ---
 
@@ -108,7 +109,13 @@
   US-024 — the recommendation panel and the shared AI narrative strip
 
 ### Thursday, 2026-09-10
-- (To be logged)
+- **Phase 3a CLOSED by US-033 — follow-up context gating (3 pts), 6/6 · 17/17.** One gate
+  (`app/lib/dashboard/follow-up-gate.ts`, two pure functions) read by both the answer and the beat,
+  so a follow-up asked before its parent renders the **PARENT** first and then offers the follow-up
+  chip. Gating and chip visibility are **two readings of one list**, pinned by source scan. Recorded
+  honestly: the behaviour was already correct at HEAD, so the story made the rule explicit and
+  guarded it by mutation (the ungated call fails 10 tests). 46 tests, **1849 green**.
+- **Phase 3b opens.** Next: US-034 — Hero 1 primary (3 pts).
 
 ### Friday, 2026-09-11
 - (To be logged)
@@ -117,16 +124,17 @@
 
 ## Velocity Trend
 
-**This Week:** 69 pts
+**This Week:** 86 pts
 **Last Week:** N/A
-**Average:** 69 pts/day (1 day)
-**Trend:** N/A (insufficient data)
+**Average:** 43 pts/day (2 days: 83, then 3)
+**Trend:** N/A (day 2 was a single 3-point story, not a slowdown)
 
 > Phase 1a landed 14 points in ~4.2 AI hours against a ~5.8 AI-core-hour estimate; Phase 1b landed
 > 10 points in ~2.8 AI hours against ~4.5; Phase 2a's 16 in ~4.6 against ~8.1; and Phase 2b's 29 in
 > ~6.4 against ~12.0. Across the four closed phases: 69 points in ~18.0 AI hours,
 > `actual_factor ≈ 0.19` against the planned 0.25 — still running ahead, and the largest and most
-> repetitive phase held the factor rather than eroding it.
+> repetitive phase held the factor rather than eroding it. Phase 3a then landed 17 points across
+> both days, closing on 2026-09-10 with US-033.
 
 ---
 
@@ -138,9 +146,9 @@
 1. Phases 1a + 1b — foundations and seed data (24 pts): **complete**
 2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts): **complete** (2a 5/5,
    2b 11/11)
-3. Phases 3a + 3b — conversation engine and the three hero flows (33 pts): **next**, starting with
-   US-028's prompt bar; 3b is composition only, and US-024 fixed the verbatim contract its
-   narratives depend on
+3. Phase 3a — conversation engine (17 pts): **complete** (6/6, closed by US-033)
+3. Phase 3b — the three hero flows (16 pts): **next**, starting with US-034; composition only, and
+   US-024 fixed the verbatim contract its narratives depend on
 4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts)
 
 **Stretch Goal:**

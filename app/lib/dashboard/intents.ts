@@ -98,9 +98,13 @@ export const INTENT_THRESHOLD: Record<ChipKind, number> = {
  *
  * Held once per KIND rather than repeated on all six definitions below,
  * because it is a property of the kind and not of the individual intent — a
- * hero's own question always stands alone, a follow-up never does. US-033 reads
- * it to decide whether to render the parent first; nothing in this module gates
- * anything itself, so the matcher stays a pure function of the text.
+ * hero's own question always stands alone, a follow-up never does.
+ *
+ * US-033 READS IT, in `./follow-up-gate.ts` and only there: that module asks
+ * this flag and the section list what a question actually renders, and both the
+ * answer (`./use-dashboard.ts`) and the beat (`./use-thinking.ts`) call it.
+ * Nothing in this module gates anything itself, so the matcher stays a pure
+ * function of the text and never sees the session.
  */
 export const INTENT_REQUIRES_PARENT: Record<ChipKind, boolean> = {
   [ChipKind.HERO]: false,
@@ -383,11 +387,16 @@ export function matchIntent(question: string): IntentMatch | null {
  * chip path takes a chip and the typed path takes a string, and no refactor can
  * quietly route a tapped chip through the scoring above.
  *
- * Returns the match so the caller can tell a resolved question from an
- * off-script one. Today `null` simply leaves the canvas alone; US-032 hangs the
- * fallback panel on it, and US-033 will read
- * {@link INTENT_REQUIRES_PARENT} to gate the follow-up branch. Nothing else
- * needs to change here for either.
+ * Returns the MATCH, which is a fact about the text: `null` raises US-032's
+ * fallback panel, and a match tells the caller an answer is on its way.
+ *
+ * IT IS NOT A REPORT OF WHAT RENDERED, and it deliberately does not become one.
+ * A follow-up matched cold renders its parent instead (US-033), but that
+ * decision belongs to the session, not to the text: it is taken once inside
+ * `showFollowUp`, against the section list, in `./follow-up-gate.ts`. Gating
+ * here as well would need this pure function to be handed the session, and
+ * would put the same rule in two places where the two could drift apart. So the
+ * TYPED path is gated exactly like the tapped path: through the action it calls.
  */
 export function askQuestion(
   question: string,

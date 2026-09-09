@@ -180,7 +180,7 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-10)
   - **Description:** Follow-ups only make sense after their parent hero — this mirrors the decision
     model in the specification.
   - **Acceptance Criteria:**
@@ -192,6 +192,23 @@ off-script question never breaks the demo. This choreography is what stands in f
     - Each hero is independent — any single hero can run start-to-follow-up on its own, so the
       presenter can show just one
   - **Dependencies:** US-030, US-014
+  - **Completion note (2026-09-10):** `app/lib/dashboard/follow-up-gate.ts` — two pure functions
+    (`renderedKind`, `isFollowUpGated`) read by `use-dashboard.ts` for the answer and
+    `use-thinking.ts` for the beat. **①** A follow-up resolves to the deep-dive only once its parent
+    has a section this session. **②** Otherwise the PARENT renders first and the follow-up chip is
+    then offered — driven end to end on the real `App` for all three heroes (cold typed follow-up →
+    parent at `primary` → chip appears → tap → phase flips), never an error, never the fallback,
+    never the empty state. **③** `withFollowUpShown` flips the existing section: one section, never
+    two, whichever path and however often. **④** The section list is the only "has been shown"
+    state — a source scan pins `hasSection` and `INTENT_REQUIRES_PARENT` to exactly two readers
+    each, so gating and US-029's chip derivation are two readings of ONE list, and Reset re-gates
+    for free. **⑤** Hero independence proved as a property over all 27 hero × phase sessions **and**
+    on the real `App`: each hero runs primary → follow-up with the other two never touched.
+    - **The chip path was already gated by construction** (US-029 offers a follow-up chip only for a
+      section at `PRIMARY`); the **typed** path is what this story owns. **Documented choice:** a
+      gated cold follow-up shows the PARENT's thinking message and sources, because the panel must
+      name the answer actually arriving. Guarded by mutation — calling `withFollowUpShown` ungated
+      fails 10 tests. 46 new tests, 1849 green. Security triage: no security-relevant changes.
 
 ---
 
@@ -201,11 +218,13 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **By Priority:** P0: 6 stories, 17 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 5 stories, 14 points · 🔄 0 · 📋 1 story, 3 points · ⏸️ 0
+**By Status:** ✅ 6 stories, 17 points · 🔄 0 · 📋 0 · ⏸️ 0
+
+**Phase status:** ✅ **Completed 2026-09-10 (6/6 stories · 17/17 points).**
 
 ---
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2b-components.md) · [Next Phase →](phase-3b-heroes.md) · [Dashboard](../../output/progress/DASHBOARD.md)
 
-**Last Updated:** 2026-09-09
+**Last Updated:** 2026-09-10

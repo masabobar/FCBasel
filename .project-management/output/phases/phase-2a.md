@@ -167,8 +167,7 @@ triage:** no security-relevant changes detected. Full detail in `completed.md`.
 
 ### 2026-09-09 — US-015 Reset to baseline ✅ (2 pts)
 
-**Delivered:** the control that lets the demo be run twice. Reset is a **transition beside the other
-three**, not a special case.
+**Delivered:** the control that lets the demo be run twice. Reset is a **transition beside the other three**, not a special case.
 - `app/lib/dashboard/sections.ts` — `BASELINE_SECTIONS` (the named baseline), `withBaselineRestored`,
   `isBaseline`, `sameSections`. Pure, and the reset path nowhere says "empty".
 - `app/lib/dashboard/use-dashboard.ts` — `reset`, plus `schedule` (the single pending timer) and
@@ -182,6 +181,9 @@ describe are not built:
 - **① the four baseline tiles are US-013** (deferred to the Phase 2b run). Reset restores
   `BASELINE_SECTIONS`, which is *also* `useDashboard`'s initial state, so US-013 lists its tiles in
   that one constant and gets reset for free. Sections are genuinely all cleared today.
+  - **① ✅ CLOSED BY US-013 (2026-09-09, Phase 2b run)** by the second route it offered: the tiles
+    are static route chrome outside the session list, so no question can remove them and Reset
+    cannot fail to restore them (`baseline-reset.test.tsx`). ①②④ all closed; re-confirmed by US-033.
 - **② the suggestion chips are US-029** and **④'s thinking beat is US-031.** No chip and no
   thinking panel was invented here. The chip seam is `sections` (derive the row from the session
   list and reset restores it with no logic of its own); the beat seam is `schedule`, and reset
@@ -234,10 +236,10 @@ sparkline draws, and `trendEndingAt` makes the window **end on the month the hea
 hover lift measured at exactly 2px. **④** All five Top Products labels whole in a 150px column,
 `scrollWidth <= clientWidth`, measured on the real data.
 
-**RESET'S BASELINE SEAM IS CLOSED** the way US-015 described: the tiles are static route chrome
-outside the session list, so no question can remove them and Reset cannot fail to restore them —
-`baseline-reset.test.tsx` drives insert → Reset and compares the canvas `innerHTML` to its load
-state. **First real-Chrome pass for US-017, US-021 and US-027:** no horizontal scroll at 1920×1080
+**RESET'S BASELINE SEAM IS CLOSED** (US-015 ①) the way US-015 described: the tiles are static route
+chrome outside the session list, so no question can remove them — `baseline-reset.test.tsx` drives
+insert → Reset and compares the canvas `innerHTML` to its load state.
+**First real-Chrome pass for US-017, US-021 and US-027:** no horizontal scroll at 1920×1080
 (nor 1440/1280/834/390), 54 distinct KPI strings and 43 bar widths per frame, two values only under
 reduced motion. **Gates:** all ✅ · 880/880 tests (103 new) · coverage 100% stmts / 99.58% branches.
 **Security triage:** no security-relevant changes detected (the loader is an SSR data hop, not an

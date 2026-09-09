@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useReducedMotion } from "../hooks/use-motion";
 import { type HeroId } from "../repositories/enums";
 import { ChipKind, type ChipActions } from "./chips";
-import { hasSection } from "./sections";
+import { renderedKind } from "./follow-up-gate";
 import {
   type ThinkingBeat,
   thinkingBeatFor,
@@ -137,18 +137,19 @@ export function useThinking(dashboard: DashboardState): ThinkingState {
 
       /**
        * A follow-up asked before its hero has been answered renders the PARENT
-       * — `useDashboard.showFollowUp` has always done that, and US-033 owns the
-       * other half (offering the follow-up chip afterwards). The beat simply
-       * agrees with it: the message and sources are the ones for the answer
-       * that is actually about to appear, so the panel can never say
-       * "Analysing badge selection trends" and then produce the hero's
-       * headline figures.
+       * (US-033's gate, in `./follow-up-gate.ts`), so the BEAT IS THE PARENT'S
+       * TOO: `renderedKind` is asked what is about to appear, and the message
+       * and sources follow that answer rather than the question. The panel can
+       * therefore never say "Analysing badge selection trends" and then produce
+       * the hero's headline figures.
+       *
+       * The gate is not re-decided here. This hook and `useDashboard` call the
+       * same function over the same section list, which is why the panel and
+       * the answer cannot disagree.
        */
       showFollowUp: (heroId) =>
-        run(
-          heroId,
-          hasSection(sections, heroId) ? ChipKind.FOLLOW_UP : ChipKind.HERO,
-          () => showFollowUp(heroId),
+        run(heroId, renderedKind(sections, heroId, ChipKind.FOLLOW_UP), () =>
+          showFollowUp(heroId),
         ),
     }),
     [run, sections, showHero, showFollowUp],
