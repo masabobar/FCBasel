@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.3.0
+**Version:** 1.4.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-015 — Reset now behaves; the baseline state is a named seam, chips and thinking beat still pending)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-013 — the baseline row is built and the Baseline state is real; chips and thinking beat still pending)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -44,7 +44,7 @@ The three inert items are deliberate: they imply a fuller product without preten
 | **Path** | `/` (single route) |
 | **Auth** | Public — no authentication model exists in the prototype |
 | **Stories** | US-012, US-013, US-014, US-015, US-016, US-028 to US-039 |
-| **Status** | *(generated)* In Progress (3/17 completed — US-012 shell, US-014 insertion machinery, US-015 reset; hero content pending) |
+| **Status** | *(generated)* In Progress (4/17 completed — US-012 shell, US-013 baseline row, US-014 insertion machinery, US-015 reset; hero content pending) |
 
 **Description:** The persona's dashboard. On arrival it already looks lived-in — four baseline tiles,
 not an empty canvas. The user types a business question or taps a suggestion chip; after a staged
@@ -66,7 +66,7 @@ between them, and all of them share the same grid.
 
 | State | When | Built by | Status |
 |---|---|---|---|
-| **Baseline** | On load, and after Reset | US-013, US-015 | ⏸️ Tiles deferred to the Phase 2b run — but the state itself is now **named and reachable**: US-015's `BASELINE_SECTIONS` is both the session's initial value and what Reset restores, so US-013 lists its four tiles in that one constant and load-state and reset-state cannot diverge. The canvas is empty until then |
+| **Baseline** | On load, and after Reset | US-013, US-015 | ✅ **Built** — the canvas is no longer empty on load: four tiles in order (Webshop revenue, Last home match, Top products, Active partners), figures fetched from the US-007 repository in the route's SSR loader. The tiles are **static chrome rendered by the route**, above and outside US-015's session list, so no question can remove them and Reset cannot fail to restore them — load state and post-reset state are the same DOM by construction, with no baseline special-case in the reset path |
 | **Empty prompt** | Before any question is asked — light branded-red panel with heading and subtext | US-032 | 📋 Not started |
 | **Thinking** | During the fixed staged delay after a confident match | US-031 | 📋 Not started — but its **timer seam exists**: US-015's `schedule` owns the single pending beat and Reset already cancels it, so US-031 schedules through it rather than calling `setTimeout` itself |
 | **Grown** | One or more hero sections inserted, in the order asked | US-014, US-034 to US-039 | 🔄 Mechanic built (US-014) — sections insert into the canvas grid, dedupe by hero id, reflow and auto-scroll; their **content** is a marked placeholder until US-034 to US-039 |
@@ -84,9 +84,9 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 |---|---|---|---|
 | Sidebar | Dashboard (active) + three inert items | US-012 | ✅ Built — `app/components/chrome/sidebar.tsx`; hides below `lg` |
 | Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 | ✅ Built — `app/components/chrome/top-bar.tsx`. **Reset now behaves:** the button stays a pure affordance taking an injected callback, and `app/root.tsx` injects `useDashboard`'s `reset`, which clears the US-014 session back to `BASELINE_SECTIONS`, cancels any pending beat and scrolls to top. Idempotent and abuse-proof — ten presses in one frame run one transition |
-| Canvas grid | The 12-column container every tile and section is inserted into | US-012, US-014 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. Empty on load; US-014's sections insert into **this** grid as direct children |
-| Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 | ⏸️ Deferred to the Phase 2b run |
-| Baseline row | Top Products (own period filter), Active Partners | US-013 | ⏸️ Deferred to the Phase 2b run |
+| Canvas grid | The 12-column container every tile and section is inserted into | US-012, US-014 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. **No longer empty on load** — US-013's four baseline tiles are its first grid items, and US-014's sections insert into **this** same grid as direct children, below them |
+| Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 | ⏸️ Still deferred — blocked on US-025 (line chart) and US-026 (segmented filter). It mounts **above** the baseline row and renders the same period dataset as a chart and a ring; it does not replace US-013's two KPI tiles |
+| Baseline row | Webshop revenue KPI, Last home match KPI, Top Products, Active Partners | US-013 | ✅ Built — `app/components/dashboard/baseline-row.tsx` (+ `app/components/tiles/partner-tile.tsx`, `app/lib/dashboard/baseline.ts`), mounted by `app/routes/_index.tsx`. Four tiles as **direct children of the canvas grid** (3 + 3 + 6 columns, then a full-width partner strip at `lg`), composing `KpiTile`, `HBarTile` and the `Card` shell — no new tile kind and no second grid. No figure is re-typed in a component: a source scan enforces it. Top Products' own **period filter is still US-026**, wired by US-016; its `action` slot is deliberately empty |
 | Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 | 🔄 Built (US-014) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
 | Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started — the chip row's reset behaviour is already provided for: **derive** it from `useDashboard`'s `sections` (initial chips at the baseline, follow-up chips from the sections on screen) and Reset restores it with no logic of its own; `generation` covers anything US-028's input holds that cannot be derived |
@@ -103,6 +103,13 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 > was added or removed — Reset changes which state the single screen is in. The two things a future
 > story must not reimplement are named here: the Baseline state (`BASELINE_SECTIONS`) and the
 > pending-beat timer (`schedule`).
+>
+> 1.4.0 records US-013: the **Baseline row region and the Baseline state are Built**. No region and
+> no route was added — the four tiles are grid items on the canvas that already existed. The region's
+> contents line is corrected: it listed only Top Products and Active Partners, but US-013's
+> acceptance criteria name four tiles, the first two being the Webshop revenue and Last home match
+> KPI tiles. Those are **not** the hero band: US-016 renders the same period dataset as a line chart
+> and an attendance ring, above this row.
 
 ---
 
@@ -112,12 +119,18 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-09, after US-015)
+## 4. Drift Report (hand-checked 2026-09-09, after US-013)
 
 - **Stories referencing screens not in this map:** *(none)*
 - **Screen entries with no backing story (orphans):** *(none)*
 - **Navigation nodes missing a registry entry (or vice versa):** *(none — the three inert sidebar
   items are intentionally not registry entries; they are not screens)*
+- **Routes added by US-013:** *(none)*. `app/routes.ts` is untouched — `/` remains the only entry.
+  US-013 adds a **loader** to that existing route, which is not a route, a path or an API endpoint:
+  it takes no params, no query and no body, reads a static in-repo fixture, and makes no network
+  call. It is the SSR data hop for the one screen, and the reason `app/lib/repositories/index.server.ts`
+  stays out of the client bundle (`grep` for `Bitpanda`, `148200` or `Rotblau` over `build/client/`
+  returns nothing).
 - **Routes added by US-015:** *(none)*. Reset is a state change on SCREEN-001, not a navigation:
   `app/routes.ts` is untouched, no history entry is pushed, and the window is scrolled rather than
   the router being asked to navigate. It adds no region and no screen — only the Baseline state's
@@ -133,6 +146,10 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
   the absence of `fetch`, `axios` and any timer. US-014 adds no endpoint either: inserting a section
   is a React state change, and a source scan asserts no storage API is used anywhere in `app/**`.
   US-015 adds none either: Reset is memory-only, makes no request, and the storage scan still passes.
+  **US-013 adds none, and this is the story most likely to be mistaken for adding one:** its route
+  loader is an SSR data hop, not an HTTP endpoint — there is no path to call, no status-code surface
+  and no client-side request. The API table above therefore stays empty **by design, not by drift**,
+  and the storage scan over `app/**` still passes.
 
 ---
 

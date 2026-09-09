@@ -81,12 +81,80 @@ export function seriesTotals(series: ComparisonSeries): SeriesTotals {
   };
 }
 
-/** Attendance as a fraction of capacity, 0 to 1, for the ring geometry. */
-export function attendanceShare(attendance: AttendanceSummary): number {
-  if (attendance.capacity === 0) {
+/**
+ * The trailing `count` values of a series, oldest first - the points a tile's
+ * sparkline glyph draws.
+ *
+ * A sparkline is a WINDOW onto a series the tile does not otherwise show, so
+ * the window is taken here rather than a second, shorter series being stored
+ * beside the long one: two arrays that are supposed to end on the same figure
+ * are two arrays that can disagree.
+ *
+ * A series shorter than `count` comes back whole rather than padded - a
+ * three-month-old year has three points to draw and inventing three more would
+ * be inventing data. `KpiSparkline` renders a one-point series as a flat line,
+ * so the glyph degrades and never disappears.
+ */
+export function trailingPoints(
+  values: readonly number[],
+  count: number,
+): number[] {
+  if (count <= 0) {
+    return [];
+  }
+  return values.slice(Math.max(values.length - count, 0));
+}
+
+/**
+ * The sparkline window for a headline figure: the trailing `count` points of
+ * `series`, ENDING ON the point that figure covers.
+ *
+ * WHY THE END IS FOUND RATHER THAN ASSUMED. A tile's headline number and the
+ * glyph under it must agree - that is the rule this whole module exists for -
+ * and `series` is a longer, coarser series than the one the headline sums. A
+ * plain {@link trailingPoints} would end the glyph on whatever the longer
+ * series happens to end on, which is the same figure only by coincidence of the
+ * date the fixture is read on. Locating `total` inside the series instead makes
+ * "the line ends where the number is" true by construction. The dataset
+ * guarantees the point exists (`app/lib/mock/baseline.ts`: the recent monthly
+ * points ARE the sums of the weekly series it also stores).
+ *
+ * A figure that is genuinely absent from the series - a period the coarser
+ * series does not reach yet - falls back to the trailing points, so the glyph
+ * degrades rather than disappearing.
+ */
+export function trendEndingAt(
+  series: readonly number[],
+  total: number,
+  count: number,
+): number[] {
+  const end = series.lastIndexOf(total);
+  return trailingPoints(end === -1 ? series : series.slice(0, end + 1), count);
+}
+
+/**
+ * Occupancy as a fraction of capacity, 0 to 1 - the ONE place that division
+ * happens.
+ *
+ * It takes two plain numbers rather than a domain object because the two
+ * callers below hold different objects (a period's {@link AttendanceSummary}
+ * and a single {@link HomeMatch}) and must not round the same ratio two ways.
+ */
+export function capacityShare(attendance: number, capacity: number): number {
+  if (capacity === 0) {
     return 0;
   }
-  return attendance.average / attendance.capacity;
+  return attendance / capacity;
+}
+
+/** Average attendance as a fraction of capacity, for the ring geometry. */
+export function attendanceShare(attendance: AttendanceSummary): number {
+  return capacityShare(attendance.average, attendance.capacity);
+}
+
+/** One fixture's attendance as a fraction of capacity - `28'900 of ~38'000`. */
+export function matchCapacityShare(match: HomeMatch): number {
+  return capacityShare(match.attendance, match.capacity);
 }
 
 /** Movement in average attendance against the comparison period. */

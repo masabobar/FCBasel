@@ -6,7 +6,7 @@ grow when a question is asked.
 **Duration:** Day 2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 16
-**Status:** In Progress (3/5 completed — US-013 and US-016 deferred to the Phase 2b run)
+**Status:** In Progress (4/5 completed — US-016 still deferred; its US-025/US-026 dependencies are unbuilt)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -16,7 +16,7 @@ grow when a question is asked.
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (3/5 completed — US-013 and US-016 deferred to the Phase 2b run)
+**Status:** In Progress (4/5 completed — US-016 still deferred; its US-025/US-026 dependencies are unbuilt)
 **Source:** Build Specification E4; Reference Implementation Guide §8.
 
 > The dashboard **never clears to show a hero — it grows.** That single behaviour is what makes the
@@ -53,7 +53,7 @@ grow when a question is asked.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** ⏸️ Deferred to the Phase 2b run
+  - **Status:** ✅ Completed (2026-09-09, in the Phase 2b run)
   - **Description:** On load the canvas shows a dashboard that already looks lived-in, not an empty
     canvas.
   - **Acceptance Criteria:**
@@ -65,10 +65,40 @@ grow when a question is asked.
     - Top Products labels are **not truncated** — a fixed 150px label column so `Cap "Rotblau"` and
       `Home shirt 26/27` show in full
   - **Dependencies:** US-007, US-012, **US-017**, US-021
-  - **Status note (2026-09-09):** ⏸️ **Deferred to the Phase 2b run.** US-017 (KPI tile, for the
-    Webshop revenue and Last home match tiles) and US-021 (horizontal bars, for Top Products) both
-    live in Phase 2b. US-017 was missing from this dependency list and has been added.
   - **Notes:** Partner logos are placeholders until licensed.
+  - **Completion note (2026-09-09, built in the Phase 2b run once US-017 and US-021 existed):** All
+    four criteria met, and nothing was reinvented — the row **composes** `KpiTile` (US-017) ×2,
+    `HBarTile` (US-021), the `Card` shell (US-005), the US-027 motion hooks and the US-011
+    formatters as direct children of US-012's single canvas grid.
+    - **①** `app/components/dashboard/baseline-row.tsx` renders exactly four tiles in DOM order —
+      Webshop revenue, Last home match, Top products, Active partners — as a fragment, so each is a
+      grid item and there is still exactly one grid. Order is asserted as a value
+      (`BASELINE_TILE_ORDER`) and measured in Chrome.
+    - **②** Figures reach the tiles through `app/lib/dashboard/baseline.ts` from the US-007
+      repository, fetched in the route's SSR loader (the repository is async and server-only). The
+      webshop total and its `+11.9%` are `seriesTotals` off the same array the sparkline draws, and
+      `trendEndingAt` makes the six-point window **end on the month the headline covers** so the
+      number and its glyph cannot disagree. Proven by a **source scan** that fails on any displayed
+      figure appearing as a literal in three spellings, on any pre-formatted `CHF`/`%` string, on a
+      scoreline, on any product or partner name, and on `toLocaleString`/`toFixed`.
+    - **③** `app/components/tiles/partner-tile.tsx` — six monogram plates (`BI`, `MA`, `AL`, `SU`,
+      `FE`, `HO`) painted in each partner's **own brand colour from the data**, with its
+      `PARTNER_ROLE_LABEL` role tag. A test asserts no hex and no FCB colour token appears in the
+      file at all: a partner plate in club red is wrong to a sponsor in the room. Hover lift
+      measured in real Chrome at **exactly 2px** plus `shadow-raised`.
+    - **④** Measured end to end in Chrome on the real data: all five labels in a 150px column with
+      `scrollWidth <= clientWidth`, `text-overflow: clip`, `white-space: normal`.
+    - **Reset (US-015 criterion ①) is now met** by the second of the two routes US-015's own note
+      offered: the tiles are static chrome rendered by the route, above and outside the session
+      list, so no question can remove them and Reset cannot fail to restore them.
+      `tests/unit/baseline-reset.test.tsx` drives it end to end.
+    - **First real-Chrome pass for US-017, US-021 and US-027**, which had all deferred it: no
+      horizontal scroll at 1920×1080 (nor 1440/1280/834/390), 54 distinct KPI strings and 43
+      distinct bar widths recorded per frame (it counts and grows, it does not snap), and two values
+      only under `prefers-reduced-motion` — final state, nothing stranded at zero.
+    - **Out of scope, deliberately:** the hero band (US-016), Top Products' period filter (US-026,
+      wired by US-016 — the `action` slot is empty and says so), the prompt bar, the thinking panel.
+      103 new tests, 880 total green.
 
 - **US-014**: Dynamic tile insertion & grid reflow
   - **Story Points:** 3
@@ -178,7 +208,7 @@ grow when a question is asked.
 
 **By Priority:** P0: 4 stories, 11 points · P1: 1 story, 5 points · P2: 0
 
-**By Status:** ✅ 3 stories, 8 points · 🔄 0 · 📋 0 · ⏸️ 2 stories, 8 points (US-013, US-016 — dependencies live in Phase 2b)
+**By Status:** ✅ 4 stories, 11 points · 🔄 0 · 📋 0 · ⏸️ 1 story, 5 points (US-016 — US-025/US-026 unbuilt)
 
 ---
 

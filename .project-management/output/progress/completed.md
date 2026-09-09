@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 17 stories
-**Total Points:** 40 / 116
+**Total Completed:** 18 stories
+**Total Points:** 43 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 40 points/day
+**Average Velocity:** 43 points/day
 **Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
 
 ---
@@ -33,106 +33,22 @@ Condensed to keep this log inside its 300-line limit; the **full per-story detai
 
 ---
 
-## Completed Stories *(Phase 1b onward)*
+## Phase 1b: Seed Data — closed 2026-09-09 (5 stories · 10 pts)
 
-### US-007: Persona baseline datasets (2 pts)
-**Completed:** 2026-09-09 · **By:** AI · **Files Changed:** 14 (9 code, 5 tracking docs) ·
-**Tests Added:** 47 (unit) · **Commit:** see phase-1b progress log
-**Notes:** All 4 criteria met; the set **intentionally exceeds them** (user-approved) - the criteria
-describe one period, the Reference Guide drives all four.
+Condensed to keep this log inside its 300-line limit; the **full per-story detail lives in
+[`../phases/phase-1b.md`](../phases/phase-1b.md)**, which is the authoritative record.
 
-**What Was Done:** *(full detail in the phase-1b progress log)*
-- Established the data seam the rest of E3 follows (`app/lib/repositories/README.md`): enums, types,
-  `derive.ts`, fixtures in `app/lib/mock/`, selection in `index.server.ts`. Domain types, not storage
-  shapes; every method returns a `Promise`; money is a plain number
-- Four periods of webshop revenue with comparison series, attendance per period, the four-period
-  top-products table and the six partners
-- **Totals and deltas are computed, never stored** — `seriesTotals` sums the same arrays the chart
-  plots, so a headline figure cannot disagree with its own chart; the two long periods derive their
-  x-axis labels from an injectable `Clock`. Store-once proved by test: last month's revenue series
-  *is* this month's comparison series. The four Specification-pinned figures asserted exactly:
-  CHF 148,200 at +11.9%, FCB 2-1 Sion at 28,900 of ~38,000, five product lines, 6 partners
+| Story | Pts | Tests | What it left behind |
+|---|---:|---:|---|
+| US-007 Persona baseline datasets | 2 | 47 | The data seam the rest of E3 follows (`app/lib/repositories/README.md`): enums, domain types, `derive.ts`, fixtures in `app/lib/mock/`, server-only selection. Every method returns a `Promise`; money is a plain number. **Totals and deltas are computed, never stored** — `seriesTotals` sums the same arrays the chart plots. Four Specification figures pinned exactly: CHF 148,200 at +11.9%, FCB 2-1 Sion at 28,900 of ~38,000, five product lines, 6 partners. Delivered set intentionally exceeds the written AC (user-approved): all four periods. |
+| US-008 Hero 1 dataset | 2 | 45 | Season-to-date merchandising across all four periods. Nothing derivable is stored: kit revenue is units × CHF 99, the Home share 22,400/38,500 = 58.18% (displays 58%), the badge share exactly 8%; the Guide's stored `homeShare: 58` did not survive the port. `badgeSegments` corrects its rounding remainder into the first segment, proved by an exhaustive 0–2,000 sweep. Both narratives verbatim (SHA-256 pinned); no salary or named-individual performance figure anywhere. |
+| US-009 Hero 2 dataset | 2 | 31 | Eight home fixtures year on year plus the Guide's twelve-month series. **The two charts sit at different scopes on purpose and the data says so** — `scopeLabel` is a field, and tests assert the labels differ and that the monthly total is the larger, so the gap reads as scope rather than a bug. Totals, the -0.6%, the four declining fixtures and the -CHF 400k badge are all derived. Narratives pinned by text, length and ASCII range. |
+| US-010 Hero 3 dataset | 2 | 44 | Six departments, each tagged Revenue or Cost — and the tag is load-bearing: `varianceJudgement` decides good-or-bad ONCE from `DepartmentType`, so Marketing's +410 is `ADVERSE` where Sponsoring's +840 is `FAVOURABLE`, and a test proves a naive "variance > 0" rule misreads one row. The attention flag is derived, not stored. The follow-up reconciles: 240 + 150 + 20 = 410, exactly Marketing's variance. |
+| US-011 Formatters & reconciliation | 2 | 70 | `app/lib/format.ts` — the one place a number becomes a string. Money always carries `CHF`, the **sign goes before the unit** (`-CHF 400k`), and `en-CH` output is pinned **independent of the runtime's ICU**, proved by stubbing `Intl` to `en-US` and `de-DE`. One rounding rule, imported from `derive.ts`. `reconciliation.test.ts` asserts **relationships, not constants** across all three heroes — no drift found. Closes Phase 1b. |
 
-### US-008: Hero 1 dataset - shirt sales, badges, printed names (2 pts)
-**Completed:** 2026-09-09 · **By:** AI · **Files Changed:** 9 (2 new, 7 modified) ·
-**Tests Added:** 45 (unit) · **Commit:** see phase-1b progress log
-**Notes:** Delivered set intentionally **exceeds the written acceptance criteria** (user-approved):
-all four periods, not only season-to-date - the tile's period switch must have data behind it.
+---
 
-**What Was Done:** *(full detail in the phase-1b progress log)*
-- Followed the US-007 recipe exactly: `SEASON_TO_DATE` + a `KitVariant` enum, domain types and
-  `Hero1Repository`, derived figures, fixtures, one line of selection. One hero object with
-  `primary` and `followUp` so tile and escalation cannot drift apart
-- **Nothing derivable is stored.** Kit revenue is units x CHF 99, the Home share 22,400 / 38,500 =
-  58.18% (displays 58%), the badge share exactly 8%. The Guide's stored `homeShare: 58` did not
-  survive the port - it can outlive an edit to its units
-- `badgeSegments(total, split)` corrects its rounding remainder into the first segment, proved by an
-  exhaustive sweep (every total 0-2,000, all four period totals, adversarial primes). Arithmetic
-  asserted: 22,400 + 10,300 + 5,800 = 38,500 shirts; CHF 3,811,500 (~3.81M); 44/24/20/12 = 100
-- Both narratives **verbatim** (SHA-256 pinned). Guardrail held: squad names appear only as
-  printed-name counts, and a test asserts no salary, goals, assists or rating exists anywhere
-
-### US-009: Hero 2 dataset - ticket revenue year on year (2 pts)
-**Completed:** 2026-09-09 · **By:** AI · **Files Changed:** 10 (2 new, 8 modified) ·
-**Tests Added:** 31 (unit) · **Commit:** see phase-1b progress log
-**Notes:** Delivered set intentionally **exceeds the written acceptance criteria** (user-approved):
-the month-by-month series is a Reference Guide addition the tile draws.
-
-**What Was Done:** *(full detail in the phase-1b progress log)*
-- Followed the US-007 four-step recipe: new `SeasonKey` and `MonthKey` enums with label maps, domain
-  types and `Hero2Repository`, derived figures, fixtures, one line of selection
-- Eight home fixtures in CHF thousands, 25/26 -> 26/27: YB 1,480/1,610; FCZ 1,390/1,240; Servette
-  980/1,050; St. Gallen 1,020/1,090; Luzern 890/820; Sion 760/690; GC 640/720; Lugano 720/610
-- **The two charts are at different scopes on purpose, and the data says so.** `scopeLabel` is a
-  field on each series - eight highest-grossing fixtures (7,880 -> 7,830) against all home fixtures
-  per month (9,880 -> 9,770), both excluding the season-ticket base. Tests assert the labels exist,
-  differ, and that the monthly total is the larger, so the gap reads as scope, not as a bug
-- **Nothing derivable is stored.** The Guide's `totalPrev`, `totalCurr`, `deltaPct` and second
-  `declines` list did not survive the port: totals come from `seriesTotals` (-50 / 7,880 = -0.6%),
-  and `fixtureDeclines` recovers FCZ -150, Lugano -110, Luzern -70, Sion -70 (stable sort) with
-  `declineTotal` producing the tile's -CHF 400k badge. The follow-up carries only its narrative —
-  its four fixtures *are* the primary's, seen through `fixtureDeclines`
-- Both narratives **verbatim**, pinned by exact text, exact length (229 / 338) and an ASCII range
-  check; `MONTH_LABEL` is pinned to the baseline band's month names. Guardrail held: fixtures are
-  clubs, and a test asserts no squad name, salary or performance figure appears anywhere
-
-### US-010: Hero 3 dataset - departmental performance (2 pts)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 6 (2 new, 4 modified) + 5 tracking docs
-**Tests Added:** 44 (unit: 44) - 348/348 green, 100% stmts / 98.7% branches of `app/**`
-**Commit:** see phase-1b progress log
-**Notes:** Fourth pass through the US-007 recipe; the new idea is that a TAG carries meaning.
-
-**What Was Done:**
-- Six departments, CHF thousands, Revenue or Cost: Sponsoring 21,000/21,840/104%; Ticketing
-  24,000/24,360/102%; Hospitality 7,200/6,840/95%; Merchandising 9,800/9,050/92%; Events
-  3,600/3,780/105%; Marketing **(Cost)** 3,400/3,810/84%
-- **Revenue vs Cost is modelled so a consumer cannot get it wrong.** `varianceJudgement` decides
-  good-or-bad ONCE from the `DepartmentType`: Marketing's +410 is `ADVERSE` (an overspend) where
-  Sponsoring's +840 is `FAVOURABLE`; a test proves a naive "variance > 0" rule misreads one row
-- **The flag is derived, not stored** - `departmentsNeedingAttention` finds exactly one row both over
-  budget *and* behind target. Totals derived too (69,000 -> 69,680, +680, +1.0%); the one stored
-  figure is `blendedTargetPercent: 96`, which no arithmetic over the rows gives
-- **The follow-up reconciles with the table:** 240 + 150 + 20 = 410, exactly Marketing's variance;
-  narratives **verbatim**; guardrail held - departments, never people
-
-### US-011: Formatters & cross-hero reconciliation (2 pts)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 8 (3 new, 3 modified) + 5 tracking docs
-**Tests Added:** 70 (unit: 70) - 418/418 green, 100% stmts / 98.9% branches of `app/**`
-**Commit:** see phase-1b progress log
-**Notes:** **Closes Phase 1b** (5/5 stories, 10/10 points). No drift found in any dataset.
-
-**What Was Done:**
-- `app/lib/format.ts` - the one place a number becomes a string. Money always carries `CHF`, the
-  **sign goes before the unit** (`-CHF 400k`). `Intl.NumberFormat("en-CH")` (Swiss U+2019 mark) is
-  pinned as a constant and made **independent of the runtime's ICU**, proved by tests that stub
-  `Intl` to `en-US` and `de-DE`. **One rounding rule:** `oneDecimal` imported from `derive.ts`
-- `tests/unit/reconciliation.test.ts` (39 tests) asserts **relationships, not constants** - every
-  split against its total, every derived delta, Marketing's drivers summing to its variance, the
-  cross-hero inequality, and every narrative number swept against the data. **No drift found**
+## Completed Stories *(Phase 2a onward)*
 
 ### US-012: Branded application shell (3 pts)
 **Completed:** 2026-09-09
@@ -268,7 +184,8 @@ components yet; the browser verification belongs to US-013, the first screen tha
 **Tests Added:** 55 (unit: 55) - 777/777 green, 100% stmts / 99.6% branches / 100% funcs of `app/**`
 **Commit:** see phase-2b progress log
 **Notes:** All 4 acceptance criteria met. The most reused chart in the product — five consumers, one
-row. **No real-Chrome pass** for the same reason as US-017: nothing mounts it yet, US-013 is next.
+row. **No real-Chrome pass** for the same reason as US-017: nothing mounted it yet. *(US-013 has
+since given both stories their browser pass — see below.)*
 
 **What Was Done:**
 - `app/components/charts/h-bars.tsx` (the `components/charts/` slot the technical spec reserved) —
@@ -292,6 +209,73 @@ row. **No real-Chrome pass** for the same reason as US-017: nothing mounts it ye
   an all-zero list still renders **labelled zeros** with their tracks
 - **One deliberate deviation from the reference, flagged for review:** a decline grows *leftwards*
   here (the reference drew every bar rightwards), so direction survives a washed-out projector
+
+### US-013: Baseline dashboard — four pre-existing tiles (3 pts)
+**Completed:** 2026-09-09 (Phase 2a story, executed in the Phase 2b run once US-017 and US-021 existed)
+**By:** AI
+**Files Changed:** 9 (3 new code, 2 modified code, 1 route, 4 new/modified test files) + 7 tracking docs
+**Tests Added:** 103 (unit) — 880/880 green, 100% stmts / 99.58% branches / 100% funcs / 100% lines of `app/**`
+**Commit:** see phase-2a progress log
+**Notes:** All 4 acceptance criteria met, **plus** US-015's deferred criterion ① (Reset restores the
+four baseline tiles). This is the story that makes the prototype look real: the persona sees a
+dashboard that already looks lived-in, and their questions ADD to it.
+
+**What Was Done:**
+- `app/components/dashboard/baseline-row.tsx` — the four tiles in order, as a **fragment**, so each
+  is a direct child of US-012's one canvas grid (3 + 3 + 6 columns and a full-width partner strip at
+  `lg`). It composes `KpiTile` ×2 (US-017), `HBarTile` (US-021) and `PartnersTile` on the US-005
+  `Card`; it invents no tile kind, no grid, no formatter and no figure. Layout is four span
+  constants, and the two KPI tiles `self-start` so a one-number tile is not stretched to the height
+  of a five-row bar list
+- `app/components/tiles/partner-tile.tsx` — the one new component: `PartnersTile` / `PartnerCard` /
+  `PartnerMonogram` / `partnerMonogram()`. Six plates (`BI`, `MA`, `AL`, `SU`, `FE`, `HO`) in each
+  partner's **own brand colour, from the data**, with its `PARTNER_ROLE_LABEL` role tag. A test
+  asserts **no hex and no FCB colour token appears in the file at all** — a partner plate rendered
+  in club red is wrong to a sponsor in the room, which is the audience for this prototype. Monograms
+  are `aria-hidden`; the name is text beside them
+- `app/lib/dashboard/baseline.ts` + a `loader` on `app/routes/_index.tsx` — the repository is async
+  and server-only, so the fetch is an SSR route loader (not an HTTP endpoint) and the components
+  stay data-in / DOM-out. Verified: `grep` for `Bitpanda`, `148200` or `Rotblau` over `build/client/`
+  returns nothing, so the fixtures never reach the browser bundle
+- `app/lib/repositories/derive.ts` — three pure additions. `trailingPoints`, `capacityShare` (which
+  `attendanceShare` and the new `matchCapacityShare` both now delegate to, so the ring and the match
+  tile cannot round the same ratio two ways), and **`trendEndingAt`**, which windows the sparkline so
+  it **ends on the month the headline figure covers** rather than on the tail of a year-to-date
+  series that is sliced by today's date — a test pins that it still holds in December
+- **NO FIGURE IS RE-TYPED, proven two ways.** Every rendered string is asserted equal to
+  `repository → derive → format.ts` output, and a **source scan** over the four files that touch a
+  figure fails on any displayed figure appearing as a literal in three spellings (`148200`,
+  `148_200`, `CHF 148’200`), on any `CHF <digit>` or `<n>%` string, on `FCB`/`Sion`, on any product
+  or partner name, and on `toLocaleString` / `Intl.NumberFormat` / `toFixed`
+- **Reset's baseline seam is closed the way US-015 itself described it.** US-015 named two routes and
+  US-013 took the second: a baseline tile that is static chrome "needs no entry here at all". The
+  tiles are rendered by the route, above and outside the session list, so no question can remove
+  them and Reset cannot fail to restore them. Inventing a `HeroId` per tile would have made them
+  dedupeable, re-askable, phase-flippable and removable — none of which a baseline tile is.
+  `tests/unit/baseline-reset.test.tsx` drives it: four tiles on load → two sections inserted below
+  them → Reset → zero sections, four tiles in order, canvas `innerHTML` identical to load state
+- **FIRST REAL-CHROME PASS FOR US-017, US-021 AND US-027**, all of which had deferred it because
+  nothing mounted them. At 1920×1080 on the production SSR build: four tiles at x=256/672/1088 plus
+  a full-width strip on row 2, canvas grid reporting **12 columns**, and
+  `documentElement.scrollWidth === clientWidth` — no horizontal scroll, the same at 1440, 1280, 834
+  and 390, with the strip folding 6 → 3 → 2 and **no label clipped at any width**. A per-frame probe
+  recorded **54 distinct KPI strings** (`CHF 0 → 8’098 → … → CHF 148’200`), **43 distinct bar
+  widths** (`0px → 48px → … → 504px`), the sparkline drawing from `dashoffset` 1 → 0 and the tile
+  entrance fading through **25 opacity steps** — it counts and grows, it does not snap. Under
+  `prefers-reduced-motion: reduce` the same probe recorded **2** KPI strings and **2** bar widths:
+  final state within one frame, opacity 1, `transform: none`, **nothing stranded at zero**
+- **Labels whole, measured end to end:** all five Top Products labels in a 150px column with
+  `scrollWidth <= clientWidth`, `text-overflow: clip` and `white-space: normal` — `Cap "Rotblau"`
+  and `Home shirt 26/27` complete, which is US-021's guarantee proven at the point of use
+- **Scope held:** no hero band (US-016), no period filter (US-026 — Top Products' `action` slot is
+  empty and says why), no prompt bar, no thinking panel, no narrative caption on any tile
+- **Security triage: no security-relevant changes detected.** Considered and cleared: new route
+  handler (a loader is not an HTTP endpoint — no path, params, query, body or user input, and it
+  reads a static in-repo fixture), IDOR, raw SQL, `dangerouslySetInnerHTML`, user-supplied URL /
+  SSRF, upload, dependency or lockfile change (**none** — `package.json` and `pnpm-lock.yaml`
+  untouched), env var or secret, logging, CSRF, storage API. The one value-driven style is
+  `style={{ backgroundColor: partner.brandColor }}`: a module constant, set through the CSSOM, with
+  a test asserting every `brandColor` matches `/^#[0-9A-Fa-f]{6}$/`
 
 ---
 

@@ -81,18 +81,33 @@ export const NO_SECTIONS: InsightSections = Object.freeze([]);
 /**
  * THE BASELINE — the session list as it is on load, and as Reset restores it.
  *
- * **This constant is the seam, and it is the only thing US-013 has to change.**
  * Reset is specified as "back to the initial state", not as "empty", so both
  * `useDashboard`'s initial state and {@link withBaselineRestored} read this one
- * name. The day the four baseline tiles arrive as descriptors, they are listed
- * here and load-state and reset-state stay identical for free — nothing in the
- * reset path says "empty" and so nothing has to be unpicked.
+ * name. Nothing in the reset path says "empty", so nothing has to be unpicked
+ * when the baseline gains content.
  *
- * It is empty **today** because the four pre-existing tiles (US-013) are
- * deferred to the Phase 2b run, so the canvas starts bare on purpose. Note that
- * a baseline tile which is static chrome — always on the canvas, never removed
- * by an answer — needs no entry here at all: reset only has to restore what a
- * question can change.
+ * **US-013 RESOLVED THIS SEAM BY THE SECOND OF THE TWO ROUTES IT OFFERED.**
+ * The note here always allowed for either: a baseline tile listed as a
+ * descriptor, or "a baseline tile which is static chrome — always on the
+ * canvas, never removed by an answer — needs no entry here at all: reset only
+ * has to restore what a question can change." The four pre-existing tiles are
+ * exactly that second case. They are rendered by the route
+ * (`app/routes/_index.tsx` → `components/dashboard/baseline-row.tsx`), above
+ * every inserted section and outside this list, so **no question can remove
+ * them and Reset therefore cannot fail to restore them**: load state and
+ * post-reset state are the same DOM by construction.
+ *
+ * The alternative — inventing a `HeroId` per baseline tile so they could be
+ * listed here — would have been strictly worse. A descriptor in this list is
+ * dedupeable, re-askable, phase-flippable and removable, and a baseline tile is
+ * none of those things; it would also have forced a discriminated union through
+ * every pure transition below to distinguish tiles that answer a question from
+ * tiles that are simply always there.
+ *
+ * So this list stays empty, and it means what it has always meant: the answers
+ * in the session. `tests/unit/baseline-reset.test.tsx` proves the mechanic end
+ * to end — sections inserted, Reset pressed, exactly the four baseline tiles
+ * left, in order.
  */
 export const BASELINE_SECTIONS: InsightSections = NO_SECTIONS;
 

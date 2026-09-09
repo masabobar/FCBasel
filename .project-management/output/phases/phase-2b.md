@@ -235,9 +235,9 @@ no `dangerouslySetInnerHTML` (asserted), no user-supplied URL, no upload, no env
 or lockfile change, no logging, no storage API. All rendered text is React-escaped; `format` is a
 caller-supplied pure function, not input.
 
-**One seam, stated plainly:** still no real-Chrome pass. Nothing in the app mounts these components
-yet — the first screen that does is **US-013**, and the browser verification of count-up, the stroke
-draw and two sparklines side by side belongs there.
+**One seam, stated plainly:** no real-Chrome pass here — nothing in the app mounted these components
+yet. *(Closed 2026-09-09: US-013's baseline row gave US-017, US-021 and US-027 their browser pass —
+54 distinct KPI strings and 43 distinct bar widths per frame, two values only under reduced motion.)*
 
 ### 2026-09-09 — US-021 Horizontal bar tile ✅ (3 pts)
 
@@ -294,6 +294,7 @@ survives a projector that washes the red out. Reverting it is a one-line change 
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress — US-027, US-017 and US-021 done; US-013 (deferred Phase 2a) next, now
-unblocked
+**Phase Status:** In Progress — US-027, US-017, US-021 done (3/11 · 8/29). The deferred Phase 2a
+story **US-013 was completed inside this run** and counts to Phase 2a (now 4/5 · 11/16), giving
+US-017/US-021/US-027 their first Chrome pass. **Next: US-025**, which with US-026 closes Phase 2a
 **Previous:** [Phase 2a](phase-2a.md) · **Next:** [Phase 3a — Conversation](phase-3a.md)

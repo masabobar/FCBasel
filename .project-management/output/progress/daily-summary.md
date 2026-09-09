@@ -7,10 +7,10 @@
 
 ## Today's Summary
 
-**Stories Completed:** 17 — **Phase 1a and Phase 1b complete; Phase 2a at 3/5 (partial); Phase 2b
+**Stories Completed:** 18 — **Phase 1a and Phase 1b complete; Phase 2a at 4/5 (partial); Phase 2b
 at 3/11**
-**Story Points:** 40
-**Time Worked:** ~10.5 hours · **Files Changed:** 164 · **Tests Added:** 777
+**Story Points:** 43
+**Time Worked:** ~11.5 hours · **Files Changed:** 180 · **Tests Added:** 880
 
 ---
 
@@ -18,8 +18,8 @@ at 3/11**
 
 - Project management setup: scope, backlog, docs, phases and tracking from the client documents.
 - **Phase 1a — US-001 to US-006 (14 pts), closed.** Condensed here to keep this file inside its
-  300-line limit; the full account is in [`completed.md`](completed.md) and
-  [`../phases/phase-1a.md`](../phases/phase-1a.md). In short: the React Router 7.18 SSR scaffold with
+  300-line limit; the full account is in [`../phases/phase-1a.md`](../phases/phase-1a.md). In short:
+  the React Router 7.18 SSR scaffold with
   the prototype's dependency set and a clean-checkout install/build/serve verified by execution
   (US-001, Railway deploy still a human step); ESLint 9 + Prettier + husky with the pre-commit hook
   *proved* to fire (US-002); one design-token set published as Tailwind v4 `@theme static` properties
@@ -103,90 +103,66 @@ at 3/11**
   1920×1080 (and 1280 / 900 / 390): no horizontal scroll. 475/475 green, gates clean.
 - **US-014 — Dynamic tile insertion & grid reflow.** The mechanic the demo turns on: the dashboard
   **grows, it never clears**. The session is a memory-only list of `{heroId, phase, revision}` —
-  pure transitions in `app/lib/dashboard/sections.ts`, React state in `use-dashboard.ts`, owned by
-  `root.tsx` so the canvas and the app bar share one source. Sections are **direct children of the
-  US-012 canvas grid**, re-using its tracks via `grid-cols-subgrid` — still exactly one grid.
-  Re-asking a hero **refreshes in place** — one section, original position, `revision` bumped so
-  the React key changes and the section re-inserts — and a follow-up **flips** its parent's phase
-  rather than appending, which is what US-033 inherits. Reflow runs through US-006's `animateReflow`
-  with `flushSync` inside the transition callback; real Chrome shows the view-transition group
-  animating as a second section inserts and the newest section scrolled into view (`scrollY` 0 → 154
-  at 1280×620, focus never moved), while `prefers-reduced-motion` recorded zero view transitions and
-  an identical final layout. A source scan over `app/**` bans every storage API. 552/552 green.
-  **Phase 2a now 2/5 stories, 6/16 points.**
-- ✅ US-015 — Reset to baseline (2 pts) — **3 of 5 acceptance criteria fully met; criterion 2
-  (suggestion chips) and half of criterion 4 (the thinking beat) are a SEAM pending US-029/US-031,
-  and criterion 1's four baseline tiles are US-013 (deferred).** Reset restores a *named baseline*,
-  never a literal empty list; it cancels the pending timer **first** (proven by deleting that line
-  and watching two tests fail), and ten presses in one frame run one view transition.
-  **Phase 2a now 3/5 stories, 8/16 points — the phase stays open.**
+  pure transitions in `sections.ts`, React state in `use-dashboard.ts`, owned by `root.tsx` so the
+  canvas and the app bar share one source. Sections are **direct children of the US-012 canvas
+  grid**, re-using its tracks via `grid-cols-subgrid` — still exactly one grid. Re-asking a hero
+  **refreshes in place**, and a follow-up **flips** its parent's phase rather than appending, which
+  is what US-033 inherits. Reflow runs through US-006's `animateReflow` with `flushSync` inside the
+  transition callback; real Chrome shows the view-transition group animating as a second section
+  inserts and the newest scrolled into view (`scrollY` 0 → 154 at 1280×620), while reduced motion
+  recorded zero view transitions and an identical final layout. An `app/**` source scan bans every
+  storage API. 552/552 green. **Phase 2a now 2/5 stories, 6/16 points.**
 - **US-015 — Reset to baseline.** The control that lets the demo be run twice, built as a
   **transition beside the other three** rather than a mode: `withBaselineRestored` and the named
-  `BASELINE_SECTIONS` in `sections.ts`, `reset` / `schedule` / `generation` on `use-dashboard.ts`,
-  `scrollToTop` in `motion.ts`, `<AppShell onReset={reset}>` in `root.tsx` — one implementation, and
-  the US-012 button finally acts. **Reset restores a named baseline, never a literal empty list:**
-  that constant is *also* the hook's initial state, so US-013 lists its four tiles there once and
-  load-state and reset-state stay identical for free. **The pending timer is the story.** `reset`
-  calls `cancelPending()` first, before it touches state; deleting that one line makes two tests
-  fail with `expected [ { heroId: 'HERO_2', … } ] to deeply equal []` — the thinking beat dropping
-  an answer into a dashboard the presenter had just cleared. Abuse-proofing is structural:
-  `withBaselineRestored` returns the *same list reference* when there is nothing to clear, so ten
-  presses in one frame run **one** view transition. Real Chrome (1280×620): from `scrollY` 900,
-  three rapid presses land at 0 with **zero** `startViewTransition` calls under reduced motion.
-  **Two criteria are honestly a seam, not a claim** — the chips are US-029 (derive the row from
-  `sections`) and the thinking beat is US-031 (schedule it through `schedule`). 592/592 green.
-  **Phase 2a now 3/5 stories, 8/16 points — and it stays open: US-013 and US-016 are deferred to
-  the Phase 2b run.**
+  `BASELINE_SECTIONS`, `reset` / `schedule` / `generation` on `use-dashboard.ts`, `scrollToTop`, and
+  `<AppShell onReset={reset}>` — one implementation, and the US-012 button finally acts. **Reset
+  restores a named baseline, never a literal empty list**, and that constant is *also* the hook's
+  initial state. **The pending timer is the story:** `reset` calls `cancelPending()` first, and
+  deleting that one line makes two tests fail with the thinking beat dropping an answer into a
+  dashboard the presenter had just cleared. Abuse-proofing is structural — the *same list reference*
+  comes back when there is nothing to clear, so ten presses in one frame run **one** view transition
+  (real Chrome, 1280×620: `scrollY` 900 → 0, zero `startViewTransition` calls under reduced motion).
+  The chips (US-029) and the thinking beat (US-031) are honestly a seam. 592/592 green.
+  **Phase 2a now 3/5 stories, 8/16 points — left open.**
 - **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
-  depends on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid` in
-  `app/lib/hooks/use-motion.ts`, the consumer API documented in the module header so the next ten
-  stories are composition rather than invention. **Count-up counts from the figure on screen, not
-  from zero** — the displayed value is mirrored in a ref, and a test proves a target changed
-  mid-flight opens the new animation *on that very figure*, climbs monotonically, never dips and
-  lands exactly on target, both directions. **Reduced motion means final state in the same render:**
-  `useGrow` is `true` on the first render with **zero** frames requested, so `width={grown ? w : 0}`
-  geometry is never stranded. One reduced-motion source (US-006's `REDUCED_MOTION_QUERY` via
-  `useSyncExternalStore`), every rAF/timer/listener cancelled on unmount, ~900ms promoted to the
-  `duration.countUp` token, SSR *proven* by `renderToString` plus a real `hydrateRoot` pass. Full
-  account in [`completed.md`](completed.md). 52 tests added, 644/644 green.
+  depends on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`, with the consumer API in the
+  module header so the next ten stories are composition rather than invention. **Count-up counts
+  from the figure on screen, not from zero** — a test proves a target changed mid-flight opens the
+  new animation *on that very figure* and lands exactly on target. **Reduced motion means final
+  state in the same render:** `useGrow` is `true` on the first render with **zero** frames
+  requested, so `width={grown ? w : 0}` geometry is never stranded. One reduced-motion source, every
+  rAF/timer/listener cancelled on unmount, and SSR *proven* by `renderToString` plus a real
+  `hydrateRoot` pass. 52 tests added, 644/644 green.
 - **US-017 — KPI tile & variance chip.** The first component built on those hooks, and the shape the
-  other nine follow. Three exports so nothing is forked later: `DeltaChip` in its own module
-  (US-019, US-022 and US-016 want the chip without a tile), plus `KpiSparkline`, `KpiFigure` and
-  `KpiTile`. **The chip is where "colour is never the sole signal" stops being a slogan.** Direction
-  is carried four independent times — the glyph, the explicit `+`/`-` from `formatSignedPercent`, an
-  `sr-only` word, and only then the token colour — and the `light` variant is the proof: on navy the
-  negative token sits near 2:1, so that variant drops colour coding altogether and a test asserts
-  the up and down chips' class strings are **identical** while glyph, sign and spoken word still
-  differ. Red never means "bad" (a test rejects `text-red` on the chip) and a zero is a **labelled
-  zero** in the neutral treatment. **Direction is arithmetic, judgement is meaning:** an optional
-  `judgement` prop from US-010's `varianceJudgement` draws Marketing's overspend as an up arrow in
-  the *negative* token. One API carries all three consumers with **no variant per hero** — hero
-  extras arrive as `children`, and US-016's navy band composes `KpiFigure onDark`, which forces the
-  light chip so nobody can leave an illegible red figure on navy. Nothing was reinvented: the number
-  is the existing `.kpi-number` role class and the motion is US-027's, with a test grepping the
-  source to fail on any local `useState`, timer or rAF. The sparkline draws itself with
-  `pathLength="1"` and a dash offset and paints with `currentColor`; empty, flat and single-point
-  series are handled rather than left to emit `NaN`. **The US-012 `tailwind-merge` trap
-  is closed at the root** — `app/lib/cn.ts` declares the named type scale as a font-size group,
-  derived from the token set — and the frame/preference stubs moved to
-  `tests/unit/support/motion-harness.ts`. **No browser pass, stated plainly:** nothing mounts these
-  components yet, so US-013 owns that. 78 tests added, 722/722 green.
+  other nine follow. Three exports so nothing is forked later: `DeltaChip` in its own module, plus
+  `KpiSparkline`, `KpiFigure` and `KpiTile`. **The chip is where "colour is never the sole signal"
+  stops being a slogan.** Direction is carried four independent times — glyph, explicit sign,
+  `sr-only` word, and only then the token colour — and the `light` variant is the proof: on navy it
+  drops colour coding altogether, and a test asserts the up and down chips' class strings are
+  **identical** while glyph, sign and spoken word still differ. Red never means "bad" and a zero is
+  a **labelled zero**. **Direction is arithmetic, judgement is meaning:** an optional `judgement`
+  prop draws Marketing's overspend as an up arrow in the *negative* token. One API carries all three
+  consumers with **no variant per hero** — hero extras arrive as `children`, and US-016's band
+  composes `KpiFigure onDark`, which forces the light chip. Nothing was reinvented: the number is
+  the existing `.kpi-number` role class and the motion is US-027's, with a test failing on any local
+  `useState`, timer or rAF. **The US-012 `tailwind-merge` trap is closed at the root.** No browser
+  pass here: nothing mounted these components yet, so US-013 owned it. 78 tests, 722/722.
 - **US-021 — Horizontal bar tile.** The most reused chart in the product, built once for five
   consumers (Top Products, top printed names, the badge trend, the declining fixtures, the Marketing
   drivers) as `HBarRow` / `HBars` / `HBarTile` in `app/components/charts/h-bars.tsx`. **The two
   review decisions are read back off the rendered element by tests, not just written down:** the
-  label column is 150px at weight 500 and a test *rejects* `truncate`, `text-ellipsis` and
-  `line-clamp`, so `Cap "Rotblau"` and `Home shirt 26/27` cannot regain the ellipsis they were
-  reported with (a long label wraps instead); the value column is 96px with `white-space: nowrap`,
-  asserted through `getComputedStyle` on three different lists, with `-CHF 150k` and `-CHF 110k`
-  each a single text node. **One rule serves every consumer: the sign of the displayed figure** — it
+  label column is 150px and a test *rejects* `truncate`, `text-ellipsis` and `line-clamp`, so
+  `Cap "Rotblau"` and `Home shirt 26/27` cannot regain the ellipsis they were reported with; the
+  value column is 96px with `white-space: nowrap`, asserted through `getComputedStyle` on three
+  lists, with `-CHF 150k` and `-CHF 110k` each a single text node. **One rule serves every
+  consumer: the sign of the displayed figure** — it
   sets the side the bar grows from, the token and the sign in the text, so `negative` mode is only
   "every row is a decline" (it negates the stored magnitude, idempotently) and the badge trend's
   mixed signs need nothing extra. Rows are keyed by name, so a filter change transitions the *same*
   bar (a test holds its identity while the width moves 100% → 50%) while the figure counts on from
   what is on screen; `hBarMax` / `hBarPercent` are pure and return zero width rather than `NaN`, so
   an all-zero list still renders labelled zeros. One deviation flagged for review: a decline grows
-  *leftwards* where the reference drew every bar rightwards. 55 tests added, 777/777 green.
+  *leftwards* where the reference drew every bar rightwards. 55 tests, 777/777 green.
 ---
 
 ## Stories Completed Today
@@ -236,6 +212,29 @@ at 3/11**
   no truncation class, and the 96px `nowrap` value column keeping `-CHF 150k` on one line — and one
   rule (the sign of the displayed figure) covers positive lists, `negative` mode and a mixed-sign
   dataset alike. US-023 composes it; US-013 is unblocked. **Phase 2b now 3/11 stories, 8/29 points.**
+- ✅ US-013 — Baseline dashboard, four pre-existing tiles (3 pts) — all 4 acceptance criteria met,
+  **plus** US-015's deferred criterion ① (Reset restores exactly these four tiles). The dashboard
+  now reads as lived-in on load, every figure traces to the US-007 repository through an SSR loader,
+  and the row composes existing components rather than adding a tile kind. First real-Chrome pass
+  for US-017, US-021 and US-027. **Phase 2a now 4/5 stories, 11/16 points** — US-016 still deferred,
+  so the phase stays open.
+
+- **US-013 — Baseline dashboard: four pre-existing tiles.** The story that makes the prototype look
+  real, and the deferred Phase 2a one US-017 + US-021 had just unblocked. **The canvas stops being
+  empty:** four tiles in order — Webshop revenue, Last home match, Top products, Active partners —
+  as direct children of US-012's one canvas grid, composing `KpiTile`, `HBarTile` and the `Card`
+  shell. Nothing was reinvented; the only new component is the partner strip. **No figure is
+  re-typed:** the route gained an SSR `loader` that reads the US-007 repository through a new
+  `app/lib/dashboard/baseline.ts`, the webshop headline and its `+11.9%` are `seriesTotals` off the
+  same array the sparkline draws, and a source scan fails on any dataset figure written as a literal
+  in the components. **Reset's baseline seam is closed the way US-015 described it** — the tiles are
+  static chrome on the route, outside the session list, so a question cannot remove them and Reset
+  cannot fail to restore them; a test drives insert → Reset and compares the canvas to its load
+  state. **This is also the first real-Chrome pass for US-017, US-021 and US-027**, all of which had
+  deferred one: no horizontal scroll at 1920×1080 (nor 1440/1280/834/390), a per-frame probe showing
+  54 distinct KPI strings and 43 distinct bar widths, and two values only under reduced motion —
+  final state, nothing stranded at zero. 880/880, gates clean, coverage 100% stmts / 99.58%
+  branches.
 
 ---
 
@@ -247,39 +246,36 @@ at 3/11**
 
 ## Open Human Step
 
-- **Deploy to Railway** (US-001, the remaining AC). The repo is deploy-ready. Run
-  `railway login && railway init && railway up`, open the URL in Chrome, then record it in
-  `output/phases/phase-1a.md` and the backlog entry.
+- **Deploy to Railway** (US-001, the remaining AC). The repo is deploy-ready: run
+  `railway login && railway init && railway up`, then record the URL in `output/phases/phase-1a.md`.
 
 ---
 
 ## Next Day Plan
 
 **Immediate Focus:**
-- **Phase 2a is done for now at 3/5 stories, 8/16 points** — US-012, US-014, US-015 built. It is
-  deliberately left open, not closed.
-- **Phase 2b — the component library** is under way: the motion hooks (US-027), the KPI tile (US-017)
-  and the horizontal bar row (US-021) are done. Next is **US-013 — Baseline dashboard, four
-  pre-existing tiles (3 pts)**, the deferred Phase 2a story US-017 + US-021 have just unblocked, then
-  US-025, US-026, US-016 and the rest of the charts. Every one of them should import from
-  `app/lib/hooks/use-motion.ts` rather than animate by hand, and compose `Card`, `DeltaChip` and now
+- **Phase 2a is at 4/5 stories, 11/16 points** — US-012, US-013, US-014, US-015 built. Only US-016
+  is left, and it stays deferred until US-025 and US-026 exist, so the phase remains open.
+- **Phase 2b — the component library** is under way: the motion hooks (US-027), the KPI tile
+  (US-017) and the horizontal bar row (US-021) are done, and US-013 has now given all three their
+  first browser pass. Next is **US-025 — line chart component (3 pts)**, then US-026, which together
+  unblock US-016 and close Phase 2a. Every remaining component should import from
+  `app/lib/hooks/use-motion.ts` rather than animate by hand, and compose `Card`, `DeltaChip` and
   `HBars` rather than restate them — US-023 in particular must reuse US-021's bar row.
 
-**Priority Stories for This Week:**
-1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
-2. Phase 2a + 2b — shell and component library (45 pts): the largest block
-3. Phase 3a + 3b — conversation and the three heroes (33 pts): the demo itself
+**Priority Stories for This Week:** Phase 1a + 1b foundations (24 pts, done) → Phase 2a + 2b shell
+and component library (45 pts, the largest block) → Phase 3a + 3b conversation and the three heroes
+(33 pts, the demo itself).
 
 ---
 
 ## Notes
 
 - **The deadline is this week.** Sponsor showing first, owner audience the following week.
-- Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
-- If the week gets tight, extend daily runtime before cutting scope — the P1 cut set is worth only
-  ~0.82 days at 8h/day.
-- Phases 1a and 1b are complete, Phase 2a is at 3/5 and Phase 2b at 3/11 (40/116 points); continue
-  with `/holycode-pm:execute-work phase 2b`, finishing US-013 and US-016 inside that run.
+  Estimated ~52 AI-core / ~68 AI-realistic hours for the full 116 points; if the week gets tight,
+  extend daily runtime before cutting scope — the P1 cut set is worth only ~0.82 days at 8h/day.
+- Phases 1a and 1b are complete, Phase 2a is at 4/5 and Phase 2b at 3/11 (43/116 points); continue
+  with `/holycode-pm:execute-work phase 2b`, finishing US-016 inside that run once US-025/US-026 land.
 - **US-021 is the reuse test for the whole epic:** `HBars` / `HBarRow` must be the only horizontal
   bar row in the codebase. Its 150px no-truncate label and 96px `nowrap` value column are review
   decisions, and a second implementation would silently drop both.
@@ -290,7 +286,11 @@ at 3/11**
   chip (US-019 and US-022 import it, judgement passed in), and `app/lib/cn.ts` protects named size
   tokens — but only through `cn`, so a hand-written `class="text-caption text-muted"` is on its own.
 - **Reset's seams are recorded in code:** US-029's chips should be *derived* from `useDashboard`'s
-  `sections` and US-031's thinking beat *scheduled* through its `schedule`.
+  `sections` and US-031's thinking beat *scheduled* through its `schedule`. US-013 closed the third
+  (the baseline tiles) as static chrome on the route — do not move them into the session list.
+- **US-013 set the no-hardcoded-figure pattern for every hero:** figures reach a component only
+  through a loader-provided view model, and `tests/unit/baseline-row.test.tsx` scans the component
+  sources for any dataset figure written as a literal. US-034 to US-039 should copy that scan.
 - The shell keeps two guardrails as *tests*: the app bar's whole text must equal the known role
   labels (no personal name can appear), and the connection status file must contain no `fetch`,
   `axios`, `useEffect` or timer (it cannot become a live health check).

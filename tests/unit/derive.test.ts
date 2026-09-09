@@ -6,10 +6,14 @@ import {
   attendanceChangePercent,
   attendanceShare,
   badgeSegments,
+  capacityShare,
   kitRevenue,
+  matchCapacityShare,
   percentChange,
   scoreline,
   seriesTotals,
+  trailingPoints,
+  trendEndingAt,
 } from "../../app/lib/repositories/derive";
 import { type BadgeSponsorShare } from "../../app/lib/repositories/types";
 
@@ -73,6 +77,96 @@ describe("attendance derivations", () => {
 
   it("compares the average against the previous period", () => {
     expect(attendanceChangePercent(attendance)).toBe(5.1);
+  });
+
+  it("shares one capacity division with a single fixture", () => {
+    // The period ring and the "Last home match" tile quote the same 76%. They
+    // hold different objects, so both go through `capacityShare`.
+    const match = {
+      opponent: "Sion",
+      goalsFor: 2,
+      goalsAgainst: 1,
+      attendance: attendance.average,
+      capacity: attendance.capacity,
+    };
+
+    expect(matchCapacityShare(match)).toBe(attendanceShare(attendance));
+    expect(capacityShare(attendance.average, attendance.capacity)).toBe(
+      matchCapacityShare(match),
+    );
+  });
+
+  it("returns zero share for a fixture with no known capacity", () => {
+    expect(
+      matchCapacityShare({
+        opponent: "Sion",
+        goalsFor: 2,
+        goalsAgainst: 1,
+        attendance: 28_900,
+        capacity: 0,
+      }),
+    ).toBe(0);
+  });
+});
+
+describe("trailingPoints", () => {
+  const series = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  it("takes the last N points, oldest first", () => {
+    expect(trailingPoints(series, 6)).toEqual([4, 5, 6, 7, 8, 9]);
+  });
+
+  it("ends on the same figure the series ends on", () => {
+    expect(trailingPoints(series, 6).at(-1)).toBe(series.at(-1));
+  });
+
+  it("returns a short series whole rather than padding it", () => {
+    expect(trailingPoints([10, 20], 6)).toEqual([10, 20]);
+    expect(trailingPoints([10], 6)).toEqual([10]);
+  });
+
+  it("draws nothing for an empty series or a non-positive window", () => {
+    expect(trailingPoints([], 6)).toEqual([]);
+    expect(trailingPoints(series, 0)).toEqual([]);
+    expect(trailingPoints(series, -3)).toEqual([]);
+  });
+
+  it("copies rather than aliasing the series it windows", () => {
+    const source = [1, 2, 3];
+    const window = trailingPoints(source, 3);
+    window[0] = 99;
+
+    expect(source[0]).toBe(1);
+  });
+});
+
+describe("trendEndingAt", () => {
+  const monthly = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
+
+  it("ends the window on the point the headline figure covers", () => {
+    expect(trendEndingAt(monthly, 90, 6)).toEqual([40, 50, 60, 70, 80, 90]);
+  });
+
+  it("ignores points after that one, however far the series runs on", () => {
+    // The whole reason this exists: a plain tail would end on 110.
+    expect(trendEndingAt(monthly, 90, 6).at(-1)).toBe(90);
+    expect(trailingPoints(monthly, 6).at(-1)).toBe(110);
+  });
+
+  it("takes the last occurrence when a figure repeats", () => {
+    expect(trendEndingAt([5, 7, 5, 9], 5, 2)).toEqual([7, 5]);
+  });
+
+  it("falls back to the tail when the figure is not in the series", () => {
+    expect(trendEndingAt(monthly, 95, 3)).toEqual([90, 100, 110]);
+  });
+
+  it("returns what exists when the window is longer than the series", () => {
+    expect(trendEndingAt([10, 20, 30], 30, 6)).toEqual([10, 20, 30]);
+  });
+
+  it("draws nothing for an empty series", () => {
+    expect(trendEndingAt([], 30, 6)).toEqual([]);
   });
 });
 

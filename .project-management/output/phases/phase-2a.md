@@ -29,12 +29,12 @@ is asked.
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline (16 story points)
 
-**Priority:** P0 (US-016 is P1) · **Status:** In Progress (3/5 completed) · **Dependencies:** US-003, US-004, US-005, US-007
+**Priority:** P0 (US-016 is P1) · **Status:** In Progress (4/5 completed) · **Dependencies:** US-003, US-004, US-005, US-007
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
 | US-012 | Branded application shell | 3 | P0 | ✅ Completed |
-| US-013 | Baseline dashboard — four pre-existing tiles | 3 | P0 | ⏸️ Deferred to Phase 2b run |
+| US-013 | Baseline dashboard — four pre-existing tiles | 3 | P0 | ✅ Completed |
 | US-014 | Dynamic tile insertion & grid reflow | 3 | P0 | ✅ Completed |
 | US-015 | Reset to baseline | 2 | P0 | ✅ Completed |
 | US-016 | Hero band — webshop trend & attendance ring | 5 | **P1** | ⏸️ Deferred to Phase 2b run |
@@ -77,11 +77,12 @@ is asked.
 - **Risk Level:** Medium — US-014's reflow behaviour is where visual polish is won or lost
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 8 / 16 (50%)
-- **Completed Stories:** 3 / 5 — **the phase is NOT complete**
-- **Deferred:** US-013 (3 pts) and US-016 (5 pts) → the **Phase 2b run**; their component
-  dependencies (US-017, US-021, US-025, US-026, US-027) all live in Phase 2b
-- **Tests Passing:** 592 / 592 · **Coverage:** 100% stmts / 99.2% branches / 100% funcs (`app/**`) · **Commits:** 3
+- **Completed Story Points:** 11 / 16 (69%)
+- **Completed Stories:** 4 / 5 — **the phase is NOT complete**
+- **Deferred:** US-016 (5 pts) → still open; its dependencies US-025 (line chart) and US-026
+  (segmented filter) are not built yet. US-013 was completed in the Phase 2b run on 2026-09-09,
+  once US-017 and US-021 existed
+- **Tests Passing:** 880 / 880 · **Coverage:** 100% stmts / 99.6% branches / 100% funcs (`app/**`) · **Commits:** 4
 
 ---
 
@@ -90,8 +91,9 @@ is asked.
 **Depends On:**
 - US-003 tokens, US-004 crest, US-005 card shell, US-006 insertion motion (Phase 1a)
 - US-007 baseline datasets (Phase 1b)
-- US-021 horizontal bar tile — **needed by US-013** for Top Products
-- US-025, US-026, US-027 — **needed by US-016** for the hero band
+- US-017 KPI tile + US-021 horizontal bar tile — **needed by US-013**; both landed 2026-09-09 and
+  US-013 shipped immediately after
+- US-025, US-026, US-027 — **needed by US-016** for the hero band (US-027 landed; US-025/US-026 open)
 
 **Blocks:** US-033 (follow-up gating) needs US-014's insertion mechanic.
 
@@ -107,7 +109,7 @@ is asked.
 |------|--------|-------|------------|-------|--------|
 | Grid jumps instead of reflowing when tiles insert | High | Medium | Existing tiles animate to new positions; verified in US-043 polish | AI | Mitigated — US-014 wraps every insertion in a view transition; `::view-transition-group(fcb-tile-HERO_1)` observed animating in real Chrome while a second section inserted |
 | Reset mid-flow leaves an orphaned timeout or animation | Medium | Medium | Reset clears the pending timeout ref; verified in US-042 and US-045 | AI | Mitigated — US-015 owns the single pending timer (`schedule`) and cancels it **first**, before touching state. Proven by deleting the cancel: the beat then inserted `HERO_2` into the reset dashboard and two tests failed. Repeated presses run one transition, not several |
-| Cross-phase dependency stalls US-013 / US-016 | Medium | High | See sequencing note above — reorder within the phase rather than blocking | AI | Open |
+| Cross-phase dependency stalls US-013 / US-016 | Medium | High | See sequencing note above — reorder within the phase rather than blocking | AI | Half closed — US-013 shipped in the Phase 2b run the day US-017 and US-021 landed, with no rework to either. US-016 stays open until US-025/US-026 exist |
 | Horizontal scroll appears at 1080p | High | Low | Responsive 12-column grid; verified in US-040 | AI | Mitigated — US-012 shell measured in Chrome at 1920×1080, `scrollWidth === clientWidth` |
 
 ---
@@ -116,99 +118,48 @@ is asked.
 
 ### 2026-09-09 — US-012 Branded application shell ✅ (3 pts)
 
-**Delivered:** the frame every state of SCREEN-001 lives in.
-- `app/components/chrome/sidebar.tsx` — navy sidebar, `Dashboard` active (`aria-current="page"`),
-  three inert placeholders. Hidden below `lg` so a narrow viewport gives the canvas full width.
-- `app/components/chrome/top-bar.tsx` — crest, workspace label, decorative connection status,
-  Reset, "SM" monogram.
-- `app/components/chrome/app-shell.tsx` — composition plus the responsive canvas grid
-  (12 → 8 → 4 columns). The grid is left **empty** for US-013/US-014.
-- `app/lib/persona.ts` — the role-not-a-person guardrail in one place.
-- `app/root.tsx` now mounts the shell around `<Outlet />`; `app/routes/_index.tsx` is reduced to the
-  screen's `h1` so the routed page renders as grid items on the canvas.
+**Delivered:** the frame every state of SCREEN-001 lives in — `chrome/{sidebar,top-bar,app-shell}`,
+plus `lib/persona.ts` (the role-not-a-person guardrail) and the responsive 12 → 8 → 4 canvas grid,
+left **empty** for US-013/US-014. `root.tsx` mounts the shell around `<Outlet />`.
 
 **Inert items are inert structurally, not by handler:** plain `<span>` (no `href`, no `role`, no
-handler, no focus, `pointer-events-none`) with `aria-disabled="true"`. Measured in real Chrome:
-`tabIndex` -1 and `pointer-events: none` on all three; a synthesised `click` leaves the router
-location at `/`. A source guard fails the build if a `hover:` rule or a second route target appears
-in the file.
+handler, no focus, `pointer-events-none`, `aria-disabled`). Chrome: `tabIndex` -1 on all three, a
+synthesised click leaves the router at `/`. **"Connected · 11 systems" is decorative** (no `fetch`,
+no `useEffect`, no timer in the file). **Reset renders but does nothing** — behaviour is US-015.
 
-**"Connected · 11 systems" is decorative** — static text, `data-decorative="true"`, no live region,
-and source assertions that the file contains no `fetch`, no `axios`, no `useEffect` and no timer, so
-it cannot be wired to a health check. **Reset renders but does nothing** beyond an injected
-callback; behaviour is US-015.
+**Verified in Chrome at 1920×1080:** `scrollWidth === clientWidth` (also 1280, 900, 390); the
+sidebar disappears at 900. **Gates:** all ✅ · 475/475 tests · coverage 100% stmts / 98.9% branches.
+**Security triage:** no security-relevant changes detected. Full detail in `completed.md`.
 
-**Verified in Chrome at 1920×1080:** `scrollWidth === clientWidth` (also at 1280, 900, 390); the
-sidebar disappears at 900 and the grid steps 12 → 8 → 4.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 475/475 tests ✅ · build ✅ · coverage 100% stmts /
-98.9% branches. **Security triage:** no security-relevant changes detected — no endpoint, no raw
-SQL, no `dangerouslySetInnerHTML`, no user-supplied URL, no upload, no env var, no dependency
-change. All rendered text comes from module constants and is React-escaped.
-
-**Not built here, on purpose:** the four baseline tiles (US-013), tile insertion (US-014), reset
-behaviour (US-015), the hero band (US-016).
-
-**Next:** US-014 — dynamic tile insertion & grid reflow (3 pts). US-013 and US-016 stay deferred to
-the Phase 2b run; their component dependencies live there.
+**Next:** US-014 — dynamic tile insertion & grid reflow (3 pts).
 
 ### 2026-09-09 — US-014 Dynamic tile insertion & grid reflow ✅ (3 pts)
 
 **Delivered:** the mechanic the whole demo turns on — the dashboard grows, it never clears.
-- `app/lib/dashboard/sections.ts` — the session as a pure, memory-only list of
-  `{ heroId, phase, revision }`; append / refresh-in-place / flip-the-phase, and nothing else.
-- `app/lib/dashboard/use-dashboard.ts` — the hook every question arrives through
-  (`showHero` / `showFollowUp`), wrapping each mutation in US-006's `animateReflow` and publishing a
-  `focus` signal for the auto-scroll.
-- `app/components/heroes/hero-section.tsx` + `insight-sections.tsx` — the section frame (label,
-  narrative first, staggered tiles) and the ordered region, rendered as **direct children of the
-  US-012 canvas grid**.
-- `app/lib/motion.ts` — adds `scrollRevealedIntoView`, the reduced-motion-aware auto-scroll.
-- `app/root.tsx` now owns the session state, above both the canvas and the app bar.
-- `app/lib/repositories/enums.ts` — `HeroId` / `HERO_IDS`, the identity a question resolves to and
-  the key a section is deduped by.
+`lib/dashboard/sections.ts` (the session as a pure, memory-only list of `{ heroId, phase,
+revision }`), `use-dashboard.ts` (the hook every question arrives through), `heroes/{hero-section,
+insight-sections}.tsx`, `scrollRevealedIntoView` in `lib/motion.ts`, and `HeroId` / `HERO_IDS` in
+the enum module. `root.tsx` now owns the session state, above both the canvas and the app bar.
 
-**Dedupe by hero id, proven three ways:** the pure list returns one entry after five re-asks; the
-hook keeps two sections when hero 1 is asked twice around hero 2, with hero 1 still first; and real
-Chrome shows two sections (order intact) after a re-ask. A refresh keeps POSITION and PHASE and only
-bumps `revision`, which changes the React key so the section re-inserts in place instead of sitting
-there unchanged — and a section that already shows its follow-up never regresses.
-
-**Follow-up flips, it does not append** — `withFollowUpShown` sharpens the existing section
-(`data-phase="withFollowUp"`, a second panel appears in the same section). US-033 inherits this
-directly; a follow-up whose parent has not been shown renders the parent first, never an error.
+**Dedupe by hero id, proven three ways** (pure list, hook, real Chrome). A refresh keeps POSITION
+and PHASE and only bumps `revision`; a section already showing its follow-up never regresses. **A
+follow-up flips its parent's phase, it does not append** — the behaviour US-033 inherits.
 
 **One grid, not two.** A section spans the canvas grid and re-uses its tracks through
-`grid-cols-subgrid`, so a tile asking for 6 of 12 columns lands on the canvas's own tracks —
-measured in Chrome at 1920×1080: canvas tracks 122.656px, section computed `subgrid`, placeholder
-tiles 816px wide at x=256 and x=1088 (exactly 6 columns + gap).
+`grid-cols-subgrid`: Chrome at 1920×1080 showed canvas tracks of 122.656px and placeholder tiles
+816px wide at x=256/1088 (exactly 6 columns + gap). **Reflow, never jump:**
+`::view-transition-group(fcb-tile-HERO_1)` animates while a second section inserts, which
+`flushSync` inside the transition callback is what makes real. Auto-scroll took `scrollY` 0 → 154 at
+1280×620; under reduced motion Chrome recorded **zero** `startViewTransition` calls.
 
-**Reflow, never jump — verified in real Chrome:** inserting a second section animates
-`::view-transition-group(fcb-tile-HERO_1)` (the existing section gliding to its new row) alongside
-`::view-transition-new(fcb-tile-HERO_2)`. `flushSync` inside the transition callback is what makes
-this real: a batched React update would let the browser capture the old layout twice.
+**No persistence, by specification:** an `app/**` source scan fails on any `localStorage`,
+`sessionStorage`, `indexedDB` or `document.cookie`. **Scope held:** hero content is a marked
+placeholder; `HeroSectionBody` is the single seam US-034 to US-039 replace.
 
-**Auto-scroll and reduced motion:** the newest (or freshly sharpened) section is scrolled into view
-with `behavior: "smooth"`, `"auto"` under `prefers-reduced-motion`, and focus is never moved. At
-1280×620, `window.scrollY` went 0 → 154 as the third section overflowed the canvas, with section 1
-still in the DOM. Under reduced motion Chrome recorded **zero** `startViewTransition` calls and an
-identical final layout (opacity 1, same tile geometry, subgrid intact).
+**Gates:** all ✅ · 552/552 tests (77 new) · coverage 100% stmts / 99.1% branches. **Security
+triage:** no security-relevant changes detected. Full detail in `completed.md`.
 
-**No persistence, by specification:** a source scan over all of `app/**` (comments stripped) fails
-on any `localStorage`, `sessionStorage`, `indexedDB` or `document.cookie`, and a remount test shows
-the session starting empty again, as a reload would.
-
-**Scope held:** hero tiles are Phase 2b and hero narratives Phase 3b, so the body is a clearly
-marked placeholder — a test asserts no digit reaches the screen from it. `HeroSectionBody` is the
-single seam US-034 to US-039 replace.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 552/552 tests ✅ (77 new) · build ✅ · coverage 100%
-stmts / 99.1% branches. **Security triage:** no security-relevant changes detected — no endpoint, no
-raw SQL, no `dangerouslySetInnerHTML`, no user-supplied URL, no upload, no env var, no dependency
-change, and no storage API. All rendered text comes from module constants and is React-escaped.
-
-**Next:** US-015 — Reset to baseline (2 pts); it adds `reset` to `useDashboard` and wires the app
-bar's existing `onReset`. US-013 and US-016 stay deferred to the Phase 2b run.
+**Next:** US-015 — Reset to baseline (2 pts).
 
 ### 2026-09-09 — US-015 Reset to baseline ✅ (2 pts)
 
@@ -234,40 +185,116 @@ describe are not built:
 - **③ and ⑤ are fully met today.**
 
 **THE TIMER, PROVEN BY BREAKING IT.** `reset` calls `cancelPending()` first, before it touches
-state. Deleting that one line makes two tests fail with
-`expected [ { heroId: 'HERO_2', … } ] to deeply equal []` — the pending beat inserting an answer
-into a dashboard the presenter had just cleared. `schedule` also keeps only ONE timer pending
-(a second replaces the first), and an unmount cancels it as a reset the user did not press.
+state; deleting that one line makes two tests fail with the pending beat inserting an answer into a
+dashboard the presenter had just cleared. `schedule` keeps only ONE timer pending, and an unmount
+cancels it. **Abuse-proof by construction:** `withBaselineRestored` returns the *same list
+reference* when there is nothing to clear, so ten presses in one frame run **one** view transition.
 
-**Abuse-proof by construction, not by a guard clause.** `withBaselineRestored` hands back the *same
-list reference* when there is nothing to clear, which is how the hook tells "something to clear"
-from "nothing to clear". Ten presses in one frame → **one** view transition, one baseline list, zero
-duplicates; a press with an empty canvas starts no transition at all; interleaved
-question/reset/question bursts end with exactly one section.
+**Verified in real Chrome (1280×620):** three rapid presses from `scrollY` 900 → 0, three scroll
+requests, **zero** `startViewTransition` calls — the no-op path under abuse; `behavior: "auto"`
+throughout under reduced motion. The *clearing* reflow could not yet be driven from the UI.
 
-**Verified in real Chrome (1280×620):** from `scrollY` 900, three rapid Reset presses land at
-`scrollY` 0 with three scroll requests (a browser replaces an in-flight smooth scroll rather than
-stacking) and **zero** `startViewTransition` calls despite the browser supporting them — the no-op
-path under abuse. Under `prefers-reduced-motion: reduce` all three presses requested
-`behavior: "auto"`. Shell, canvas and Reset control intact, no page error. The *clearing* reflow
-cannot yet be driven from the UI (no prompt bar until US-028), so it is covered by jsdom against a
-real-shaped `startViewTransition` and gets its browser pass with US-029's chips.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 592/592 tests ✅ (40 new) · build ✅ · coverage 100%
-stmts / 99.2% branches / 100% funcs. **Security triage:** no security-relevant changes detected —
-no endpoint, no raw SQL, no `dangerouslySetInnerHTML`, no user-supplied URL, no upload, no env var,
-no dependency or lockfile change, no logging, and no storage API (the `app/**` scan still passes).
-`reset` takes no arguments, so no user input reaches it; the only new resource is one timer, bounded
-to one at a time and cleared on reset and on unmount.
+**Gates:** all ✅ · 592/592 tests (40 new) · coverage 100% stmts / 99.2% branches. **Security
+triage:** no security-relevant changes detected. Full detail in `completed.md`.
 
 **Next:** Phase 2b — the tile components (US-017 to US-027). US-013 and US-016 are completed **in
 that run**, once their dependencies exist; Phase 2a therefore closes at **3/5 stories, 8/16 points**
 and is deliberately left open.
 
+### 2026-09-09 — US-013 Baseline dashboard: four pre-existing tiles ✅ (3 pts, in the Phase 2b run)
+
+**Delivered: the canvas stops being empty.** This is the first impression in the owner meeting and
+the client's own framing of the mechanic — the persona sees a dashboard that already looks lived-in,
+and their questions ADD to it rather than filling a blank one. Everything here **composes** the
+Phase 1a/2b parts; no tile kind, grid, formatter or figure was invented.
+
+- `app/lib/dashboard/baseline.ts` — `loadBaseline(repository)`, the view model the route's loader
+  hands to the row. One place reads the US-007 repository, derives the webshop total and delta, and
+  windows the sparkline; nothing downstream holds a number it did not receive.
+- `app/components/dashboard/baseline-row.tsx` — the four tiles, in order, as **direct children of
+  the US-012 canvas grid** (a fragment, so there is still exactly one grid). `KpiTile` ×2,
+  `HBarTile`, `PartnersTile`; layout is four span constants and nothing else.
+- `app/components/tiles/partner-tile.tsx` — `PartnersTile` / `PartnerCard` / `PartnerMonogram` /
+  `partnerMonogram()`. The one new component, and it is a `Card` composition.
+- `app/routes/_index.tsx` — gains a `loader` (React Router 7 framework mode, SSR). The repository is
+  async and server-only, so the fetch happens there and the components stay data-in / DOM-out.
+- `app/lib/repositories/derive.ts` — three pure additions: `trailingPoints`, `trendEndingAt`, and
+  `capacityShare` (which `attendanceShare` and the new `matchCapacityShare` now both delegate to, so
+  the ring and the match tile cannot round the same ratio two ways).
+
+**② NO FIGURE IS RE-TYPED — proven two ways, not asserted.** Every rendered string is asserted
+EQUAL to `repository → derive → format.ts` output, and a **source scan** over `baseline-row.tsx`,
+`partner-tile.tsx`, `baseline.ts` and `_index.tsx` fails on any displayed figure appearing as a
+literal in three spellings (`148200`, `148_200`, `CHF 148’200`), on any `CHF <digit>` or `<n>%`
+string, on `FCB`/`Sion`, on any product or partner name, and on `toLocaleString` /
+`Intl.NumberFormat` / `toFixed`. The webshop headline and its `+11.9%` are `seriesTotals` off the
+same array the sparkline draws, so the number and its own glyph cannot disagree — and
+`trendEndingAt` makes that structural: the six-point window **ends on the month the headline
+covers**, located inside the monthly series rather than taken off its tail, so it still holds in
+December when the year-to-date series runs past the baseline month (a test pins that).
+
+**③ Partner plates.** Six monograms (`BI`, `MA`, `AL`, `SU`, `FE`, `HO`) on plates painted in the
+partner's OWN brand colour, each with its `PARTNER_ROLE_LABEL` role tag. The colour arrives as data
+and is applied as an inline style: a test asserts **no hex and no `bg-red`/`bg-navy` token appears
+in the file at all**, because a partner plate rendered in club red is wrong to a sponsor in the
+room. Monograms are `aria-hidden` — the name is text beside them. Hover lift measured in real
+Chrome: **exactly 2px** and `shadow-raised`, timed off `--duration-fast`.
+
+**④ Top Products labels are whole, end to end.** Measured in Chrome on the real data:
+`scrollWidth <= clientWidth` on all five labels (nothing ellipsised), each in a 150px column,
+`text-overflow: clip`, `white-space: normal` — `Cap "Rotblau"` and `Home shirt 26/27` both complete.
+
+**RESET INHERITS THE BASELINE, and the seam US-015 left is closed the way US-015 itself described.**
+US-015 offered two routes and named both; US-013 took the second — a baseline tile that is static
+chrome "needs no entry here at all". The four tiles are rendered by the ROUTE, above and outside the
+session list, so **no question can remove them and Reset cannot fail to restore them**: load state
+and post-reset state are the same DOM by construction, with no baseline special-case anywhere in the
+reset path. Inventing a `HeroId` per tile would have made them dedupeable, re-askable,
+phase-flippable and removable — none of which a baseline tile is — and forced a discriminated union
+through every pure transition. `tests/unit/baseline-reset.test.tsx` drives the whole mechanic: four
+tiles on load → two sections inserted **below** them, order and figures intact → Reset → zero
+sections, exactly four tiles in order, and the canvas `innerHTML` byte-identical to its load state
+(only React's `useId` gradient ids normalised). Repeated presses stay stable.
+
+**FIRST REAL-CHROME PASS FOR US-017, US-021 AND US-027** — all three deferred visual verification
+because nothing mounted them. At 1920×1080 on the production SSR build:
+- four tiles in order at x=256/672/1088 and a full-width partner strip on row 2; canvas grid
+  reports **12 columns**; `documentElement.scrollWidth === clientWidth` (1920) — **no horizontal
+  scroll**, and the same at 1440, 1280, 834 and 390, with the partner strip folding 6 → 3 → 2 and
+  no label clipped at any width;
+- **the number counts up and the bars grow, they do not snap:** a per-frame probe recorded **54
+  distinct KPI strings** (`CHF 0 → 8’098 → 15’849 → … → CHF 148’200`), **43 distinct bar widths**
+  (`0px → 48px → 97px → … → 504px`), the sparkline stroke drawing from `dashoffset` 1 → 0, and the
+  tile entrance fading through **25 opacity steps**;
+- under `prefers-reduced-motion: reduce` the same probe recorded **2** distinct KPI strings and **2**
+  bar widths — final state within one frame, opacity 1, `transform: none`, bars at 504px, sparkline
+  at `dashoffset: 0`. **Nothing is stranded at zero.**
+
+**Scope held.** No hero band (US-016), no period filter (Top Products' `action` slot is empty and
+says why), no prompt bar, no thinking panel, no narrative caption on any tile. The client build
+confirms the `.server` boundary: `grep` for `Bitpanda`, `148200` and `Rotblau` over `build/client/`
+returns nothing, so the fixtures never reach the browser bundle.
+
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 880/880 tests ✅ (103 new) · build ✅ · coverage
+**100% stmts / 99.58% branches / 100% funcs / 100% lines** (`app/**`). **Security triage:** no
+security-relevant changes detected. Triggers considered — new route handler (a React Router loader
+is not an HTTP endpoint: no path, no params, no query, no body, no user input, and it reads a static
+in-repo fixture), resource-by-id lookup (none), raw SQL (none), `dangerouslySetInnerHTML` /
+`innerHTML` (none), user-supplied `href`/`src`/URL and SSRF (none — zero network calls),
+file upload (none), dependency or lockfile change (**none** — `package.json` and `pnpm-lock.yaml`
+untouched), env var or secret (none), logging (none), state-changing endpoint / CSRF (none), storage
+API (none — the `app/**` scan still passes). The one value-driven style in the change is
+`style={{ backgroundColor: partner.brandColor }}`; the value is a module constant, React sets it
+through the CSSOM (which rejects anything that is not a colour), and a test asserts every partner's
+`brandColor` matches `/^#[0-9A-Fa-f]{6}$/`.
+
+**Next:** US-025 — line chart component (3 pts), which with US-026 unblocks US-016 and closes
+Phase 2a.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress (3/5 stories · 8/16 points) — US-013 and US-016 **deferred to the
-Phase 2b run**, so this phase does **not** close here
+**Phase Status:** In Progress (4/5 stories · 11/16 points) — US-016 remains **deferred**, so this
+phase does **not** close here
 **Previous:** [Phase 1b](phase-1b.md) · **Next:** [Phase 2b — Components](phase-2b.md)
