@@ -2,6 +2,7 @@ import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "../../lib/cn";
+import { MOTION_CLASS } from "../../lib/motion";
 
 /**
  * The tile card shell — the ONE card anatomy every tile and hero panel in the
@@ -63,14 +64,16 @@ const DEFAULT_HEADING_LEVEL: CardHeadingLevel = 3;
 /* --------------------------------------------------------- ENTRANCE ----- */
 
 /**
- * Class a newly inserted tile carries. US-006 owns the keyframes behind it and
- * the `prefers-reduced-motion` handling; this shell only decides WHICH tiles
- * are new and how long each waits, so the stagger lives in one place.
+ * Class a newly inserted tile carries. The keyframes behind it and the
+ * `prefers-reduced-motion` handling live in `app/app.css`, named by
+ * `MOTION_CLASS` — this shell only decides WHICH tiles are new and how long
+ * each waits, so the stagger lives in one place.
  *
  * There is deliberately NO ring or glow on a new tile — new tiles fade and
  * rise only (Reference Guide; supersedes the Specification's gold-ring text).
+ * `MOTION_CLASS.glow` is an ambient brand pulse and must not be added here.
  */
-export const TILE_ENTER_CLASS = "fcb-enter";
+export const TILE_ENTER_CLASS = MOTION_CLASS.enter;
 
 /* ------------------------------------------------------- CAPTION STRIP -- */
 

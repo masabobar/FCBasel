@@ -5,7 +5,7 @@
 **Duration:** Day 1 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (5/6 completed)
+**Status:** Completed (6/6 completed — US-001's Railway deploy AC deferred to the human)
 
 > **Global guardrails apply to every story here** — see [`../constraints.md`](../constraints.md) §2.
 > No integration, no runtime model, no auth, no persistence, no salary/named-individual data.
@@ -64,7 +64,7 @@
 
 **Priority:** P0
 **Total Story Points:** 9
-**Status:** In Progress (3/4 completed)
+**Status:** Completed (4/4 completed)
 **Source:** Build Specification E2; Reference Implementation Guide §4.
 
 > Getting this right is most of what sells the illusion to an audience that knows FC Basel
@@ -138,22 +138,28 @@
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** The insertion animation and motion primitives that make the dashboard visibly
     grow on command. This choreography is most of the "wow".
   - **Acceptance Criteria:**
-    - New tiles fade in and rise ~12px over ~400ms with a gentle ease
-    - The grid reflows smoothly — existing tiles animate to new positions, never jump
-    - Keyframes defined for entrance, accent glow, thinking scan line, source-chip reveal
-    - `prefers-reduced-motion` honoured: every animated value renders at its final state immediately
-    - No animation can leave an element stuck at zero when reduced motion is set
+    - ✅ New tiles fade in and rise ~12px over ~400ms with a gentle ease
+    - ✅ The grid reflows smoothly — existing tiles animate to new positions, never jump
+    - ✅ Keyframes defined for entrance, accent glow, thinking scan line, source-chip reveal
+    - ✅ `prefers-reduced-motion` honoured: every animated value renders at its final state at once
+    - ✅ No animation can leave an element stuck at zero when reduced motion is set
   - **Dependencies:** US-003
   - **Notes:** **Resolved conflict (2026-09-09) — no gold ring.** The Specification's E2 acceptance
     criteria require a ~1.5s gold highlight ring on newly inserted tiles; the Reference Guide
     explicitly removed it in favour of fade-and-rise only. The documented precedence rule applies
-    (Guide + JSX govern the experience — [`../scope.md`](../scope.md) §10), so build fade-and-rise.
-    Do not reintroduce the ring from the spec text. Gold therefore appears only as target-hit marks
-    and the follow-up accent.
+    (Guide + JSX govern the experience — [`../scope.md`](../scope.md) §10), so fade-and-rise was
+    built. Gold therefore appears only as target-hit marks and the follow-up accent.
+    Delivered as four keyframes in `app/app.css` (`fcbUp`, `fcbGlow`, `fcbScan`, `fcbSrc`) plus
+    `app/lib/motion.ts` (`MOTION_CLASS`, `prefersReducedMotion`, `animateReflow`,
+    `viewTransitionName`); `TILE_ENTER_CLASS` from US-005 now derives from `MOTION_CLASS.enter`.
+    Reduced motion **collapses** animations to a ~1ms final frame globally rather than removing
+    them — `animation: none` would strand anything whose opening frame is `opacity: 0` — and each
+    primitive restates its end state. Grid reflow uses a view transition, since CSS cannot
+    transition a grid position.
 
 ---
 
@@ -163,7 +169,8 @@
 
 **By Priority:** P0: 6 stories, 14 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 5 stories, 11 points · 🔄 0 · 📋 1 story, 3 points · ⏸️ 0
+**By Status:** ✅ 6 stories, 14 points · 🔄 0 · 📋 0 · ⏸️ 0
+*(US-001's Railway deploy acceptance criterion remains deferred to the human — see US-001.)*
 
 ---
 

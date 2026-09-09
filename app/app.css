@@ -172,3 +172,174 @@
     font-size: var(--text-caption);
   }
 }
+
+/**
+ * MOTION PRIMITIVES — defined exactly once, here.
+ *
+ * The dashboard's "wow" is an orchestrated reveal: the thinking panel appears
+ * (scan line sweeping, source chips lighting up one by one), the hero section
+ * mounts, its tiles stagger in, then numbers and chart geometry animate. Four
+ * keyframes carry all of it, and every consumer references a class below
+ * rather than restating an animation — a component that needs a new motion
+ * adds it here.
+ *
+ * Timing and distance come from the motion tokens (`--duration-*`,
+ * `--ease-*`, `--spacing-enter-rise`), so the whole reveal can be retimed from
+ * the token set.
+ *
+ * NO GOLD RING ON A NEW TILE. New tiles fade and rise — nothing else. The
+ * Build Specification's ~1.5s gold highlight ring was removed by the Reference
+ * Guide, which governs the experience (`scope.md` §10). `fcbGlow` below is the
+ * ambient brand pulse used by the sidebar status dot and the AI orbs; it is
+ * never applied to an inserted tile.
+ */
+@layer components {
+  /* Entrance — a newly inserted tile fades in and rises 12px over 400ms.
+     `both` holds the opening frame during the per-tile `animation-delay`, so a
+     staggered tile stays invisible until its turn instead of flashing. */
+  @keyframes fcbUp {
+    from {
+      opacity: 0;
+      transform: translateY(var(--spacing-enter-rise));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fcb-enter {
+    animation: fcbUp var(--duration-enter) var(--ease-enter) both;
+  }
+
+  /* Accent glow — the ambient pulse on a handful of brand elements (sidebar
+     status dot, AI orbs). Ambient only: not an insertion effect. */
+  @keyframes fcbGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    50% {
+      box-shadow: 0 0 14px 1px
+        color-mix(in srgb, var(--color-accent-target-hit) 45%, transparent);
+    }
+  }
+
+  .fcb-glow {
+    animation: fcbGlow var(--duration-glow) ease-in-out infinite;
+  }
+
+  /* Thinking scan line — a narrow gold sweep across the top of the thinking
+     panel. Decoration: it says "working", and carries no information. */
+  @keyframes fcbScan {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(500%);
+    }
+  }
+
+  .fcb-scan {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 22%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-accent-target-hit),
+      transparent
+    );
+    animation: fcbScan var(--duration-scan) ease-in-out infinite;
+  }
+
+  /* Source-chip reveal — data-source chips light up one by one; the caller
+     sets each chip's `animation-delay`, exactly as tiles do. */
+  @keyframes fcbSrc {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fcb-src {
+    animation: fcbSrc var(--duration-enter) var(--ease-standard) both;
+  }
+}
+
+/**
+ * Grid reflow — when a tile is inserted, the tiles already on screen must
+ * glide to their new grid positions rather than jump. CSS cannot transition a
+ * grid position, so the insertion is wrapped in a view transition
+ * (`animateReflow` in `app/lib/motion.ts`) and the browser tweens every named
+ * box between its old and new geometry. Tiles opt in by carrying a
+ * `view-transition-name` (see `viewTransitionName`); this rule only times the
+ * result, matching the insertion animation so the two read as one movement.
+ */
+::view-transition-group(*) {
+  animation-duration: var(--duration-enter);
+  animation-timing-function: var(--ease-enter);
+}
+
+/**
+ * REDUCED MOTION — every animated value renders at its FINAL state, at once.
+ *
+ * The trap this block exists to avoid: `animation: none` looks like the safe
+ * answer and is not. An element whose resting state is invisible — anything
+ * animating in from `opacity: 0`, a bar whose base geometry is zero — is left
+ * stranded there when its animation is simply removed, so honouring the
+ * preference would blank the dashboard.
+ *
+ * So instead of removing animations, this collapses them: every animation runs
+ * exactly one ~1ms cycle and every transition completes in ~1ms. A filled
+ * animation therefore lands on its closing frame immediately, and a transition
+ * lands on its target immediately — final state, no motion. That holds for
+ * animations added later too, including chart geometry driven by transitions
+ * (US-027), which is why the rule is global rather than a list of classes.
+ *
+ * The named primitives then restate their end values explicitly, so no
+ * primitive depends on the collapse alone. This block is deliberately
+ * unlayered: unlayered rules beat every cascade layer, so nothing in
+ * `components` or a Tailwind utility can reintroduce motion here.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Final state, stated outright — never "no animation on an invisible box". */
+  .fcb-enter,
+  .fcb-src {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .fcb-glow {
+    box-shadow: none !important;
+  }
+
+  /* The one element with no meaningful final state: a sweep that has finished
+     is a gold bar parked mid-panel. It is pure decoration, so it goes. */
+  .fcb-scan {
+    display: none !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

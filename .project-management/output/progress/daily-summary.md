@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 5
-**Story Points:** 11
-**Time Worked:** ~3.4 hours
-**Files Changed:** 54
-**Tests Added:** 144
+**Stories Completed:** 6 — **Phase 1a complete**
+**Story Points:** 14
+**Time Worked:** ~4.2 hours
+**Files Changed:** 58
+**Tests Added:** 181
 
 ---
 
@@ -65,6 +65,25 @@
   `aria-hidden` AI glyph. `isNew` and `delayMs` are hooks only — US-006 owns the keyframes, and
   there is no gold ring and no glow. 38 tests added (144/144 green), coverage 100% of `app/**`, and
   lint / format / typecheck / build all clean.
+- **US-006 — Tile-insertion motion & reduced-motion support.** The four keyframes the orchestrated
+  reveal is built from, defined once in `app/app.css` and timed entirely from motion tokens: `fcbUp`
+  (a new tile fades in while rising 12px over 400ms on the gentle insertion ease), `fcbGlow` (the
+  ambient brand pulse for the sidebar dot and AI orbs — never an inserted tile), `fcbScan` (the
+  thinking scan line) and `fcbSrc` (the source-chip reveal). `app/lib/motion.ts` holds the class
+  names, so `TILE_ENTER_CLASS` from US-005 now derives from `MOTION_CLASS.enter` instead of
+  repeating the string, and the entrance attaches to the `isNew`/`delayMs` hooks the card already
+  exposed rather than to a parallel mechanism. The subtle criterion — nothing stuck at zero under
+  reduced motion — is met by *collapsing* animations rather than removing them: `animation: none`
+  would strand any element whose opening frame is `opacity: 0`, so the unlayered
+  `prefers-reduced-motion` block gives every animation one ~1ms iteration with no delay and every
+  transition ~1ms, landing each on its final value at once, and then restates each primitive's end
+  state outright. Being unlayered it beats every cascade layer and Tailwind utility, and being
+  written against `*` it will cover US-027's transition-driven chart geometry before that exists.
+  Smooth grid reflow uses a view transition, since CSS cannot transition a grid position; the update
+  always runs, wrapped or not, so no state change is lost to a missing API. The resolved conflict is
+  guarded by tests, not just comments: no ring, no glow, and gold keeps exactly two consumers.
+  37 tests added (181/181 green), coverage 100% statements / 97.6% branches of `app/**`, and lint /
+  format / typecheck / build all clean.
 
 ---
 
@@ -81,6 +100,9 @@
   the running server.
 - ✅ US-005 — Tile card anatomy (2 pts) — all 4 acceptance criteria met; one reusable shell, no
   per-hero copies, no hardcoded colour, and the entrance hooks US-006 will attach to.
+- ✅ US-006 — Tile-insertion motion & reduced-motion support (3 pts) — all 5 acceptance criteria met;
+  fade-and-rise only, and reduced motion renders final state rather than switching animation off.
+  **Phase 1a closes here: 6/6 stories, 14/14 points.**
 
 ---
 
@@ -101,9 +123,8 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- US-006 — Tile-insertion motion (3 pts) — fade-and-rise only, no gold ring; attaches to the
-  `TILE_ENTER_CLASS` and `animationDelay` hooks US-005 already exposes
-- Phase 1b — seed data (10 pts), the swap point for real data later
+- Phase 1b — seed data (10 pts), the swap point for real data later. Phase 1a's foundation is done:
+  tokens, crest, card shell and motion primitives are all in place for it to build on
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -118,7 +139,7 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Start with `/holycode-pm:execute-work phase 1a`.
+- Phase 1a is complete; continue with `/holycode-pm:execute-work phase 1b`.
 
 ---
 

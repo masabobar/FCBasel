@@ -8,22 +8,23 @@
 ## Overall Status
 
 **Project:** FC Basel — Intelligence Platform Prototype
-**Current Phase:** Phase 1a - Project Setup & Design System
-**Overall Progress:** 0% (0/45 items completed)
-**Story Points Completed:** 0/116
+**Current Phase:** Phase 1b - Dummy Data Model & Seed Datasets
+**Overall Progress:** 13% (6/45 items completed)
+**Story Points Completed:** 14/116
 
 ---
 
 ## Phase Status
 
-### Phase 1a: Project Setup & Design System (Current)
-- **Status:** 🔴 Not Started
-- **Progress:** 0/6 items · **Points:** 0/14
-- **Target:** 2026-09-09 (~5.8 AI-hours)
+### Phase 1a: Project Setup & Design System
+- **Status:** ✅ Completed 2026-09-09
+- **Progress:** 6/6 items · **Points:** 14/14
+- **Target:** 2026-09-09 (~5.8 AI-hours) — met
 - **Epics:** Epic 1 (Setup & Deployment), Epic 2 (E2 Brand Theming)
+- **Open human step:** the Railway deploy acceptance criterion of US-001
 
-### Phase 1b: Dummy Data Model & Seed Datasets
-- **Status:** ⏳ Upcoming
+### Phase 1b: Dummy Data Model & Seed Datasets (Current)
+- **Status:** 🔴 Not Started
 - **Progress:** 0/5 stories · **Points:** 0/10
 - **Epics:** Epic 3 (E3 Seed Datasets)
 
@@ -58,11 +59,11 @@
 
 ### Epic 1: Project Setup & Deployment
 - **Phase:** 1a · **Stories:** 2 (US-001 to US-002) · **Points:** 5
-- **Completed:** 0/2 · **Status:** Not Started
+- **Completed:** 2/2 · **Status:** ✅ Done (US-001's Railway deploy AC is a human step)
 
 ### Epic 2: E2 — FCB Brand Theming & Design System
 - **Phase:** 1a · **Stories:** 4 (US-003 to US-006) · **Points:** 9
-- **Completed:** 0/4 · **Status:** Not Started
+- **Completed:** 4/4 · **Status:** ✅ Done
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets
 - **Phase:** 1b · **Stories:** 5 (US-007 to US-011) · **Points:** 10
@@ -92,9 +93,9 @@
 
 ## Active Work
 
-**Currently In Progress:** None
+**Currently In Progress:** None — Phase 1a complete
 **Blocked Stories:** None
-**Next Up:** US-001 — Environment & deployment setup (3 pts, Owner: Human+AI)
+**Next Up:** US-007 — the first Phase 1b seed-data story
 
 ---
 
@@ -114,7 +115,7 @@ Full breakdown: [`../reports/ai-hours-estimate-2026-09-09.md`](../reports/ai-hou
 
 - [View DASHBOARD](DASHBOARD.md) - Live auto-updating status
 - [View Backlog](../../input/backlog/README.md) - Master backlog index
-- [View Phase 1a](../phases/phase-1a.md) - Current phase plan
+- [View Phase 1b](../phases/phase-1b.md) - Current phase plan · [Phase 1a](../phases/phase-1a.md) - Completed
 - [PRD](../docs/prd.md) · [Technical Spec](../docs/technical-spec.md) · [Architecture](../docs/architecture.md)
 
 ---

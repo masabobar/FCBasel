@@ -50,7 +50,8 @@ P2: 0
 ### [Phase 1a: Project Setup & Design System](phase-1a-setup-design-system.md)
 **Goal:** Stand up project + Railway deployment, then the design token foundation (E2) that every
 later epic references.
-**Stories:** 6 | **Points:** 14 | **Status:** Not Started (0/6)
+**Stories:** 6 | **Points:** 14 | **Status:** ✅ Completed (6/6) — US-001's Railway deploy AC remains
+a human step
 
 ### [Phase 1b: Dummy Data Model & Seed Datasets](phase-1b-seed-data.md)
 **Goal:** The single source of truth for every figure in the prototype (E3), grounded in verified
@@ -115,7 +116,7 @@ rule (`.claude/rules/documentation.md` §2.1) — 1a/1b and 2a/2b are sequential
 
 ## 🎯 Quick Navigation
 
-- Start the build → `/holycode-pm:execute-work phase 1a`
+- Continue the build → `/holycode-pm:execute-work phase 1b` *(1a is complete)*
 - Run a single story → `/holycode-pm:execute-work story US-001`
 - Add a story → `/holycode-pm:add-scope`
 - Record a post-prototype requirement → `/holycode-pm:add-backlog-requirement` → [future.md](future.md)

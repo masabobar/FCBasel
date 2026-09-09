@@ -1,10 +1,10 @@
 # Phase 1a: Project Setup & Design System
 
 **Duration:** 2026-09-09 to 2026-09-09 (~5.8 AI-hours)
-**Status:** In Progress
+**Status:** Completed
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-09
-**Actual Completion:** —
+**Actual Completion:** 2026-09-09
 
 > **Single source of truth for acceptance criteria:** the backlog file
 > [`../../input/backlog/phase-1a-setup-design-system.md`](../../input/backlog/phase-1a-setup-design-system.md).
@@ -47,14 +47,14 @@ every later epic references rather than restates.
 
 ### Epic 2: E2 — FCB Brand Theming & Design System (9 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (3/4) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** Done (4/4) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-003 | Design token set | 3 | ✅ Done |
 | US-004 | Self-hosted FCB crest | 1 | ✅ Done |
 | US-005 | Tile card anatomy | 2 | ✅ Done |
-| US-006 | Tile-insertion motion & reduced-motion support | 3 | 📋 Todo |
+| US-006 | Tile-insertion motion & reduced-motion support | 3 | ✅ Done |
 
 **Technical Notes:**
 - **Colour discipline is non-negotiable:** red and blue carry series identity; variance uses only the
@@ -71,12 +71,12 @@ every later epic references rather than restates.
 
 ## Definition of Done *(applies to every story in this phase)*
 
-- [ ] Code implemented and reviewed against `.claude/rules/code-quality.md` (SOLID, DRY)
-- [ ] Tests written and passing; coverage ≥ 80%
-- [ ] Security triage run per `.claude/rules/security-review.md`
-- [ ] Linter clean
-- [ ] Git commit created per `.claude/rules/git.md` (conventional, no AI credits)
-- [ ] Progress tracking updated
+- [x] Code implemented and reviewed against `.claude/rules/code-quality.md` (SOLID, DRY)
+- [x] Tests written and passing; coverage ≥ 80%
+- [x] Security triage run per `.claude/rules/security-review.md`
+- [x] Linter clean
+- [x] Git commit created per `.claude/rules/git.md` (conventional)
+- [x] Progress tracking updated
 
 *Not applicable this project:* API status-code matrix (no endpoints) · i18n translations (English only).
 
@@ -90,12 +90,12 @@ every later epic references rather than restates.
 - **Risk Level:** Low
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 11 / 14 (79%)
-- **Completed Stories:** 5 / 6
-- **Tests Passing:** 144 / 144
-- **Code Coverage:** 100% of `app/**` (35 statements, 11 functions)
+- **Completed Story Points:** 14 / 14 (100%)
+- **Completed Stories:** 6 / 6
+- **Tests Passing:** 181 / 181
+- **Code Coverage:** 100% statements / 97.6% branches of `app/**` (46 statements, 14 functions)
 - **Linter:** ESLint 9 flat config — clean (0 errors, 0 warnings)
-- **Commits:** 5
+- **Commits:** 6 · **Open human step:** US-001's Railway deploy AC (no AI account access)
 
 ---
 
@@ -119,7 +119,7 @@ every later epic references rather than restates.
 | Railway setup consumes more than the ~3 h budgeted | Medium | Low | Zero-config app: no env vars, no database, no migrations; `railway.json` committed so the deploy is one command | Human+AI | Open (human step) |
 | Crest asset unavailable or format-awkward | Medium | Low | Self-host from the committed copy; the build must never depend on the live CDN | AI | Closed (US-004) |
 | Token drift — a colour introduced outside the set | High | Medium | Not permitted by spec; choose the nearest token. US-003 pins the hex set with a test and fails the suite on any CSS/TS divergence. Re-verified in US-044 brand QA | AI | Mitigated |
-| Reduced-motion path leaves a value stuck at zero | Medium | Medium | Grow hook returns `true` immediately under reduced motion | AI | Open |
+| Reduced-motion path leaves a value stuck at zero | Medium | Medium | US-006 collapses animations to a ~1ms final frame instead of removing them, globally, and restates each primitive's end state; the US-027 grow hook will also return `true` immediately | AI | Mitigated (US-006) |
 
 ---
 
@@ -129,138 +129,100 @@ every later epic references rather than restates.
 
 React Router 7.18 framework mode with SSR scaffolded at the repo root: `react-router.config.ts`
 (`ssr: true`), `vite.config.ts` (Tailwind v4 + React Router plugins), strict `tsconfig.json`,
-`app/root.tsx`, `app/routes.ts` and a deliberately minimal `app/routes/_index.tsx`. Only the
-packages this prototype needs are installed — Prisma, bcryptjs, msw, Recharts, TanStack Table,
-`@react-pdf/renderer`, resend, react-email and every i18next package are expansion-path only and
-absent, per `input/technologies.md`.
+`app/root.tsx`, `app/routes.ts`, a minimal `app/routes/_index.tsx`. Only the packages this prototype
+needs are installed — Prisma, msw, Recharts, TanStack Table, resend and every i18next package are
+expansion-path only and absent, per `input/technologies.md`. Verified by running, not assumed:
+`pnpm install --frozen-lockfile`, `pnpm build` and `pnpm start` all succeed from a **clean checkout**
+and the server returns HTTP 200 with server-rendered markup. No env var required; no database.
 
-Verified by running, not assumed: `pnpm install --frozen-lockfile`, `pnpm build` and `pnpm start`
-all succeed from a **clean checkout** (fresh tree, no `node_modules`), and the server returns
-HTTP 200 with server-rendered markup. No environment variable is required (`PORT` is honoured when
-the platform supplies it, defaulting to 3000); no database is provisioned.
-
-- **Tests:** 8 unit tests, all passing; coverage scoped to `app/**` only (100%, small surface).
-- **Typecheck:** `pnpm typecheck` clean under TypeScript strict.
-- **Security triage:** dependency trigger fired (`package.json` + lockfile added). `pnpm audit`
-  initially reported 2 moderate `qs` advisories reaching us through express under
-  `@react-router/serve`; a `qs: ">=6.16.0"` override in `pnpm-workspace.yaml` clears them.
-  **`pnpm audit` now reports no known vulnerabilities.** No high/critical. No secrets, no env vars,
-  no HTTP handlers, no database, no user input — no other trigger applies.
-- **⏸️ Deferred to the human:** the Railway deploy AC. The repo is deploy-ready (`railway.json`,
-  `build`/`start` scripts, `@react-router/serve` as the production server). Run
-  `railway login && railway init && railway up`, then record the shareable URL in this file and in
-  the backlog entry.
+- **Tests:** 8 unit tests passing; coverage of `app/**` 100%. **Typecheck** clean under strict.
+- **Security triage:** dependency trigger fired. Two moderate `qs` advisories reaching us via express
+  under `@react-router/serve` are cleared by a `qs: ">=6.16.0"` override in `pnpm-workspace.yaml`;
+  **`pnpm audit` reports no known vulnerabilities**. No secrets, env vars, handlers, DB or user input.
+- **⏸️ Deferred to the human:** the Railway deploy AC (see Epic 1 technical notes).
 
 ### 2026-09-09 — US-002 Developer tooling & local DX (2 pts) ✅
 
-ESLint 9 flat config (`eslint.config.js`) covering TypeScript and React hooks: `@eslint/js`
-recommended, `typescript-eslint` recommended (syntax-only, not type-aware — fast enough to run on
-every commit), `eslint-plugin-react-hooks` flat recommended, and `eslint-config-prettier` **last**
-so ESLint never argues with Prettier over formatting. Prettier is configured in `.prettierrc.json`
-with `prettier-plugin-tailwindcss` and `tailwindStylesheet: ./app/app.css` for Tailwind v4 class
-sorting. Build artefacts (`build/`, `.react-router/`, `coverage/`, `node_modules/`) are ignored by
-both tools; Prettier additionally skips `.project-management/`, `.claude/` and `CLAUDE.md`, whose
-line-count limits are governed by `.claude/rules/documentation.md`.
+ESLint 9 flat config (`eslint.config.js`): `@eslint/js` recommended, `typescript-eslint` recommended
+(syntax-only, so it is fast enough for every commit), `eslint-plugin-react-hooks`, and
+`eslint-config-prettier` **last** so ESLint never argues with Prettier over formatting. Prettier uses
+`prettier-plugin-tailwindcss` with `tailwindStylesheet: ./app/app.css`, and skips
+`.project-management/`, `.claude/` and `CLAUDE.md`, whose line limits `documentation.md` governs.
+Scripts added: `lint`, `lint:fix`, `format`, `format:check`, `prepare` — all six AC scripts **run,
+not assumed** (`dev` and `start` each booted, HTTP 200).
 
-Scripts added: `lint`, `lint:fix`, `format`, `format:check`, `prepare`. All six acceptance-criteria
-scripts were **run, not assumed** — `dev` and `start` were each booted and answered HTTP 200.
+husky v9 + lint-staged run `eslint --fix` then `prettier --write` on staged `*.{ts,tsx}`. **Hook
+verified with real throwaway commits** (since removed): an unfixable `no-explicit-any` probe was
+rejected and `HEAD` did not move; a formatting-only probe committed with Prettier's reflow and
+Tailwind class re-ordering already applied in the committed blob.
 
-husky v9 + lint-staged run `eslint --fix` then `prettier --write` on staged `*.{ts,tsx}`, and
-`prettier --write` on staged config/markdown. **Hook verified with real throwaway commits** (both
-since removed with `git reset --soft`, history left tidy): a probe file with an unfixable
-`no-explicit-any` error was rejected and `HEAD` did not move; a probe with only formatting problems
-committed successfully with Prettier's reflow *and* Tailwind class re-ordering already applied in
-the committed blob.
-
-- **Tests:** unchanged at 8 unit tests, all passing; no hollow tests added for config. Coverage of
-  `app/**` still 100%.
-- **Typecheck:** `pnpm typecheck` clean under TypeScript strict.
-- **Linter:** `pnpm lint` clean over all 11 source files — no rule was weakened and no file was
-  disabled to get there.
-- **Security triage:** dependency trigger fired (A06 — `package.json` + lockfile changed for
-  7 new devDependencies). **`pnpm audit`: no known vulnerabilities**; the `qs: ">=6.16.0"` override
-  from US-001 is retained. All additions are dev-only tooling that never ships in the server bundle.
-  No secrets, env vars, HTTP handlers, database, user input or uploads — no other trigger applies.
+- **Tests:** unchanged at 8, all passing; no hollow tests added for config. Coverage still 100%.
+- **Linter:** clean over all 11 source files — no rule weakened, no file disabled to get there.
+- **Security triage:** dependency trigger fired (A06 — 7 dev-only devDependencies that never ship in
+  the server bundle). **`pnpm audit`: no known vulnerabilities**; the US-001 `qs` override retained.
 
 ### 2026-09-09 — US-003 Design token set (3 pts) ✅
 
-One token set, published twice on purpose. `app/app.css` carries it as Tailwind v4 CSS custom
-properties inside `@theme static`, so utilities are generated and `var(--…)` resolves at runtime;
+One token set, published twice on purpose. `app/app.css` carries it as Tailwind v4 custom properties
+inside `@theme static`, so utilities are generated and `var(--…)` resolves at runtime;
 `app/lib/tokens.ts` carries the same values as a typed object, because the hand-built SVG charts in
 Phase 2b need strings for stroke, fill and gradient stops and cannot use a class. Every hex is
-written exactly once — the semantic aliases are `var()` references in CSS and constant references in
+written exactly once — semantic aliases are `var()` references in CSS and constant references in
 TypeScript — and `tests/unit/tokens.test.ts` parses the stylesheet, resolves those references and
-fails on any divergence. That drift test is the load-bearing one in this story.
-
-Values follow the Reference Guide's `T` object, which wins over the Specification on the three known
-divergences (`scope.md` §10): **surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`**.
-The Specification-only gold ring for new tiles was **not** introduced — gold exists solely as
-`accentTargetHit` and `accentFollowUp`.
+fails on any divergence. That drift test is the load-bearing one here. Values follow the Reference
+Guide's `T` object, which wins over the Specification on the three known divergences (`scope.md`
+§10): **surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`**. The Specification-only gold
+ring for new tiles was **not** introduced — gold exists solely as `accentTargetHit`/`accentFollowUp`.
 
 Colour discipline is encoded, not merely documented: `seriesPrimary`/`seriesSecondary`/
 `seriesCurrent`/`seriesPrevious` name identity, `variancePositive`/`varianceNegative` are the only
 tokens permitted to mean good/bad, and `varianceNegative` is deliberately a *separate* token from
-`red` even though they share a hex, so red can never drift into meaning "bad". Tests assert each of
-those relationships plus that gold has exactly two consumers. Typography roles (`.tile-title`,
+`red` even though they share a hex, so red can never drift into meaning "bad". Tests assert each
+relationship plus that gold has exactly two consumers. Typography roles (`.tile-title`,
 `.kpi-number`, `.chart-axis-label`, `.narrative-caption`) are defined once in the components layer,
 so US-005 references a role instead of restating "uppercase, 700, 0.04em"; `.kpi-number` carries
 `tabular-nums` so count-up animations do not jitter.
 
 - **Tests:** 88 added (96 total, all passing) — exact-hex assertions, Guide-precedence assertions,
   colour-discipline relationships, the type scale, and full CSS↔TS parity in both directions.
-- **Coverage:** 100% of `app/**` (21/21 statements, 7/7 functions) — above the 80% gate.
-- **Gates:** `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` all clean.
-  Emitted CSS verified in `build/client/assets/root-*.css`: aliases resolve, `.tile-title` and
-  `.kpi-number` ship as written.
-- **Security triage:** every trigger in `.claude/rules/security-review.md` §1 considered — no
-  dependency or lockfile change, no HTTP handler or route, no raw SQL, no `dangerouslySetInnerHTML`,
-  no `fetch`, no upload, no env var, no auth, no logging, no user input. **No security-relevant
-  changes detected** (§4).
+- **Coverage:** 100% of `app/**` (21/21 statements, 7/7 functions). **Gates:** all five clean;
+  emitted CSS verified — aliases resolve, `.tile-title` and `.kpi-number` ship as written.
+- **Security triage:** every §1 trigger considered — no dependency or lockfile change, route, raw
+  SQL, `dangerouslySetInnerHTML`, `fetch`, upload, env var, auth, logging or user input. **No
+  security-relevant changes detected** (§4).
 
 ### 2026-09-09 — US-004 Self-hosted FCB crest (1 pt) ✅
 
 The club serves the crest from `https://fcb.ch/cdn/shop/files/logo.webp` — but the **bytes are a
-PNG**, not a WebP; the extension lies and the `Content-Type` (`image/png`) tells the truth. The
-downloaded file was inspected before anything was committed (`file`: `PNG image data, 608 x 648,
-8-bit/color RGBA`), so it is stored as `public/fcb-crest.png` under its real format. Committing it
-as `.webp` would have shipped a file no build tool could reason about.
+PNG**, not a WebP; the extension lies and the `Content-Type` tells the truth. The download was
+inspected before anything was committed, so it is stored as `public/fcb-crest.png` under its real
+format. 194 KB of 608x648 artwork for a 32px mark is ~90x more pixels than it can show, so it was
+downsampled with macOS `sips` (**no image dependency added**) to 120x128, crisp to 2x render size;
+every ancillary chunk (including an XMP `iTXt` naming the source machine) was then stripped with a
+stdlib Python filter, leaving `IHDR`/`IDAT`/`IEND`. Final asset: **17,908 bytes, a 91% reduction**,
+transparency intact, verified as the genuine crest.
 
-194 KB of 608x648 artwork for a 32px app-bar mark is ~90x more pixels than the mark can show, so it
-was downsampled with macOS `sips` (already on the machine — **no image dependency was added**) to
-120x128, which stays crisp to 64px, i.e. 2x of the render size. `sips` re-attached an XMP `iTXt`
-chunk carrying the source machine's `HostComputer` name; every ancillary chunk was then stripped
-with a stdlib Python filter, leaving only `IHDR`/`IDAT`/`IEND`. Final asset: **17,908 bytes, a 91%
-reduction**, transparency intact, visually verified as the genuine crest.
+`app/components/chrome/crest.tsx` exports `Crest`, rendering `/fcb-crest.png` with
+`alt="FC Basel 1893"` and deriving width from the asset's aspect ratio so the app bar reserves the
+right box and never shifts on decode. A minimal `<header>` in `app/root.tsx` holds it top-left at
+32px — **the sidebar, workspace label, avatar, connection status and Reset control are US-012 in
+Phase 2a and were not built here**.
 
-`app/components/chrome/crest.tsx` exports `Crest`, which renders `/fcb-crest.png` with
-`alt="FC Basel 1893"` and derives width from the asset's own aspect ratio so the app bar reserves
-the right box and never shifts on decode. A deliberately minimal `<header>` in `app/root.tsx` holds
-it top-left at 32px — **the sidebar, workspace label, avatar, connection status and Reset control
-are US-012 in Phase 2a and were not built here**.
-
-- **No CDN request — proved four ways, not assumed:** `grep -rIa "fcb\.ch" build/` returns nothing;
-  the only `fcb.ch` string in the repo is a warning comment in `crest.tsx`, which the bundler strips.
-  Both bundles reference the literal `"/fcb-crest.png"` and nothing else. The production server was
-  booted and the served HTML contains `<img src="/fcb-crest.png" … height="32">` with **every**
-  `src`/`href` on the page root-relative — zero external hosts of any kind. `/fcb-crest.png` answers
-  `200 image/png 17908` from the local server.
-- **Tests:** 10 added (106 total, all passing). They assert the accessible name, the root-relative
-  `src`, that `CREST_SRC` matches no absolute URL or `fcb.ch`, the 32px default and aspect-ratio
-  scaling, crest-first placement inside the `banner` landmark, and — reading the committed file — the
-  PNG magic bytes and the size budget. That last pair is what would catch a future "fix" that
-  re-hotlinks or swaps the asset for a mislabelled one.
-- **Coverage:** 100% of `app/**` (26/26 statements, 8/8 functions) — above the 80% gate.
-- **Gates:** `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` all clean.
-- **Security triage:** the **external-binary trigger fired (A04/A08)** — bytes verified against the
-  PNG magic number and the real format used, chunk table walked end-to-end (`IHDR`+`eXIf`+`iCCP`+
-  `pHYs`+`IDAT`x25+`IEND` consuming exactly 194,518 bytes, so **no data appended past `IEND`**), no
-  `tEXt`/`zTXt`/`iTXt` chunk survives in the committed file, so **no secret or tracking payload is
-  embedded**; the asset is static content that is never executed. `src` is a hardcoded constant, not
-  user input (A03 n/a). **No runtime `fetch` remains (A10 n/a)** — the download was a one-off
-  authoring step. `package.json` and the lockfile are untouched, so the A06 audit gate does not
-  fire. No route, raw SQL, env var, auth or logging change.
-- **Trademark:** the genuine crest is used exactly as the client's Build Specification instructs.
-  It stays in this repo; no further club branding was invented.
+- **No CDN request — proved, not assumed:** `grep -rIa "fcb\.ch" build/` returns nothing (the only
+  `fcb.ch` string is a warning comment the bundler strips); both bundles reference the literal
+  `"/fcb-crest.png"` and nothing else; the booted production server serves HTML in which **every**
+  `src`/`href` is root-relative, and `/fcb-crest.png` answers `200 image/png 17908` locally.
+- **Tests:** 10 added (106 total, all passing) — accessible name, root-relative `src`, `CREST_SRC`
+  matching no absolute URL, the 32px default and aspect-ratio scaling, crest-first placement in the
+  `banner` landmark, and — reading the committed file — PNG magic bytes and size budget.
+- **Coverage:** 100% of `app/**` (26/26 statements, 8/8 functions). **Gates:** all five clean.
+- **Security triage:** the **external-binary trigger fired (A04/A08)** — magic number checked, chunk
+  table walked end-to-end (exactly 194,518 bytes consumed, so **nothing appended past `IEND`**), no
+  `tEXt`/`zTXt`/`iTXt` chunk survives, so **no secret or tracking payload is embedded**; the asset is
+  never executed. `src` is a hardcoded constant, not user input (A03 n/a); no runtime `fetch` remains
+  (A10 n/a); lockfile untouched (A06 n/a). No route, SQL, env var, auth or logging change.
+- **Trademark:** the genuine crest is used exactly as the Build Specification instructs; it stays in
+  this repo and no further club branding was invented.
 
 ### 2026-09-09 — US-005 Tile card anatomy (2 pts) ✅
 
@@ -274,27 +236,65 @@ title) and a KPI tile (title, icon, no accent) share one implementation.
 Two deliberate constraints. `accent` takes a **token name**, not a colour string, so no tile can
 smuggle a hex past the closed token set — enforced by the type, not by review. And the title renders
 as a real heading (`h3` by default), because a dashboard that grows tile by tile needs structure.
-
 No value is retyped: `rounded-tile`, `p-tile`, `shadow-tile`, `border-border`, `bg-bg` and the
 `.tile-title` / `.narrative-caption` role classes come from US-003. `isNew` applies the exported
 `TILE_ENTER_CLASS`, `delayMs` sets `animationDelay` — hooks only; **US-006 owns the keyframes**, and
 there is no ring, no glow. Nothing beyond the shell and its caption strip was built.
 
-- **Tests:** 38 added (144 total, all passing). They cover the optionality of every slot in both
-  directions, that the AC values resolve from tokens, that no hex or `rgb()` literal exists in the
-  component, that the AI glyph is `aria-hidden` and announced as nothing, that caller text is
-  escaped rather than parsed as markup, and that no ring or glow returns.
-- **Coverage:** 100% of `app/**` (35/35 statements, 11/11 functions, 31/31 branches).
-- **Gates:** `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` clean.
-  Emitted CSS checked in `build/client/assets/root-*.css`: every utility the card names is generated.
-- **Security triage:** all `.claude/rules/security-review.md` §1 triggers considered — no dependency
-  or lockfile change, no route or handler, no SQL, no `fetch`, no upload, no env var, no auth, no
-  logging. Caller content is rendered as React children only: **no `dangerouslySetInnerHTML`**
-  (asserted by test), so slot content is escaped. **No security-relevant changes detected** (§4).
+- **Tests:** 38 added (144 total, all passing) — the optionality of every slot in both directions,
+  AC values resolving from tokens, no hex or `rgb()` literal in the component, the AI glyph
+  `aria-hidden` and announced as nothing, caller text escaped rather than parsed as markup, and no
+  ring or glow returning.
+- **Coverage:** 100% of `app/**` (35/35 statements, 11/11 functions, 31/31 branches). **Gates:** all
+  five clean; emitted CSS checked — every utility the card names is generated.
+- **Security triage:** all §1 triggers considered — no dependency change, route, SQL, `fetch`,
+  upload, env var, auth or logging; caller content renders as React children only, with **no
+  `dangerouslySetInnerHTML`** (asserted by test). **No security-relevant changes detected** (§4).
+
+### 2026-09-09 — US-006 Tile-insertion motion & reduced-motion support (3 pts) ✅
+
+The four keyframes the reveal is built from, defined once in `app/app.css`: `fcbUp` (entrance —
+opacity 0→1 while rising `--spacing-enter-rise` = 12px over `--duration-enter` = 400ms on
+`--ease-enter`), `fcbGlow` (ambient brand pulse), `fcbScan` (thinking scan line) and `fcbSrc`
+(source-chip reveal), each driven from motion tokens so the choreography retimes from the token set.
+`app/lib/motion.ts` names the classes (`MOTION_CLASS`) so no component types `"fcb-enter"` by hand —
+US-005's `TILE_ENTER_CLASS` now derives from it, and the entrance attaches to the `isNew`/`delayMs`
+hooks the card already exposed rather than a parallel mechanism. `both` fill is what makes the
+stagger read as one: a delayed tile holds its opening frame instead of flashing in.
+
+**No gold ring.** The Specification's ~1.5s highlight ring stays removed per the Guide
+(`scope.md` §10) — a new tile fades and rises, nothing else. Guarded by tests: the entrance keyframes
+and `.fcb-enter` may declare nothing but the animation (no `box-shadow`, `outline`, `ring`), the card
+never carries `fcb-glow`, and gold has exactly two consumers below the theme block (glow, scan line).
+
+**Reduced motion (AC 4-5).** `animation: none` is the trap, not the answer: strip the animation from
+an element whose opening frame is `opacity: 0` and it stays invisible. The unlayered
+`@media (prefers-reduced-motion: reduce)` block therefore *collapses* motion instead — one ~1ms
+iteration, zero delay, transitions completing in ~1ms — so filled animations land on their closing
+frame and transitions on their target, at once. It applies to `*`, covering US-027's
+transition-driven chart geometry before it exists; each primitive then restates its end state
+outright (`opacity: 1`, `transform: none`, glow cleared), and only the scan line is hidden, having no
+meaningful end state. Unlayered, it beats every cascade layer and Tailwind utility.
+
+**Grid reflow (AC 2)** uses a view transition, since CSS cannot transition a grid position:
+`animateReflow()` wraps the insertion and the browser tweens each named tile from its old geometry to
+its new, timed by `::view-transition-group(*)` to match the entrance. The update always runs —
+unwrapped under reduced motion, without support, or on the server — so no state change is lost to a
+missing API. `viewTransitionName()` sanitises a tile id into a legal, unique CSS identifier.
+
+- **Tests:** 37 added (181 total, all passing). The load-bearing ones are structural, not string
+  matches: every class whose keyframes open at `opacity: 0` must be restored to its final state by
+  the reduced-motion block, and that block must not sit inside a cascade layer.
+- **Coverage:** 100% statements / 97.6% branches of `app/**` (46 statements, 14 functions).
+  **Gates:** all five clean; compiled CSS verified to ship every keyframe and final-state rule.
+- **Security triage:** all §1 triggers considered — no dependency or lockfile change, route, SQL,
+  `fetch`, upload, env var, auth or logging. The only string reaching CSS (`viewTransitionName`) is
+  allowlist-sanitised to `[A-Za-z0-9_-]`, so a tile id cannot break out of an inline style value.
+  **No security-relevant changes detected** (§4).
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress
+**Phase Status:** Completed — 6/6 stories, 14/14 points (US-001's Railway deploy AC is a human step)
 **Next Phase:** [Phase 1b — Seed Data](phase-1b.md)

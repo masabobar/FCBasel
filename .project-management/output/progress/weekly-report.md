@@ -7,16 +7,27 @@
 
 ## Week Summary
 
-**Stories Completed:** 0
-**Story Points:** 0/116 (0%)
-**Current Phase:** Phase 1a - Project Setup & Design System
-**Team Velocity:** N/A (insufficient data)
+**Stories Completed:** 6
+**Story Points:** 14/116 (12%)
+**Current Phase:** Phase 1b - Seed Data *(Phase 1a completed 2026-09-09)*
+**Team Velocity:** 14 pts/day (one day of data — not yet a trend)
 
 ---
 
 ## This Week's Achievements
 
-*No stories completed yet.*
+**✅ Phase 1a — Project Setup & Design System, complete (6/6 stories, 14/14 points):**
+- **US-001/US-002** — React Router 7 SSR app, Railway-ready deploy config, ESLint 9 + Prettier +
+  husky. One acceptance criterion is deferred: the Railway deploy itself is a human step.
+- **US-003** — the single token set, published as Tailwind v4 `@theme static` custom properties and
+  a typed TS object, held in lockstep by a parity test. Colour discipline encoded, not documented.
+- **US-004** — the genuine crest self-hosted; the club's `.webp` URL actually serves PNG bytes, so
+  it is committed under its real format, downsampled and stripped of metadata. Zero CDN requests.
+- **US-005** — one `Card` shell that all eleven later tile and hero callers compose. Slots, not
+  variants; `accent` takes a token name so no hex can reach a tile.
+- **US-006** — the motion foundation: four keyframes, the tile entrance wired to the card's existing
+  hooks, smooth grid reflow, and a reduced-motion path that renders final state rather than
+  switching animation off. Fade-and-rise only — the Specification's gold ring stays removed.
 
 **Non-story work completed 2026-09-09:**
 - HolyCode PM framework bootstrapped into the project
@@ -37,7 +48,8 @@
 - Framework setup; client documents added
 
 ### Wednesday, 2026-09-09
-- Requirements extraction and project initialization (no implementation stories yet)
+- Requirements extraction and project initialization
+- **Phase 1a delivered end to end:** US-001, US-002, US-003, US-004, US-005, US-006 (14 pts)
 
 ### Thursday, 2026-09-10
 - (To be logged)
@@ -49,12 +61,13 @@
 
 ## Velocity Trend
 
-**This Week:** 0 pts
+**This Week:** 14 pts
 **Last Week:** N/A
-**Average:** N/A
+**Average:** 14 pts/day (1 day)
 **Trend:** N/A (insufficient data)
 
-> Velocity becomes meaningful after Phase 1a and 1b complete. At that point, recalculate
+> Velocity becomes meaningful after Phase 1a and 1b complete. Phase 1a landed 14 points in ~4.2 AI
+> hours against a ~5.8 AI-core-hour estimate. At the end of 1b, recalculate
 > `actual_factor = actual_ai_hours / (planned_team_hours × 1.20)` and re-run the estimate if it
 > differs from 0.25 by more than ±0.05.
 
@@ -65,7 +78,7 @@
 **Target:** the prototype is **demo-ready** — not feature-complete, but robust.
 
 **Planned Stories:**
-1. Phases 1a + 1b — foundations: deployment, tokens, crest, seed datasets (24 pts)
+1. Phase 1b — seed datasets (10 pts); Phase 1a's foundations are already complete
 2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts)
 3. Phases 3a + 3b — conversation engine and the three hero flows (33 pts)
 4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts)
@@ -86,6 +99,8 @@
   that directory loses the specification.
 
 **Active Blockers:** None
+
+**Open human step (not a blocker):** the Railway deploy for US-001 — the repo is deploy-ready.
 
 ---
 

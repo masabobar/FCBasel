@@ -6,11 +6,12 @@
 
 ## Summary
 
-**Total Completed:** 5 stories
-**Total Points:** 11 / 116
+**Total Completed:** 6 stories
+**Total Points:** 14 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 11 points/day
+**Average Velocity:** 14 points/day
+**Phases Completed:** Phase 1a (2026-09-09)
 
 ---
 
@@ -141,6 +142,37 @@ three Phase 3b heroes compose this one shell, so the prop set was designed for t
   parsed as markup, and that no ring or glow returns
 - `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (144/144) and `pnpm build` all
   clean; coverage 100% of `app/**`; generated utilities verified in the emitted CSS
+
+### US-006: Tile-insertion motion & reduced-motion support (3 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 9 (3 code, 1 test, 5 tracking docs)
+**Tests Added:** 37 (unit: 37)
+**Commit:** see phase-1a progress log
+**Notes:** All 5 acceptance criteria met. **Closes Phase 1a** (6/6 stories, 14/14 points). The
+resolved conflict holds: fade-and-rise only, no gold ring on an inserted tile.
+
+**What Was Done:**
+- Defined the four reveal keyframes once, in `app/app.css`: `fcbUp` (entrance — opacity 0→1 while
+  rising 12px over 400ms on `cubic-bezier(0.2, 0.8, 0.2, 1)`), `fcbGlow` (ambient brand pulse),
+  `fcbScan` (thinking scan line) and `fcbSrc` (source-chip reveal). Every value comes from a motion
+  token, so the whole choreography can be retimed from the token set
+- Added `app/lib/motion.ts`: `MOTION_CLASS` (the single spelling of each class name),
+  `REDUCED_MOTION_QUERY` / `prefersReducedMotion`, `animateReflow` and `viewTransitionName`.
+  US-005's `TILE_ENTER_CLASS` now derives from `MOTION_CLASS.enter` rather than repeating the string
+- **Reduced motion renders final state, not "no animation":** the unlayered
+  `@media (prefers-reduced-motion: reduce)` block collapses every animation to one ~1ms iteration
+  with no delay and every transition to ~1ms, so filled animations land on their closing frame and
+  transitions on their target immediately. Applied to `*`, so US-027's transition-driven chart
+  geometry is covered before it exists; each primitive then restates its end state outright
+- **Grid reflow** wraps an insertion in a view transition (CSS cannot transition a grid position),
+  timed by `::view-transition-group(*)` to match the entrance; the update always runs, wrapped or not
+- **No gold ring, guarded by tests:** the entrance keyframes and `.fcb-enter` may declare nothing but
+  the animation, the card never carries `fcb-glow`, and gold keeps exactly two consumers
+- 37 tests, the load-bearing ones structural: every class whose keyframes open at `opacity: 0` must
+  be restored to its final state by the reduced-motion block, which must not sit inside a cascade layer
+- All five gates clean; 181/181 tests; coverage 100% statements / 97.6% branches of `app/**`;
+  compiled CSS verified to ship all four keyframes and every final-state rule
 
 ---
 
