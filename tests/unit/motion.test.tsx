@@ -9,6 +9,7 @@ import {
   MOTION_CLASS,
   prefersReducedMotion,
   REDUCED_MOTION_QUERY,
+  scrollRevealedIntoView,
   viewTransitionName,
 } from "../../app/lib/motion";
 import { duration, easing, spacing } from "../../app/lib/tokens";
@@ -392,6 +393,87 @@ describe("grid reflow", () => {
       "fcb-tile-2026-kit-away",
     );
     expect(viewTransitionName("a")).not.toBe(viewTransitionName("b"));
+  });
+});
+
+/* ------------------------------------------------------------ AUTO-SCROLL -- */
+
+describe("scrollRevealedIntoView", () => {
+  const originalMatchMedia = window.matchMedia;
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia;
+    vi.restoreAllMocks();
+  });
+
+  function stubReducedMotion(matches: boolean): void {
+    window.matchMedia = vi.fn(
+      (query: string) => ({ matches, media: query }) as MediaQueryList,
+    );
+  }
+
+  /** jsdom implements no scrolling, so the method is installed as a spy. */
+  function nodeWithSpy(): {
+    node: HTMLElement;
+    scrollIntoView: ReturnType<typeof vi.fn>;
+  } {
+    const node = document.createElement("div");
+    const scrollIntoView = vi.fn();
+    Object.assign(node, { scrollIntoView });
+    return { node, scrollIntoView };
+  }
+
+  it("glides to the top of the revealed section", () => {
+    stubReducedMotion(false);
+    const { node, scrollIntoView } = nodeWithSpy();
+
+    scrollRevealedIntoView(node);
+
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+
+  it("jumps to the same place under reduced motion", () => {
+    // A smooth scroll IS motion, so the preference has to reach it too.
+    stubReducedMotion(true);
+    const { node, scrollIntoView } = nodeWithSpy();
+
+    scrollRevealedIntoView(node);
+
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: "auto",
+      block: "start",
+    });
+  });
+
+  it("moves focus nowhere", () => {
+    // Yanking focus out of the prompt bar mid-answer would be worse than not
+    // scrolling at all.
+    stubReducedMotion(false);
+    const { node } = nodeWithSpy();
+    document.body.append(node);
+
+    scrollRevealedIntoView(node);
+
+    expect(document.activeElement).toBe(document.body);
+    node.remove();
+  });
+
+  it("does nothing when there is no node to scroll to", () => {
+    stubReducedMotion(false);
+
+    expect(() => scrollRevealedIntoView(null)).not.toThrow();
+  });
+
+  it("does nothing where scrollIntoView is unavailable", () => {
+    // The server and jsdom have no scrolling; a reveal must not fail for it.
+    stubReducedMotion(false);
+
+    expect(() =>
+      scrollRevealedIntoView(document.createElement("div")),
+    ).not.toThrow();
   });
 });
 

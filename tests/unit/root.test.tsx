@@ -1,9 +1,16 @@
 import { render, screen } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import App, { Layout } from "../../app/root";
+
+const ROOT_SOURCE = readFileSync(
+  resolve(process.cwd(), "app/root.tsx"),
+  "utf8",
+);
 
 type AnyElement = ReactElement<Record<string, unknown>>;
 
@@ -79,6 +86,27 @@ describe("App", () => {
     // inside the same grid instead of the view being replaced.
     const grid = document.querySelector('[data-slot="canvas-grid"]')!;
     expect(grid).toContainElement(screen.getByText("child route"));
+  });
+
+  it("starts the session with no insight section on the canvas", () => {
+    // Memory-only state: a load (and therefore a reload) starts empty.
+    renderApp();
+
+    expect(
+      document.querySelectorAll('[data-slot="insight-section"]'),
+    ).toHaveLength(0);
+  });
+
+  it("owns the dashboard state above both the canvas and the app bar", () => {
+    // The sections render as siblings of the routed page inside the shell's
+    // canvas, so an answer joins the same grid instead of replacing the view.
+    expect(ROOT_SOURCE).toMatch(/useDashboard\(\)/);
+    expect(ROOT_SOURCE).toMatch(
+      /<InsightSections sections=\{sections\} focus=\{focus\} \/>/,
+    );
+    expect(ROOT_SOURCE.indexOf("<Outlet />")).toBeLessThan(
+      ROOT_SOURCE.indexOf("<InsightSections"),
+    );
   });
 
   it("renders the crest as the first item of the app bar", () => {

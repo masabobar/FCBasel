@@ -6,7 +6,7 @@ grow when a question is asked.
 **Duration:** Day 2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 16
-**Status:** In Progress (1/5 completed)
+**Status:** In Progress (2/5 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -16,7 +16,7 @@ grow when a question is asked.
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (1/5 completed)
+**Status:** In Progress (2/5 completed)
 **Source:** Build Specification E4; Reference Implementation Guide §8.
 
 > The dashboard **never clears to show a hero — it grows.** That single behaviour is what makes the
@@ -74,7 +74,7 @@ grow when a question is asked.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Hero tiles insert into the same grid with the E2 animation; the dashboard grows
     rather than clearing.
   - **Acceptance Criteria:**
@@ -86,6 +86,24 @@ grow when a question is asked.
     - Many tiles in one session: the grid scrolls vertically, earlier tiles remain, layout stays intact
     - No persistence — state is memory-only and resets on reload
   - **Dependencies:** US-006, US-012
+  - **Completion note (2026-09-09):** All seven criteria met. Session state is a memory-only list of
+    `{ heroId, phase, revision }` — pure transitions in `app/lib/dashboard/sections.ts`, React state
+    in `use-dashboard.ts`, owned by `app/root.tsx` so the canvas and the app bar share one source.
+    Sections render as **direct children of the US-012 canvas grid** and re-use its column tracks
+    through `grid-cols-subgrid`, so there is still exactly one grid: measured in Chrome, canvas
+    tracks 122.656px and a placeholder tile 816px wide (6 columns + gap) at the canvas's own column
+    starts. Re-asking a hero refreshes in place — one section, same position, `revision` bumped, and
+    a section already showing its follow-up never regresses; a follow-up **flips** its parent's
+    phase rather than appending (the behaviour US-033 depends on), and a follow-up whose parent has
+    not been shown renders the parent first. Reflow goes through US-006's `animateReflow` with
+    `flushSync` inside the transition callback: real Chrome shows
+    `::view-transition-group(fcb-tile-HERO_1)` animating while a second section inserts. The newest
+    section is scrolled into view (`smooth`, `auto` under reduced motion, focus never moved) —
+    `scrollY` 0 → 154 at 1280×620 as the third section overflowed, with the first still present.
+    Under `prefers-reduced-motion` Chrome recorded zero `startViewTransition` calls and an identical
+    final layout. A source scan over `app/**` fails on any `localStorage`, `sessionStorage`,
+    `indexedDB` or `document.cookie`. Hero tiles (Phase 2b) and narratives (Phase 3b) are a clearly
+    marked placeholder; `HeroSectionBody` is the single seam US-034 to US-039 replace.
 
 - **US-015**: Reset to baseline
   - **Story Points:** 2
@@ -134,7 +152,7 @@ grow when a question is asked.
 
 **By Priority:** P0: 4 stories, 11 points · P1: 1 story, 5 points · P2: 0
 
-**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 2 stories, 8 points (US-013, US-016 — dependencies live in Phase 2b)
+**By Status:** ✅ 2 stories, 6 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 2 stories, 8 points (US-013, US-016 — dependencies live in Phase 2b)
 
 ---
 

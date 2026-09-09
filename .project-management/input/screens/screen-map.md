@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-012 — the shell regions are now built)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-014 — insertion machinery built; hero content still pending)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -44,7 +44,7 @@ The three inert items are deliberate: they imply a fuller product without preten
 | **Path** | `/` (single route) |
 | **Auth** | Public — no authentication model exists in the prototype |
 | **Stories** | US-012, US-013, US-014, US-015, US-016, US-028 to US-039 |
-| **Status** | *(generated)* In Progress (1/17 completed — US-012 shell built; canvas still empty) |
+| **Status** | *(generated)* In Progress (2/17 completed — US-012 shell + US-014 insertion machinery; hero content pending) |
 
 **Description:** The persona's dashboard. On arrival it already looks lived-in — four baseline tiles,
 not an empty canvas. The user types a business question or taps a suggestion chip; after a staged
@@ -69,7 +69,7 @@ between them, and all of them share the same grid.
 | **Baseline** | On load, and after Reset | US-013 | ⏸️ Deferred to the Phase 2b run — the shell renders the frame with an empty canvas until then |
 | **Empty prompt** | Before any question is asked — light branded-red panel with heading and subtext | US-032 | 📋 Not started |
 | **Thinking** | During the fixed staged delay after a confident match | US-031 | 📋 Not started |
-| **Grown** | One or more hero sections inserted, in the order asked | US-014, US-034 to US-039 | 📋 Next (US-014) |
+| **Grown** | One or more hero sections inserted, in the order asked | US-014, US-034 to US-039 | 🔄 Mechanic built (US-014) — sections insert into the canvas grid, dedupe by hero id, reflow and auto-scroll; their **content** is a marked placeholder until US-034 to US-039 |
 | **Fallback** | Typed input matched nothing — re-surfaces the prepared questions | US-032 | 📋 Not started |
 
 **Persistent chrome across every state:** navy sidebar, top app bar (crest, "Sales & Marketing", "SM"
@@ -83,16 +83,21 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 | Region | Contents | Stories | Status |
 |---|---|---|---|
 | Sidebar | Dashboard (active) + three inert items | US-012 | ✅ Built — `app/components/chrome/sidebar.tsx`; hides below `lg` |
-| Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 | ✅ Built — `app/components/chrome/top-bar.tsx`; Reset control renders, behaviour pending US-015 |
-| Canvas grid | The 12-column container every tile and section is inserted into | US-012 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. Intentionally **empty** |
+| Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 | ✅ Built — `app/components/chrome/top-bar.tsx`; Reset control renders, behaviour pending US-015 (which clears the US-014 session state) |
+| Canvas grid | The 12-column container every tile and section is inserted into | US-012, US-014 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. Empty on load; US-014's sections insert into **this** grid as direct children |
 | Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 | ⏸️ Deferred to the Phase 2b run |
 | Baseline row | Top Products (own period filter), Active Partners | US-013 | ⏸️ Deferred to the Phase 2b run |
-| Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 | 📋 Next (US-014) |
+| Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 | 🔄 Built (US-014) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
 | Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started |
 
 > The **canvas grid** row is new in 1.1.0. It was implicit before — US-012 made it a real region
 > with its own component, and US-013/US-014 both insert into it rather than owning a grid each.
+>
+> 1.2.0 records US-014: the insight-section region now exists and is proven to sit **inside** that
+> one grid — each section spans it and re-uses its column tracks (`grid-cols-subgrid`), so no second
+> grid was introduced. Session state is memory-only, so the Grown state always starts from Baseline
+> after a reload.
 
 ---
 
@@ -102,18 +107,22 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-09, after US-012)
+## 4. Drift Report (hand-checked 2026-09-09, after US-014)
 
 - **Stories referencing screens not in this map:** *(none)*
 - **Screen entries with no backing story (orphans):** *(none)*
 - **Navigation nodes missing a registry entry (or vice versa):** *(none — the three inert sidebar
   items are intentionally not registry entries; they are not screens)*
+- **Routes added by US-014:** *(none)*. An answer is inserted into the existing screen — it is a
+  state of SCREEN-001, not a navigation. `app/routes.ts` is unchanged and `root.tsx` renders the
+  sections beside the routed page inside the same canvas.
 - **Routes added by US-012:** *(none)*. The shell added no route: `/` remains the only entry in
   `app/routes.ts`, and the three inert items are `<span>` elements with no href and no handler —
   proven non-focusable and click-inert by test. The navigation hierarchy above is unchanged.
 - **API endpoint columns:** still empty, as designed. The prototype has no API, so this is not
   drift (`constraints.md` §2). US-012 makes no network call at runtime, and the app-bar tests assert
-  the absence of `fetch`, `axios` and any timer.
+  the absence of `fetch`, `axios` and any timer. US-014 adds no endpoint either: inserting a section
+  is a React state change, and a source scan asserts no storage API is used anywhere in `app/**`.
 
 ---
 

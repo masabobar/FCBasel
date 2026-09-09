@@ -8,7 +8,9 @@
  *   1. the class names, so a component never types `"fcb-enter"` by hand and
  *      a rename stays a one-line change;
  *   2. the reduced-motion query, shared by CSS and by the hooks that read it;
- *   3. the view-transition wrapper that makes the grid reflow smoothly.
+ *   3. the view-transition wrapper that makes the grid reflow smoothly;
+ *   4. the auto-scroll that brings a just-revealed section into view, which is
+ *      motion too and so reads the same preference.
  *
  * The `useReducedMotion` / `useGrow` / `useCountUp` hooks that drive chart
  * geometry are US-027's; they build on `REDUCED_MOTION_QUERY` and
@@ -110,4 +112,32 @@ export function animateReflow(update: () => void): void {
   }
 
   doc.startViewTransition(update);
+}
+
+/* ----------------------------------------------------------- AUTO-SCROLL -- */
+
+/**
+ * Bring a just-revealed section into view.
+ *
+ * The dashboard grows downwards, so an answer inserted below the fold would
+ * otherwise land unseen. This is the third piece of the reveal system that
+ * has to read the motion preference: a smooth scroll is motion, so under
+ * reduced motion the view jumps to the same place instead of gliding to it.
+ *
+ * It deliberately does NOT focus the target. Moving focus mid-answer would
+ * yank a keyboard user out of the prompt bar they are still typing in; the
+ * section carries a real heading instead, so it can be reached on its own
+ * terms.
+ *
+ * A missing node and an environment without `scrollIntoView` (jsdom, the
+ * server) are both no-ops rather than throws: the reveal must not fail
+ * because the view could not be scrolled.
+ */
+export function scrollRevealedIntoView(target: Element | null): void {
+  if (typeof target?.scrollIntoView !== "function") return;
+
+  target.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "start",
+  });
 }

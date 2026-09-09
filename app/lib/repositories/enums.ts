@@ -244,3 +244,39 @@ export const PARTNER_ROLE_LABEL: Record<PartnerRole, string> = {
   [PartnerRole.BEVERAGE_PARTNER]: "Beverage partner",
   [PartnerRole.MOBILITY_PARTNER]: "Mobility partner",
 };
+
+/* -------------------------------------------------------------- HEROES -- */
+
+/**
+ * The three scripted demonstrations. This is the identity a question resolves
+ * to and the key the dashboard dedupes an inserted section by, so it lives
+ * here with the other cross-boundary keys rather than as three loose strings.
+ *
+ * The number matches the dataset the hero renders (`../mock/hero1.ts` ->
+ * `HERO_1`) and the backlog's own numbering (US-034/035 are Hero 1, US-036/037
+ * Hero 2, US-038/039 Hero 3), so there is one vocabulary from fixture to
+ * screen. It is an identifier and is never rendered: a hero's title and
+ * narrative are part of its content (Phase 3b), not of its id.
+ */
+export const HeroId = {
+  /** Merchandising - shirt sales, sponsor badges, printed names. */
+  HERO_1: "HERO_1",
+  /** Ticketing - ticket revenue year on year. */
+  HERO_2: "HERO_2",
+  /** Departments - budget versus actual versus target. */
+  HERO_3: "HERO_3",
+} as const;
+
+export type HeroId = (typeof HeroId)[keyof typeof HeroId];
+
+/**
+ * The heroes in the order their suggestion chips are offered (US-029).
+ *
+ * NOT the order sections appear in: that is the order the questions were asked
+ * and is a property of the session, not of this list.
+ */
+export const HERO_IDS: readonly HeroId[] = [
+  HeroId.HERO_1,
+  HeroId.HERO_2,
+  HeroId.HERO_3,
+];

@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2a - Shell & Baseline *(1/5 stories complete)* · Phase 1b complete
+**Current Phase:** Phase 2a - Shell & Baseline *(2/5 stories complete)* · Phase 1b complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 23% | 100% | 🟢 On Track |
+| **Overall Progress** | 26% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 12/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 27/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 13/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 30/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 12
-**Currently Working On:** US-014 — Dynamic tile insertion & grid reflow (3 pts)
-**Story Points Completed Today:** 27
+**Stories Completed Today:** 13
+**Currently Working On:** US-015 — Reset to baseline (2 pts)
+**Story Points Completed Today:** 30
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -105,6 +105,20 @@
   static and marked `data-decorative`; tests pin the absence of `fetch`, a live region and any timer,
   so nobody can wire it to a health check. Reset renders here; its behaviour stays US-015.
 
+- ✅ **US-014 — Dynamic tile insertion & grid reflow (3 pts)** — the mechanic the whole demo turns on:
+  the dashboard **grows, it never clears**. Session state is a memory-only list of `{heroId, phase,
+  revision}` (`app/lib/dashboard/`), owned by `root.tsx` so the canvas and the app bar share one
+  source. Re-asking a hero **refreshes in place** — one section, same position, revision bumped —
+  and a follow-up **flips an existing section's phase** instead of appending, which is exactly what
+  US-033 builds on. Sections are direct children of the US-012 canvas grid and re-use its column
+  tracks via `grid-cols-subgrid`, so there is still only **one grid**. Verified in real Chrome:
+  `::view-transition-group(fcb-tile-HERO_1)` animates while a second section inserts (existing tiles
+  glide, never jump), the view auto-scrolls to the newest section once the canvas overflows, and
+  under `prefers-reduced-motion` the tween is skipped entirely while the final layout renders
+  identically. Hero content is deliberately a marked placeholder — tiles are Phase 2b, narratives
+  Phase 3b — and a source scan asserts no `localStorage`, `sessionStorage`, cookie or IndexedDB
+  anywhere in `app/**`.
+
 ---
 
 ## 🏁 Phase 1b complete — Seed Data
@@ -118,12 +132,13 @@ grounded in verified FCB facts. Closed at 100% on 2026-09-09, as did **Phase 1a*
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| Phase 2a: US-014 — Dynamic tile insertion & grid reflow | 📋 Next | 0% |
+| Phase 2a: US-015 — Reset to baseline | 📋 Next | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-014: Dynamic tile insertion & grid reflow | 2026-09-09 | 3 |
 | US-012: Branded application shell | 2026-09-09 | 3 |
 | US-011: Formatters & cross-hero reconciliation | 2026-09-09 | 2 |
 | US-010: Hero 3 dataset — departmental performance | 2026-09-09 | 2 |
@@ -167,8 +182,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 100% stmts / 98.9% branches | 80% | 🟢 Good |
-| Passing Tests | 475/475 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 100% stmts / 99.1% branches | 80% | 🟢 Good |
+| Passing Tests | 552/552 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -200,7 +215,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 |-------|--------|---------|--------|----------|
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
-| Phase 2a: Shell & Baseline | 🔄 Active | 1/5 | 3/16 | 19% |
+| Phase 2a: Shell & Baseline | 🔄 Active | 2/5 | 6/16 | 38% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
@@ -223,4 +238,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-012 completed at 2026-09-09 — Phase 2a active (1/5), US-014 next
+**Last Auto-Update:** US-014 completed at 2026-09-09 — Phase 2a active (2/5), US-015 next

@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 12 — **Phase 1a and Phase 1b complete; Phase 2a started**
-**Story Points:** 27
-**Time Worked:** ~7.6 hours
-**Files Changed:** 108
-**Tests Added:** 475
+**Stories Completed:** 13 — **Phase 1a and Phase 1b complete; Phase 2a at 2/5**
+**Story Points:** 30
+**Time Worked:** ~8.4 hours
+**Files Changed:** 128
+**Tests Added:** 552
 
 ---
 
@@ -20,34 +20,29 @@
 - Project management setup: scope, backlog, documentation, phase structure and progress tracking
   generated from the client document set.
 - **US-001 — Environment & deployment setup.** React Router 7.18 framework mode with SSR scaffolded
-  at the repo root (Vite 6, Tailwind v4, strict TypeScript). Only the prototype's dependency set is
-  installed. Railway deploy config committed. Clean-checkout `pnpm install` / `build` / `start`
-  verified by execution, serving HTTP 200 with server-rendered markup, with no environment variable
-  and no database. 8 unit tests green, `tsc --noEmit` clean, `pnpm audit` clean after overriding a
-  vulnerable transitive `qs`.
+  at the repo root (Vite 6, Tailwind v4, strict TypeScript), only the prototype's dependency set,
+  Railway deploy config committed. Clean-checkout `install` / `build` / `start` verified by
+  execution: HTTP 200 with SSR markup, no env var, no database. 8 tests green, `tsc` clean,
+  `pnpm audit` clean after overriding a vulnerable transitive `qs`.
 - **US-002 — Developer tooling & local DX.** ESLint 9 flat config (TypeScript + React hooks) with
-  `eslint-config-prettier` applied last, Prettier with `prettier-plugin-tailwindcss` for Tailwind v4
-  class sorting, and husky v9 + lint-staged running `eslint --fix` and `prettier --write` on staged
-  files. Every acceptance-criteria script was executed rather than assumed, and the pre-commit hook
-  was proven with throwaway commits that were then reset away: a lint error blocked the commit, and
-  a badly formatted file landed already formatted and class-sorted. `pnpm lint` clean, `pnpm
-  typecheck` clean, 8/8 tests green, `pnpm audit` clean with the US-001 `qs` override retained.
+  `eslint-config-prettier` last, Prettier with `prettier-plugin-tailwindcss`, and husky v9 +
+  lint-staged on staged files. Every acceptance-criteria script was executed rather than assumed,
+  and the hook was proven with throwaway commits later reset away: a lint error blocked the commit,
+  a badly formatted file landed already formatted. All gates clean, 8/8 tests green.
 - **US-003 — Design token set.** One token set, published twice on purpose: Tailwind v4 CSS custom
   properties in `app/app.css` (`@theme static`) for utilities and `var()`, and a typed object in
   `app/lib/tokens.ts` for the hand-built SVG charts that need strings rather than classes. A parity
   test parses the stylesheet, resolves the `var()` aliases and fails on drift in either direction.
   Reference Guide values win on the three known divergences (surface `#F1F4F9`, text `#161A20`,
-  positive variance `#0E9F6E`), and the Specification-only gold ring for new tiles was not
-  introduced. Colour discipline is encoded rather than documented — series-identity tokens, variance
-  tokens as the only good/bad carriers, `varianceNegative` deliberately separate from `red`, and
-  gold restricted to two accent roles, each backed by a test. 96/96 tests green, coverage 100% of
-  `app/**`, and lint / format / typecheck / build all clean.
+  positive variance `#0E9F6E`), and the Specification-only gold ring was not introduced. Colour
+  discipline is encoded rather than documented — series-identity tokens, variance tokens as the only
+  good/bad carriers, `varianceNegative` separate from `red`, gold restricted to two accent roles,
+  each backed by a test. 96/96 green, coverage 100% of `app/**`, all gates clean.
 - **US-004 — Self-hosted FCB crest.** The club serves the crest from a `.webp` URL that actually
   returns PNG bytes, so the download was inspected with `file` before anything was committed and
   stored under its real format as `public/fcb-crest.png`. 608x648 at 194 KB is ~90x more pixels than
-  a 32px app-bar mark can show, so it was downsampled to 120x128 with macOS `sips` — no image
-  dependency added — and every ancillary PNG chunk stripped, including the XMP block `sips`
-  re-attached; the committed asset is 17,908 bytes of pure `IHDR`/`IDAT`/`IEND`. `Crest` in
+  a 32px mark can show, so it was downsampled to 120x128 with macOS `sips` — no image dependency —
+  and every ancillary chunk stripped; the asset is 17,908 bytes of `IHDR`/`IDAT`/`IEND`. `Crest` in
   `app/components/chrome/crest.tsx` renders it with an accessible name and an aspect-ratio-derived
   width, placed top-left in a minimal `<header>` in `app/root.tsx` — the full shell stays US-012.
   The no-CDN criterion was proved rather than assumed: nothing in `build/` matches `fcb.ch`, both
@@ -55,11 +50,10 @@
   whose every `src`/`href` is root-relative. 106/106 tests green, coverage 100% of `app/**`.
 - **US-005 — Tile card anatomy.** `Card` and `CardCaption` in `app/components/tiles/card.tsx`: the
   one shell that seven Phase 2b tile kinds and three Phase 3b heroes compose, so the prop set was
-  designed for those eleven callers rather than for today. Slots, not variants — `title`, `subtitle`,
-  `headingLevel`, `icon`, `action`, `accent`, `caption`, `isNew`, `delayMs`, `className`, `children`
-  — and every optional part collapses on its own, the header disappearing entirely when nothing
-  would fill it, which is what lets an accent-only recommendation panel and a titled KPI tile share
-  one implementation. `accent` takes a token name rather than a colour string, so the US-003 colour
+  designed for those eleven callers rather than for today. Slots, not variants — eleven optional
+  props, each collapsing on its own and the header disappearing entirely when nothing would fill it,
+  which is what lets an accent-only recommendation panel and a titled KPI tile share one
+  implementation. `accent` takes a token name rather than a colour string, so the US-003 colour
   discipline is enforced by the type instead of by review; the title is a real heading so a
   tile-by-tile dashboard stays navigable; the caption strip is one muted line behind an
   `aria-hidden` AI glyph. `isNew` and `delayMs` are hooks only — US-006 owns the keyframes, and
@@ -70,9 +64,9 @@
   (a new tile fades in while rising 12px over 400ms on the gentle insertion ease), `fcbGlow` (the
   ambient brand pulse for the sidebar dot and AI orbs — never an inserted tile), `fcbScan` (the
   thinking scan line) and `fcbSrc` (the source-chip reveal). `app/lib/motion.ts` holds the class
-  names, so `TILE_ENTER_CLASS` from US-005 now derives from `MOTION_CLASS.enter` instead of
-  repeating the string, and the entrance attaches to the `isNew`/`delayMs` hooks the card already
-  exposed rather than to a parallel mechanism. The subtle criterion — nothing stuck at zero under
+  names, so `TILE_ENTER_CLASS` derives from `MOTION_CLASS.enter` instead of repeating the string,
+  and the entrance attaches to the card's existing `isNew`/`delayMs` hooks rather than to a parallel
+  mechanism. The subtle criterion — nothing stuck at zero under
   reduced motion — is met by *collapsing* animations rather than removing them: `animation: none`
   would strand any element whose opening frame is `opacity: 0`, so the unlayered
   `prefers-reduced-motion` block gives every animation one ~1ms iteration with no delay and every
@@ -81,9 +75,8 @@
   written against `*` it will cover US-027's transition-driven chart geometry before that exists.
   Smooth grid reflow uses a view transition, since CSS cannot transition a grid position; the update
   always runs, wrapped or not, so no state change is lost to a missing API. The resolved conflict is
-  guarded by tests, not just comments: no ring, no glow, and gold keeps exactly two consumers.
-  37 tests added (181/181 green), coverage 100% statements / 97.6% branches of `app/**`, and lint /
-  format / typecheck / build all clean.
+  guarded by tests: no ring, no glow, and gold keeps exactly two consumers. 37 tests added
+  (181/181 green), coverage 100% stmts / 97.6% branches, all gates clean.
 
 - **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 / US-009 /
   US-010 follow: enum keys in `app/lib/repositories/enums.ts`, domain types and the repository
@@ -111,29 +104,25 @@
   drift, and a `scopeLabel` of "Season-to-date merchandising" so the tile states what it covers,
   which matters when Hero 2 and Hero 3 quote different scopes in the same room. **Nothing derivable
   is stored:** kit revenue is units x CHF 99, the Home share is 22,400/38,500 = 58.18% shown as 58%,
-  the badge share is exactly 8%, and the sponsor segments are computed — the Reference Guide's
+  the badge share is exactly 8%, and the sponsor segments are computed — the Guide's
   `homeShare: 58` deliberately did not survive the port. `badgeSegments` corrects its rounding
-  remainder into Bitpanda's segment, and the proof is exhaustive rather than anecdotal: the four
-  parts sum *exactly* to the total for every total from 0 to 2,000, plus the four real period totals
-  and a set of adversarial primes. Both narratives are verbatim, checked byte-for-byte against the
-  source by SHA-256 and pinned by text and length in the suite. The guardrail is tested, not just
-  documented: squad names exist only as print counts, and no salary, goals, assists, appearances,
-  minutes or rating value appears anywhere. 45 tests added (273/273 green), coverage 100%
-  statements / 98.4% branches of `app/**`, and lint / format / typecheck / build all clean.
+  remainder into Bitpanda's segment, proved exhaustively: the four parts sum *exactly* to the total
+  for every total from 0 to 2,000, the four real period totals and adversarial primes. Both
+  narratives are verbatim, checked by SHA-256 and pinned by text and length. The guardrail is
+  tested: squad names exist only as print counts, and no salary, goals, assists, minutes or rating
+  appears anywhere. 45 tests added (273/273 green), coverage 100% stmts / 98.4% branches.
 - **US-009 — Hero 2 dataset: ticket revenue year on year.** Eight home fixtures in CHF thousands
   (7,880 -> 7,830) plus the twelve-month series the Reference Guide adds beyond the Specification,
   as one `Hero2` object with `primary` and `followUp`. The story's real risk was labelling, not
   arithmetic: the two charts sit at deliberately different scopes — eight highest-grossing fixtures
   against all home fixtures per month (9,880 -> 9,770) — so `scopeLabel` is a field on each series
   and tests assert the labels exist, differ, and that the monthly total is the larger one. Nothing
-  derivable is stored: the Reference Guide's `totalPrev`, `totalCurr`, `deltaPct` and its second
-  `declines` list did not survive the port, so the headline -0.6% comes from the same `seriesTotals`
-  the baseline band uses, and FCZ -150 / Lugano -110 / Luzern -70 / Sion -70 and the -CHF 400k badge
-  are recovered from the fixture pairs by `fixtureDeclines` and `declineTotal`. New `SeasonKey` and
-  `MonthKey` enums carry the season and month axis keys, with `MONTH_LABEL` pinned by test to the
-  baseline band's `Intl`-derived month names. Both narratives verbatim, pinned by text, length and
-  an ASCII-range check. 31 tests added (304/304 green), coverage 100% statements / 98.4% branches of
-  `app/**`, and lint / format / typecheck / build all clean.
+  derivable is stored: the Guide's `totalPrev`, `totalCurr`, `deltaPct` and second `declines` list
+  did not survive the port, so the headline -0.6% comes from the same `seriesTotals` the baseline
+  band uses, and FCZ -150 / Lugano -110 / Luzern -70 / Sion -70 and the -CHF 400k badge are
+  recovered from the fixture pairs. New `SeasonKey` and `MonthKey` enums carry the axis keys, with
+  `MONTH_LABEL` pinned to the baseline band's `Intl`-derived month names. Both narratives verbatim,
+  pinned by text, length and an ASCII-range check. 31 tests added (304/304 green).
 - **US-010 — Hero 3 dataset: departmental performance.** Six departments in CHF thousands
   (69,000 -> 69,680, +680 / +1.0% derived) as one `Hero3` object with `primary` and `followUp`. The
   new idea here is that a TAG carries the meaning of a number: above budget is money earned for the
@@ -195,17 +184,32 @@
   the four baseline tiles are US-013, insertion is US-014.
   Three things were made structural rather than trusted. **The persona is a role:** the label and
   the "SM" monogram live in one module and a test asserts the app bar renders no text beyond those
-  labels, so a personal name cannot be introduced by accident; the crest is the only `<img>`.
-  **The placeholder items are inert by construction:** plain `<span aria-disabled="true">` with no
-  href, no role, no handler, no focus and `pointer-events-none` — Chrome reports `tabIndex` -1 and
-  `pointer-events: none` on all three, and a synthesised click leaves the router at `/`; a source
-  guard fails the suite if a `hover:` rule or a second route target ever appears in the file.
+  labels; the crest is the only `<img>`. **The placeholder items are inert by construction:** plain
+  `<span aria-disabled="true">`, no href, no role, no handler, no focus, `pointer-events-none` —
+  Chrome reports `tabIndex` -1 and `pointer-events: none` on all three, a synthesised click leaves
+  the router at `/`, and a source guard bans a `hover:` rule or a second route target.
   **The connection status is decorative:** static text, `data-decorative`, no live region, and
-  source assertions that the file holds no `fetch`, `axios`, `useEffect` or timer, so nobody can
-  quietly wire it to a health check. Reset renders but its behaviour stays US-015.
-  Verified in Chrome at 1920×1080 (and 1280 / 900 / 390): no horizontal scroll, the sidebar leaves
-  at 900, the grid steps down as designed. 475/475 tests green, coverage 100% stmts / 98.9%
-  branches of `app/**`, all five gates clean. Security triage: no security-relevant changes.
+  source assertions that the file holds no `fetch`, `axios`, `useEffect` or timer. Reset renders but
+  its behaviour stays US-015. Verified in Chrome at 1920×1080 (and 1280 / 900 / 390): no horizontal
+  scroll, the sidebar leaves at 900, the grid steps down as designed. 475/475 green, coverage 100%
+  stmts / 98.9% branches, all gates clean. Security triage: no security-relevant changes.
+- **US-014 — Dynamic tile insertion & grid reflow.** The mechanic the demo turns on: the dashboard
+  **grows, it never clears**. The session is a memory-only list of `{heroId, phase, revision}` —
+  pure transitions in `app/lib/dashboard/sections.ts`, React state in `use-dashboard.ts`, owned by
+  `root.tsx` so the canvas and the app bar share one source. Sections are **direct children of the
+  US-012 canvas grid**, re-using its tracks via `grid-cols-subgrid` — still exactly one grid
+  (Chrome: canvas tracks 122.656px, placeholder tiles 816px at x=256 and x=1088).
+  Re-asking a hero **refreshes in place** — one section, original position, `revision` bumped so the
+  React key changes and the section re-inserts instead of silently doing nothing — and a follow-up
+  **flips** its parent's phase rather than appending, which is exactly what US-033 inherits. Reflow
+  runs through US-006's `animateReflow` with `flushSync` inside the transition callback; real Chrome
+  shows `::view-transition-group(fcb-tile-HERO_1)` animating as a second section inserts. The newest
+  section is scrolled into view (`smooth`, `auto` under reduced motion, focus never moved):
+  `scrollY` went 0 → 154 at 1280×620 as the third section overflowed, with the first still present.
+  Under `prefers-reduced-motion` Chrome recorded zero view transitions and an identical final
+  layout. Hero tiles (Phase 2b) and narratives (Phase 3b) are a clearly marked placeholder, and a
+  source scan over `app/**` bans every storage API. 77 tests added, 552/552 green.
+  **Phase 2a now 2/5 stories, 6/16 points.**
 
 ---
 
@@ -242,6 +246,10 @@
   ones to fake were measured in a real browser rather than asserted: the placeholder nav items come
   back `tabIndex` -1 with `pointer-events: none`, and the page reports
   `scrollWidth === clientWidth` at 1920×1080. **Phase 2a opens here: 1/5 stories, 3/16 points.**
+- ✅ US-014 — Dynamic tile insertion & grid reflow (3 pts) — all 7 acceptance criteria met: dedupe
+  by hero id proven in unit tests and in real Chrome, a follow-up flips its parent's phase, the
+  reflow tween observed animating, auto-scroll measured, and no storage API anywhere.
+  **Phase 2a now 2/5 stories, 6/16 points.**
 
 ---
 
@@ -262,10 +270,9 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 2a continues from the shell (3/16 pts done). **US-014 — dynamic tile insertion & grid
-  reflow** is next: in-memory tile descriptors appended into the shell's existing canvas grid, hero
-  dedupe by id, and the US-006 reflow wrapper so the dashboard *grows* instead of clearing.
-  US-015 (reset behaviour, wiring the control the shell already renders) follows it
+- Phase 2a continues (6/16 pts done). **US-015 — reset to baseline** is next: add `reset` to
+  `useDashboard`, wire the app bar's existing `onReset`, scroll to top, and stay stable when pressed
+  repeatedly or mid-flow
 - **US-013 and US-016 stay deferred to the Phase 2b run** — US-013 needs US-017 and US-021,
   US-016 needs US-025/026/027, and all five live in Phase 2b
 
@@ -282,8 +289,8 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phases 1a and 1b are complete and Phase 2a has started (27/116 points); continue with
-  `/holycode-pm:execute-work story US-014`.
+- Phases 1a and 1b are complete and Phase 2a is at 2/5 (30/116 points); continue with
+  `/holycode-pm:execute-work story US-015`.
 - The shell keeps two guardrails as *tests*, not comments: the app bar's whole text must equal the
   known role labels (so no personal name can appear), and the connection status file must contain no
   `fetch`, `axios`, `useEffect` or timer (so it cannot become a live health check).

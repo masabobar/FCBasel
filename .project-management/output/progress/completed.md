@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 12 stories
-**Total Points:** 27 / 116
+**Total Completed:** 13 stories
+**Total Points:** 30 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 27 points/day
+**Average Velocity:** 30 points/day
 **Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
 
 ---
@@ -23,15 +23,14 @@
 **Files Changed:** 21 (16 code/config, 5 tracking docs)
 **Tests Added:** 8 (unit: 8)
 **Commit:** see phase-1a progress log
-**Notes:** 4 of 5 acceptance criteria met and verified by execution. The Railway deploy AC is
-**deferred to the human** — no account access from the AI session.
+**Notes:** 4 of 5 criteria verified by execution; the Railway deploy AC is **deferred to the human**.
 
 **What Was Done:** *(full detail in the phase-1a progress log)*
-- React Router 7.18 in framework mode with SSR, Vite 6, Tailwind v4, strict TypeScript, and only the
-  prototype's dependency set (no Prisma, msw, Recharts, TanStack Table, PDF/email, i18n)
+- React Router 7.18 in framework mode with SSR, Vite 6, Tailwind v4, strict TypeScript, and only
+  the prototype's dependency set (no Prisma, msw, Recharts, TanStack Table, PDF/email, i18n)
 - Railway deploy config committed; verified from a **clean checkout** that install, build and a
-  production server return HTTP 200 with server-rendered markup, no env var and no database. Cleared
-  2 moderate transitive `qs` advisories with a pnpm override; `pnpm audit` clean
+  production server return HTTP 200 with SSR markup, no env var, no database. Two moderate `qs`
+  advisories cleared with a pnpm override; `pnpm audit` clean
 
 ### US-002: Developer tooling & local DX (2 pts)
 **Completed:** 2026-09-09
@@ -42,11 +41,10 @@
 **Notes:** All 4 acceptance criteria met and verified by execution, including the pre-commit hook.
 
 **What Was Done:**
-- ESLint 9 flat config (TypeScript + React hooks, `eslint-config-prettier` last), Prettier with
-  `prettier-plugin-tailwindcss` for Tailwind v4 class sorting, and the `lint` / `format` scripts
-- Wired husky v9 + lint-staged and **proved the hook fires** with throwaway commits later reset
-  away: a lint error blocked the commit; a badly formatted file landed already formatted
-- `pnpm lint` clean, `pnpm typecheck` clean, 8/8 tests green, `pnpm audit` clean
+- ESLint 9 flat config (TS + React hooks, `eslint-config-prettier` last), Prettier with
+  `prettier-plugin-tailwindcss`, and the `lint` / `format` scripts
+- Wired husky v9 + lint-staged and **proved the hook fires** with throwaway commits later reset:
+  a lint error blocked the commit; a badly formatted file landed already formatted. All gates clean
 
 ### US-003: Design token set (3 pts)
 **Completed:** 2026-09-09
@@ -60,12 +58,12 @@ surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`. No new-tile gold
 **What Was Done:** *(full detail in the phase-1a progress log)*
 - The colour, type, spacing, radii, shadow and motion set defined once as Tailwind v4 custom
   properties in `app/app.css` (`@theme static`) and mirrored as a typed object in `app/lib/tokens.ts`
-  for the hand-built SVG charts, guarded by a parity test that resolves `var()` aliases
+  for the SVG charts, guarded by a parity test that resolves `var()` aliases
 - Colour discipline encoded in the token *names* (series identity, variance as the only good/bad
   carriers, gold restricted to two accent roles), each asserted by a test, with `varianceNegative`
-  kept separate from `red` so red can never drift into meaning "bad"
+  separate from `red` so red can never drift into meaning "bad"
 - Typography roles (`.tile-title`, `.kpi-number`, `.chart-axis-label`, `.narrative-caption`) so
-  US-005 references a role rather than restating the type spec. All gates clean (96/96)
+  US-005 references a role, never the type spec. All gates clean (96/96)
 
 ### US-004: Self-hosted FCB crest (1 pt)
 **Completed:** 2026-09-09
@@ -81,9 +79,9 @@ extension is wrong and the bytes were trusted instead. No image dependency was a
   stored under its real format as `public/fcb-crest.png`, downsampled to 120x128 with macOS `sips`
   (194,518 → 17,908 bytes), stripped to `IHDR`/`IDAT`/`IEND` — no image dependency, no XMP block
 - `app/components/chrome/crest.tsx` renders it with an accessible name and an aspect-ratio-derived
-  width, top-left at 32px in a minimal `<header>`; the rest of the shell is **US-012**
-- **Proved no CDN request survives:** nothing in `build/` matches `fcb.ch`, both bundles carry the
-  literal `"/fcb-crest.png"`, the booted server's HTML is root-relative. All gates clean (106/106)
+  width, top-left at 32px; the rest of the shell is **US-012**
+- **Proved no CDN request survives:** nothing in `build/` matches `fcb.ch` and both bundles carry
+  `"/fcb-crest.png"`. All gates clean (106/106)
 
 ### US-005: Tile card anatomy (2 pts)
 **Completed:** 2026-09-09
@@ -95,16 +93,15 @@ extension is wrong and the bytes were trusted instead. No image dependency was a
 three Phase 3b heroes compose this one shell, so the prop set was designed for that, not for today.
 
 **What Was Done:** *(full detail in the phase-1a progress log)*
-- `app/components/tiles/card.tsx` — `Card` (the shell) plus `CardCaption`. Nothing else: no KPI tile,
-  no chart, no table, no recommendation panel, no hero
+- `app/components/tiles/card.tsx` — `Card` plus `CardCaption`. Nothing else: no KPI tile, no chart,
+  no table, no recommendation panel, no hero
 - **Slots, not variants** (eleven optional props, each collapsing on its own), so a recommendation
   panel and a KPI tile share one implementation; `accent` takes a **token name**, never a hex, so
   the colour discipline is enforced by the type rather than by review
-- Real heading element (`h3`, nestable) for screen-reader structure; caption strip is one muted line
-  behind an `aria-hidden` glyph; `isNew` / `delayMs` are **hooks only** — US-006 owns the keyframes,
-  and there is no gold ring and no glow (Guide supersedes the spec). Added `app/lib/cn.ts`
-- 38 tests: both directions of every slot, no hex or `rgb()` literal, caller text escaped, no ring
-  or glow. All gates clean (144/144), coverage 100% of `app/**`
+- Real heading element (`h3`, nestable); caption strip is one muted line behind an `aria-hidden`
+  glyph; `isNew` / `delayMs` are **hooks only** — US-006 owns the keyframes, and there is no gold
+  ring and no glow (Guide supersedes the spec). Added `app/lib/cn.ts`
+- 38 tests: both directions of every slot, no hex, caller text escaped. Gates clean (144/144)
 
 ### US-006: Tile-insertion motion & reduced-motion support (3 pts)
 **Completed:** 2026-09-09
@@ -126,8 +123,7 @@ resolved conflict holds: fade-and-rise only, no gold ring on an inserted tile.
   closing frame; each primitive also restates its end state outright
 - **Grid reflow** wraps an insertion in a view transition, timed to match the entrance
 - **No gold ring, guarded structurally:** every class whose keyframes open at `opacity: 0` must be
-  restored by the reduced-motion block, which must not sit inside a cascade layer
-- 37 tests; all five gates clean (181/181); coverage 100% stmts / 97.6% branches of `app/**`
+  restored by the reduced-motion block, which must not sit inside a cascade layer (181/181 green)
 
 ### US-007: Persona baseline datasets (2 pts)
 **Completed:** 2026-09-09
@@ -135,26 +131,23 @@ resolved conflict holds: fade-and-rise only, no gold ring on an inserted tile.
 **Files Changed:** 14 (9 code, 5 tracking docs)
 **Tests Added:** 47 (unit: 47)
 **Commit:** see phase-1b progress log
-**Notes:** All 4 acceptance criteria met, and the delivered set **intentionally exceeds them** per
-the user's approved decision: the criteria describe one period, the Reference Guide (definitive for
-the experience, `scope.md` §10) drives all four.
+**Notes:** All 4 criteria met; the set **intentionally exceeds them** (user-approved) - the criteria
+describe one period, the Reference Guide drives all four.
 
 **What Was Done:** *(full detail in the phase-1b progress log)*
-- Established the data seam the rest of E3 follows, written down in `app/lib/repositories/README.md`
-  as a four-step recipe: enum keys in `enums.ts`, domain types and the repository interface in
-  `types.ts`, derived figures in `derive.ts`, fixtures in `app/lib/mock/<dataset>.ts`, selection in
-  `index.server.ts`. Domain types, not storage shapes; every method returns a `Promise`; money is a
-  plain number, never a formatted string
-- Four periods of webshop revenue with their comparison series, the attendance block per period, the
-  four-period top-products table and the six partners
+- Established the data seam the rest of E3 follows (`app/lib/repositories/README.md`): enum keys in
+  `enums.ts`, types and interfaces in `types.ts`, derived figures in `derive.ts`, fixtures in
+  `app/lib/mock/`, selection in `index.server.ts`. Domain types, not storage shapes; every method
+  returns a `Promise`; money is a plain number
+- Four periods of webshop revenue with comparison series, attendance per period, the four-period
+  top-products table and the six partners
 - **Totals and deltas are computed, never stored** — `seriesTotals` sums the same arrays the chart
   plots, so the headline figure cannot disagree with its own chart. The two long periods derive their
   x-axis labels from the current date through an injectable `Clock`, so the demo never looks stale
-- Store-once proved by test: last month's revenue series *is* this month's comparison series. Partner
-  brand colours are tested as brand colours, not design tokens, and typed as plain strings
-- The four Specification-pinned figures asserted exactly: CHF 148,200 at +11.9% (+12% rounded),
-  FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners (47 tests, 228/228
-  green; coverage 100% stmts / 98% branches; all gates clean)
+- Store-once proved by test: last month's revenue series *is* this month's comparison series;
+  partner brand colours are typed as plain strings, not design tokens
+- The four Specification-pinned figures asserted exactly: CHF 148,200 at +11.9%, FCB 2-1 Sion at
+  28,900 of ~38,000, five product lines, 6 partners (47 tests, 228/228 green; gates clean)
 
 ### US-008: Hero 1 dataset - shirt sales, badges, printed names (2 pts)
 **Completed:** 2026-09-09
@@ -162,30 +155,24 @@ the experience, `scope.md` §10) drives all four.
 **Files Changed:** 9 (2 new, 7 modified)
 **Tests Added:** 45 (unit: 45)
 **Commit:** see phase-1b progress log
-**Notes:** Delivered set intentionally **exceeds the written acceptance criteria**, per the user's
-approved decision: all four periods (season to date, last 3 months, last month, current month), not
-only the season-to-date figures the criteria describe. `scope.md` §10 makes the Reference Guide
-definitive for the experience, and the tile has a period switch that must have data behind it.
+**Notes:** Delivered set intentionally **exceeds the written acceptance criteria** (user-approved):
+all four periods, not only season-to-date - the tile's period switch must have data behind it.
 
 **What Was Done:** *(full detail in the phase-1b progress log)*
-- Followed the US-007 four-step recipe exactly: `SEASON_TO_DATE` added to the existing `PeriodKey`
-  plus a new `KitVariant` enum with its label map, domain types and `Hero1Repository`, derived
-  figures, fixtures, one line of selection
+- Followed the US-007 recipe exactly: `SEASON_TO_DATE` added to `PeriodKey` plus a `KitVariant`
+  enum, domain types and `Hero1Repository`, derived figures, fixtures, one line of selection
 - One hero object with `primary` and `followUp`, per the epic rule, so the tile and its escalation
-  cannot drift apart; `scopeLabel` is "Season-to-date merchandising" so the tile can state its scope
-- **Nothing derivable is stored.** Kit revenue is units x CHF 99, the Home share is 22,400 / 38,500
-  = 58.18% (displays 58%), the badge share is 3,080 / 38,500 = exactly 8%, and the four sponsor
-  segments come from `badgeSegments`. The Reference Guide's stored `homeShare: 58` deliberately did
-  not survive the port - a stored 58 can outlive an edit to the units beneath it
+  cannot drift apart; `scopeLabel` states the tile's scope
+- **Nothing derivable is stored.** Kit revenue is units x CHF 99, the Home share 22,400 / 38,500 =
+  58.18% (displays 58%), the badge share exactly 8%, the four segments from `badgeSegments`. The
+  Guide's stored `homeShare: 58` did not survive the port - it can outlive an edit to its units
 - `badgeSegments(total, split)` corrects its rounding remainder into the first segment, proved by an
-  exhaustive sweep: the four segments sum *exactly* to the total for every total 0-2,000, all four
-  period totals and adversarial primes. Arithmetic asserted: 22,400 + 10,300 + 5,800 = 38,500
-  shirts; CHF 3,811,500 (~3.81M); badge split 44/24/20/12 = 100
+  exhaustive sweep (every total 0-2,000, all four period totals, adversarial primes). Arithmetic
+  asserted: 22,400 + 10,300 + 5,800 = 38,500 shirts; CHF 3,811,500 (~3.81M); 44/24/20/12 = 100
 - Both narratives **verbatim**, verified by SHA-256 and pinned by exact text and length
 - Guardrail held: squad names appear only as printed-name counts, and a test asserts no salary,
-  goals, assists, appearances, minutes or rating value exists anywhere. The baseline fixture was
-  narrowed to its own period keys so extending the shared enum could not demand invented figures
-  (45 tests, 273/273 green; coverage 100% stmts / 98.4% branches; all gates clean)
+  goals, assists, minutes or rating exists anywhere. The baseline fixture was narrowed to its own
+  period keys so extending the shared enum could not demand invented figures (45 tests, 273/273)
 
 ### US-009: Hero 2 dataset - ticket revenue year on year (2 pts)
 **Completed:** 2026-09-09
@@ -193,35 +180,29 @@ definitive for the experience, and the tile has a period switch that must have d
 **Files Changed:** 10 (2 new, 8 modified)
 **Tests Added:** 31 (unit: 31)
 **Commit:** see phase-1b progress log
-**Notes:** Delivered set intentionally **exceeds the written acceptance criteria**, per the user's
-approved decision: the month-by-month series (twelve points per season) is a Reference Guide
-addition the Build Specification never mentions, and the tile draws it. `scope.md` §10 makes the
-Reference Guide definitive for the experience.
+**Notes:** Delivered set intentionally **exceeds the written acceptance criteria** (user-approved):
+the month-by-month series is a Reference Guide addition the tile draws.
 
 **What Was Done:** *(full detail in the phase-1b progress log)*
 - Followed the US-007 four-step recipe: new `SeasonKey` and `MonthKey` enums with label maps, domain
   types and `Hero2Repository`, derived figures, fixtures, one line of selection
-- Eight home fixtures in CHF thousands, 25/26 against 26/27: YB 1,480 -> 1,610; FCZ 1,390 -> 1,240;
-  Servette 980 -> 1,050; St. Gallen 1,020 -> 1,090; Luzern 890 -> 820; Sion 760 -> 690;
-  GC 640 -> 720; Lugano 720 -> 610
+- Eight home fixtures in CHF thousands, 25/26 -> 26/27: YB 1,480/1,610; FCZ 1,390/1,240; Servette
+  980/1,050; St. Gallen 1,020/1,090; Luzern 890/820; Sion 760/690; GC 640/720; Lugano 720/610
 - **The two charts are at different scopes on purpose, and the data says so.** `scopeLabel` is a
   field on each series - eight highest-grossing fixtures (7,880 -> 7,830) against all home fixtures
   per month (9,880 -> 9,770), both excluding the season-ticket base. Tests assert the labels exist,
   differ, and that the monthly total is the larger, so the gap reads as scope, not as a bug
-- **Nothing derivable is stored.** The Reference Guide's `totalPrev`, `totalCurr`, `deltaPct` and its
-  second `declines` list did not survive the port. Totals come from the same `seriesTotals` the
-  baseline band uses, so -50 / 7,880 = -0.63% displays as -0.6% under one rounding rule;
-  `fixtureDeclines` recovers FCZ -150, Lugano -110, Luzern -70, Sion -70 from the fixture pairs
-  (stable sort keeps Luzern before Sion) and `declineTotal` produces the tile's -CHF 400k badge
-- One hero object with `primary` and `followUp`; the follow-up carries only its narrative, because
-  its four fixtures *are* the primary's fixtures seen through `fixtureDeclines`
+- **Nothing derivable is stored.** The Guide's `totalPrev`, `totalCurr`, `deltaPct` and second
+  `declines` list did not survive the port: totals come from `seriesTotals` (-50 / 7,880 = -0.6%),
+  and `fixtureDeclines` recovers FCZ -150, Lugano -110, Luzern -70, Sion -70 (stable sort) with
+  `declineTotal` producing the tile's -CHF 400k badge
+- One hero object with `primary` and `followUp`; the follow-up carries only its narrative - its four
+  fixtures *are* the primary's, seen through `fixtureDeclines`
 - Both narratives **verbatim**, pinned by exact text, exact length (229 / 338) and an ASCII range
   check. `MONTH_LABEL` is pinned to the baseline band's `Intl`-derived month names, so the two
   spellings of "Jul" cannot diverge
 - Guardrail held: fixtures are clubs, and a test asserts no squad name, salary or performance figure
   appears anywhere in the dataset (31 tests, 304/304 green; all gates clean)
-
----
 
 ### US-010: Hero 3 dataset - departmental performance (2 pts)
 **Completed:** 2026-09-09
@@ -236,18 +217,15 @@ Reference Guide definitive for the experience.
   24,000/24,360/102%; Hospitality 7,200/6,840/95%; Merchandising 9,800/9,050/92%; Events
   3,600/3,780/105%; Marketing **(Cost)** 3,400/3,810/84%
 - **Revenue vs Cost is modelled so a consumer cannot get it wrong.** `varianceJudgement` decides
-  good-or-bad ONCE from the `DepartmentType`, so Marketing's +410 is `ADVERSE` (an overspend) where
+  good-or-bad ONCE from the `DepartmentType`: Marketing's +410 is `ADVERSE` (an overspend) where
   Sponsoring's +840 is `FAVOURABLE`; a test proves a naive "variance > 0" rule misreads one row
-- **The flag is derived, not stored** - the Guide's `flag: true` did not survive the port, and
-  `departmentsNeedingAttention` finds exactly one row both over budget *and* behind target
-- **Totals and variances derived:** `departmentTotals` gives 69,000 -> 69,680, +680, +1.0% through
-  the same `percentChange` (one `oneDecimal` rule). The one stored figure is
-  `blendedTargetPercent: 96` - a measured attainment no arithmetic over the rows gives
-- **The follow-up reconciles with the table:** activations 240 + paid social 150 + agency retainer
-  20 = 410, exactly Marketing's derived variance. Conversion 2.2% vs 2.6% derives 84.6% attainment
-- **Scope label is data**, as in US-009: Ticketing's 24,360 exceeds Hero 2's 7,830 because it
-  includes the season-ticket base. Both narratives **verbatim**, pinned by text, length and range.
-  Guardrail held: departments, never people - no salary, headcount or named individual
+- **The flag is derived, not stored** - `departmentsNeedingAttention` finds exactly one row both
+  over budget *and* behind target; the Guide's `flag: true` did not survive the port
+- **Totals and variances derived:** 69,000 -> 69,680, +680, +1.0% through the same `percentChange`.
+  The one stored figure is `blendedTargetPercent: 96`, which no arithmetic over the rows gives
+- **The follow-up reconciles with the table:** 240 + 150 + 20 = 410, exactly Marketing's variance
+- **Scope label is data**, as in US-009: Ticketing's 24,360 exceeds Hero 2's 7,830 (season-ticket
+  base). Narratives **verbatim**; guardrail held - departments, never people
 
 ### US-011: Formatters & cross-hero reconciliation (2 pts)
 **Completed:** 2026-09-09
@@ -266,10 +244,9 @@ Reference Guide definitive for the experience.
   is the only factor of 1000. Variance carries meaning through sign plus a `VarianceDirection` enum,
   never colour
 - `tests/unit/reconciliation.test.ts` (39 tests) asserts **relationships, not constants** - every
-  split against its total in all four periods, every derived delta, the one department both over
-  budget and behind target with its drivers summing to its variance, the intended cross-hero
-  inequality (Ticketing 24,360 > 7,830, both scope-labelled), store-once pinned structurally, and
-  every number in all six narratives swept against the reachable data. **No drift found**
+  split against its total in all four periods, every derived delta, Marketing's drivers summing to
+  its variance, the intended cross-hero inequality, and every number in all six narratives swept
+  against the reachable data. **No drift found**
 
 ### US-012: Branded application shell (3 pts)
 **Completed:** 2026-09-09
@@ -285,15 +262,38 @@ Reference Guide definitive for the experience.
   bar with the self-hosted crest, "Sales & Marketing", decorative status and Reset, and a 12/8/4
   column canvas grid. No literal colour anywhere - tests pin that, as they do for the card
 - **Persona is a role:** the label and the "SM" monogram live in one module, and a test asserts the
-  app bar's entire text is exactly those labels, so a personal name cannot slip in. No photo either:
-  the crest is the only `<img>` in the shell
-- **Placeholders inert structurally, not by handler:** `<span aria-disabled="true">` with no href, no
-  role, no handler, no focus and `pointer-events-none`. Measured in real Chrome - `tabIndex` -1,
-  `pointer-events: none`, and a synthesised click leaves the router at `/`. A source guard bans a
-  `hover:` rule and a second route target in the file
-- **Status is decorative:** static text, `data-decorative`, no live region, plus source assertions
-  that the file holds no `fetch`, `axios`, `useEffect` or timer - it cannot become a health check
-- 1920x1080 measured in Chrome: `scrollWidth === clientWidth` (also at 1280 / 900 / 390)
+  app bar's entire text is exactly those labels. No photo - the crest is the only `<img>`
+- **Placeholders inert structurally, not by handler:** `<span aria-disabled="true">`, no href, no
+  role, no handler, no focus, `pointer-events-none`. Real Chrome: `tabIndex` -1, `pointer-events:
+  none`, a synthesised click leaves the router at `/`; a source guard bans a `hover:` rule
+- **Status is decorative:** static text, `data-decorative`, no live region, and source assertions
+  that the file holds no `fetch`, `axios`, `useEffect` or timer. 1920x1080 measured in Chrome:
+  `scrollWidth === clientWidth` (also at 1280 / 900 / 390)
+
+### US-014: Dynamic tile insertion & grid reflow (3 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 8 code (4 new, 4 modified) + 5 test files + 7 tracking docs
+**Tests Added:** 77 (unit: 77) - 552/552 green, 100% stmts / 99.1% branches of `app/**`
+**Commit:** see phase-2a progress log
+**Notes:** The mechanic the demo turns on: the dashboard **grows, it never clears**. Hero content is
+a marked placeholder - tiles are Phase 2b, narratives Phase 3b.
+
+**What Was Done:**
+- `lib/dashboard/sections.ts` (pure) + `use-dashboard.ts` (state, owned by `root.tsx`): the session
+  as a memory-only `{heroId, phase, revision}` list - append, refresh-in-place, flip-phase
+- **Dedupe by hero id:** re-asking keeps ONE section in its original position and bumps `revision`
+  (which changes the React key, so it re-inserts rather than doing nothing); a section already
+  showing its follow-up never regresses. A follow-up **flips** its parent's phase - what US-033 needs
+- **One grid, not two:** sections are direct children of the US-012 canvas grid and re-use its tracks
+  via `grid-cols-subgrid`. Chrome at 1920x1080: canvas tracks 122.656px, tiles 816px at x=256/1088
+- **Reflow, never jump:** every mutation runs through US-006's `animateReflow` with `flushSync`
+  inside the transition callback; Chrome shows `::view-transition-group(fcb-tile-HERO_1)` animating
+  as a second section inserts. Under reduced motion: zero transitions, identical final layout
+- **Auto-scroll:** `scrollRevealedIntoView` (smooth, `auto` when reduced, focus never moved) -
+  `scrollY` 0 -> 154 at 1280x620 as the third section overflowed, section 1 still present
+- **No persistence:** a source scan over `app/**` bans `localStorage`, `sessionStorage`, `indexedDB`
+  and `document.cookie`; a remount test shows the session starting empty, as a reload does
 
 ---
 

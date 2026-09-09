@@ -76,6 +76,7 @@ app/
 ├── lib/
 │   ├── mock/                   seed datasets (E3) — the swap point for real data
 │   ├── repositories/           interfaces the rest of the app reads through
+│   ├── dashboard/              session state: the {heroId, phase} list  (US-014)
 │   ├── intents/                normalise, score, match, tie-break  (E5)
 │   ├── format/                 CHF, %, signed, millions, tabular  (US-011)
 │   └── hooks/                  useReducedMotion, useGrow, useCountUp, useUid
@@ -91,9 +92,14 @@ they must not be routes.
 ### 4.3 State Management Strategy
 React state only — no store library, no persistence.
 
-- `App` owns: `input` (string), `groups` (`{heroId, phase}[]` where phase is `primary` or
-  `withFollowUp`), `thinking` (`{message, sources} | null`), `fallback` (bool), plus refs for the
-  pending timeout and the scroll container.
+- `App` (`app/root.tsx`) owns: `input` (string), the section list (`{heroId, phase, revision}[]`
+  where phase is `primary` or `withFollowUp`), `thinking` (`{message, sources} | null`), `fallback`
+  (bool), plus a ref for the pending timeout. **Built in US-014:** the list lives in
+  `app/lib/dashboard/` — pure transitions in `sections.ts`, React state in `use-dashboard.ts`
+  (`showHero` / `showFollowUp`, each wrapped in `animateReflow`, plus a `focus` signal the section
+  component's auto-scroll follows). `revision` is added beyond the reference model so a re-asked
+  hero re-inserts in place instead of being a silent no-op. Sections render as direct children of
+  the canvas grid and re-use its columns via `grid-cols-subgrid` — one grid, never two.
 - Section-level components own their own period filters (hero band, Top Products, Hero 1).
 - Each chart owns local hover / grow / count-up state.
 

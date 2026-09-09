@@ -27,11 +27,11 @@ describe("index route", () => {
     expect(container.textContent).toBe(`${WORKSPACE_LABEL} dashboard`);
   });
 
-  it("leaves the canvas otherwise empty for US-013 and US-014", () => {
+  it("leaves the canvas otherwise empty — the route owns no tiles", () => {
     const { container } = render(<Index />);
 
-    // The shell's grid is deliberately unpopulated by this story: the four
-    // baseline tiles are US-013 and inserted hero sections are US-014.
+    // The four baseline tiles are US-013; the insight sections a question
+    // inserts are rendered beside this route by `root.tsx` (US-014), not here.
     expect(container.querySelectorAll('[data-slot="card"]')).toHaveLength(0);
     expect(container.childElementCount).toBe(1);
   });
