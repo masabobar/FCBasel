@@ -186,6 +186,12 @@ describe are not built:
   thinking panel was invented here. The chip seam is `sections` (derive the row from the session
   list and reset restores it with no logic of its own); the beat seam is `schedule`, and reset
   already cancels it, so US-031 needs no retrofit.
+  - **② ✅ CLOSED BY US-029 (2026-09-09, in the Phase 3a run) — through the seam exactly as
+    described, with no change to any reset code.** `suggestionChips(sections)`
+    (`app/lib/dashboard/chips.ts`) is a pure function of the session list, `app/root.tsx` evaluates
+    it every render and holds **no chip state**, so Reset restoring `BASELINE_SECTIONS` restores
+    the three hero chips and drops every follow-up chip for free. Driven end to end on the real
+    `App` in `tests/unit/suggestion-chips.test.tsx`.
 - **③ and ⑤ are fully met today.**
 
 **THE TIMER, PROVEN BY BREAKING IT.** `reset` calls `cancelPending()` first, before it touches

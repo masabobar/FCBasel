@@ -6,10 +6,10 @@
 
 ## Today's Summary
 
-**Stories Completed:** 28 — **Phases 1a, 1b, 2a and 2b ALL complete (2b closed by US-024, 11/11 ·
-29/29); Phase 3a opened by US-028 (1/6 · 2/17)**
-**Story Points:** 71
-**Time Worked:** ~18.7 hours · **Files Changed:** 229 · **Tests Added:** 1441
+**Stories Completed:** 29 — **Phases 1a, 1b, 2a and 2b ALL complete (2b closed by US-024, 11/11 ·
+29/29); Phase 3a open at 2/6 · 5/17 after US-028 and US-029**
+**Story Points:** 74
+**Time Worked:** ~19.4 hours · **Files Changed:** 236 · **Tests Added:** 1498
 
 ---
 
@@ -52,23 +52,19 @@
   animation *on that very figure* and lands exactly on target. **Reduced motion means final state in
   the same render:** `useGrow` is `true` on the first render with **zero** frames requested. One
   reduced-motion source, everything cancelled on unmount, SSR proven by `hydrateRoot`. 52 tests.
-- **US-017 — KPI tile & variance chip.** The first component built on those hooks, and the shape the
-  other nine follow: `DeltaChip` in its own module, plus `KpiSparkline`, `KpiFigure` and `KpiTile`.
-  **The chip is where "colour is never the sole signal" stops being a slogan.** Direction is carried
-  four independent times — glyph, explicit sign, `sr-only` word, and only then the token colour — and
-  the `light` variant is the proof: on navy a test asserts the up and down chips' class strings are
-  **identical** while glyph, sign and spoken word still differ. **Direction is arithmetic, judgement
-  is meaning:** an optional `judgement` prop draws Marketing's overspend as an up arrow in the
-  *negative* token. **No variant per hero** — extras arrive as `children`. **The US-012
-  `tailwind-merge` trap is closed at the root**. 78 tests, 722/722.
-- **US-021 — Horizontal bar tile.** The most reused chart in the product, built once for five
-  consumers as `HBarRow` / `HBars` / `HBarTile`. **The two review decisions are read back off the
-  rendered element by tests:** a 150px label column with `truncate` / `text-ellipsis` /
-  `line-clamp` *rejected*, so `Cap "Rotblau"` cannot regain its reported ellipsis, and a 96px
-  `nowrap` value column asserted through `getComputedStyle`. **One rule serves every consumer: the
-  sign of the displayed figure** — it sets the anchor side, the token and the sign in the text. Rows
-  are keyed by name, so a filter change transitions the *same* bar while the figure counts on from
-  what is on screen. One deviation flagged: a decline grows *leftwards*. 55 tests.
+- **US-017 — KPI tile & variance chip.** The first component built on those hooks, and the shape
+  the other nine follow: `DeltaChip`, plus `KpiSparkline`, `KpiFigure` and `KpiTile`. **The chip is
+  where "colour is never the sole signal" stops being a slogan:** direction is carried four times
+  over, and the `light` variant is the proof — on navy the up and down chips' class strings are
+  asserted **identical** while glyph, sign and spoken word still differ. **Direction is arithmetic,
+  judgement is meaning.** Extras arrive as `children`; the `tailwind-merge` trap is closed at the
+  root. 78 tests, 722/722.
+- **US-021 — Horizontal bar tile.** The most reused chart, built once for five consumers as
+  `HBarRow` / `HBars` / `HBarTile`. **Both review decisions are read back off the rendered
+  element:** a 150px label column with truncation *rejected* (so `Cap "Rotblau"` cannot regain its
+  ellipsis) and a 96px `nowrap` value column via `getComputedStyle`. **The sign of the displayed
+  figure** sets anchor side, token and text sign; rows keyed by name, so a filter transitions the
+  *same* bar. 55 tests.
 - **US-016 — Hero band. Phase 2a is closed (5/5 · 16/16).** The navy band above the baseline row,
   and the first thing to mount `LineChart` and `Segmented` in the app. **ONE `Segmented` drives both
   halves** from a single `BaselinePeriod` entry (one `useState`, one `<Segmented>`, pinned by tests),
@@ -77,71 +73,62 @@
   `seriesTotals` off the plotted array**; the greeting comes from an injectable clock. Chrome at
   1920×1080: 54 distinct KPI strings, still the old figure in the frame after the click, 43 arc dash
   pairs on the same element, one value each under reduced motion. One defect fixed. 92 tests.
-- **US-018 — Vertical bar chart tile.** `app/components/charts/v-bars.tsx` — the kit-split chart
-  US-034 composes. **Bar persistence is the story and the test is a re-rank:** columns keyed by
-  category, so a filter press hands `Home` the *same* `<rect>` and its `x` / `y` / `height`
-  transition carries it; an index key **fails exactly two tests**, and the surviving instance keeps
-  its `useCountUp` state. Gradient caps, `filter` hover highlight, optional `tooltip(index)`,
-  wrapping DOM-text labels. 52 tests.
-- **US-019 — Grouped bar chart tile.** `app/components/charts/grouped-bars.tsx` — US-036's fixture
-  chart: eight fixtures giving **sixteen bars and eight delta chips in one tile**. **The review's
-  overlap fix is now arithmetic, and both halves are measured:** a 44-unit **left gutter** owned by
-  the scale that everything is inset to, and a 34-unit **chip band** that stays empty because the
-  axis maximum is *derived from the geometry*. No chip slot reaches the gutter or its neighbour, the
-  tallest bar clears the band over seven datasets, and **a fixed 10% headroom fails that test**.
-  **No per-bar value labels by design.** Pairs keyed by fixture. 63 tests.
-- **US-020 — Donut / ring tile.** `app/components/charts/donut.tsx` — US-034's sponsor-badge ring
-  (`donutGeometry` / `Donut` / `DonutTile`), deliberately a different component from US-016's
-  single-arc `AttendanceRing`. **Two hover surfaces write ONE state** (arc and legend row), proven by
-  a cross-surface test; stub either write and 4-5 tests fail. **The segments morph:** arcs keyed by
-  SPONSOR, so a period press transitions the same `<circle>`'s dasharray/dashoffset while one
-  `useCountUp` carries the centre, never via zero. **The arithmetic is `badgeSegments`'** (US-008),
-  imported not restated, so the four figures add up exactly. 56 tests, 1261/1261.
-- **US-022 — Department table tile.** `app/components/tiles/department-table.tsx` — Hero 3's primary
-  tile as a real `<table>`, six departments and a total row. **The revenue/cost trap is closed by
-  construction:** the colour comes from `row.judgement` (US-010's `varianceJudgement`) through
-  US-017's `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while Sponsoring's +840
-  renders FAVOURABLE, and a source scan rejects `FAVOURABLE` / `ADVERSE`, any `variance <>` test and
-  any `DepartmentType` equality. **Both review decisions are asserted:** CHF millions with the
-  unremovable subtitle saying so (`/000/` rejected in the rendered tile), and numeric headers
-  right-aligned **including "% of target"** from one `columnAlignClass` rule the header *and* its
-  cells read. 54 tests, 1315/1315.
-- **US-023 — Driver / breakdown tile.** `app/components/tiles/driver-tile.tsx` — `DriverTile`,
-  `DriverTotalBadge` and the pure `rankDrivers` / `driverTotal`, for all three causal follow-ups.
-  **It draws no bars, and the tests keep it that way:** every row is US-021's `HBarRow` through
-  `HBarTile` (the 150px label and 96px `nowrap` columns are read back off the rows this tile
-  produced, and the widths are `HBars`' scaling), while a source scan rejects bar geometry, both
-  width constants, `useCountUp` / `useGrow` / `transition`, every local state or timer, gradient
-  classes and even a second `Card`. **What it adds is three things:** magnitude ranking that is
-  **stable for ties** (asserted equal to US-009's `fixtureDeclines`, so Luzern precedes Sion) with
-  `rank="none"` for an authored order; a total **derived from the rows on screen** through the newly
-  exported `hBarDisplayedValue`, so the `-CHF 400k total` badge matches `declineTotal` and the
-  Marketing drivers match the +410 variance; and a muted note line for US-037's attendance
-  sentence. Two shared seams were widened rather than forked — `HBarTile`'s `children` slot and
-  `DeltaChip`'s `suffix`. 43 tests, 1358/1358.
-- **US-024 — Recommendation panel & narrative caption strip.** The last story of Phase 2b, and the
-  two elements the client's framing calls the peak of the demo: advice, and the line that interprets.
-  **The strip was reused, not rebuilt** — US-005's `CardCaption` gained a `section` placement rather
-  than a second component, so the tile foot line and the wrapping section narrative share one
-  implementation, one AI glyph and one decorative `aria-hidden`; `SectionHead` renders that element
-  now. **The panel is structurally not a tile:** an `aside` region named by its "Recommendation"
-  eyebrow, a 3px gold bar down the SIDE where a tile's runs across the top, `rounded-panel` on a
-  tinted surface, no tile shadow and none of the card's metric chrome — a `Card` beside it is told
-  apart by test. **Verbatim is asserted byte for byte** on US-039's string (straight quotes, ASCII
-  hyphens, `CHF 150k`, `2.2%` vs `2.6%`), with no clamp and no casing, because Phase 3b's copy is
-  signed off. **Criterion 3 is order**, so the tests assert the narrative precedes every chart in a
-  section. Gold stayed sanctioned; no new-tile ring appeared. 35 tests, 1393/1393.
-- **US-028 — Persistent prompt bar. Phase 3a opens (1/6 · 2/17).**
-  `app/components/chrome/prompt-bar.tsx`, mounted by `root.tsx` through a new `promptBar` slot on the
-  shell: the product's only user input. **ONE bordered field IS the typing area** — icon and send
-  button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, the
-  input's own outline suppressed, and a test that walks the subtree and rejects any descendant
-  border or ring, because the nested box was the reported defect. **A real `<form>`** (the reference
-  build avoided one only for its sandbox), so Enter and the button share the browser's implicit
-  submission. **Debounce with no second clock:** a submit consumes the question by clearing a
-  mirrored ref *before* `onSubmit`, so three rapid Enters yield one call, and `busy` closes the field
-  for US-031. Empty and whitespace-only do nothing. `fixed`, not `sticky` — the shell clips overflow,
-  and the page must keep scrolling for Reset. XSS pass-through proven. 48 tests, 1441/1441.
+- **US-018 — Vertical bar chart tile.** The kit-split chart US-034 composes. **Bar persistence is
+  the story and the test is a re-rank:** columns keyed by category, so a filter press hands `Home`
+  the *same* `<rect>` and its geometry transition carries it — an index key **fails exactly two
+  tests**. Gradient caps, hover highlight, wrapping DOM-text labels. 52 tests.
+- **US-019 — Grouped bar chart tile.** US-036's fixture chart: **sixteen bars and eight delta chips
+  in one tile**. **The review's overlap fix is arithmetic and both halves are measured:** a 44-unit
+  left gutter everything is inset to, and a 34-unit chip band that stays empty because the axis
+  maximum is *derived from the geometry* — a fixed 10% headroom fails that test. Pairs keyed by
+  fixture. 63 tests.
+- **US-020 — Donut / ring tile.** US-034's sponsor-badge ring, deliberately a different component
+  from US-016's single-arc `AttendanceRing`. **Two hover surfaces write ONE state** (arc and legend
+  row), and **the segments morph** — arcs keyed by SPONSOR, so a period press transitions the same
+  `<circle>` while one `useCountUp` carries the centre, never via zero. **The arithmetic is
+  `badgeSegments`'** (US-008), imported not restated. 56 tests, 1261/1261.
+- **US-022 — Department table tile.** Hero 3's primary tile as a real `<table>`. **The revenue/cost
+  trap is closed by construction:** the colour comes from `row.judgement` (US-010) through
+  `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while Sponsoring's +840 renders
+  FAVOURABLE, and a source scan blocks the judgement migrating back into the tile. CHF millions with
+  an unremovable subtitle; numeric headers right-aligned by one rule header and cells share.
+  54 tests, 1315/1315.
+- **US-023 — Driver / breakdown tile.** `DriverTile`, `DriverTotalBadge` and the pure
+  `rankDrivers` / `driverTotal`, for all three causal follow-ups. **It draws no bars, and the tests
+  keep it that way:** every row is US-021's `HBarRow` through `HBarTile`, and a source scan rejects
+  bar geometry, the width constants, the motion hooks, local state and even a second `Card`. What it
+  adds: tie-stable magnitude ranking (equal to US-009's `fixtureDeclines`, so Luzern precedes Sion),
+  a total **derived from the rows on screen** so the `-CHF 400k total` badge cannot disagree, and a
+  note line. Two shared seams widened rather than forked. 43 tests, 1358/1358.
+- **US-024 — Recommendation panel & narrative caption strip.** The last story of Phase 2b: advice,
+  and the line that interprets. **The strip was reused, not rebuilt** — US-005's `CardCaption`
+  gained a `section` placement rather than a second component, so both placements share one AI
+  glyph. **The panel is structurally not a tile** (an `aside` with its own eyebrow, a gold bar down
+  the SIDE, `rounded-panel`, no metric chrome — a `Card` beside it is told apart by test).
+  **Verbatim is asserted byte for byte** on US-039's string, because Phase 3b's copy is signed off,
+  and **criterion 3 is order**, so the narrative is asserted before every chart. 35 tests, 1393.
+- **US-028 — Persistent prompt bar. Phase 3a opens.** `app/components/chrome/prompt-bar.tsx`,
+  mounted by `root.tsx` through a new `promptBar` slot: the product's only user input. **ONE
+  bordered field IS the typing area** — icon and send button inside it as siblings of the `<input>`,
+  the `:focus-within` ring on that same element, and a test walking the subtree that rejects any
+  descendant border or ring (the nested box was the reported defect). **A real `<form>`**, so Enter
+  and the button share the browser's implicit submission. **Debounce with no second clock:** a
+  submit consumes the question by clearing a mirrored ref *before* `onSubmit`. `fixed`, not
+  `sticky`. XSS pass-through proven. 48 tests, 1441/1441.
+- **US-029 — Suggestion chips & chip lifecycle. The screen can now be ASKED a question (2/6 ·
+  5/17).** `app/lib/dashboard/chips.ts` (derivation, pure) and
+  `app/components/chrome/suggestion-chips.tsx` (the row), wired into US-028's `children` slot.
+  **THE ROW IS DERIVED, NOT STORED, and everything else follows:** `suggestionChips(sections)`
+  returns the three hero chips always plus one follow-up chip per answer still at `primary`, so
+  criterion ③'s "removed once shown" is implemented in **no line of code** — the phase flip stops
+  deriving it. Proved over **all 27** hero × phase combinations. **US-015's criterion ② is thereby
+  SATISFIED** with no reset code touched: Reset restores the baseline sections and the row follows,
+  driven end to end on the real `App`. **A tap bypasses scoring by TYPE** — `selectChip` takes a
+  chip and reads its `heroId`, US-030's matcher will take a `string`, and a source scan rejects any
+  scoring vocabulary in the module. `CHIP_SURFACE_CLASS` and the shared `.fcb-chip` rule carry the
+  11px radius and the lift; only the tint is new, gold for the follow-up variant — a wash and a
+  border, never a fill, still no gold ring. Kind is not colour alone (trend glyph plus a hidden
+  "Follow-up:"), labels verbatim, one tab stop per chip, no trap. 57 tests, 1498/1498.
 
 ---
 
@@ -211,9 +198,16 @@
 - ✅ US-028 — Persistent prompt bar (2 pts) — all 4 criteria met: one field with the icon and send
   button embedded and **no inner bordered box** (asserted structurally, not by class), a press on
   the padding focusing the input, Enter *and* the embedded button submitting through one real form
-  while empty input is a no-op that leaves the chips alone, and rapid repeated submits collapsing to
-  exactly one call — proven by three rapid Enters, a triple-click and a latching `busy` harness.
+  while empty input is a no-op, and rapid repeated submits collapsing to exactly one call.
   **Phase 3a opens here: 1/6 stories, 2/17 points.**
+
+- ✅ US-029 — Suggestion chips & chip lifecycle (3 pts) — all 5 criteria met: exactly three chips on
+  load with the hero labels verbatim, a tap resolving **directly** to its hero with no scoring in
+  the path (enforced by type and by a source scan), a follow-up chip appearing once its hero renders
+  and disappearing once that follow-up is shown, the three hero chips present throughout, and the
+  11px lift-and-tint surface reused from US-026 with a gold-tinted follow-up variant. **It also
+  closes US-015's criterion ②** — the chip row is a pure function of `sections`, so Reset restores
+  it with no reset logic at all. **Phase 3a: 2/6 stories, 5/17 points.**
 
 *(Long-form accounts are condensed to keep this log inside its 300-line limit — the full detail is
 in [`completed.md`](completed.md) and [`../phases/phase-2b.md`](../phases/phase-2b.md).)*
@@ -237,16 +231,16 @@ in [`completed.md`](completed.md) and [`../phases/phase-2b.md`](../phases/phase-
 **Immediate Focus:**
 - **Phases 1a, 1b, 2a and 2b are all closed** (69 points): seven tile kinds, four chart geometries,
   the segmented control, the motion hooks and the two insight elements, no per-hero copy anywhere.
-- **Phase 3a is open and US-028 is done:** next is **US-029, the three suggestion chips**, which go
-  into the bar's `children` slot wearing `CHIP_SURFACE_CLASS` and should be **derived** from
-  `useDashboard`'s `sections` so Reset restores them for free. Then US-030's matcher wires to the
-  bar's `onSubmit`, US-031 latches `busy` and schedules the beat through `schedule`, US-032 catches
-  everything below threshold, US-033 gates the follow-ups. Then Phase 3b is composition only —
-  every hero beat assembles existing components and supplies the pre-authored strings, which US-024
-  proved render verbatim.
+- **Phase 3a is open, US-028 and US-029 are done, and the screen is now driveable by chip:** next
+  is **US-030, the intent matcher** — the riskiest story in the build — wired to the bar's
+  `onSubmit` for TYPED text only, deliberately separate from the chip path US-029 built. Then
+  US-031 latches `busy` and schedules the beat through `schedule`, US-032 catches everything below
+  threshold, and US-033 gates the follow-ups **reading the visibility US-029 already derives**. Then
+  Phase 3b is composition only — every hero beat assembles existing components and supplies the
+  pre-authored strings, which US-024 proved render verbatim.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
-3a + 3b, the demo itself (33 pts, 2 done).
+3a + 3b, the demo itself (33 pts, 5 done).
 
 ---
 
@@ -255,12 +249,18 @@ in [`completed.md`](completed.md) and [`../phases/phase-2b.md`](../phases/phase-
 - **The deadline is this week.** Sponsor showing first, owner audience the following week. ~52
   AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope — the
   P1 cut set is worth only ~0.82 days at 8h/day.
-- Phases 1a, 1b, 2a and 2b are all complete and Phase 3a is open (71/116 points); continue with
-  `/holycode-pm:execute-work story US-029`.
-- **US-028 named three seams and they are the whole wiring of Phase 3a:** `onSubmit` (US-030's
-  matcher), `busy` (US-031's beat) and `children` (US-029's chips) — plus `key={generation}` in
-  `root.tsx`, which is how a half-typed question clears with Reset. A story that grows its own
-  submit path, its own timer or its own chip styling is a review finding.
+- Phases 1a, 1b, 2a and 2b are all complete and Phase 3a is open (74/116 points); continue with
+  `/holycode-pm:execute-work story US-030`.
+- **US-028 named three seams and they are the whole wiring of Phase 3a:** `children` is now filled
+  (US-029's chips), `onSubmit` is US-030's matcher and `busy` is US-031's beat — plus
+  `key={generation}` in `root.tsx`, which is how a half-typed question clears with Reset. A story
+  that grows its own submit path, its own timer or its own chip styling is a review finding.
+- **US-029 settled the rule for anything the chip row or a panel needs to know: DERIVE IT FROM
+  `sections`.** The chip row keeps no state, which is exactly why Reset restores it for free and
+  why US-015's criterion ② could be closed without touching reset code. US-033 must read that same
+  derived visibility rather than storing a second copy of it. **The chip path and the typed path
+  are separate by TYPE:** a chip carries a `heroId`, a typed question carries a `string`; a chip tap
+  reaching US-030's scoring is a review finding.
 - **US-021 is the reuse test for the whole epic, and US-023 and US-024 both passed it:** widen the
   shared seam when a consumer needs a little more (`HBarTile`'s `children`, `DeltaChip`'s `suffix`,
   `CardCaption`'s `section` placement) and let a source scan prove the new file holds no copy of

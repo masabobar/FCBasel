@@ -54,7 +54,7 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The tappable prompts that make the prepared questions discoverable.
   - **Acceptance Criteria:**
     - On load, **exactly three chips** show the three hero prompts (short labels per E7)
@@ -65,6 +65,20 @@ off-script question never breaks the demo. This choreography is what stands in f
     - Chips use an 11px corner radius with a lift-and-tint hover; follow-up chips use the
       gold-tinted variant
   - **Dependencies:** US-028
+  - **Implementation:** `app/lib/dashboard/chips.ts` (the labels and the derivation, pure) and
+    `app/components/chrome/suggestion-chips.tsx` (the row), mounted by `app/root.tsx` into US-028's
+    `children` slot above the field. **The row is DERIVED from `sections`, never stored:**
+    `suggestionChips(sections)` returns the three hero chips always, plus one follow-up chip per
+    section still at `PRIMARY` — so criterion ③'s removal is not implemented anywhere, the phase
+    flip simply stops deriving it. Asserted over all 27 hero × phase combinations as a pure
+    function. **A tap bypasses scoring by TYPE:** `selectChip` takes a chip and reads its `heroId`,
+    US-030's matcher will take a `string` through `onSubmit`, and a source scan rejects any scoring
+    vocabulary in the chip module. Surface reused, not restated — `CHIP_SURFACE_CLASS` and the
+    shared `.fcb-chip` rule carry the 11px radius and the lift; only the tint is new, gold for the
+    follow-up variant (a wash and a border, never a fill). Kind is not colour alone: a trend glyph
+    plus a visually hidden "Follow-up:" in the accessible name. **This also closes US-015
+    criterion ②** — Reset restores the baseline sections and the row follows for free, proven end
+    to end on the real `App`. 57 new tests, 1498 total green.
 
 - **US-030**: Intent normalisation, scoring & tie-breaking
   - **Story Points:** 5

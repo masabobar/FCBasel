@@ -6,10 +6,10 @@
 
 ## Summary
 
-**Total Completed:** 28 stories
-**Total Points:** 71 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 71 points/day
-**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (1/6)**
+**Total Completed:** 29 stories
+**Total Points:** 74 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 74 points/day
+**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (2/6)**
 
 ---
 
@@ -57,7 +57,7 @@ entry stays in full below the table — it is the story that closed the phase.
 | US-012 Branded application shell | 3 | 57 | `chrome/{sidebar,top-bar,app-shell}.tsx` + `lib/persona.ts` — navy sidebar (hidden below `lg`), app bar with the self-hosted crest, and a 12/8/4 canvas grid left **empty** for US-013/014/015/016. No literal colour anywhere. **Persona is a role:** one module holds the label and the "SM" monogram, and a test asserts the app bar's entire text is exactly those labels. **Placeholders are inert structurally, not by handler** (`aria-disabled`, no href, no focus, `pointer-events-none`); status is decorative — no live region, no `fetch`, no timer. Chrome: `scrollWidth === clientWidth` at 1920x1080. |
 | US-014 Dynamic tile insertion & grid reflow | 3 | 77 | `lib/dashboard/sections.ts` (pure) + `use-dashboard.ts` (state, owned by `root.tsx`): the session as a memory-only `{heroId, phase, revision}` list. The dashboard **grows, it never clears**. **Dedupe by hero id** — re-asking keeps ONE section in place and bumps `revision` so it re-inserts rather than doing nothing, and a follow-up *flips* its parent's phase (what US-033 needs). **One grid, not two:** sections re-use US-012's tracks via `grid-cols-subgrid`. **Reflow, never jump** — every mutation runs through `animateReflow` with `flushSync` inside the callback; reduced motion gives zero transitions with an identical layout. A source scan bans every storage API. |
 | US-013 Baseline dashboard — four tiles | 3 | 103 | `dashboard/baseline-row.tsx` + `tiles/partner-tile.tsx` + `lib/dashboard/baseline.ts` + a `loader` on `_index.tsx`: **the canvas stops being empty.** Four tiles in order as direct children of the one canvas grid, composing `KpiTile` ×2, `HBarTile` and `PartnersTile` — no new tile kind, no second grid. **No figure re-typed:** every string asserted equal to `repository → derive → format.ts`, plus a source scan over four files for literals, `CHF`/`%` strings, product and partner names and `toLocaleString`/`toFixed`. `trendEndingAt` makes the sparkline END on the month the headline covers. Partner plates carry the partner's **own** brand colour (no hex, no FCB token in the file). Reset's baseline seam closed as static route chrome, driven end to end by a test. First real-Chrome pass for US-017/US-021/US-027. |
-| US-015 Reset to baseline | 2 | 40 | Reset built as a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS`, `reset` + `schedule` + `generation`, `scrollToTop`, `<AppShell onReset>`. It restores the same named constant that is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free. **The timer, proven by breaking it:** `reset` cancels the pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard. **Abuse-proof by construction** — the same reference comes back when there is nothing to clear, so 10 presses in one frame run **one** transition. 3 of 5 criteria met; the chips (US-029) and half the thinking beat (US-031) are a stated SEAM, not a claim. |
+| US-015 Reset to baseline | 2 | 40 | Reset built as a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS`, `reset` + `schedule` + `generation`, `scrollToTop`, `<AppShell onReset>`. It restores the same named constant that is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free. **The timer, proven by breaking it:** `reset` cancels the pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard. **Abuse-proof by construction** — the same reference comes back when there is nothing to clear, so 10 presses in one frame run **one** transition. 3 of 5 criteria met at the time; **criterion ② is now SATISFIED by US-029** (the chip row is derived from `sections`, so Reset restores it with no reset code), and half of ④'s thinking beat remains US-031's. |
 
 ---
 
@@ -155,141 +155,136 @@ trap closed structurally rather than by care.
   real-Chrome pass; nothing mounts the table until US-038
 
 ### US-023: Driver / breakdown tile (2 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 1 code (new) + 2 code (shared seams widened) + 3 test files + 5 tracking docs
-**Tests Added:** 43 (unit: 39 new file + 2 on `HBarTile`'s new slot + 2 on `DeltaChip`'s suffix) - 1358/1358 green, **100% on the new file**, 99.8% stmts / 98.1% branches of `app/**`
-**Notes:** All 3 acceptance criteria met. The story was deliberately small — a REUSE story — and the
-honest outcome is a thin tile plus the tests that keep it thin.
+**Completed:** 2026-09-09 · 43 tests (1358 green), **100% on the new file** · all 3 criteria met.
+A deliberate REUSE story: a thin tile plus the tests that keep it thin. Condensed to keep this log
+inside its 300-line limit; full detail in [`../phases/phase-2b.md`](../phases/phase-2b.md).
 
-**What Was Done:**
-- `app/components/tiles/driver-tile.tsx` — `DriverTile`, `DriverTotalBadge` and the pure
-  `rankDrivers` / `driverTotal`, designed at once for all three consumers: US-035's mixed-sign
-  percentages, US-037's negative money with the total badge, US-039's positive money
-- **CRITERION 3 IS ENFORCED TWO WAYS, not asserted.** Every row is US-021's `HBarRow` reached
-  through `HBarTile`: the render tests read the 150px label column, the 96px `nowrap` value column
-  and the `aria-hidden` track back off the rows THIS tile produced, and the scaling is `HBars`'
-  (FCZ 100% / Lugano 73.33% / Sion 46.67%). A source scan then rejects `h-bar-*`, both width
-  constants, `H_BAR_SERIES`, `width` / `toFixed` / `Math.min`, `useCountUp` / `useGrow` /
-  `transition` / `animation`, every `useState` / `useEffect` / timer, every gradient class and even
-  a second `Card` — so a sixth copy of the shared row cannot appear without failing tests
-- **RANKING is the tile's own, and it is STABLE:** `rankDrivers` sorts by magnitude descending on a
-  COPY (the caller's dataset is never sorted in place) and equal values keep their arrival order, so
-  Luzern precedes the tied Sion — asserted equal to US-009's `fixtureDeclines` order rather than to
-  a hand-written list. `rank="none"` keeps an authored order for US-035, whose list leads with
-  Bitpanda because Bitpanda leads badge selection, not because +2 is the largest figure
-- **THE TOTAL IS DERIVED, so the badge cannot disagree with the bars:** `driverTotal` sums the
-  figures the rows DISPLAY through `hBarDisplayedValue` (newly exported from `h-bars.tsx` rather
-  than restated), giving `-CHF 400k` — asserted equal to `declineTotal(fixtures)` — and `CHF 410k`
-  for the Marketing drivers, asserted equal to `departmentVariance(Marketing)`. It is re-derived on
-  a rerender (dropping two rows moves the badge to `-CHF 220k`) and is unaffected by the ranking
-- **TWO SEAMS WIDENED IN THE SHARED MODULES RATHER THAN FORKED:** `HBarTile` gained a `children`
-  slot rendered under the bars (US-037's one-line attendance `note` lives there, wrapping rather
-  than truncating, and distinct from the card's AI caption strip), and `DeltaChip` gained an
-  optional `suffix` node so `-CHF 400k total` is ONE chip that keeps the arrow, the explicit sign
-  and the `sr-only` direction. An explicit `action` still wins over the derived badge
-- The custom formatter is used verbatim in all three shapes (`+38%`, `-CHF 150k`, `CHF 240k`), a
-  mixed-sign list renders both directions (`data-direction` UP and DOWN off one dataset), an
-  overspend total renders UP and ADVERSE, and reduced motion lands on final widths, final figures
-  *and* the final badge with **zero frames requested**
-- **Security triage: no trigger fires** — considered and cleared: HTTP handler or route, IDOR, raw
-  SQL, `dangerouslySetInnerHTML` (scan-rejected), user-supplied URL / SSRF, upload, dependency or
-  lockfile change (**none**), env var or secret, logging, CSRF, storage API. `note` / `totalLabel`
-  are React nodes React escapes. **One seam:** no real-Chrome pass until US-035 / US-037 / US-039
-  mount it
+- `tiles/driver-tile.tsx` — `DriverTile`, `DriverTotalBadge` and the pure `rankDrivers` /
+  `driverTotal`, designed at once for all three consumers (US-035 percentages, US-037 negative
+  money with the total badge, US-039 positive money)
+- **CRITERION 3 IS ENFORCED TWO WAYS, not asserted.** Every row is US-021's `HBarRow` through
+  `HBarTile` — the tests read the 150px label and 96px `nowrap` columns back off the rows THIS tile
+  produced — and a source scan then rejects the width constants, `H_BAR_SERIES`, `width` /
+  `toFixed`, the motion hooks, every `useState` / timer, gradients and even a second `Card`
+- **RANKING is stable:** `rankDrivers` sorts by magnitude on a COPY and equal values keep arrival
+  order, so Luzern precedes the tied Sion (asserted equal to US-009's `fixtureDeclines`);
+  `rank="none"` keeps US-035's authored order
+- **THE TOTAL IS DERIVED, so the badge cannot disagree with the bars:** `driverTotal` sums what the
+  rows DISPLAY through `hBarDisplayedValue`, giving `-CHF 400k` (equal to `declineTotal`) and
+  `CHF 410k` (equal to `departmentVariance(Marketing)`), re-derived on rerender
+- **Two seams widened rather than forked:** `HBarTile` gained a `children` slot under the bars, and
+  `DeltaChip` an optional `suffix` so `-CHF 400k total` is ONE chip keeping arrow, sign and
+  `sr-only` direction. Reduced motion lands on final widths, figures *and* badge, zero frames
+- **Security triage: no trigger fires** — `note` / `totalLabel` are React nodes React escapes.
+  **One seam:** no real-Chrome pass until US-035 / US-037 / US-039 mount it
 
 ### US-024: Recommendation panel & narrative caption strip (2 pts)
-**Completed:** 2026-09-09 — **it closes Phase 2b at 11/11 · 29/29 pts**
-**Files Changed:** 3 code (1 new) + 1 test file (new) + 7 tracking docs
-**Tests Added:** 35 (unit: 35) - 1393/1393 green, 99.82% stmts / 98.17% branches / 100% lines
-**Notes:** All 3 acceptance criteria met. The two elements the client's framing calls the peak of
-the demo: the panel that recommends, and the line that interprets.
+**Completed:** 2026-09-09 — **it closes Phase 2b at 11/11 · 29/29 pts** · 35 tests (1393 green),
+99.82% stmts / 98.17% branches / 100% lines · all 3 criteria met.
 
-**What Was Done:**
-- `tiles/recommendation-panel.tsx` — `RecommendationPanel` and the `RECOMMENDATION_VARIANTS` table.
-  **The panel is structurally NOT a tile, and each row of the difference is asserted:** an `aside`
-  region named by its "Recommendation" eyebrow (a card is a `div`), `data-slot="recommendation-
-  panel"` with no card slot inside it, a 3px gold bar down the **side** where a tile's runs across
-  the top, `rounded-panel` (16px) on a tinted `bg-gold/10` surface with no `shadow-tile`, and none
-  of the card's metric chrome — no icon badge, no uppercase heading, no KPI number. A `Card`
-  rendered right beside it is told apart by test, and the panel adds no heading to the outline
-- **THE CAPTION STRIP WAS REUSED, NOT REBUILT** (the explicit instruction): US-005's `CardCaption`
-  gained a second placement rather than a second component — `tile` (hairline, truncated) and
-  `section` (no hairline, wraps, never truncated, body size) — so the AI glyph, the escaping and the
-  decorative `aria-hidden` exist once. `SectionHead` renders that element now instead of its own
-  `<p>`, and source scans reject a second `Sparkles` or `narrative-caption` in either consumer
-- **VERBATIM FIDELITY IS THE LOAD-BEARING TEST:** US-039's recommendation renders byte-identical
-  (`toBe`, not "contains") — straight apostrophe and quotes, ASCII hyphens, `CHF 240k` / `CHF 150k`,
-  `2.2%` against a `2.6%` plan — with no `truncate` / `line-clamp` / casing class on the body and a
-  scan rejecting `toUpperCase` / `.replace(` / `.slice(` in the module. Phase 3b's signed-off copy
-  cannot be "improved" on its way to the projector
-- **Criterion 3 is ORDER, so DOM order is what is asserted:** in a section shaped the way Phase 3b
-  will build one, the narrative precedes every `svg`, every card and the panel itself, and the
-  head's last child is the narrative — proven again inside a live `InsightSections` render
-- **Gold stayed sanctioned:** three mentions in the module (accent name, tint, border) reached
-  through `CARD_ACCENTS` so gold is still spelled once, the glyph through
-  `--color-accent-follow-up`; **no ring or glow on an inserted panel**, and the navy `narrative`
-  variant serves US-037 without spending the accent twice
-- Reduced motion lands on the final state (the CSS block states `opacity: 1` / `transform: none`
-  outright) and the panel requests **no frame of its own** — it animates in CSS only
-- **Security triage: no trigger fires** — considered and cleared: HTTP handler or route, IDOR, raw
-  SQL, `dangerouslySetInnerHTML` (scan-rejected), user-supplied URL / SSRF, upload, dependency or
-  lockfile change (**none**), env var or secret, logging, CSRF, storage API. Panel text and captions
-  are React nodes React escapes, proven with an `<img onerror>` string. **One seam:** no real-Chrome
-  pass until US-035 / US-037 / US-039 mount it
+Condensed to keep this log inside its 300-line limit; full detail in
+[`../phases/phase-2b.md`](../phases/phase-2b.md).
 
----
+- `tiles/recommendation-panel.tsx` + the `RECOMMENDATION_VARIANTS` table. **The panel is
+  structurally NOT a tile, and every row of the difference is asserted:** an `aside` named by its
+  "Recommendation" eyebrow, a 3px gold bar down the **side**, `rounded-panel` on a `bg-gold/10`
+  surface, no `shadow-tile`, and none of the card's metric chrome
+- **THE CAPTION STRIP WAS REUSED, NOT REBUILT:** US-005's `CardCaption` gained a `section`
+  placement (wraps, never truncated) beside its `tile` one, so the AI glyph and its escaping exist
+  once; scans reject a second `Sparkles` in either consumer
+- **Verbatim fidelity is the load-bearing test:** US-039's recommendation renders byte-identical
+  (`toBe`), with no truncation or casing class and `toUpperCase` / `.replace(` / `.slice(`
+  scan-rejected — signed-off copy cannot be "improved" on its way to the projector
+- Criterion 3 is ORDER, so DOM order is asserted: the narrative precedes every `svg`, card and the
+  panel, inside a live `InsightSections` render. Gold stayed sanctioned (reached through
+  `CARD_ACCENTS`, no ring or glow); reduced motion lands on the final state with no frame requested
+- **Security triage: no trigger fires** — panel text and captions are React nodes React escapes,
+  proven with an `<img onerror>` string. **One seam:** no real-Chrome pass until US-035/037/039
+  mount it
 
-## Phase 3a: Conversational Interface — in progress (1/6 stories · 2/17 pts)
+## Phase 3a: Conversational Interface — in progress (2/6 stories · 5/17 pts)
 
 ### US-028: Persistent prompt bar (2 pts)
-**Completed:** 2026-09-09 — **it opens Phase 3a**
-**Files Changed:** 4 code (1 new) + 3 test files (1 new) + 6 tracking docs
-**Tests Added:** 48 (unit: 48) - 1441/1441 green, 99.82% stmts / 98.20% branches / 100% lines
-**Notes:** All 4 acceptance criteria met. The product's first and only user input.
+**Completed:** 2026-09-09 — **it opens Phase 3a** · 48 tests (1441 green), 99.82% stmts / 98.20%
+branches / 100% lines · all 4 criteria met. The product's first and only user input.
 
-**What Was Done:**
-- `chrome/prompt-bar.tsx` — `PromptBar`, mounted by `app/root.tsx` through a new `promptBar` slot on
-  the US-012 shell (`AppShell` also gained `PROMPT_BAR_CLEARANCE_CLASS`, applied to the canvas only
-  when a bar is supplied)
-- **ONE field, and the field IS the typing area.** The search icon and the send button are siblings
-  of the `<input>` inside the single bordered element; the `:focus-within` ring sits on that same
-  element and the input's own outline is suppressed, so focus reads as one ring around one field
-  rather than a box inside a box. **The reported defect is rejected structurally:** a test walks the
-  field's subtree and fails on any descendant carrying a border or a ring, and asserts the input and
-  the button are DIRECT children. The field wears `rounded-pill`, deliberately not `.fcb-chip` /
-  `--radius-chip` — those stay with US-026 and US-029, or "11px, not a pill" stops meaning anything
-- **A real HTML `<form>` was chosen, and the choice is recorded.** The reference build avoided one
-  only because its sandbox swallowed submissions; here the browser's implicit submission makes Enter
-  and the embedded button ONE code path instead of two hand-rolled ones, with `preventDefault`
-  because there is nowhere to navigate. A press on the field's padding (or on the decorative icon)
-  focuses the input through `mousedown` + `preventDefault`, leaving the keyboard path untouched
-- **Criterion 4 without a second clock, because US-015 already owns the only one.** A submit
-  CONSUMES the question: the cleared value is written to a mirrored ref *before* `onSubmit` runs —
-  the same committed-ref trick `useDashboard` uses so two presses in one frame see each other — so a
-  re-entrant submit reads an empty draft and takes the no-op branch. `busy` additionally disables
-  both controls for US-031's beat. Proven three ways: three rapid Enters, a triple-click on send,
-  and a latching harness where the parent never releases `busy`, each yielding exactly ONE call. A
-  scan rejects `setTimeout` / `setInterval` in the file
-- **Empty and whitespace-only input are no-ops** — not an error, not a fallback, nothing cleared and
-  nothing removed; a chip rendered in the bar's `children` slot is still there afterwards
-- **`fixed`, not `sticky`, and that is a structural finding worth keeping:** the shell clips sideways
-  overflow, which per the CSS overflow spec makes it a scroll container on the other axis as tall as
-  the dashboard, so a sticky bar would settle at the bottom of the CONTENT. Fixed also leaves the
-  PAGE scrolling, which US-015's `scrollToTop` and US-014's auto-scroll both depend on. The canvas
-  reserves the strip so no tile can hide under the bar, and `lg:left-60` is checked against the
-  sidebar's own exported `SIDEBAR_WIDTH_CLASS`
-- Accessibility: a real visually hidden `<label>` (the placeholder is guidance, never the name), an
-  `aria-label` on the send button, `aria-hidden` on both glyphs, the form as a named `search` region
-  with `aria-busy`
-- **Security triage — the user-input trigger FIRES here (A03), and it is closed:** the typed value is
-  rendered only as an input `value`, never as markup; there is no `dangerouslySetInnerHTML`,
-  `innerHTML`, `eval` or template-built URL, request, storage key or selector (the single selector
-  is the fixed `INTERACTIVE_SELECTOR` constant); an `<img onerror>` payload reaches the callback
-  verbatim and creates no element, with `onerror=` absent from the document. US-030 will match it
-  against a fixed intent list and discard it. Considered and cleared: HTTP handler or route, IDOR,
-  raw SQL, SSRF, upload, dependency or lockfile change (**none**), env var or secret, logging, CSRF,
-  storage API. **One seam:** no real-Chrome pass yet — the bar is verified in Chrome once US-029 to
-  US-032 give it something to answer with
+Condensed to keep this log inside its 300-line limit; full detail in
+[`../phases/phase-3a.md`](../phases/phase-3a.md).
+
+- **ONE field, and the field IS the typing area.** The icon and the send button are siblings of the
+  `<input>` inside the single bordered element, the `:focus-within` ring on that same element with
+  the input's own outline suppressed. **The reported nested box is rejected structurally:** a test
+  walks the field's subtree and fails on any descendant carrying a border or a ring. The field wears
+  `rounded-pill`, deliberately not `.fcb-chip` — that stays with US-026 and US-029
+- **A real HTML `<form>` was chosen** (the reference build avoided one only because its sandbox
+  swallowed submissions), so Enter and the embedded button are ONE code path; a press on the field's
+  padding focuses the input through `mousedown` + `preventDefault`
+- **Criterion 4 without a second clock, because US-015 owns the only one.** A submit CONSUMES the
+  question — the cleared value is written to a mirrored ref *before* `onSubmit` — so a re-entrant
+  submit reads an empty draft; `busy` also disables both controls. Three rapid Enters, a
+  triple-click and a latching harness each yield exactly ONE call; `setTimeout` scan-rejected
+- **Empty and whitespace-only input are no-ops**, chips untouched. **`fixed`, not `sticky`:** the
+  shell clips sideways overflow, which makes it a scroll container as tall as the dashboard, so a
+  sticky bar would settle at the bottom of the CONTENT; fixed also leaves the PAGE scrolling, which
+  US-015's `scrollToTop` and US-014's auto-scroll depend on
+- Accessibility: a visually hidden `<label>` (the placeholder is guidance, never the name), an
+  `aria-label` on send, `aria-hidden` glyphs, a named `search` region with `aria-busy`
+- **Security triage — the user-input trigger FIRES (A03) and is closed:** the typed value is
+  rendered only as an input `value`, never as markup; no `dangerouslySetInnerHTML`, `innerHTML`,
+  `eval`, or template-built URL, request, storage key or selector (the one selector is a fixed
+  constant); an `<img onerror>` payload reaches the callback verbatim and creates no element.
+  Cleared: route/IDOR, raw SQL, SSRF, upload, dependency change (none), env/secret, logging, CSRF,
+  storage. **One seam:** no real-Chrome pass until US-029 to US-032 give it something to answer with
+
+### US-029: Suggestion chips & chip lifecycle (3 pts)
+
+**Completed:** 2026-09-09 · **Tests:** 57 new (1498 green) · **Coverage:** 99.82% stmts / 98.22%
+branches / 100% lines / 100% funcs · **Files:** `app/lib/dashboard/chips.ts` (new),
+`app/components/chrome/suggestion-chips.tsx` (new), `app/root.tsx`, plus two source-scan regexes
+widened in `tests/unit/root.test.tsx` / `baseline-reset.test.tsx` for the new composition.
+
+- **THE ROW IS DERIVED, NOT STORED — and every other property follows from that.**
+  `suggestionChips(sections)` is a pure function: the three hero chips always, in `HERO_IDS` order,
+  plus one follow-up chip per section still at `PRIMARY`. So criterion ③ ("the chip is removed once
+  that follow-up has been shown") is implemented in **no line of code**: `withFollowUpShown` flips
+  the phase and the chip stops being derived. Asserted as a function over **all 27** combinations of
+  three heroes × {absent, primary, withFollowUp}, plus non-mutation of the input, a fresh array per
+  call, and a scan for `let` / `var` / `useState` / `useRef` / `useMemo` in the module (none)
+- **US-015 CRITERION ② IS NOW SATISFIED — through the seam its own note described, with no reset
+  code touched.** Reset restores `BASELINE_SECTIONS`; the derivation runs again; the row is exactly
+  the three hero chips with every follow-up gone. Driven end to end on the real `App` (not a
+  harness — the chips are the first thing that lets `App` ask a question): two heroes tapped → 5
+  chips, Reset → 3 hero labels, 0 follow-up chips, 0 sections, and the row usable again on the very
+  next tap. A half-run (one follow-up taken, one not) resets identically, and the MECHANISM is
+  asserted too: `root.tsx` derives `chips={suggestionChips(sections)}` and declares no `useState`
+- **A chip tap bypasses scoring by TYPE, not by discipline.** `selectChip(chip, actions)` takes a
+  `SuggestionChip` and reads its `heroId`; US-030's matcher will take a `string` through `onSubmit`.
+  The two paths meet only at `showHero` / `showFollowUp`. A source scan fails on
+  `score|threshold|keyword|normalis|tie-break|toLowerCase` anywhere in the chip module, a
+  `@ts-expect-error` case breaks `pnpm typecheck` if the argument ever loosens to `string`, and a
+  chip with a nonsense label still resolves to its own hero
+- **The chip surface is reused, never restated.** `CHIP_SURFACE_CLASS` comes from US-026's segmented
+  control; the 11px radius and the one-pixel lift stay in the shared `.fcb-chip` rule in
+  `app/app.css`. The component contains no `11px`, no `radius-chip`, no `rounded-full` /
+  `rounded-pill`, and no transition of its own — reduced motion is the stylesheet's global block
+  collapsing that transition to ~1ms, so a hover lands on its target state with no travel
+- **Only the TINT is new**, as a closed table keyed by chip kind: white with a blue hover tint for a
+  hero chip, and the **gold-tinted variant** for a follow-up — one of gold's three sanctioned accent
+  uses (colour discipline rule 4), as a `bg-gold/10` wash plus an `accent-follow-up` border, never a
+  fill, and **still no gold ring** anywhere. No hex and no arbitrary Tailwind value in the file
+- **Accessibility:** real `type="button"` buttons with accessible names; kind is not carried by
+  colour alone (the reference's trend glyph plus a visually hidden "Follow-up:" in the accessible
+  name); one tab stop per chip in DOM order with **no roving tabindex and no trap** — Tab walks the
+  row and continues into the prompt field, Enter and Space activate. Labels render **verbatim**: no
+  truncation, no ellipsis, no case transform, and `whitespace-nowrap` is deliberately absent so a
+  long label wraps inside its chip rather than pushing the row past the shell's clipped overflow
+- **Security triage — no security-relevant changes detected.** No new user input (a chip carries a
+  hero id from a closed enum, never text), no `dangerouslySetInnerHTML` / `innerHTML`, no URL,
+  request, storage key or selector built from anything, no dependency or lockfile change, no
+  endpoint, env var, secret or logging. Considered and cleared: A01 (no route or resource id), A03
+  (no injection sink; the app's only user input is still US-028's field), A06 (no dependency
+  change), A10 (no `fetch`). **One seam, as with US-028:** no real-Chrome pass yet — the chips are
+  verified in Chrome once US-031/US-032 give a tap something to answer with
 
 ---
 

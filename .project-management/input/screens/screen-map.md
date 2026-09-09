@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.7.0
+**Version:** 1.8.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-028 — the Prompt bar region is now half Built: the unified field with its embedded send is real and always on screen; the suggestion chips inside it are US-029)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-029 — the Prompt bar region now has its chip row: the three hero chips plus a derived follow-up chip per un-sharpened answer, so a question can finally be ASKED from the screen; the typed path is US-030)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -90,7 +90,7 @@ does not.
 | Baseline row | Webshop revenue KPI, Last home match KPI, Top Products, Active Partners | US-013, US-016 | ✅ Built — `app/components/dashboard/baseline-row.tsx` (+ `app/components/tiles/partner-tile.tsx`, `app/lib/dashboard/baseline.ts`), mounted by `app/routes/_index.tsx`. Four tiles as **direct children of the canvas grid** (3 + 3 + 6 columns, then a full-width partner strip at `lg`), composing `KpiTile`, `HBarTile` and the `Card` shell — no new tile kind and no second grid. No figure is re-typed in a component: a source scan enforces it. **Top Products' period filter is now wired (US-016):** its `action` slot holds a light `Segmented` driving its own period, independent of the band's, so the five figures recalculate and the same bar elements transition |
 | Insight sections | One per answered question — section head, narrative, cards, optional follow-up (recommendation panel) | US-014, US-024, US-034 to US-039 | 🔄 Built (US-014, US-024) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. **US-024 finished the section's two insight elements:** the prominent narrative line under the section header is US-005's caption strip in its `section` variant (AI glyph, wraps, never truncated), and the follow-up's advice is `app/components/tiles/recommendation-panel.tsx` — a gold-accented `aside`, structurally not a tile. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
-| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 🔄 Built (US-028) — `app/components/chrome/prompt-bar.tsx`, mounted by `app/root.tsx` through a new `promptBar` slot on the shell and **pinned to the foot of the screen** (`fixed`, because the shell clips overflow and a sticky bar would settle at the bottom of the dashboard instead; the canvas reserves the strip so no tile hides under it). **ONE bordered field** with the search icon and send button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, a press on the padding focusing the input, a real `<form>` so Enter and the button share one submit path, empty input a no-op, and rapid submits collapsing to one without a second timer. **Still to come:** the three suggestion chips render into the bar's `children` slot (US-029) — **derive** them from `useDashboard`'s `sections` so Reset restores them for free; the typed question reaches the matcher through `onSubmit` (US-030) and the field closes on `busy` during the thinking beat (US-031) |
+| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 🔄 Built (US-028, US-029) — `app/components/chrome/prompt-bar.tsx`, mounted by `app/root.tsx` through a new `promptBar` slot on the shell and **pinned to the foot of the screen** (`fixed`, because the shell clips overflow and a sticky bar would settle at the bottom of the dashboard instead; the canvas reserves the strip so no tile hides under it). **ONE bordered field** with the search icon and send button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, a press on the padding focusing the input, a real `<form>` so Enter and the button share one submit path, empty input a no-op, and rapid submits collapsing to one without a second timer. **US-029 filled the `children` slot with the suggestion-chip row** — the three hero prompts, always, plus one gold-tinted follow-up chip per answer still at `primary`, all **derived** from `useDashboard`'s `sections` by `app/lib/dashboard/chips.ts` and rendered by `app/components/chrome/suggestion-chips.tsx`. There is no chip state, so Reset restores the row for free (**US-015 criterion ② is now met**) and a follow-up chip disappears the moment its phase flips. A tap resolves straight to `showHero` / `showFollowUp` from the chip's own hero id — no scoring in that path, by type. The chips are the FIRST way to ask a question from this screen. **Still to come:** the typed question reaches the matcher through `onSubmit` (US-030), the field closes on `busy` during the thinking beat (US-031), and US-033 reads this derived visibility for typed-input gating |
 
 > The **canvas grid** row is new in 1.1.0. It was implicit before — US-012 made it a real region
 > with its own component, and US-013/US-014 both insert into it rather than owning a grid each.
@@ -132,6 +132,15 @@ does not.
 > the send button inside it; the nested box reported in review is rejected by a test that walks the
 > field's subtree. This is also the app's **only user input**: it is rendered solely as an input
 > `value`, never as markup, and builds no URL, request, storage key or selector.
+>
+> 1.8.0 records US-029: the **Prompt bar region is Built except for the typed path**. No region and
+> no route was added — the chip row is the `children` slot US-028 left inside the bar, above the
+> field. The one structural fact a later story must not undo: **the chip row is DERIVED from the
+> session list, not stored.** `suggestionChips(sections)` is a pure function (three hero chips
+> always; a follow-up chip exactly while its hero's section is still `primary`), and `root.tsx`
+> holds no chip state, which is what makes Reset restore the row with no reset logic — US-015's
+> criterion ② is satisfied by construction rather than by a clear step. A chip tap carries a hero
+> id, never text, so it cannot reach US-030's matcher.
 >
 > 1.4.0 records US-013: the **Baseline row region and the Baseline state are Built**. No region and
 > no route was added — the four tiles are grid items on the canvas that already existed. The region's

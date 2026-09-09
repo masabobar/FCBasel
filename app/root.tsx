@@ -3,7 +3,9 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
 import { AppShell } from "./components/chrome/app-shell";
 import { PromptBar } from "./components/chrome/prompt-bar";
+import { SuggestionChips } from "./components/chrome/suggestion-chips";
 import { InsightSections } from "./components/heroes/insight-sections";
+import { selectChip, suggestionChips } from "./lib/dashboard/chips";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 
 import "./app.css";
@@ -42,25 +44,46 @@ export function Layout({ children }: { children: ReactNode }) {
  * control renders in `TopBar`, the behaviour lives in `useDashboard`, and this
  * is the one place the two meet.
  *
- * THE PROMPT BAR IS MOUNTED, ITS MEANING IS NOT (US-028). The bar renders and
- * behaves — Enter submits, the embedded button submits, an empty field does
- * nothing — with no handler attached, exactly as `TopBar`'s Reset did before
- * US-015 supplied one. Three props finish it, and each belongs to a later
- * story: `onSubmit` (US-030's matcher, calling `showHero` / `showFollowUp`),
- * `busy` (US-031, while the thinking beat scheduled through `schedule` is in
- * flight) and `children` (US-029's suggestion chips, derived from `sections`).
+ * THE PROMPT BAR IS MOUNTED, AND HALF ITS MEANING IS NOW WIRED.
+ * US-028 mounted the bar with three seams named; US-029 fills the first of
+ * them. `children` holds the suggestion-chip row, and the chips are DERIVED
+ * from `sections` by `suggestionChips` rather than kept in state of their own —
+ * which is what makes US-015 criterion 2 hold without a line of reset logic:
+ * Reset restores `BASELINE_SECTIONS`, the derivation runs again, and the row is
+ * back to exactly the three hero chips. The two remaining seams still belong to
+ * later stories: `onSubmit` (US-030's matcher for TYPED text) and `busy`
+ * (US-031, while the thinking beat scheduled through `schedule` is in flight).
+ *
+ * A CHIP TAP AND A TYPED QUESTION ARE TWO DIFFERENT PATHS, and this is the one
+ * place both are visible. A chip carries the hero it means, so `selectChip`
+ * calls `showHero` / `showFollowUp` straight away — no normalising, no keyword
+ * scoring, no threshold (US-029 criterion 2). US-030's matcher will hang off
+ * `onSubmit`, which carries a `string`. They meet only at the two dashboard
+ * actions they both end in.
  *
  * `key={generation}` IS THE RESET WIRING. A half-typed question is the one
  * piece of state that cannot be derived from `sections`, which is precisely
  * what `useDashboard`'s `generation` counter exists for: it advances on every
  * Reset, so the bar remounts with an empty field and the presenter is not left
- * with the previous run's typing in front of a freshly cleared dashboard.
+ * with the previous run's typing in front of a freshly cleared dashboard. The
+ * chips inside it need no such help — they are derived.
  */
 export default function App() {
-  const { sections, focus, generation, reset } = useDashboard();
+  const { sections, focus, generation, reset, showHero, showFollowUp } =
+    useDashboard();
 
   return (
-    <AppShell onReset={reset} promptBar={<PromptBar key={generation} />}>
+    <AppShell
+      onReset={reset}
+      promptBar={
+        <PromptBar key={generation}>
+          <SuggestionChips
+            chips={suggestionChips(sections)}
+            onSelect={(chip) => selectChip(chip, { showHero, showFollowUp })}
+          />
+        </PromptBar>
+      }
+    >
       <Outlet />
       <InsightSections sections={sections} focus={focus} />
     </AppShell>

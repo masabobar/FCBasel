@@ -16,11 +16,16 @@
  * inserted below it → Reset → exactly the four tiles, in order, and nothing
  * else.
  *
- * WHY A HARNESS AND NOT `App` ITSELF. Nothing can yet ASK a question — the
- * prompt bar and suggestion chips are US-028 to US-033 — so `App` exposes no
- * way to insert a section. The harness below is `app/root.tsx`'s composition
- * with one test-only button added, and the final case asserts that the
- * composition it mirrors is the one `root.tsx` actually renders.
+ * WHY A HARNESS AND NOT `App` ITSELF. The four baseline tiles reach the canvas
+ * through the ROUTE's SSR loader, which `App` alone does not run, so the
+ * harness below is `app/root.tsx`'s composition with the baseline row mounted
+ * directly and one test-only button that asks a question. The final case
+ * asserts that the composition it mirrors is the one `root.tsx` really renders.
+ *
+ * `App` can now ask a question for itself — US-029's suggestion chips are wired
+ * — and US-015's OTHER reset criterion (② "re-shows the three initial
+ * suggestion chips and removes any follow-up chips") is driven end to end on
+ * the real `App` in `tests/unit/suggestion-chips.test.tsx`.
  */
 
 import { render, screen } from "@testing-library/react";
@@ -254,7 +259,7 @@ describe("the seam is closed the way US-015 described it", () => {
     // The harness above is only evidence if it is the real tree: the routed
     // page (which renders the baseline row) inside the shell, with the
     // sections after it, and Reset wired to the hook.
-    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}/);
+    expect(ROOT_SOURCE).toMatch(/<AppShell\s+onReset=\{reset\}/);
     expect(ROOT_SOURCE.indexOf("<Outlet />")).toBeLessThan(
       ROOT_SOURCE.indexOf("<InsightSections"),
     );

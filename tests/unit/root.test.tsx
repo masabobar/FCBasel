@@ -122,8 +122,10 @@ describe("App", () => {
   it("wires the app bar's Reset to the dashboard's own reset", () => {
     // One implementation, one wiring point: the control is US-012's, the
     // behaviour is `useDashboard`'s, and this is where they meet (US-015).
-    expect(ROOT_SOURCE).toMatch(/const \{[^}]*reset[^}]*\} = useDashboard\(\)/);
-    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}/);
+    expect(ROOT_SOURCE).toMatch(
+      /const \{[^}]*reset[^}]*\} =\s*useDashboard\(\)/,
+    );
+    expect(ROOT_SOURCE).toMatch(/<AppShell\s+onReset=\{reset\}/);
   });
 
   it("presses Reset on a baseline dashboard without breaking the screen", async () => {

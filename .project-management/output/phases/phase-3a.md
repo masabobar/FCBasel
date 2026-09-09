@@ -1,7 +1,7 @@
 # Phase 3a: Conversational Interface & Interaction Model
 
 **Duration:** 2026-09-12 to 2026-09-13 (~8.7 AI-hours)
-**Status:** Active (1/6 stories)
+**Status:** Active (2/6 stories)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-13
 **Actual Completion:** —
@@ -30,12 +30,12 @@ the demo.
 
 ### Epic 6: E5 — Conversational Interface & Interaction Model (17 story points)
 
-**Priority:** P0 · **Status:** In Progress (1/6 · 2/17 pts) · **Dependencies:** US-003, US-006, US-014
+**Priority:** P0 · **Status:** In Progress (2/6 · 5/17 pts) · **Dependencies:** US-003, US-006, US-014
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-028 | Persistent prompt bar | 2 | ✅ Completed |
-| US-029 | Suggestion chips & chip lifecycle | 3 | 📋 Todo |
+| US-029 | Suggestion chips & chip lifecycle | 3 | ✅ Completed |
 | US-030 | Intent normalisation, scoring & tie-breaking | 5 | 📋 Todo |
 | US-031 | Thinking beat | 2 | 📋 Todo |
 | US-032 | Graceful fallback panel | 2 | 📋 Todo |
@@ -86,9 +86,9 @@ the demo.
 > paraphrases" is judged, not asserted.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 2 / 17 (12%)
-- **Completed Stories:** 1 / 6
-- **Tests Passing:** 1441 / 1441 · **Coverage:** 100% lines (`app/**`) · **Commits:** 1
+- **Completed Story Points:** 5 / 17 (29%)
+- **Completed Stories:** 2 / 6
+- **Tests Passing:** 1498 / 1498 · **Coverage:** 100% lines (`app/**`) · **Commits:** 2
 
 ---
 
@@ -148,9 +148,48 @@ US-012's shell. 48 new tests (1441 green), coverage 99.82% stmts / 98.20% branch
 - **Seams left named:** `onSubmit` (US-030's matcher), `busy` (US-031), `children` (US-029's chip
   row), and `key={generation}` in `root.tsx` so Reset clears a half-typed question.
 
+### 2026-09-09 — US-029 Suggestion chips & chip lifecycle (3 pts) ✅
+
+`app/lib/dashboard/chips.ts` (the derivation, pure) + `app/components/chrome/suggestion-chips.tsx`
+(the row), wired in `app/root.tsx` through US-028's `children` slot. 57 new tests (1498 green),
+coverage 99.82% stmts / 98.22% branches / 100% lines.
+
+- **THE ROW IS DERIVED, NOT STORED — the decision the whole story rests on.**
+  `suggestionChips(sections)` is a pure function: the three hero chips always, plus one follow-up
+  chip per section still at `PRIMARY`. There is no chip state anywhere, so criterion 3's "removed
+  once that follow-up has been shown" is not implemented at all — the phase flip stops the chip
+  being derived. Proved as a function over **all 27** combinations of three heroes ×
+  {absent, primary, withFollowUp}, plus non-mutation, fresh-array and no-`let`/no-`useState` checks.
+- **US-015 CRITERION ② IS NOW SATISFIED, through its own seam and with no reset code touched.**
+  Reset restores `BASELINE_SECTIONS`, the derivation runs again, and the row is exactly the three
+  hero chips with every follow-up gone. Driven end to end on the real `App`: chips tapped,
+  follow-ups taken, Reset pressed → three hero labels, zero follow-up chips, zero sections; the row
+  is usable again immediately afterwards. `phase-2a.md` / `phase-2a-shell.md` updated.
+- **A chip tap BYPASSES scoring, by type and not by discipline.** `selectChip(chip, actions)` takes
+  a `SuggestionChip` and reads its `heroId`; US-030's matcher will take a `string` through
+  `onSubmit`. Two paths that meet only at `showHero` / `showFollowUp`. A source scan fails on
+  `score|threshold|keyword|normalis|tie-break|toLowerCase` anywhere in the chip module, and a
+  `@ts-expect-error` case fails typecheck if the argument ever loosens to `string`.
+- **Nothing about the chip surface was restated.** The row imports `CHIP_SURFACE_CLASS` from
+  US-026's segmented control; the 11px radius and the one-pixel lift stay in the shared `.fcb-chip`
+  rule, and the component contains no `11px`, no `radius-chip`, no `rounded-full`/`rounded-pill` and
+  no transition of its own (reduced motion is the stylesheet's global block). Only the TINT is new:
+  a closed table keyed by chip kind, gold for the follow-up variant — a wash and a border, never a
+  fill, and still no gold ring.
+- **Kind is not carried by colour alone:** a follow-up chip also wears the trend glyph and a
+  visually hidden "Follow-up:" in its accessible name. Plain buttons, one tab stop each, no roving
+  tabindex and no trap — Tab walks the row and continues into the field; Enter and Space activate.
+  Labels render verbatim: no truncation, no re-casing, and `whitespace-nowrap` is deliberately
+  absent so a long label wraps instead of pushing the row past the shell's clipped overflow.
+- **Security triage: no security-relevant changes detected.** No new user input (the chip carries a
+  hero id from a closed enum, not text), no URL, request, storage or `innerHTML`, no dependency
+  change, no endpoint. The one user input in the product is still US-028's field.
+- **Seams left:** the derived row is the state US-033 will read for typed-input gating, and
+  `onSubmit` / `busy` are still untouched for US-030 / US-031.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** Active (1/6 stories · 2/17 pts)
+**Phase Status:** Active (2/6 stories · 5/17 pts)
 **Previous:** [Phase 2b](phase-2b.md) · **Next:** [Phase 3b — Heroes](phase-3b.md)

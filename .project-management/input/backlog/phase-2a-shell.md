@@ -157,10 +157,18 @@ grow when a question is asked.
       session returns to `BASELINE_SECTIONS`, the single named constant that is *also*
       `useDashboard`'s initial state. Nothing in the reset path says "empty"; US-013 lists its
       tiles in that one constant and load-state and reset-state stay identical for free.
-    - **② Seam-only — the chips are US-029.** No chip is invented here. The intended wiring is
-      recorded in the hook: a chip row **derived** from `sections` (initial chips at the baseline,
-      follow-up chips from the sections on screen) is restored by reset with no reset logic of its
-      own; `generation` is there for anything US-028/US-029 hold that cannot be derived.
+    - **② ✅ NOW SATISFIED BY US-029 (2026-09-09).** It was seam-only here, with the intended
+      wiring recorded in the hook: a chip row **derived** from `sections` (initial chips at the
+      baseline, follow-up chips from the sections on screen), restored by reset with no reset logic
+      of its own. US-029 built exactly that — `suggestionChips(sections)` in
+      `app/lib/dashboard/chips.ts` is a pure function, `app/root.tsx` evaluates it on every render
+      and keeps **no chip state at all**, so Reset restores `BASELINE_SECTIONS` and the row is the
+      three hero chips again with every follow-up chip gone. Nothing in the reset path mentions
+      chips, and nothing had to be retrofitted. Driven end to end on the real `App` in
+      `tests/unit/suggestion-chips.test.tsx` (chips tapped, follow-ups taken, Reset pressed →
+      exactly the three hero labels, zero follow-up chips, zero sections), plus a mechanism check
+      that `root.tsx` declares no `useState`. `generation` remains what it always was: the seam for
+      state that cannot be derived, which is now only US-028's half-typed question.
     - **③ Fully met.** `scrollToTop` (`app/lib/motion.ts`) returns the window to the top, reduced-
       motion-aware and focus-preserving; the session is replaced by one whole baseline snapshot,
       so sections, focus and counters all clear together — no residual state.
