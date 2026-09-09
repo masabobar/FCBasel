@@ -6,10 +6,10 @@
 
 ## Today's Summary
 
-**Stories Completed:** 22 — **Phases 1a, 1b and 2a all complete (2a closed by US-016); Phase 2b at
-6/11**
-**Story Points:** 56
-**Time Worked:** ~15.0 hours · **Files Changed:** 200 · **Tests Added:** 1142
+**Stories Completed:** 23 — **Phases 1a, 1b and 2a all complete (2a closed by US-016); Phase 2b at
+7/11**
+**Story Points:** 59
+**Time Worked:** ~15.6 hours · **Files Changed:** 202 · **Tests Added:** 1205
 
 ---
 
@@ -129,14 +129,26 @@
   US-034 composes: `vBarGeometry` / `VBars` / `VBarTile`. **Bar persistence is the story and the
   test is a re-rank:** columns are keyed by category, so a filter press hands `Home` the *same*
   `<rect>` and the `x` / `y` / `height` CSS transition carries it — element identity holds across a
-  data change *and* a re-ordered dataset, each label stays with its own category, and switching that
-  key to the array index **fails exactly two tests**. The surviving instance keeps its `useCountUp`
-  state, so the label counts on from what is displayed; reduced motion lands on final heights with
-  zero frames requested. Gradient fills with rounded caps, one gradient per distinct token colour
-  (`useUid`), gridlines behind, labels above, a `filter` hover highlight, and an **optional
-  `tooltip(index)` renderer** for Hero 1's units + share + revenue. Category labels are DOM text so
-  a long one wraps; `niceMax` / `vBarHeight` never yield `NaN`; US-025's `tooltipAnchor` /
-  `nextHoverIndex` reused rather than restated. 52 tests, 1142/1142.
+  data change *and* a re-ordered dataset, and switching that key to the array index **fails exactly
+  two tests**. The surviving instance keeps its `useCountUp` state; reduced motion lands on final
+  heights with zero frames requested. Gradient caps, one gradient per distinct token colour, a
+  `filter` hover highlight and an **optional `tooltip(index)` renderer**. Category labels are DOM
+  text so a long one wraps; `niceMax` / `vBarHeight` never yield `NaN`. 52 tests, 1142/1142.
+- **US-019 — Grouped bar chart tile.** `app/components/charts/grouped-bars.tsx` — US-036's fixture
+  chart: `groupedBarGeometry` / `GroupedBars` / `GroupedBarTile`, eight fixtures giving **sixteen
+  bars (navy 25/26, red 26/27) and eight delta chips in one tile**. **The review's overlap fix is
+  now arithmetic, and both halves are measured:** the scale owns a 44-unit **left gutter** and every
+  bar, chip, label and legend row is inset to the plot's left edge, while a 34-unit **chip band**
+  above the bars is guaranteed empty because the axis maximum is *derived from the geometry*
+  (`plotHeight / barZoneHeight` fed to US-018's `niceMax`, which only rounds up). Tests compute the
+  clearance rather than assume it — no chip slot reaches the gutter, none overlaps its neighbour (at
+  8 pairs and at 14), the tallest bar clears `plotTop` by the full band over seven datasets × three
+  heights, and **a fixed 10% headroom fails that test**. Chips are US-017's `DeltaChip` in one flex
+  strip (overlap impossible by layout too); the hover box carries both seasons *and* the delta.
+  **No per-bar value labels by design** — sixteen figures over sixteen bars *was* the defect — so the
+  gutter carries magnitudes, the chip the movement, the tooltip the readings, and a bar with no
+  height is a labelled zero. Pairs keyed by fixture (an index key fails the re-rank test); mixed
+  signs render both ways; reduced motion is final state. 63 tests, 1205/1205.
 ---
 
 ## Stories Completed Today
@@ -151,8 +163,7 @@
   approved scope decision. US-010 derives the Revenue/Cost judgement and the attention flag rather
   than storing either; US-011 adds one shared display layer, one rounding rule, and a reconciliation
   suite that found **no drift**.
-- ✅ US-012 — Branded application shell (3 pts) — all 5 acceptance criteria met, and the two easy
-  ones to fake were measured in a real browser. **Phase 2a opens here: 1/5 stories, 3/16 points.**
+- ✅ US-012 — Branded application shell (3 pts) — all 5 criteria met, the two easy ones to fake measured in a real browser. **Phase 2a opens here: 1/5 · 3/16.**
 - ✅ US-014 — Dynamic tile insertion & grid reflow (3 pts) — all 7 acceptance criteria met: dedupe
   by hero id proven in unit tests and in Chrome, a follow-up flips its parent's phase, the reflow
   tween observed animating, no storage API anywhere. **Phase 2a: 2/5, 6/16 points.**
@@ -195,6 +206,12 @@
   labels and a hover highlight; an optional per-bar tooltip renderer taking the index; and bars
   keyed by category, proven by a re-rank test where the same `<rect>` survives and transitions while
   each label stays with its own figure. **Phase 2b now 6/11 stories, 16/29 points.**
+- ✅ US-019 — Grouped bar chart tile (3 pts) — all 3 acceptance criteria met at Hero 2's full density
+  (8 fixtures, 16 bars, 8 chips): two seasons per fixture with a delta chip above each pair, the
+  y-axis in its own left gutter with a reserved band of headroom above the bars, and a per-fixture
+  tooltip carrying both seasons and the delta. **The review decision is geometry, not a class** — the
+  chip clearances are computed in tests and a fixed 10% headroom fails them.
+  **Phase 2b now 7/11 stories, 19/29 points.**
 
 *(US-013, US-025 and US-026's long-form accounts were condensed to keep this log inside its 300-line
 limit — they stay bulleted above, and the full detail is in [`completed.md`](completed.md) and
@@ -221,11 +238,14 @@ limit — they stay bulleted above, and the full detail is in [`completed.md`](c
 - **Phases 1a, 1b and 2a are all closed** (14 + 10 + 16 = 40 points). Nothing in Phase 2a is
   outstanding: US-013 and US-016 were both finished inside the Phase 2b run on the day their
   dependencies landed.
-- **Phase 2b — the component library** is at 6/11 · 16/29. Next is **US-019 — grouped bar chart
-  tile (3 pts)**, whose y-axis gutter with headroom is a review decision. Every remaining component
-  should import from `app/lib/hooks/use-motion.ts` rather than animate by hand, and compose `Card`,
-  `DeltaChip`, `HBars`, `VBars`, `LineChart` and `Segmented` rather than restate them — US-023 in
-  particular must reuse US-021's bar row, and US-019 should take US-018's keyed-column pattern.
+- **Phase 2b — the component library** is at 7/11 · 19/29. Next is **US-020 — donut / ring tile
+  (3 pts)**: segments must morph via `stroke-dasharray` / `stroke-dashoffset`, hovering a segment
+  *or its legend row* swaps the centre, and the rounding correction has to make the parts sum
+  exactly to the total (US-008's `badgeSegments` already does that arithmetic — read it, do not
+  restate it). It is a **different component from US-016's `AttendanceRing`** and must not be folded
+  into it. Every remaining component should import from `app/lib/hooks/use-motion.ts` rather than
+  animate by hand, and compose `Card`, `DeltaChip`, `HBars`, `VBars`, `GroupedBars`, `LineChart` and
+  `Segmented` rather than restate them — US-023 in particular must reuse US-021's bar row.
 
 **Priority Stories for This Week:** Phase 1a + 1b foundations (24 pts, done) → Phase 2a + 2b shell
 and component library (45 pts, the largest block) → Phase 3a + 3b conversation and the three heroes
@@ -238,11 +258,10 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
 - **The deadline is this week.** Sponsor showing first, owner audience the following week.
   Estimated ~52 AI-core / ~68 AI-realistic hours for the full 116 points; if the week gets tight,
   extend daily runtime before cutting scope — the P1 cut set is worth only ~0.82 days at 8h/day.
-- Phases 1a, 1b and 2a are complete and Phase 2b is at 6/11 (56/116 points); continue with
-  `/holycode-pm:execute-work phase 2b`, starting at US-019.
+- Phases 1a, 1b and 2a are complete and Phase 2b is at 7/11 (59/116 points); continue with
+  `/holycode-pm:execute-work phase 2b`, starting at US-020.
 - **US-021 is the reuse test for the whole epic:** `HBars` / `HBarRow` must be the only horizontal
-  bar row in the codebase. Its 150px no-truncate label and 96px `nowrap` value column are review
-  decisions, and a second implementation would silently drop both.
+  bar row; its 150px no-truncate label and 96px `nowrap` column are review decisions.
 - **The motion hooks are the shared contract for Phase 2b:** `useCountUp` from the current value and
   `useGrow`'s reduced-motion short-circuit are what keep ten charts consistent. A component that
   reimplements either is a review finding, not a style choice.
@@ -251,7 +270,7 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
   tokens — but only through `cn`, so a hand-written `class="text-caption text-muted"` is on its own.
 - **Reset's seams are recorded in code:** US-029's chips should be *derived* from `useDashboard`'s
   `sections` and US-031's thinking beat *scheduled* through its `schedule`. US-013 closed the third
-  (the baseline tiles) as static chrome on the route — do not move them into the session list.
+  (the baseline tiles) as static route chrome — do not move them into the session list.
 - **US-013 set the no-hardcoded-figure pattern for every hero:** figures reach a component only
   through a loader-provided view model, and `tests/unit/baseline-row.test.tsx` scans the component
   sources for any dataset figure written as a literal. US-034 to US-039 should copy that scan.
@@ -259,9 +278,12 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
   is the replay mechanism, `legend={false}` plus `LineChartLegend` is how the band places its own
   legend, and a second `smoothPath` anywhere is a review finding.
 - **US-018 keyed its columns by category, and that is now the epic's pattern for geometry:** US-019
-  and US-020 must key by fixture and by segment, never by index — the proof is a re-rank test, since
-  an index key is invisible while the order holds. Its `V_BAR_SERIES` map has no gold entry, and the
-  optional `tooltip(index)` renderer is how a hero passes several figures into one hover box.
+  did the same by fixture and **US-020 must key by segment, never by index** — the proof is a re-rank
+  test, since an index key is invisible while the order holds.
+- **US-019's gutter and headroom are review decisions expressed as arithmetic, not padding:** the
+  axis maximum is derived from `plotHeight / barZoneHeight`, so any chart that later crowds labels
+  above its bars should reserve a band the same way rather than nudging paddings. Its
+  `groupedBarGeometry` is pure, so a collision is a computable assertion — copy that habit.
 - **US-026's `Segmented` is the only period control**, and the period stays the CALLER's state —
   US-016 proved the pattern: one value in the band drives both the chart's `key` and the ring, while
   Top Products holds its own. Its 11px radius is a reviewed decision: `rounded-full` on it or on
@@ -271,7 +293,7 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
   keep that property. Its `AttendanceRing` is the only ring in the product — US-020's donut is a
   different component and must not be folded into it.
 - The shell keeps two guardrails as *tests*: the app bar's whole text must equal the known role
-  labels, and the connection status file must contain no `fetch`, `useEffect` or timer.
+  labels, and the status file must contain no `fetch`, `useEffect` or timer.
 
 ---
 

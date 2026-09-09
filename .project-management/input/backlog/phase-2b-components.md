@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (6/11 completed)
+**Status:** In Progress (7/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (6/11 completed)
+**Status:** In Progress (7/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -82,7 +82,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Paired two-season bars per fixture for the ticket-revenue hero.
   - **Acceptance Criteria:**
     - Two bars per fixture (25/26 navy, 26/27 red) with a year-on-year delta chip above each pair
@@ -91,6 +91,23 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - Per-fixture hover tooltip showing both seasons and the delta
   - **Dependencies:** US-005, US-027
   - **Notes:** The overlap fix is an explicit review decision — do not revert it.
+  - **Completion note (2026-09-09):** All three criteria met, in
+    `app/components/charts/grouped-bars.tsx` — `groupedBarGeometry` (pure), `GroupedBars` and
+    `GroupedBarTile`. Eight fixtures render sixteen bars (navy previous / red current, gradients from
+    the US-018 series tokens) with one `DeltaChip` above each pair. **CRITERION 2 IS STRUCTURAL AND
+    MEASURED, so it cannot be reverted by accident:** the scale owns a 44-unit left gutter and every
+    bar, chip, label and legend row is inset to `plotLeft` (tests assert `axisLabelX < plotLeft` and
+    `chipLeft >= plotLeft` for all eight, and read the rendered strip's inset back off the DOM); the
+    34-unit chip band above the bars is guaranteed because the axis maximum is **derived from the
+    geometry** (`plotHeight / barZoneHeight` fed to `niceMax`, which only rounds up), proven over
+    seven datasets × three heights — replacing that factor with a fixed 10% fails the test. Chips are
+    one flex strip of equal cells, so neighbour overlap is impossible by layout as well as by
+    arithmetic (verified at 8 and 14 pairs). No per-bar value labels by design (sixteen figures over
+    sixteen bars *was* the defect) — the gutter carries the magnitudes, the chip the movement and the
+    hover box both seasons plus the delta; a zero is still a labelled zero at the baseline. Pairs and
+    chip cells keyed by fixture, so a data change transitions the same rects and an index key fails
+    the re-rank test; mixed-sign deltas render both directions; reduced motion lands on final heights
+    with zero frames requested. 63 tests added (1205/1205, gates clean, 100% coverage on the file).
 
 - **US-020**: Donut / ring tile
   - **Story Points:** 3
