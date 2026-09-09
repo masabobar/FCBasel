@@ -17,9 +17,11 @@ import {
   type AttendanceSummary,
   type BadgeSponsorShare,
   type ComparisonSeries,
+  type FixtureRevenue,
   type Hero1Period,
   type HomeMatch,
   type KitUnits,
+  type MonthlyRevenue,
 } from "./types";
 
 /** How the club is written in a scoreline. */
@@ -171,4 +173,94 @@ export function badgeSegments(
     first.value += total - sum(segments.map((segment) => segment.value));
   }
   return segments;
+}
+
+/* ---------------------------------------------------- HERO 2 TICKETING -- */
+
+/** A row of anything compared across the two seasons. */
+interface YearOnYearRow {
+  readonly previous: number;
+  readonly current: number;
+}
+
+/**
+ * Turns year-on-year rows into the chart primitive the baseline band already
+ * uses, so BOTH of Hero 2's charts and every total under them go through one
+ * `seriesTotals` and therefore one rounding rule.
+ */
+function yearOnYear<T extends YearOnYearRow>(
+  rows: readonly T[],
+  label: (row: T) => string,
+): ComparisonSeries {
+  return {
+    labels: rows.map(label),
+    current: rows.map((row) => row.current),
+    previous: rows.map((row) => row.previous),
+  };
+}
+
+/** The fixture chart: one grouped bar per opponent. */
+export function fixtureSeries(
+  fixtures: readonly FixtureRevenue[],
+): ComparisonSeries {
+  return yearOnYear(fixtures, (fixture) => fixture.opponent);
+}
+
+/**
+ * Ticket revenue across the shown fixtures, both seasons, and how it moved.
+ * The tile's headline `-0.6%` is THIS value - never a stored `deltaPct`.
+ */
+export function fixtureTotals(
+  fixtures: readonly FixtureRevenue[],
+): SeriesTotals {
+  return seriesTotals(fixtureSeries(fixtures));
+}
+
+/** The monthly chart: one point per month, July to June. */
+export function monthlySeries(
+  months: readonly MonthlyRevenue[],
+): ComparisonSeries {
+  return yearOnYear(months, (month) => month.label);
+}
+
+/**
+ * Ticket revenue across every month of the two seasons.
+ *
+ * This total is LARGER than {@link fixtureTotals} by design: the monthly series
+ * covers all home fixtures while the fixture chart shows only the eight
+ * highest-grossing. Each series states that in its own `scopeLabel`.
+ */
+export function monthlyTotals(months: readonly MonthlyRevenue[]): SeriesTotals {
+  return seriesTotals(monthlySeries(months));
+}
+
+/** One fixture's year-on-year loss, as a POSITIVE amount of CHF thousands. */
+export interface FixtureDecline {
+  readonly opponent: string;
+  readonly drop: number;
+}
+
+/**
+ * The fixtures that lost revenue year on year, biggest loss first.
+ *
+ * Derived rather than stored: the follow-up tile lists FCZ, Lugano, Luzern and
+ * Sion because those four are the fixtures that fell, not because a second list
+ * repeats them. Equal drops keep fixture order - `Array.prototype.sort` is
+ * stable - so Luzern precedes Sion, as the Reference Guide shows them.
+ */
+export function fixtureDeclines(
+  fixtures: readonly FixtureRevenue[],
+): FixtureDecline[] {
+  return fixtures
+    .filter((fixture) => fixture.current < fixture.previous)
+    .map((fixture) => ({
+      opponent: fixture.opponent,
+      drop: fixture.previous - fixture.current,
+    }))
+    .sort((left, right) => right.drop - left.drop);
+}
+
+/** Total revenue lost across the declining fixtures - the tile's badge. */
+export function declineTotal(fixtures: readonly FixtureRevenue[]): number {
+  return sum(fixtureDeclines(fixtures).map((decline) => decline.drop));
 }

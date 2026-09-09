@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 8 — **Phase 1a complete, Phase 1b under way**
-**Story Points:** 18
-**Time Worked:** ~5.3 hours
-**Files Changed:** 74
-**Tests Added:** 273
+**Stories Completed:** 9 — **Phase 1a complete, Phase 1b under way**
+**Story Points:** 20
+**Time Worked:** ~5.8 hours
+**Files Changed:** 82
+**Tests Added:** 304
 
 ---
 
@@ -120,6 +120,20 @@
   documented: squad names exist only as print counts, and no salary, goals, assists, appearances,
   minutes or rating value appears anywhere. 45 tests added (273/273 green), coverage 100%
   statements / 98.4% branches of `app/**`, and lint / format / typecheck / build all clean.
+- **US-009 — Hero 2 dataset: ticket revenue year on year.** Eight home fixtures in CHF thousands
+  (7,880 -> 7,830) plus the twelve-month series the Reference Guide adds beyond the Specification,
+  as one `Hero2` object with `primary` and `followUp`. The story's real risk was labelling, not
+  arithmetic: the two charts sit at deliberately different scopes — eight highest-grossing fixtures
+  against all home fixtures per month (9,880 -> 9,770) — so `scopeLabel` is a field on each series
+  and tests assert the labels exist, differ, and that the monthly total is the larger one. Nothing
+  derivable is stored: the Reference Guide's `totalPrev`, `totalCurr`, `deltaPct` and its second
+  `declines` list did not survive the port, so the headline -0.6% comes from the same `seriesTotals`
+  the baseline band uses, and FCZ -150 / Lugano -110 / Luzern -70 / Sion -70 and the -CHF 400k badge
+  are recovered from the fixture pairs by `fixtureDeclines` and `declineTotal`. New `SeasonKey` and
+  `MonthKey` enums carry the season and month axis keys, with `MONTH_LABEL` pinned by test to the
+  baseline band's `Intl`-derived month names. Both narratives verbatim, pinned by text, length and
+  an ASCII-range check. 31 tests added (304/304 green), coverage 100% statements / 98.4% branches of
+  `app/**`, and lint / format / typecheck / build all clean.
 
 ---
 
@@ -143,7 +157,9 @@
   exceeded (all four periods, per the user's approved scope decision). Phase 1b: 1/5 stories.
 - ✅ US-008 — Hero 1 dataset: shirt sales, badges, printed names (2 pts) — all 5 acceptance criteria
   met and deliberately exceeded (all four periods, per the user's approved scope decision).
-  Phase 1b: 2/5 stories.
+- ✅ US-009 — Hero 2 dataset: ticket revenue year on year (2 pts) — all 5 acceptance criteria met and
+  deliberately exceeded (the twelve-month series, per the user's approved scope decision).
+  Phase 1b: 3/5 stories.
 
 ---
 
@@ -164,9 +180,9 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 1b — seed data (6 pts remaining). US-009 (Hero 2: ticket revenue year on year) is next and
-  is mechanical: the repository pattern, the enum source of truth and the primary/followUp hero
-  shape are all now in place
+- Phase 1b — seed data (4 pts remaining). US-010 (Hero 3: departmental performance) is next; the
+  repository pattern, the enum source of truth, the primary/followUp hero shape and the scope-label
+  convention are all now in place, and Hero 3's Revenue/Cost tagging is the one new idea in it
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -181,7 +197,7 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phase 1a is complete and Phase 1b is 2/5; continue with `/holycode-pm:execute-work story US-009`.
+- Phase 1a is complete and Phase 1b is 3/5; continue with `/holycode-pm:execute-work story US-010`.
 
 ---
 

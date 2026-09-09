@@ -28,13 +28,13 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets (10 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (2/5) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (3/5) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-007 | Persona baseline datasets (4 tiles) | 2 | ✅ Completed |
 | US-008 | Hero 1 dataset — shirt sales, badges, printed names | 2 | ✅ Completed |
-| US-009 | Hero 2 dataset — ticket revenue year on year | 2 | 📋 Todo |
+| US-009 | Hero 2 dataset — ticket revenue year on year | 2 | ✅ Completed |
 | US-010 | Hero 3 dataset — departmental performance | 2 | 📋 Todo |
 | US-011 | Formatters & cross-hero reconciliation | 2 | 📋 Todo |
 
@@ -77,9 +77,9 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 - **Risk Level:** Low (mechanical work — every figure is pinned in the specification)
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 4 / 10 (40%)
-- **Completed Stories:** 2 / 5
-- **Tests Passing:** 273 / 273 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 2
+- **Completed Story Points:** 6 / 10 (60%)
+- **Completed Stories:** 3 / 5
+- **Tests Passing:** 304 / 304 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 3
 
 ---
 
@@ -171,6 +171,43 @@ position on it must have data behind it; the Reference Guide is definitive for t
 - The baseline fixture was narrowed to its own four period keys so extending the shared enum could
   not silently demand invented figures from a dataset that has none.
 - 45 tests added (273/273 green), coverage 100% statements / 98.4% branches over `app/**`; lint,
+  format, typecheck and build all clean. Security triage: no security-relevant changes (static local
+  data, no endpoint, no dependency, no environment variable, no user input, no network call).
+
+### 2026-09-09 — US-009: Hero 2 dataset, ticket revenue year on year (2 pts) ✅
+
+Third pass through the US-007 recipe, and the first one where the *labelling* mattered more than the
+arithmetic. New `SeasonKey` and `MonthKey` enums with their label maps in `enums.ts`, domain types
+plus `Hero2Repository` in `types.ts`, derived figures in `derive.ts`, fixtures and the implementation
+in `app/lib/mock/hero2.ts`, one line of selection in `index.server.ts`.
+
+**Scope:** the delivered set intentionally exceeds the written acceptance criteria, per the user's
+approved decision — the month-by-month series (twelve points per season) is a Reference Guide
+addition the Build Specification never mentions, and the tile draws it.
+
+- **The two charts are at DIFFERENT scopes on purpose, and the data says so.** `scopeLabel` sits on
+  each series: the fixture chart is "Eight highest-grossing home fixtures, matchday ticket revenue
+  excluding the season-ticket base" (7,880 → 7,830), the monthly chart is "All home fixtures per
+  month …" (9,880 → 9,770). Summing the months and comparing gives a bigger number — intended, and
+  now stated rather than left for someone in the room to reconcile. A test asserts both labels exist,
+  differ, and that the monthly total is the larger of the two.
+- **Nothing derivable is stored.** The Reference Guide stores `totalPrev`, `totalCurr`, `deltaPct`
+  *and* a second list of `declines`; none of them survived the port. Totals come from the same
+  `seriesTotals` the baseline band uses, so -50 / 7,880 = -0.63% displays as -0.6% under exactly one
+  rounding rule; `fixtureDeclines` recovers FCZ -150, Lugano -110, Luzern -70, Sion -70 *from the
+  fixture pairs* (stable sort keeps Luzern before Sion), and `declineTotal` produces the tile's
+  -CHF 400k badge. Nothing is re-typed, so nothing can drift.
+- **One hero object with `primary` and `followUp`.** The follow-up carries a narrative and nothing
+  else — its four fixtures are the primary's fixtures, seen through `fixtureDeclines`.
+- **Both narratives verbatim**, extracted from the source and compared programmatically, then pinned
+  in the suite by exact text, exact length (229 / 338) and a printable-ASCII range check. The
+  hygiene rule that bans "CHF" and comma-grouped digits from stored strings is scoped to the *data*
+  strings here, because this hero's verbatim copy legitimately says "-CHF 150k" and "3,200".
+- `MONTH_LABEL` is pinned to the baseline band's `Intl`-derived month names by test, so the two
+  spellings of "Jul" cannot diverge.
+- Guardrail held and tested: fixtures are clubs, and no squad name, salary or performance figure
+  appears anywhere in the dataset.
+- 31 tests added (304/304 green), coverage 100% statements / 98.4% branches over `app/**`; lint,
   format, typecheck and build all clean. Security triage: no security-relevant changes (static local
   data, no endpoint, no dependency, no environment variable, no user input, no network call).
 

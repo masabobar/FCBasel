@@ -12,7 +12,13 @@
  *     data - formatting is US-011's job and happens at render time.
  */
 
-import { type KitVariant, type PartnerRole, type PeriodKey } from "./enums";
+import {
+  type KitVariant,
+  type MonthKey,
+  type PartnerRole,
+  type PeriodKey,
+  type SeasonKey,
+} from "./enums";
 
 /* ---------------------------------------------------------- PRIMITIVES -- */
 
@@ -190,6 +196,92 @@ export interface Hero1 {
   readonly followUp: Hero1FollowUp;
 }
 
+/* ---------------------------------------------------------- HERO 2 DATA -- */
+
+/**
+ * A season, named once so a legend, an axis and a narrative cannot disagree
+ * about which year is which.
+ */
+export interface SeasonRef {
+  readonly key: SeasonKey;
+  readonly label: string;
+}
+
+/**
+ * Matchday ticket revenue for one home fixture across the two seasons, in CHF
+ * THOUSANDS (1,610 is CHF 1.61M). Formatting is US-011's job.
+ *
+ * The opponent is a CLUB, never a person - the same field the baseline's
+ * `HomeMatch` uses. Neither the year-on-year change nor any total is stored:
+ * both come from `./derive.ts`, so a fixture edit moves the headline with it.
+ */
+export interface FixtureRevenue {
+  readonly opponent: string;
+  /** Season 25/26, drawn as the comparison bar. */
+  readonly previous: number;
+  /** Season 26/27, drawn as the current bar. */
+  readonly current: number;
+}
+
+/** Ticket revenue for one month of the season, in CHF thousands. */
+export interface MonthlyRevenue {
+  readonly month: MonthKey;
+  /** Short axis label, e.g. `"Jul"`. */
+  readonly label: string;
+  readonly previous: number;
+  readonly current: number;
+}
+
+/**
+ * The eight highest-grossing home fixtures, with the scope they cover.
+ *
+ * `scopeLabel` is DATA, not decoration. Hero 2's two charts are deliberately at
+ * DIFFERENT scopes - this one is eight fixtures, the monthly one is every home
+ * fixture - so summing the monthly series and comparing it to this total gives
+ * a larger number ON PURPOSE. Unlabelled, that reads as an arithmetic bug to
+ * anyone checking the figures in the room.
+ */
+export interface FixtureRevenueSeries {
+  readonly scopeLabel: string;
+  readonly fixtures: readonly FixtureRevenue[];
+}
+
+/** The twelve-month view, July to June, and the scope it covers. */
+export interface MonthlyRevenueSeries {
+  readonly scopeLabel: string;
+  readonly months: readonly MonthlyRevenue[];
+}
+
+/** The Hero 2 tile as first shown: ticket revenue, this season against last. */
+export interface Hero2Primary {
+  /** Season 25/26 - the comparison year. */
+  readonly previousSeason: SeasonRef;
+  /** Season 26/27 - the year the headline figure describes. */
+  readonly currentSeason: SeasonRef;
+  readonly fixtures: FixtureRevenueSeries;
+  readonly monthly: MonthlyRevenueSeries;
+  /** Hand-authored copy. Verbatim from the Reference Guide - never paraphrased. */
+  readonly narrative: string;
+}
+
+/**
+ * The escalation shown when the user asks Hero 2 which fixtures drive the drop.
+ *
+ * It carries a narrative and NOTHING ELSE: the four declining fixtures and the
+ * `-CHF 400k total` badge above them are derived from the primary's fixtures by
+ * `fixtureDeclines` / `declineTotal`, so a fixture edit can never leave the
+ * follow-up quoting a decline the chart no longer shows.
+ */
+export interface Hero2FollowUp {
+  readonly narrative: string;
+}
+
+/** Hero 2 as ONE object - see {@link Hero1} for why the two travel together. */
+export interface Hero2 {
+  readonly primary: Hero2Primary;
+  readonly followUp: Hero2FollowUp;
+}
+
 /* -------------------------------------------------------- REPOSITORIES -- */
 
 /**
@@ -219,4 +311,16 @@ export interface Hero1Repository {
   periods(): Promise<Hero1Period[]>;
   /** One period, or `null` when the key is unknown. */
   period(key: PeriodKey): Promise<Hero1Period | null>;
+}
+
+/** Hero 2: matchday ticket revenue year on year, plus the decline follow-up. */
+export interface Hero2Repository {
+  /** The whole hero - primary and follow-up in one object. */
+  hero(): Promise<Hero2>;
+  /** The eight fixtures, in the order the grouped bar chart draws them. */
+  fixtures(): Promise<FixtureRevenue[]>;
+  /** One fixture by opponent, or `null` when the opponent is not shown. */
+  fixture(opponent: string): Promise<FixtureRevenue | null>;
+  /** The twelve months of the season, July first. */
+  monthly(): Promise<MonthlyRevenue[]>;
 }

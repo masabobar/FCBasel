@@ -64,6 +64,75 @@ export const KIT_VARIANT_LABEL: Record<KitVariant, string> = {
   [KitVariant.THIRD]: "3rd",
 };
 
+/* -------------------------------------------------------------- SEASONS -- */
+
+/**
+ * The two seasons every year-on-year comparison is drawn against: the season
+ * running now and the one before it.
+ *
+ * The wire value carries the years so it survives the move to a database
+ * column, while WHICH of the two is "current" stays a property of the dataset
+ * that uses them - a fixture row says `previous`/`current` and names the season
+ * once, at the top of the hero.
+ */
+export const SeasonKey = {
+  SEASON_25_26: "SEASON_25_26",
+  SEASON_26_27: "SEASON_26_27",
+} as const;
+
+export type SeasonKey = (typeof SeasonKey)[keyof typeof SeasonKey];
+
+/** How a season is named in a chart legend. */
+export const SEASON_LABEL: Record<SeasonKey, string> = {
+  [SeasonKey.SEASON_25_26]: "Season 25/26",
+  [SeasonKey.SEASON_26_27]: "Season 26/27",
+};
+
+/* --------------------------------------------------------------- MONTHS -- */
+
+/**
+ * Calendar months, as the key of a point on a month-by-month axis.
+ *
+ * A football season runs July to June, so a season's axis is neither the
+ * calendar year's order nor derivable from today's date - it is a fixed axis
+ * and its keys belong here rather than as bare strings on a fixture. Contrast
+ * `app/lib/calendar.ts`, which derives labels from the CURRENT DATE for the
+ * baseline band's date-relative periods; `tests/unit/hero2-dataset.test.ts`
+ * pins the two spellings of a month name to each other.
+ */
+export const MonthKey = {
+  JANUARY: "JANUARY",
+  FEBRUARY: "FEBRUARY",
+  MARCH: "MARCH",
+  APRIL: "APRIL",
+  MAY: "MAY",
+  JUNE: "JUNE",
+  JULY: "JULY",
+  AUGUST: "AUGUST",
+  SEPTEMBER: "SEPTEMBER",
+  OCTOBER: "OCTOBER",
+  NOVEMBER: "NOVEMBER",
+  DECEMBER: "DECEMBER",
+} as const;
+
+export type MonthKey = (typeof MonthKey)[keyof typeof MonthKey];
+
+/** Short month name for a chart axis, matching the baseline band's `"Sep"`. */
+export const MONTH_LABEL: Record<MonthKey, string> = {
+  [MonthKey.JANUARY]: "Jan",
+  [MonthKey.FEBRUARY]: "Feb",
+  [MonthKey.MARCH]: "Mar",
+  [MonthKey.APRIL]: "Apr",
+  [MonthKey.MAY]: "May",
+  [MonthKey.JUNE]: "Jun",
+  [MonthKey.JULY]: "Jul",
+  [MonthKey.AUGUST]: "Aug",
+  [MonthKey.SEPTEMBER]: "Sep",
+  [MonthKey.OCTOBER]: "Oct",
+  [MonthKey.NOVEMBER]: "Nov",
+  [MonthKey.DECEMBER]: "Dec",
+};
+
 /* ------------------------------------------------------- PARTNER ROLES -- */
 
 /** What a commercial partner is to the club. */

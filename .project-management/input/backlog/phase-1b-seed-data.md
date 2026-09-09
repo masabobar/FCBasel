@@ -5,7 +5,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 **Duration:** Day 1-2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 10
-**Status:** In Progress (2/5 completed)
+**Status:** In Progress (3/5 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 
 **Priority:** P0
 **Total Story Points:** 10
-**Status:** In Progress (2/5 completed)
+**Status:** In Progress (3/5 completed)
 **Source:** Build Specification E3.
 
 > **Applies to every story in this epic:**
@@ -85,7 +85,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Matchday ticket revenue per home fixture, 25/26 vs 26/27, plus culprit-fixture
     follow-up data.
   - **Acceptance Criteria:**
@@ -150,7 +150,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
 
 **By Priority:** P0: 5 stories, 10 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 2 stories, 4 points · 🔄 0 · 📋 3 stories, 6 points · ⏸️ 0
+**By Status:** ✅ 3 stories, 6 points · 🔄 0 · 📋 2 stories, 4 points · ⏸️ 0
 
 ---
 

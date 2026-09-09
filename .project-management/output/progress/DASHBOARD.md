@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 1b - Seed Data *(2/5 stories complete)*
+**Current Phase:** Phase 1b - Seed Data *(3/5 stories complete)*
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 16% | 100% | 🟢 On Track |
+| **Overall Progress** | 17% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
-| **Phase 1b** | 40% — In Progress | 100% | 🟢 On Track |
-| **Stories Completed** | 8/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 18/116 | 116 | 🟢 On Track |
+| **Phase 1b** | 60% — In Progress | 100% | 🟢 On Track |
+| **Stories Completed** | 9/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 20/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 8
-**Currently Working On:** US-009 — Hero 2 dataset (2 pts)
-**Story Points Completed Today:** 18
+**Stories Completed Today:** 9
+**Currently Working On:** US-010 — Hero 3 dataset (2 pts)
+**Story Points Completed Today:** 20
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -62,6 +62,15 @@
   narratives are byte-identical to the source, proven by SHA-256, and squad names appear only as
   shirt-print counts.
 
+- ✅ **US-009 — Hero 2 dataset (2 pts)** — matchday ticket revenue year on year: eight home fixtures
+  (7,880 → 7,830 CHF thousands) plus the twelve-month series the Reference Guide adds beyond the
+  Specification. The two charts sit at *different scopes on purpose* — eight fixtures against all
+  home fixtures — so each series carries its own `scopeLabel` and a test proves they differ and that
+  the monthly total is the larger. Totals, the -0.6%, the four declining fixtures and their
+  -CHF 400k badge are all *derived* from the fixture pairs; the Guide's stored `totalPrev`,
+  `totalCurr`, `deltaPct` and second `declines` list did not survive the port. Both narratives
+  verbatim, pinned by text, length and ASCII range.
+
 ---
 
 ## 🏁 Phase 1b in progress — Seed Data
@@ -69,18 +78,19 @@
 **Phase 1b goal:** the single source of truth for every figure in the prototype, seeded locally and
 grounded in verified FCB facts. **Phase 1a** (setup and design system) closed at 100% on 2026-09-09.
 **Duration:** 2026-09-09 to 2026-09-10
-**Progress:** 40% (2/5 stories · 4/10 points)
+**Progress:** 60% (3/5 stories · 6/10 points)
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-009: Hero 2 dataset — ticket revenue year on year | 📋 Next | 0% |
+| US-010: Hero 3 dataset — departmental performance | 📋 Next | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-009: Hero 2 dataset — ticket revenue year on year | 2026-09-09 | 2 |
 | US-008: Hero 1 dataset — shirt sales, badges, printed names | 2026-09-09 | 2 |
 | US-007: Persona baseline datasets | 2026-09-09 | 2 |
 | US-006: Tile-insertion motion & reduced-motion support | 2026-09-09 | 3 |
@@ -121,7 +131,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 100% stmts / 98% branches | 80% | 🟢 Good |
-| Passing Tests | 273/273 | TBD | 🟢 Good |
+| Passing Tests | 304/304 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -134,7 +144,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 > Specification baseline figures, proves the webshop total is derived from its chart series, and
 > fails if a partner's brand colour is ever "corrected" into a design token. US-008 adds a rounding
 > torture test: the four sponsor badge segments must sum *exactly* to the badge total at every total
-> from 0 to 2,000 and at a set of adversarial primes. Since
+> from 0 to 2,000 and at a set of adversarial primes, and US-009 pins both of Hero 2's deliberately
+> different scope labels so the fixture total and the larger monthly total cannot read as a bug. Since
 > US-002 the gate is three-part: strict `tsc`, ESLint 9 flat config, and Prettier — the last two
 > enforced on every commit by husky + lint-staged.
 
@@ -145,7 +156,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Phase | Status | Stories | Points | Progress |
 |-------|--------|---------|--------|----------|
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
-| Phase 1b: Seed Data | 🔄 Active | 2/5 | 4/10 | 40% |
+| Phase 1b: Seed Data | 🔄 Active | 3/5 | 6/10 | 60% |
 | Phase 2a: Shell & Baseline | ⏸️ Pending | 0/5 | 0/16 | 0% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
@@ -168,4 +179,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-008 completed at 2026-09-09 — Phase 1b under way
+**Last Auto-Update:** US-009 completed at 2026-09-09 — Phase 1b under way

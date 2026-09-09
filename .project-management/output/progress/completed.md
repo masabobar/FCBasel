@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 8 stories
-**Total Points:** 18 / 116
+**Total Completed:** 9 stories
+**Total Points:** 20 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 18 points/day
+**Average Velocity:** 20 points/day
 **Phases Completed:** Phase 1a (2026-09-09)
 
 ---
@@ -27,13 +27,10 @@
 **deferred to the human** — no account access from the AI session.
 
 **What Was Done:**
-- Scaffolded React Router 7.18 in framework mode with SSR (`ssr: true`), Vite 6, Tailwind v4
-- Added strict TypeScript config, `app/root.tsx`, `app/routes.ts`, a minimal index route
-- Installed only the prototype's dependency set; no Prisma, msw, Recharts, TanStack Table,
-  PDF/email or i18next packages
-- Committed Railway deploy config (`railway.json`) with `pnpm build` / `pnpm start`
-- Verified from a **clean checkout**: install, build, and a production server returning HTTP 200
-  with server-rendered markup — no environment variable, no database
+- Scaffolded React Router 7.18 in framework mode with SSR, Vite 6, Tailwind v4, strict TypeScript,
+  and only the prototype's dependency set (no Prisma, msw, Recharts, TanStack Table, PDF/email, i18n)
+- Committed Railway deploy config; verified from a **clean checkout** that install, build and a
+  production server return HTTP 200 with server-rendered markup, with no env var and no database
 - Cleared 2 moderate transitive `qs` advisories with a pnpm override; `pnpm audit` is now clean
 
 ### US-002: Developer tooling & local DX (2 pts)
@@ -45,17 +42,10 @@
 **Notes:** All 4 acceptance criteria met and verified by execution, including the pre-commit hook.
 
 **What Was Done:**
-- Added ESLint 9 flat config (`eslint.config.js`): `@eslint/js` + `typescript-eslint` +
-  `eslint-plugin-react-hooks`, with `eslint-config-prettier` last so the two tools never conflict
-- Added `.prettierrc.json` with `prettier-plugin-tailwindcss` and `tailwindStylesheet` pointing at
-  `app/app.css`, so Tailwind v4 utility classes are sorted on save and on commit
-- Ignored `build/`, `.react-router/`, `coverage/`, `node_modules/` in both tools
-- Added `lint`, `lint:fix`, `format`, `format:check` and `prepare` scripts; ran every AC script
-  (`dev` and `start` both booted and answered HTTP 200)
-- Wired husky v9 + lint-staged: `eslint --fix` then `prettier --write` on staged `*.{ts,tsx}`
-- **Proved the hook fires** with two throwaway commits, then removed them with `git reset --soft`:
-  a lint error blocked the commit outright; a badly formatted file was auto-formatted and
-  class-sorted *inside* the committed blob
+- ESLint 9 flat config (TypeScript + React hooks, `eslint-config-prettier` last), Prettier with
+  `prettier-plugin-tailwindcss` for Tailwind v4 class sorting, and the `lint` / `format` scripts
+- Wired husky v9 + lint-staged and **proved the hook fires** with throwaway commits later reset
+  away: a lint error blocked the commit; a badly formatted file landed already formatted
 - `pnpm lint` clean, `pnpm typecheck` clean, 8/8 tests green, `pnpm audit` clean
 
 ### US-003: Design token set (3 pts)
@@ -70,20 +60,14 @@ surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`. No new-tile gold
 **What Was Done:**
 - Defined the colour, type, spacing, radii, shadow and motion set once as Tailwind v4 CSS custom
   properties in `app/app.css` (`@theme static`, so every variable is emitted for `var()` use)
-- Mirrored the same values as a typed object in `app/lib/tokens.ts`, because the hand-built SVG
-  charts in Phase 2b need strings for stroke, fill and gradient stops
-- Guarded the pair with a parity test that parses the stylesheet, resolves `var()` aliases and fails
-  on any drift in either direction — the highest-value test in the story
-- Encoded colour discipline in the token names: `seriesPrimary`/`seriesSecondary`/`seriesCurrent`/
-  `seriesPrevious` for identity, `variancePositive`/`varianceNegative` as the only good/bad tokens,
-  `accentTargetHit`/`accentFollowUp` as gold's only two consumers — each asserted by a test
-- Kept `varianceNegative` a separate token from `red` despite the shared hex, so red can never drift
-  into meaning "bad"; stated the discipline in a comment block at both definition sites
+- Mirrored the same values as a typed object in `app/lib/tokens.ts` for the hand-built SVG charts
+- Guarded the pair with a parity test that resolves `var()` aliases and fails on drift either way
+- Encoded colour discipline in the token names (series identity, variance as the only good/bad
+  carriers, gold restricted to two accent roles), each asserted by a test, and kept
+  `varianceNegative` separate from `red` so red can never drift into meaning "bad"
 - Added typography roles (`.tile-title`, `.kpi-number`, `.chart-axis-label`, `.narrative-caption`)
-  so US-005 references a role rather than restating "uppercase, 700, 0.04em"; `.kpi-number` carries
-  `tabular-nums` so animated digits do not jitter
-- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (96/96) and `pnpm build` all clean;
-  coverage 100% of `app/**`
+  so US-005 references a role rather than restating the type spec
+- All gates clean (96/96 tests); coverage 100% of `app/**`
 
 ### US-004: Self-hosted FCB crest (1 pt)
 **Completed:** 2026-09-09
@@ -95,23 +79,15 @@ surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`. No new-tile gold
 extension is wrong and the bytes were trusted instead. No image dependency was added.
 
 **What Was Done:**
-- Downloaded `https://fcb.ch/cdn/shop/files/logo.webp` and inspected it before committing anything:
-  `file` reports `PNG image data, 608 x 648, 8-bit/color RGBA`, so it is stored under its real
-  format as `public/fcb-crest.png`
-- Downsampled 608x648 → 120x128 with macOS `sips` (already on the machine), keeping the mark crisp
-  to 64px — 2x the 32px render size — and cutting 194,518 bytes to 17,908 (a 91% reduction)
-- Stripped every ancillary PNG chunk (including the XMP `iTXt` that `sips` re-attached, carrying the
-  source machine's `HostComputer` name), leaving only `IHDR`/`IDAT`/`IEND`
-- Added `app/components/chrome/crest.tsx` — `Crest` renders `/fcb-crest.png` with
-  `alt="FC Basel 1893"` and derives width from the asset's aspect ratio, so the app bar reserves the
-  right box and never shifts on decode
-- Rendered it top-left at 32px in a deliberately minimal `<header>` in `app/root.tsx`; the sidebar,
-  workspace label, avatar, connection status and Reset control are **US-012**, not this story
-- **Proved no CDN request survives:** `grep -rIa "fcb\.ch" build/` returns nothing, both bundles
-  carry the literal `"/fcb-crest.png"`, and the booted production server serves HTML in which every
-  `src`/`href` is root-relative — zero external hosts
-- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (106/106) and `pnpm build` all
-  clean; coverage 100% of `app/**`
+- Inspected the download before committing it: `file` reports `PNG image data, 608 x 648`, so it is
+  stored under its real format as `public/fcb-crest.png`, downsampled to 120x128 with macOS `sips`
+  (194,518 → 17,908 bytes) and stripped to `IHDR`/`IDAT`/`IEND` — no image dependency, no XMP block
+- Added `app/components/chrome/crest.tsx` — `Crest` renders `/fcb-crest.png` with an accessible name
+  and an aspect-ratio-derived width, placed top-left at 32px in a minimal `<header>`; the rest of
+  the shell is **US-012**
+- **Proved no CDN request survives:** nothing in `build/` matches `fcb.ch`, both bundles carry the
+  literal `"/fcb-crest.png"`, and the booted server's HTML is entirely root-relative
+- All gates clean (106/106 tests); coverage 100% of `app/**`
 
 ### US-005: Tile card anatomy (2 pts)
 **Completed:** 2026-09-09
@@ -242,6 +218,48 @@ definitive for the experience, and the tile has a period switch that must have d
 - Baseline fixture narrowed to its own four period keys so extending the shared enum could not
   silently demand invented figures from it
 - 45 tests added (273/273 green), coverage 100% statements / 98.4% branches of `app/**`; lint,
+  format, typecheck and build all clean
+
+### US-009: Hero 2 dataset - ticket revenue year on year (2 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 10 (2 new, 8 modified)
+**Tests Added:** 31 (unit: 31)
+**Commit:** see phase-1b progress log
+**Notes:** Delivered set intentionally **exceeds the written acceptance criteria**, per the user's
+approved decision: the month-by-month series (twelve points per season) is a Reference Guide
+addition the Build Specification never mentions, and the tile draws it. `scope.md` §10 makes the
+Reference Guide definitive for the experience.
+
+**What Was Done:**
+- Followed the US-007 four-step recipe: new `SeasonKey` and `MonthKey` enums with their label maps
+  in `enums.ts`, domain types and `Hero2Repository` in `types.ts`, derived figures in `derive.ts`,
+  fixtures and the in-memory implementation in `app/lib/mock/hero2.ts`, one line of selection in
+  `index.server.ts`
+- Eight home fixtures in CHF thousands, 25/26 against 26/27: YB 1,480 -> 1,610; FCZ 1,390 -> 1,240;
+  Servette 980 -> 1,050; St. Gallen 1,020 -> 1,090; Luzern 890 -> 820; Sion 760 -> 690;
+  GC 640 -> 720; Lugano 720 -> 610
+- **The two charts are at different scopes on purpose, and the data says so.** `scopeLabel` is a
+  field on each series - eight highest-grossing fixtures (7,880 -> 7,830) against all home fixtures
+  per month (9,880 -> 9,770), both excluding the season-ticket base. Tests assert the labels exist,
+  differ, and that the monthly total is the larger of the two, so the mismatch reads as scope rather
+  than as an arithmetic bug
+- **Nothing derivable is stored.** The Reference Guide's `totalPrev`, `totalCurr`, `deltaPct` and its
+  second `declines` list did not survive the port. Totals come from the same `seriesTotals` the
+  baseline band uses, so -50 / 7,880 = -0.63% displays as -0.6% under one rounding rule;
+  `fixtureDeclines` recovers FCZ -150, Lugano -110, Luzern -70, Sion -70 from the fixture pairs
+  (stable sort keeps Luzern before Sion) and `declineTotal` produces the tile's -CHF 400k badge
+- One hero object with `primary` and `followUp`; the follow-up carries only its narrative, because
+  its four fixtures *are* the primary's fixtures seen through `fixtureDeclines`
+- Both narratives are **verbatim**, extracted from the source and compared programmatically, then
+  pinned by exact text, exact length (229 / 338) and a printable-ASCII range check. The hygiene rule
+  banning "CHF" and comma-grouped digits from stored strings is scoped to the data strings, because
+  this hero's verbatim copy legitimately says "-CHF 150k" and "3,200"
+- `MONTH_LABEL` is pinned by test to the baseline band's `Intl`-derived month names, so the two
+  spellings of "Jul" cannot diverge
+- Guardrail held: fixtures are clubs, and a test asserts no squad name, salary or performance figure
+  appears anywhere in the dataset
+- 31 tests added (304/304 green), coverage 100% statements / 98.4% branches of `app/**`; lint,
   format, typecheck and build all clean
 
 ---
