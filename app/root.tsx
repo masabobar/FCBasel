@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
-import { Crest } from "./components/chrome/crest";
+import { AppShell } from "./components/chrome/app-shell";
 
 import "./app.css";
 
@@ -25,16 +25,14 @@ export function Layout({ children }: { children: ReactNode }) {
 
 export default function App() {
   return (
-    <>
-      {/*
-       * Minimal app bar — the crest only. The full shell (sidebar, workspace
-       * label, connection status, avatar, Reset) is US-012 in Phase 2a and
-       * grows from this header; do not build it here.
-       */}
-      <header className="flex h-14 items-center border-b border-border bg-bg px-4">
-        <Crest />
-      </header>
+    /*
+     * The routed page renders as grid items inside the shell's canvas, so a
+     * hero section inserted by US-014 joins the same grid as the baseline
+     * tiles instead of replacing the view. Reset's behaviour is US-015: it
+     * will own the dashboard state here and pass `onReset` down.
+     */
+    <AppShell>
       <Outlet />
-    </>
+    </AppShell>
   );
 }

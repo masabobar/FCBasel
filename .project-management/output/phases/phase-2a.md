@@ -1,8 +1,8 @@
 # Phase 2a: Dashboard Shell & Persona Baseline
 
 **Duration:** 2026-09-10 to 2026-09-11 (~8.1 AI-hours)
-**Status:** Planning
-**Started:** —
+**Status:** In Progress
+**Started:** 2026-09-09
 **Target Completion:** 2026-09-11
 **Actual Completion:** —
 
@@ -29,15 +29,15 @@ is asked.
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline (16 story points)
 
-**Priority:** P0 (US-016 is P1) · **Status:** Todo · **Dependencies:** US-003, US-004, US-005, US-007
+**Priority:** P0 (US-016 is P1) · **Status:** In Progress (1/5 completed) · **Dependencies:** US-003, US-004, US-005, US-007
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
-| US-012 | Branded application shell | 3 | P0 | 📋 Todo |
-| US-013 | Baseline dashboard — four pre-existing tiles | 3 | P0 | 📋 Todo |
+| US-012 | Branded application shell | 3 | P0 | ✅ Completed |
+| US-013 | Baseline dashboard — four pre-existing tiles | 3 | P0 | ⏸️ Deferred to Phase 2b run |
 | US-014 | Dynamic tile insertion & grid reflow | 3 | P0 | 📋 Todo |
 | US-015 | Reset to baseline | 2 | P0 | 📋 Todo |
-| US-016 | Hero band — webshop trend & attendance ring | 5 | **P1** | 📋 Todo |
+| US-016 | Hero band — webshop trend & attendance ring | 5 | **P1** | ⏸️ Deferred to Phase 2b run |
 
 **Technical Notes:**
 
@@ -77,9 +77,9 @@ is asked.
 - **Risk Level:** Medium — US-014's reflow behaviour is where visual polish is won or lost
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 0 / 16 (0%)
-- **Completed Stories:** 0 / 5
-- **Tests Passing:** 0 / 0 · **Coverage:** 0% · **Commits:** 0
+- **Completed Story Points:** 3 / 16 (19%)
+- **Completed Stories:** 1 / 5
+- **Tests Passing:** 475 / 475 · **Coverage:** 100% stmts / 98.9% branches (`app/**`) · **Commits:** 1
 
 ---
 
@@ -106,17 +106,53 @@ is asked.
 | Grid jumps instead of reflowing when tiles insert | High | Medium | Existing tiles animate to new positions; verified in US-043 polish | AI | Open |
 | Reset mid-flow leaves an orphaned timeout or animation | Medium | Medium | Reset clears the pending timeout ref; verified in US-042 and US-045 | AI | Open |
 | Cross-phase dependency stalls US-013 / US-016 | Medium | High | See sequencing note above — reorder within the phase rather than blocking | AI | Open |
-| Horizontal scroll appears at 1080p | High | Low | Responsive 12-column grid; verified in US-040 | AI | Open |
+| Horizontal scroll appears at 1080p | High | Low | Responsive 12-column grid; verified in US-040 | AI | Mitigated — US-012 shell measured in Chrome at 1920×1080, `scrollWidth === clientWidth` |
 
 ---
 
 ## Progress Log
 
-_Entries appear here as `/execute-work` completes stories._
+### 2026-09-09 — US-012 Branded application shell ✅ (3 pts)
+
+**Delivered:** the frame every state of SCREEN-001 lives in.
+- `app/components/chrome/sidebar.tsx` — navy sidebar, `Dashboard` active (`aria-current="page"`),
+  three inert placeholders. Hidden below `lg` so a narrow viewport gives the canvas full width.
+- `app/components/chrome/top-bar.tsx` — crest, workspace label, decorative connection status,
+  Reset, "SM" monogram.
+- `app/components/chrome/app-shell.tsx` — composition plus the responsive canvas grid
+  (12 → 8 → 4 columns). The grid is left **empty** for US-013/US-014.
+- `app/lib/persona.ts` — the role-not-a-person guardrail in one place.
+- `app/root.tsx` now mounts the shell around `<Outlet />`; `app/routes/_index.tsx` is reduced to the
+  screen's `h1` so the routed page renders as grid items on the canvas.
+
+**Inert items are inert structurally, not by handler:** plain `<span>` (no `href`, no `role`, no
+handler, no focus, `pointer-events-none`) with `aria-disabled="true"`. Measured in real Chrome:
+`tabIndex` -1 and `pointer-events: none` on all three; a synthesised `click` leaves the router
+location at `/`. A source guard fails the build if a `hover:` rule or a second route target appears
+in the file.
+
+**"Connected · 11 systems" is decorative** — static text, `data-decorative="true"`, no live region,
+and source assertions that the file contains no `fetch`, no `axios`, no `useEffect` and no timer, so
+it cannot be wired to a health check. **Reset renders but does nothing** beyond an injected
+callback; behaviour is US-015.
+
+**Verified in Chrome at 1920×1080:** `scrollWidth === clientWidth` (also at 1280, 900, 390); the
+sidebar disappears at 900 and the grid steps 12 → 8 → 4.
+
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 475/475 tests ✅ · build ✅ · coverage 100% stmts /
+98.9% branches. **Security triage:** no security-relevant changes detected — no endpoint, no raw
+SQL, no `dangerouslySetInnerHTML`, no user-supplied URL, no upload, no env var, no dependency
+change. All rendered text comes from module constants and is React-escaped.
+
+**Not built here, on purpose:** the four baseline tiles (US-013), tile insertion (US-014), reset
+behaviour (US-015), the hero band (US-016).
+
+**Next:** US-014 — dynamic tile insertion & grid reflow (3 pts). US-013 and US-016 stay deferred to
+the Phase 2b run; their component dependencies live there.
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** Planning
+**Phase Status:** In Progress (1/5 stories · 3/16 points)
 **Previous:** [Phase 1b](phase-1b.md) · **Next:** [Phase 2b — Components](phase-2b.md)

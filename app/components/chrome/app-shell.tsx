@@ -1,0 +1,76 @@
+import type { ReactNode } from "react";
+
+import { cn } from "../../lib/cn";
+import { Sidebar } from "./sidebar";
+import { TopBar } from "./top-bar";
+
+/**
+ * The branded application shell — the frame every state of the single screen
+ * lives in (`screen-map.md` SCREEN-001).
+ *
+ * Layout: the navy sidebar on the left, the app bar across the top of the
+ * remaining space, and below it the main canvas holding the tile grid.
+ *
+ * WHAT THIS FILE DOES NOT DO
+ * It owns no dashboard content. The canvas grid is deliberately left empty for
+ * US-013 (the four baseline tiles) and US-014 (hero sections inserted into
+ * this same grid — the dashboard grows, it never clears). Tiles are passed in
+ * as `children` and become grid items, so insertion is a change of children
+ * and never a change of frame.
+ *
+ * NO HORIZONTAL SCROLL AT 1920×1080 (`constraints.md` §3) is a structural
+ * property here rather than a media query: the sidebar is the only fixed-width
+ * box, everything beside it is `min-w-0 flex-1` so a wide child shrinks rather
+ * than pushing the page out, and the shell clips any overflow that survives
+ * that. Below `lg` the sidebar leaves entirely and the canvas takes the full
+ * viewport width.
+ */
+
+/**
+ * The canvas grid: 12 columns at `lg` and above, stepping down to 8 and then 4
+ * on narrower viewports. Column counts are multiples of 12's factors so a tile
+ * spanning 3, 4 or 6 columns still lands on a clean fraction at every step.
+ *
+ * Exported because US-013 and US-014 assert the tiles they insert sit in this
+ * container, and a test pins the 12-column class.
+ */
+export const CANVAS_GRID_CLASS =
+  "grid grid-cols-4 gap-grid-gap sm:grid-cols-8 lg:grid-cols-12";
+
+export interface AppShellProps {
+  /**
+   * Reset handler, forwarded to the app-bar control. Behaviour is US-015; the
+   * shell only renders the affordance.
+   */
+  onReset?: () => void;
+  /** Grid items for the main canvas — baseline tiles and hero sections. */
+  children?: ReactNode;
+  className?: string;
+}
+
+export function AppShell({ onReset, children, className }: AppShellProps) {
+  return (
+    <div
+      data-slot="app-shell"
+      className={cn(
+        "flex min-h-screen w-full overflow-x-hidden bg-surface",
+        className,
+      )}
+    >
+      <Sidebar />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TopBar onReset={onReset} />
+
+        <main
+          data-slot="canvas"
+          className="min-w-0 flex-1 overflow-x-hidden p-grid-gap"
+        >
+          <div data-slot="canvas-grid" className={CANVAS_GRID_CLASS}>
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

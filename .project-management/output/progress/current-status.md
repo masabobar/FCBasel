@@ -9,8 +9,8 @@
 
 **Project:** FC Basel — Intelligence Platform Prototype
 **Current Phase:** Phase 2a - Dashboard Shell & Persona Baseline
-**Overall Progress:** 21% (11/45 items completed)
-**Story Points Completed:** 24/116
+**Overall Progress:** 23% (12/45 items completed)
+**Story Points Completed:** 27/116
 
 ---
 
@@ -31,7 +31,7 @@
 
 ### Phase 2a: Dashboard Shell & Persona Baseline (Current)
 - **Status:** 🔄 Active
-- **Progress:** 0/5 stories · **Points:** 0/16
+- **Progress:** 1/5 stories · **Points:** 3/16 — US-013 and US-016 deferred to the Phase 2b run
 - **Epics:** Epic 4 (E4 Shell & Baseline)
 
 ### Phase 2b: Chart & Tile Component Library
@@ -72,7 +72,7 @@
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline
 - **Phase:** 2a · **Stories:** 5 (US-012 to US-016) · **Points:** 16
-- **Completed:** 0/5 · **Status:** Not Started
+- **Completed:** 1/5 · **Status:** 🔄 In Progress
 
 ### Epic 5: E6 — Chart & Tile Component Library
 - **Phase:** 2b · **Stories:** 11 (US-017 to US-027) · **Points:** 29
@@ -94,9 +94,9 @@
 
 ## Active Work
 
-**Currently In Progress:** None — Phase 1b complete (5/5)
+**Currently In Progress:** None — US-012 complete, Phase 2a at 1/5
 **Blocked Stories:** None
-**Next Up:** US-012 — Branded application shell, opening Phase 2a
+**Next Up:** US-014 — Dynamic tile insertion & grid reflow (3 pts)
 
 ---
 

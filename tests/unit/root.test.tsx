@@ -63,6 +63,24 @@ describe("App", () => {
     expect(screen.getByText("child route")).toBeInTheDocument();
   });
 
+  it("mounts the branded shell around the routed page", () => {
+    renderApp();
+
+    const shell = document.querySelector('[data-slot="app-shell"]');
+    expect(shell).toBeInTheDocument();
+    expect(document.querySelector('[data-slot="sidebar"]')).toBeInTheDocument();
+    expect(screen.getByRole("main")).toBeInTheDocument();
+  });
+
+  it("renders the routed page as a grid item on the canvas", () => {
+    renderApp();
+
+    // US-014 inserts hero sections as siblings here, so the dashboard grows
+    // inside the same grid instead of the view being replaced.
+    const grid = document.querySelector('[data-slot="canvas-grid"]')!;
+    expect(grid).toContainElement(screen.getByText("child route"));
+  });
+
   it("renders the crest as the first item of the app bar", () => {
     renderApp();
 
@@ -80,9 +98,11 @@ describe("App", () => {
     const appBar = screen.getByRole("banner");
     const page = screen.getByText("child route");
 
-    expect(container.firstElementChild).toBe(appBar);
-    expect(appBar.compareDocumentPosition(page)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
+    expect(container.firstElementChild).toBe(
+      document.querySelector('[data-slot="app-shell"]'),
     );
+    expect(
+      appBar.compareDocumentPosition(page) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

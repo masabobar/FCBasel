@@ -6,7 +6,7 @@ grow when a question is asked.
 **Duration:** Day 2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 16
-**Status:** Not Started (0/5 completed)
+**Status:** In Progress (1/5 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -16,7 +16,7 @@ grow when a question is asked.
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** Not Started (0/5 completed)
+**Status:** In Progress (1/5 completed)
 **Source:** Build Specification E4; Reference Implementation Guide §8.
 
 > The dashboard **never clears to show a hero — it grows.** That single behaviour is what makes the
@@ -28,7 +28,7 @@ grow when a question is asked.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Navy left sidebar, top app bar, and the main canvas holding a responsive tile grid.
   - **Acceptance Criteria:**
     - App bar shows the self-hosted crest, the workspace label "Sales & Marketing", and a generic
@@ -40,12 +40,20 @@ grow when a question is asked.
     - No horizontal scroll at 1920×1080
   - **Dependencies:** US-003, US-004, US-005
   - **Notes:** The inert items imply a fuller product without pretending to be one.
+  - **Completion note (2026-09-09):** All five criteria met. The shell lives in
+    `app/components/chrome/{sidebar,top-bar,app-shell}.tsx`; the persona label and monogram are
+    centralised in `app/lib/persona.ts` and a test asserts the app bar renders no text beyond those
+    role labels. The three placeholders are `<span aria-disabled="true">` — no href, no role, no
+    handler, no focus, `pointer-events-none` — proven non-focusable and click-inert in real Chrome.
+    The connection status is static and `data-decorative`; Reset renders but its behaviour is
+    US-015. Canvas grid is 12 columns at `lg`, 8 at `sm`, 4 below, and stays **empty** for
+    US-013/US-014. Measured `scrollWidth === clientWidth` at 1920×1080.
 
 - **US-013**: Baseline dashboard — four pre-existing tiles
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ⏸️ Deferred to the Phase 2b run
   - **Description:** On load the canvas shows a dashboard that already looks lived-in, not an empty
     canvas.
   - **Acceptance Criteria:**
@@ -56,7 +64,10 @@ grow when a question is asked.
       with a subtle hover lift
     - Top Products labels are **not truncated** — a fixed 150px label column so `Cap "Rotblau"` and
       `Home shirt 26/27` show in full
-  - **Dependencies:** US-007, US-012, US-021
+  - **Dependencies:** US-007, US-012, **US-017**, US-021
+  - **Status note (2026-09-09):** ⏸️ **Deferred to the Phase 2b run.** US-017 (KPI tile, for the
+    Webshop revenue and Last home match tiles) and US-021 (horizontal bars, for Top Products) both
+    live in Phase 2b. US-017 was missing from this dependency list and has been added.
   - **Notes:** Partner logos are placeholders until licensed.
 
 - **US-014**: Dynamic tile insertion & grid reflow
@@ -95,7 +106,7 @@ grow when a question is asked.
   - **Story Points:** 5
   - **Priority:** P1
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ⏸️ Deferred to the Phase 2b run
   - **Description:** The navy greeting band above the baseline row: a persona greeting, a period
     filter, the webshop line chart, and the attendance ring.
   - **Acceptance Criteria:**
@@ -110,6 +121,8 @@ grow when a question is asked.
       ring sweeps to the new value
     - Webshop total and its delta are **computed** from the series, never stored separately
   - **Dependencies:** US-007, US-025, US-026, US-027
+  - **Status note (2026-09-09):** ⏸️ **Deferred to the Phase 2b run** — US-025 (line chart),
+    US-026 (segmented filter) and US-027 (motion hooks) all live in Phase 2b.
   - **Notes:** A Reference Guide addition beyond the Build Specification, added at the lead owner's
     direction. P1 because the three heroes are the demo's core; this is the frame around them.
 
@@ -121,7 +134,7 @@ grow when a question is asked.
 
 **By Priority:** P0: 4 stories, 11 points · P1: 1 story, 5 points · P2: 0
 
-**By Status:** ✅ 0 · 🔄 0 · 📋 5 stories, 16 points · ⏸️ 0
+**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 2 stories, 8 points (US-013, US-016 — dependencies live in Phase 2b)
 
 ---
 

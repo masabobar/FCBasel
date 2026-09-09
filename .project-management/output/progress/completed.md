@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 11 stories
-**Total Points:** 24 / 116
+**Total Completed:** 12 stories
+**Total Points:** 27 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 24 points/day
+**Average Velocity:** 27 points/day
 **Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
 
 ---
@@ -150,13 +150,11 @@ the experience, `scope.md` §10) drives all four.
 - **Totals and deltas are computed, never stored** — `seriesTotals` sums the same arrays the chart
   plots, so the headline figure cannot disagree with its own chart. The two long periods derive their
   x-axis labels from the current date through an injectable `Clock`, so the demo never looks stale
-- Store-once proved by test: last month's revenue series *is* this month's comparison series, and the
-  monthly points for the last three months are the weekly sums. Partner brand colours are documented
-  and tested as brand colours, not design tokens, and typed as plain strings so they cannot be
-  mistaken for a `ColorToken`
+- Store-once proved by test: last month's revenue series *is* this month's comparison series. Partner
+  brand colours are tested as brand colours, not design tokens, and typed as plain strings
 - The four Specification-pinned figures asserted exactly: CHF 148,200 at +11.9% (+12% rounded),
-  FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners
-- 47 tests added (228/228 green), coverage 100% stmts / 98% branches of `app/**`; all gates clean
+  FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners (47 tests, 228/228
+  green; coverage 100% stmts / 98% branches; all gates clean)
 
 ### US-008: Hero 1 dataset - shirt sales, badges, printed names (2 pts)
 **Completed:** 2026-09-09
@@ -179,18 +177,15 @@ definitive for the experience, and the tile has a period switch that must have d
   = 58.18% (displays 58%), the badge share is 3,080 / 38,500 = exactly 8%, and the four sponsor
   segments come from `badgeSegments`. The Reference Guide's stored `homeShare: 58` deliberately did
   not survive the port - a stored 58 can outlive an edit to the units beneath it
-- `badgeSegments(total, split)` corrects its rounding remainder into the first segment (Bitpanda,
-  the largest share). Proved by an exhaustive sweep: the four segments sum *exactly* to the total for
-  every total from 0 to 2,000, for all four period totals, and at adversarial values (0, 1, 7,
-  primes). Season-to-date arithmetic asserted: 22,400 + 10,300 + 5,800 = 38,500 shirts;
-  CHF 2,217,600 / 1,019,700 / 574,200 = CHF 3,811,500 (~3.81M); badge split 44/24/20/12 = 100
-- Both narratives are **verbatim**, verified byte-for-byte against the source by SHA-256, and pinned
-  by exact text and length so a later "improvement" fails the suite
+- `badgeSegments(total, split)` corrects its rounding remainder into the first segment, proved by an
+  exhaustive sweep: the four segments sum *exactly* to the total for every total 0-2,000, all four
+  period totals and adversarial primes. Arithmetic asserted: 22,400 + 10,300 + 5,800 = 38,500
+  shirts; CHF 3,811,500 (~3.81M); badge split 44/24/20/12 = 100
+- Both narratives **verbatim**, verified by SHA-256 and pinned by exact text and length
 - Guardrail held: squad names appear only as printed-name counts, and a test asserts no salary,
-  goals, assists, appearances, minutes or rating value exists anywhere in the dataset. The baseline
-  fixture was narrowed to its own four period keys so extending the shared enum could not silently
-  demand invented figures from it
-- 45 tests added (273/273 green), coverage 100% stmts / 98.4% branches of `app/**`; all gates clean
+  goals, assists, appearances, minutes or rating value exists anywhere. The baseline fixture was
+  narrowed to its own period keys so extending the shared enum could not demand invented figures
+  (45 tests, 273/273 green; coverage 100% stmts / 98.4% branches; all gates clean)
 
 ### US-009: Hero 2 dataset - ticket revenue year on year (2 pts)
 **Completed:** 2026-09-09
@@ -220,16 +215,11 @@ Reference Guide definitive for the experience.
   (stable sort keeps Luzern before Sion) and `declineTotal` produces the tile's -CHF 400k badge
 - One hero object with `primary` and `followUp`; the follow-up carries only its narrative, because
   its four fixtures *are* the primary's fixtures seen through `fixtureDeclines`
-- Both narratives are **verbatim**, extracted from the source and compared programmatically, then
-  pinned by exact text, exact length (229 / 338) and a printable-ASCII range check. The hygiene rule
-  banning "CHF" and comma-grouped digits from stored strings is scoped to the data strings, because
-  this hero's verbatim copy legitimately says "-CHF 150k" and "3,200"
-- `MONTH_LABEL` is pinned by test to the baseline band's `Intl`-derived month names, so the two
+- Both narratives **verbatim**, pinned by exact text, exact length (229 / 338) and an ASCII range
+  check. `MONTH_LABEL` is pinned to the baseline band's `Intl`-derived month names, so the two
   spellings of "Jul" cannot diverge
 - Guardrail held: fixtures are clubs, and a test asserts no squad name, salary or performance figure
-  appears anywhere in the dataset
-- 31 tests added (304/304 green), coverage 100% statements / 98.4% branches of `app/**`; lint,
-  format, typecheck and build all clean
+  appears anywhere in the dataset (31 tests, 304/304 green; all gates clean)
 
 ---
 
@@ -250,17 +240,14 @@ Reference Guide definitive for the experience.
   Sponsoring's +840 is `FAVOURABLE`; a test proves a naive "variance > 0" rule misreads one row
 - **The flag is derived, not stored** - the Guide's `flag: true` did not survive the port, and
   `departmentsNeedingAttention` finds exactly one row both over budget *and* behind target
-- **Totals and variances derived:** `totalBudget` / `totalActual` not ported; `departmentTotals`
-  gives 69,000 -> 69,680, +680, +0.99% shown as +1.0% through the same `percentChange` the baseline
-  uses (one `oneDecimal` rule), and the narrative's -7.7% / +12.1% with it. The one stored figure is
-  `blendedTargetPercent: 96` - a measured attainment no arithmetic over the rows gives (97.0 / 99.7)
+- **Totals and variances derived:** `departmentTotals` gives 69,000 -> 69,680, +680, +1.0% through
+  the same `percentChange` (one `oneDecimal` rule). The one stored figure is
+  `blendedTargetPercent: 96` - a measured attainment no arithmetic over the rows gives
 - **The follow-up reconciles with the table:** activations 240 + paid social 150 + agency retainer
-  20 = 410, exactly Marketing's derived variance (the retainer is a Guide addition, per the approved
-  scope decision). Conversion 2.2% vs 2.6% derives 84.6% attainment, -0.4 *points*, -15.4% relative
+  20 = 410, exactly Marketing's derived variance. Conversion 2.2% vs 2.6% derives 84.6% attainment
 - **Scope label is data**, as in US-009: Ticketing's 24,360 exceeds Hero 2's 7,830 because it
-  includes the season-ticket base. Both narratives **verbatim** (checked against `DATA.hero3`:
-  identical, 270 / 468 chars, ASCII), pinned by text, length and range. Guardrail held on the
-  dataset closest to the line: departments, never people - no salary, headcount or named individual
+  includes the season-ticket base. Both narratives **verbatim**, pinned by text, length and range.
+  Guardrail held: departments, never people - no salary, headcount or named individual
 
 ### US-011: Formatters & cross-hero reconciliation (2 pts)
 **Completed:** 2026-09-09
@@ -271,29 +258,42 @@ Reference Guide definitive for the experience.
 **Notes:** **Closes Phase 1b** (5/5 stories, 10/10 points). No drift found in any dataset.
 
 **What Was Done:**
-- `app/lib/format.ts` - the one place a number becomes a string. Money always carries `CHF` and there
-  is deliberately no bare-amount variant; the **sign goes before the unit** (`-CHF 400k`); millions
-  render bare (`69.68`) under the "figures in CHF millions" subtitle, with no "000" note anywhere
-- **Locale decided deliberately:** `Intl.NumberFormat("en-CH")` per the Reference Guide, which groups
-  with the Swiss U+2019 mark (`CHF 3'811'500`). Pinned as a constant and made **independent of the
-  runtime's ICU** - whatever separator ICU produced is rewritten to the pinned one, proved by tests
-  that stub `Intl` to `en-US` and `de-DE`
-- **One rounding rule:** `oneDecimal` was made public in `derive.ts` and imported, never restated;
-  `chfFromThousands` is the only factor of 1000 in the app. Variance carries its meaning through sign
-  plus a new `VarianceDirection` enum (UP / DOWN / FLAT + label map), never colour; tabular numerals
-  stay in the token layer and a test reads that declaration back out of `app/app.css`
-- `tests/unit/reconciliation.test.ts` (39 tests) asserts **relationships, not constants**: 22,400 +
-  10,300 + 5,800 = 38,500 with the Home share 58.18% -> 58% and the badge exactly 8.00%; segments
-  summing to their period total in all four periods; 38,500 x CHF 99 = CHF 3,811,500 split
-  2.218/1.020/0.574M; 7,880 -> 7,830 = -50 -> -0.6% with declines 150+110+70+70 = 400 and monthly
-  totals larger *on purpose*; 69,000 -> 69,680 = +680 -> +1.0%, Merchandising -7.65% -> "7.7% under",
-  Marketing +12.06% -> "12% over" and the one department both over budget *and* behind target, its
-  drivers 240+150+20 = 410 = its variance
-- **Cross-hero:** Ticketing 24,360 legitimately exceeds Hero 2's 7,830, asserted as an intended
-  inequality with both scope labels checked; Hero 1's shirt revenue asserted *inside* Hero 3's
-  Fanshop actual. **Store-once asserted structurally** (each hero's stored key set is pinned), and
-  every number in all six narratives swept against the reachable data, with two documented
-  exceptions ("3,200 fewer seats", "18%")
+- `app/lib/format.ts` - the one place a number becomes a string. Money always carries `CHF`, the
+  **sign goes before the unit** (`-CHF 400k`), millions render bare under the "figures in CHF
+  millions" subtitle. `Intl.NumberFormat("en-CH")` (Swiss U+2019 mark) pinned as a constant and made
+  **independent of the runtime's ICU**, proved by tests that stub `Intl` to `en-US` and `de-DE`
+- **One rounding rule:** `oneDecimal` imported from `derive.ts`, never restated; `chfFromThousands`
+  is the only factor of 1000. Variance carries meaning through sign plus a `VarianceDirection` enum,
+  never colour
+- `tests/unit/reconciliation.test.ts` (39 tests) asserts **relationships, not constants** - every
+  split against its total in all four periods, every derived delta, the one department both over
+  budget and behind target with its drivers summing to its variance, the intended cross-hero
+  inequality (Ticketing 24,360 > 7,830, both scope-labelled), store-once pinned structurally, and
+  every number in all six narratives swept against the reachable data. **No drift found**
+
+### US-012: Branded application shell (3 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 7 code (4 new, 3 modified) + 5 test files + 6 tracking docs
+**Tests Added:** 57 net (unit: 57) - 475/475 green, 100% stmts / 98.9% branches of `app/**`
+**Commit:** see phase-2a progress log
+**Notes:** Scope held to the frame. Baseline tiles (US-013), insertion (US-014), reset behaviour
+(US-015) and the hero band (US-016) deliberately not built - the canvas is left empty for them.
+
+**What Was Done:**
+- `chrome/{sidebar,top-bar,app-shell}.tsx` + `lib/persona.ts`: navy sidebar (hidden below `lg`), app
+  bar with the self-hosted crest, "Sales & Marketing", decorative status and Reset, and a 12/8/4
+  column canvas grid. No literal colour anywhere - tests pin that, as they do for the card
+- **Persona is a role:** the label and the "SM" monogram live in one module, and a test asserts the
+  app bar's entire text is exactly those labels, so a personal name cannot slip in. No photo either:
+  the crest is the only `<img>` in the shell
+- **Placeholders inert structurally, not by handler:** `<span aria-disabled="true">` with no href, no
+  role, no handler, no focus and `pointer-events-none`. Measured in real Chrome - `tabIndex` -1,
+  `pointer-events: none`, and a synthesised click leaves the router at `/`. A source guard bans a
+  `hover:` rule and a second route target in the file
+- **Status is decorative:** static text, `data-decorative`, no live region, plus source assertions
+  that the file holds no `fetch`, `axios`, `useEffect` or timer - it cannot become a health check
+- 1920x1080 measured in Chrome: `scrollWidth === clientWidth` (also at 1280 / 900 / 390)
 
 ---
 

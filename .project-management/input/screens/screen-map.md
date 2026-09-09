@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(never — hand-curated at init; run `/screen-map` once stories complete)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-012 — the shell regions are now built)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -44,7 +44,7 @@ The three inert items are deliberate: they imply a fuller product without preten
 | **Path** | `/` (single route) |
 | **Auth** | Public — no authentication model exists in the prototype |
 | **Stories** | US-012, US-013, US-014, US-015, US-016, US-028 to US-039 |
-| **Status** | *(generated)* Not Started (0/17 completed) |
+| **Status** | *(generated)* In Progress (1/17 completed — US-012 shell built; canvas still empty) |
 
 **Description:** The persona's dashboard. On arrival it already looks lived-in — four baseline tiles,
 not an empty canvas. The user types a business question or taps a suggestion chip; after a staged
@@ -64,30 +64,35 @@ first. A follow-up sharpens that section from *what happened* to *why, and what 
 The single screen has five distinct states. They are states, not screens — no navigation occurs
 between them, and all of them share the same grid.
 
-| State | When | Built by |
-|---|---|---|
-| **Baseline** | On load, and after Reset | US-013 |
-| **Empty prompt** | Before any question is asked — light branded-red panel with heading and subtext | US-032 |
-| **Thinking** | During the fixed staged delay after a confident match | US-031 |
-| **Grown** | One or more hero sections inserted, in the order asked | US-014, US-034 to US-039 |
-| **Fallback** | Typed input matched nothing — re-surfaces the prepared questions | US-032 |
+| State | When | Built by | Status |
+|---|---|---|---|
+| **Baseline** | On load, and after Reset | US-013 | ⏸️ Deferred to the Phase 2b run — the shell renders the frame with an empty canvas until then |
+| **Empty prompt** | Before any question is asked — light branded-red panel with heading and subtext | US-032 | 📋 Not started |
+| **Thinking** | During the fixed staged delay after a confident match | US-031 | 📋 Not started |
+| **Grown** | One or more hero sections inserted, in the order asked | US-014, US-034 to US-039 | 📋 Next (US-014) |
+| **Fallback** | Typed input matched nothing — re-surfaces the prepared questions | US-032 | 📋 Not started |
 
 **Persistent chrome across every state:** navy sidebar, top app bar (crest, "Sales & Marketing", "SM"
 avatar, connection status, Reset), hero band, and the prompt bar with its suggestion chips.
+The sidebar and app bar halves of that chrome ship as of US-012; the hero band and prompt bar do not.
 
 ---
 
 ## 2.2 Regions of SCREEN-001
 
-| Region | Contents | Stories |
-|---|---|---|
-| Sidebar | Dashboard (active) + three inert items | US-012 |
-| Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 |
-| Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 |
-| Baseline row | Top Products (own period filter), Active Partners | US-013 |
-| Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 |
-| Transient panels | Thinking, Fallback, empty state | US-031, US-032 |
-| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 |
+| Region | Contents | Stories | Status |
+|---|---|---|---|
+| Sidebar | Dashboard (active) + three inert items | US-012 | ✅ Built — `app/components/chrome/sidebar.tsx`; hides below `lg` |
+| Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 | ✅ Built — `app/components/chrome/top-bar.tsx`; Reset control renders, behaviour pending US-015 |
+| Canvas grid | The 12-column container every tile and section is inserted into | US-012 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. Intentionally **empty** |
+| Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 | ⏸️ Deferred to the Phase 2b run |
+| Baseline row | Top Products (own period filter), Active Partners | US-013 | ⏸️ Deferred to the Phase 2b run |
+| Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 | 📋 Next (US-014) |
+| Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
+| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started |
+
+> The **canvas grid** row is new in 1.1.0. It was implicit before — US-012 made it a real region
+> with its own component, and US-013/US-014 both insert into it rather than owning a grid each.
 
 ---
 
@@ -97,14 +102,18 @@ avatar, connection status, Reset), hero band, and the prompt bar with its sugges
 
 ---
 
-## 4. Drift Report (last `/screen-map` run)
-
-> Auto-populated by `/screen-map`. Not yet run — no stories are complete.
+## 4. Drift Report (hand-checked 2026-09-09, after US-012)
 
 - **Stories referencing screens not in this map:** *(none)*
 - **Screen entries with no backing story (orphans):** *(none)*
 - **Navigation nodes missing a registry entry (or vice versa):** *(none — the three inert sidebar
   items are intentionally not registry entries; they are not screens)*
+- **Routes added by US-012:** *(none)*. The shell added no route: `/` remains the only entry in
+  `app/routes.ts`, and the three inert items are `<span>` elements with no href and no handler —
+  proven non-focusable and click-inert by test. The navigation hierarchy above is unchanged.
+- **API endpoint columns:** still empty, as designed. The prototype has no API, so this is not
+  drift (`constraints.md` §2). US-012 makes no network call at runtime, and the app-bar tests assert
+  the absence of `fetch`, `axios` and any timer.
 
 ---
 

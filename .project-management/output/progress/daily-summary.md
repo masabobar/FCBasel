@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 11 — **Phase 1a and Phase 1b both complete**
-**Story Points:** 24
-**Time Worked:** ~7.0 hours
-**Files Changed:** 96
-**Tests Added:** 418
+**Stories Completed:** 12 — **Phase 1a and Phase 1b complete; Phase 2a started**
+**Story Points:** 27
+**Time Worked:** ~7.6 hours
+**Files Changed:** 108
+**Tests Added:** 475
 
 ---
 
@@ -186,6 +186,27 @@
   **No drift was found in any dataset.** 70 tests added (418/418 green), coverage 100% statements /
   98.9% branches of `app/**`, and lint / format / typecheck / build all clean.
 
+- **US-012 — Branded application shell.** `app/components/chrome/{sidebar,top-bar,app-shell}.tsx`
+  plus `app/lib/persona.ts`: the navy sidebar (hidden below `lg`), the app bar carrying the
+  US-004 crest, the workspace label, a decorative connection status and Reset, and a responsive
+  canvas grid that steps 12 → 8 → 4 columns. `app/root.tsx` now mounts the shell around
+  `<Outlet />` and `app/routes/_index.tsx` shrinks to the screen's `h1`, so the routed page renders
+  as grid items and a hero inserted later joins the same grid. The canvas is deliberately **empty** —
+  the four baseline tiles are US-013, insertion is US-014.
+  Three things were made structural rather than trusted. **The persona is a role:** the label and
+  the "SM" monogram live in one module and a test asserts the app bar renders no text beyond those
+  labels, so a personal name cannot be introduced by accident; the crest is the only `<img>`.
+  **The placeholder items are inert by construction:** plain `<span aria-disabled="true">` with no
+  href, no role, no handler, no focus and `pointer-events-none` — Chrome reports `tabIndex` -1 and
+  `pointer-events: none` on all three, and a synthesised click leaves the router at `/`; a source
+  guard fails the suite if a `hover:` rule or a second route target ever appears in the file.
+  **The connection status is decorative:** static text, `data-decorative`, no live region, and
+  source assertions that the file holds no `fetch`, `axios`, `useEffect` or timer, so nobody can
+  quietly wire it to a health check. Reset renders but its behaviour stays US-015.
+  Verified in Chrome at 1920×1080 (and 1280 / 900 / 390): no horizontal scroll, the sidebar leaves
+  at 900, the grid steps down as designed. 475/475 tests green, coverage 100% stmts / 98.9%
+  branches of `app/**`, all five gates clean. Security triage: no security-relevant changes.
+
 ---
 
 ## Stories Completed Today
@@ -217,6 +238,10 @@
 - ✅ US-011 — Formatters & cross-hero reconciliation (2 pts) — all 6 acceptance criteria met; one
   shared display layer, one rounding rule, and a reconciliation suite that found **no drift**.
   **Phase 1b closes here: 5/5 stories, 10/10 points.**
+- ✅ US-012 — Branded application shell (3 pts) — all 5 acceptance criteria met, and the two easy
+  ones to fake were measured in a real browser rather than asserted: the placeholder nav items come
+  back `tabIndex` -1 with `pointer-events: none`, and the page reports
+  `scrollWidth === clientWidth` at 1920×1080. **Phase 2a opens here: 1/5 stories, 3/16 points.**
 
 ---
 
@@ -237,9 +262,12 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 2a — shell and baseline (16 pts). US-012 (branded application shell) starts it: the app
-  chrome around the crest that US-004 already ships, then the baseline dashboard that reads the
-  US-007 datasets through the repository seam and renders them with the US-011 formatters
+- Phase 2a continues from the shell (3/16 pts done). **US-014 — dynamic tile insertion & grid
+  reflow** is next: in-memory tile descriptors appended into the shell's existing canvas grid, hero
+  dedupe by id, and the US-006 reflow wrapper so the dashboard *grows* instead of clearing.
+  US-015 (reset behaviour, wiring the control the shell already renders) follows it
+- **US-013 and US-016 stay deferred to the Phase 2b run** — US-013 needs US-017 and US-021,
+  US-016 needs US-025/026/027, and all five live in Phase 2b
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -254,8 +282,11 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phases 1a and 1b are both complete (24/116 points); continue with
-  `/holycode-pm:execute-work story US-012`.
+- Phases 1a and 1b are complete and Phase 2a has started (27/116 points); continue with
+  `/holycode-pm:execute-work story US-014`.
+- The shell keeps two guardrails as *tests*, not comments: the app bar's whole text must equal the
+  known role labels (so no personal name can appear), and the connection status file must contain no
+  `fetch`, `axios`, `useEffect` or timer (so it cannot become a live health check).
 
 ---
 

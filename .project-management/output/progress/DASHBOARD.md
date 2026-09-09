@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2a - Shell & Baseline *(0/5 stories started)* · Phase 1b complete
+**Current Phase:** Phase 2a - Shell & Baseline *(1/5 stories complete)* · Phase 1b complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 21% | 100% | 🟢 On Track |
+| **Overall Progress** | 23% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 11/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 24/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 12/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 27/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 11
-**Currently Working On:** None — Phase 1b complete
-**Story Points Completed Today:** 24
+**Stories Completed Today:** 12
+**Currently Working On:** US-014 — Dynamic tile insertion & grid reflow (3 pts)
+**Story Points Completed Today:** 27
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -95,6 +95,16 @@
   inequality (Ticketing 24,360 > 7,830, both scope-labelled), and every number in all six narratives
   swept against the figures the data can actually produce. **No drift found.**
 
+- ✅ **US-012 — Branded application shell (3 pts)** — the frame Phase 2a builds on: navy sidebar, top
+  app bar, and an empty 12-column canvas left for US-013/US-014 to populate. The persona is a *role*
+  — `app/lib/persona.ts` holds the workspace label and the "SM" monogram, and a test asserts the app
+  bar's entire text is accounted for by those labels, so a personal name cannot be added by accident.
+  The three placeholder nav items are inert **structurally**, not by handler: plain `<span>`s with
+  `aria-disabled`, no href, no focus, `pointer-events-none`. Verified in real Chrome — `tabIndex` -1,
+  `pointer-events: none`, and `scrollWidth === clientWidth` at 1920×1080. "Connected · 11 systems" is
+  static and marked `data-decorative`; tests pin the absence of `fetch`, a live region and any timer,
+  so nobody can wire it to a health check. Reset renders here; its behaviour stays US-015.
+
 ---
 
 ## 🏁 Phase 1b complete — Seed Data
@@ -108,12 +118,13 @@ grounded in verified FCB facts. Closed at 100% on 2026-09-09, as did **Phase 1a*
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| Phase 2a: US-012 — Branded application shell | 📋 Next | 0% |
+| Phase 2a: US-014 — Dynamic tile insertion & grid reflow | 📋 Next | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-012: Branded application shell | 2026-09-09 | 3 |
 | US-011: Formatters & cross-hero reconciliation | 2026-09-09 | 2 |
 | US-010: Hero 3 dataset — departmental performance | 2026-09-09 | 2 |
 | US-009: Hero 2 dataset — ticket revenue year on year | 2026-09-09 | 2 |
@@ -157,7 +168,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 100% stmts / 98.9% branches | 80% | 🟢 Good |
-| Passing Tests | 418/418 | TBD | 🟢 Good |
+| Passing Tests | 475/475 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -189,7 +200,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 |-------|--------|---------|--------|----------|
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
-| Phase 2a: Shell & Baseline | 🔄 Active | 0/5 | 0/16 | 0% |
+| Phase 2a: Shell & Baseline | 🔄 Active | 1/5 | 3/16 | 19% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
@@ -212,4 +223,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-011 completed at 2026-09-09 — Phase 1b complete, Phase 2a active
+**Last Auto-Update:** US-012 completed at 2026-09-09 — Phase 2a active (1/5), US-014 next
