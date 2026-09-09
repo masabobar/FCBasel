@@ -7,11 +7,12 @@
 
 ## Week Summary
 
-**Stories Completed:** 14
-**Story Points:** 32/116 (28%)
-**Current Phase:** Phase 2a - Shell & Baseline, **partial at 3/5 stories / 8/16 points**
-*(Phases 1a and 1b both completed 2026-09-09; US-013 and US-016 deferred to the Phase 2b run)*
-**Team Velocity:** 32 pts/day (one day of data — not yet a trend)
+**Stories Completed:** 27
+**Story Points:** 69/116 (60%)
+**Current Phase:** Phase 3a - Conversation, **not started**
+*(Phases 1a, 1b, 2a and 2b all completed 2026-09-09 — 2a closed by US-016, 2b by US-024 at 11/11 ·
+29/29; US-013 and US-016 were built inside the Phase 2b run)*
+**Team Velocity:** 69 pts/day (one day of data — not yet a trend)
 
 ---
 
@@ -60,8 +61,22 @@
   in a just-cleared dashboard — and is abuse-proof by construction: ten presses in one frame run
   one view transition. **Two of its five criteria are honestly a seam:** the suggestion chips are
   US-029 and the thinking beat is US-031, and nothing was invented to make them look done.
-- **⏸️ US-013 and US-016 are deferred to the Phase 2b run**, not dropped: US-013 needs US-017 +
-  US-021 and US-016 needs US-025/026/027, all of which live in Phase 2b. Phase 2a stays open.
+- **✅ US-013 and US-016 were deferred to the Phase 2b run and finished there**, on the day their
+  cross-phase dependencies landed (US-017 + US-021 for the baseline row; US-025/026/027 for the hero
+  band), with no rework — **Phase 2a closed 5/5 · 16/16.**
+
+**✅ Phase 2b — Chart & Tile Component Library, complete (11/11 stories, 29/29 points):**
+
+- The reusable kit the heroes are assembled from, built once each and shared: `Card`-based tiles
+  (KPI, vertical / grouped / horizontal bar, donut, department table, driver), the line chart, the
+  segmented period control, the four motion hooks — and **US-024's recommendation panel and shared
+  AI narrative strip, the two elements that carry the insight beat.**
+- Three rules held across the phase and are enforced by tests rather than by review: **no per-hero
+  copy** (a source scan rejects a second bar row, a second caption element, a second line chart),
+  **colour is never the sole signal** (variance always carries a sign, an arrow and an `sr-only`
+  word), and **reduced motion renders the final state** rather than switching animation off.
+- US-024 also fixed the contract Phase 3b depends on: **pre-authored copy renders verbatim**,
+  asserted byte for byte, and the narrative is stated **before** the charts, asserted as DOM order.
 
 **Non-story work completed 2026-09-09:**
 - HolyCode PM framework bootstrapped into the project
@@ -85,7 +100,12 @@
 - Requirements extraction and project initialization
 - **Phase 1a delivered end to end:** US-001, US-002, US-003, US-004, US-005, US-006 (14 pts)
 - **Phase 1b delivered end to end:** US-007, US-008, US-009, US-010, US-011 (10 pts)
-- **Phase 2a started:** US-012, US-014, US-015 (8 pts) — partial, 3/5 stories
+- **Phase 2a delivered end to end:** US-012, US-014, US-015, plus US-013 and US-016 inside the
+  Phase 2b run (16 pts) — closed 5/5
+- **Phase 2b delivered end to end:** US-027, US-017, US-021, US-025, US-026, US-018, US-019,
+  US-020, US-022, US-023, US-024 (29 pts) — closed 11/11. The whole component library exists:
+  seven tile kinds, four chart geometries, the segmented control, the motion hooks and — with
+  US-024 — the recommendation panel and the shared AI narrative strip
 
 ### Thursday, 2026-09-10
 - (To be logged)
@@ -97,16 +117,16 @@
 
 ## Velocity Trend
 
-**This Week:** 32 pts
+**This Week:** 69 pts
 **Last Week:** N/A
-**Average:** 32 pts/day (1 day)
+**Average:** 69 pts/day (1 day)
 **Trend:** N/A (insufficient data)
 
 > Phase 1a landed 14 points in ~4.2 AI hours against a ~5.8 AI-core-hour estimate; Phase 1b landed
-> 10 points in ~2.8 AI hours against ~4.5. Phase 2a's three buildable stories landed 8 points in
-> ~1.9 AI hours against a ~8.1 AI-core-hour estimate for all five. Across all three phases: 32
-> points in ~8.9 AI hours, `actual_factor ≈ 0.19` against the planned 0.25 — still running ahead,
-> and the first non-foundation phase held the factor.
+> 10 points in ~2.8 AI hours against ~4.5; Phase 2a's 16 in ~4.6 against ~8.1; and Phase 2b's 29 in
+> ~6.4 against ~12.0. Across the four closed phases: 69 points in ~18.0 AI hours,
+> `actual_factor ≈ 0.19` against the planned 0.25 — still running ahead, and the largest and most
+> repetitive phase held the factor rather than eroding it.
 
 ---
 
@@ -116,9 +136,11 @@
 
 **Planned Stories:**
 1. Phases 1a + 1b — foundations and seed data (24 pts): **complete**
-2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts): 2a **partial** (8/16);
-   Phase 2b is next and closes US-013 + US-016 inside that run
-3. Phases 3a + 3b — conversation engine and the three hero flows (33 pts)
+2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts): **complete** (2a 5/5,
+   2b 11/11)
+3. Phases 3a + 3b — conversation engine and the three hero flows (33 pts): **next**, starting with
+   US-028's prompt bar; 3b is composition only, and US-024 fixed the verbatim contract its
+   narratives depend on
 4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts)
 
 **Stretch Goal:**

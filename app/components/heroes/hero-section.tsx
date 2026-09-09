@@ -7,7 +7,7 @@ import {
 } from "../../lib/dashboard/sections";
 import { scrollRevealedIntoView, viewTransitionName } from "../../lib/motion";
 import { type HeroId } from "../../lib/repositories/enums";
-import { Card } from "../tiles/card";
+import { Card, CardCaption } from "../tiles/card";
 
 /**
  * One answered question, as a self-contained insight section on the canvas.
@@ -130,9 +130,19 @@ function HeroSectionBody({
  * The head of a section: its label, then its narrative.
  *
  * NARRATIVE FIRST is a product rule, not a layout preference — the answer is
- * stated in words before any chart is offered as evidence. The label is a real
- * `h2` so a dashboard that grows section by section stays walkable by heading;
- * the tiles inside each carry an `h3` (`Card`'s default).
+ * stated in words before any chart is offered as evidence (US-024, criterion
+ * 3; Reference Guide §11.6). The head is the FIRST child of the section and
+ * the tiles follow it, so DOM order and reading order are the same order; a
+ * test in `tests/unit/recommendation-panel.test.tsx` asserts the narrative
+ * precedes every chart and every card inside a section.
+ *
+ * The label is a real `h2` so a dashboard that grows section by section stays
+ * walkable by heading; the tiles inside each carry an `h3` (`Card`'s default).
+ *
+ * THE NARRATIVE LINE IS US-005'S CAPTION STRIP, widened by its `section`
+ * variant — the AI glyph, the escaping and the accessibility treatment are
+ * defined once in `card.tsx` rather than twice. It wraps and is never
+ * truncated: Phase 3b's narratives are verbatim, several-sentence strings.
  *
  * No font-size utility on the narrative on purpose: `body` already sets
  * `--text-body`, and a `text-body` class would sit in the same `tailwind-merge`
@@ -152,9 +162,9 @@ export function SectionHead({
       <h2 id={id} className="tile-title">
         {label}
       </h2>
-      <p data-slot="section-narrative" className="mt-1.5 text-muted">
+      <CardCaption variant="section" className="mt-1.5">
         {narrative}
-      </p>
+      </CardCaption>
     </div>
   );
 }

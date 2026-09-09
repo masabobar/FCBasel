@@ -77,37 +77,88 @@ export const TILE_ENTER_CLASS = MOTION_CLASS.enter;
 
 /* ------------------------------------------------------- CAPTION STRIP -- */
 
+/**
+ * WHERE THE AI NARRATIVE SITS — the two placements of ONE element (US-024).
+ *
+ * `tile` is the strip at the foot of a tile: a hairline, then one truncated
+ * muted line. `section` is the same element widened for the PROMINENT
+ * narrative under a hero's section header — no hairline, no truncation,
+ * because that line is the answer itself and runs to several sentences.
+ *
+ * Two placements, one implementation, on purpose: the AI glyph, the escaping
+ * and the accessibility treatment are stated once. US-024 was explicitly not
+ * allowed to fork a second caption element, and a variant table is how that
+ * stays true when a third placement appears.
+ */
+export const CARD_CAPTION_VARIANTS = {
+  tile: {
+    /** Kept as `card-caption` — five tile tests already address it. */
+    slot: "card-caption",
+    root: "narrative-caption items-center border-t border-line px-tile py-3",
+    glyph: "",
+    /** One line by design — the strip summarises, it does not explain. */
+    text: "truncate",
+  },
+  section: {
+    slot: "section-narrative",
+    // No `text-caption` here: the section narrative reads at body size, and it
+    // WRAPS. Truncating a verbatim narrative would delete the answer.
+    root: "items-start gap-2.5 text-muted",
+    /** Optical alignment of a 14px glyph against the first line of body text. */
+    glyph: "mt-1",
+    text: "",
+  },
+} as const;
+
+export type CardCaptionVariant = keyof typeof CARD_CAPTION_VARIANTS;
+
+const DEFAULT_CAPTION_VARIANT: CardCaptionVariant = "tile";
+
 interface CardCaptionProps {
-  /** The one-line narrative. Plain text; React escapes it. */
+  /**
+   * The narrative, exactly as authored.
+   *
+   * VERBATIM, ALWAYS. Phase 3b's narratives are pre-authored strings the
+   * client signed off, hyphens, percentages and CHF figures included. This
+   * component renders what it is given and transforms nothing — no
+   * truncation in the DOM, no casing, no quote or dash substitution.
+   */
   children: ReactNode;
+  /** Placement — see {@link CARD_CAPTION_VARIANTS}. Defaults to `tile`. */
+  variant?: CardCaptionVariant;
   className?: string;
 }
 
 /**
- * The narrative caption strip that closes a tile: a single muted line behind a
- * small AI glyph, divided from the body by a hairline.
+ * The narrative caption strip: a muted line behind a small AI glyph.
  *
  * The glyph is decoration — it signals "this line was written by the
  * assistant" visually and carries no information a screen reader needs, so it
  * is hidden from the accessibility tree rather than announced.
  *
- * Exported for the rare panel that composes the strip itself; a tile should
- * normally pass `caption` to `Card` and let the shell place it.
+ * Exported for the rare panel that composes the strip itself (the section head
+ * in `app/components/heroes/hero-section.tsx`, the recommendation panel); a
+ * tile should normally pass `caption` to `Card` and let the shell place it.
  */
-export function CardCaption({ children, className }: CardCaptionProps) {
+export function CardCaption({
+  children,
+  variant = DEFAULT_CAPTION_VARIANT,
+  className,
+}: CardCaptionProps) {
+  const placement = CARD_CAPTION_VARIANTS[variant];
+
   return (
     <div
-      data-slot="card-caption"
-      className={cn(
-        "narrative-caption flex items-center gap-2 border-t border-line px-tile py-3",
-        className,
-      )}
+      data-slot={placement.slot}
+      className={cn("flex gap-2", placement.root, className)}
     >
-      <span aria-hidden="true" className="shrink-0 text-navy">
+      <span
+        aria-hidden="true"
+        className={cn("shrink-0 text-navy", placement.glyph)}
+      >
         <Sparkles size={14} />
       </span>
-      {/* One line by design — the strip summarises, it does not explain. */}
-      <span className="truncate">{children}</span>
+      <span className={placement.text || undefined}>{children}</span>
     </div>
   );
 }

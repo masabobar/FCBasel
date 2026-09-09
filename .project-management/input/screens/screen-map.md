@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.5.0
+**Version:** 1.6.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-016 — the hero band is built, so every region Phase 2a owns is now Built; chips and thinking beat still pending)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-024 — Phase 2b is closed, so every tile kind an insight section will hold now exists, the recommendation panel included; chips and thinking beat still pending)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -88,7 +88,7 @@ does not.
 | Canvas grid | The 12-column container every tile and section is inserted into | US-012, US-014 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. **No longer empty on load** — US-013's four baseline tiles are its first grid items, and US-014's sections insert into **this** same grid as direct children, below them |
 | Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 | ✅ **Built** — `app/components/dashboard/hero-band.tsx` (+ the new `app/components/charts/attendance-ring.tsx`), mounted by `app/routes/_index.tsx` **above** the baseline row as ONE full-width grid item on the existing canvas. **One `Segmented` drives both halves** from the same `BaselinePeriod` entry: the webshop `LineChart` (gold area over a dashed white previous period, re-keyed so the stroke draw replays) in the wider 8-column half, and the attendance ring — hand-built SVG, arc sweeping on `stroke-dasharray`, centre swapping to "% of capacity" on hover or focus — in the narrower 4. The total and its delta are computed from the plotted series. It does **not** replace US-013's two KPI tiles: it is a second presentation of the same reading, and the two agree because both sum the same array. Self-contained by design (P1, first in the cut order): the baseline row does not import it |
 | Baseline row | Webshop revenue KPI, Last home match KPI, Top Products, Active Partners | US-013, US-016 | ✅ Built — `app/components/dashboard/baseline-row.tsx` (+ `app/components/tiles/partner-tile.tsx`, `app/lib/dashboard/baseline.ts`), mounted by `app/routes/_index.tsx`. Four tiles as **direct children of the canvas grid** (3 + 3 + 6 columns, then a full-width partner strip at `lg`), composing `KpiTile`, `HBarTile` and the `Card` shell — no new tile kind and no second grid. No figure is re-typed in a component: a source scan enforces it. **Top Products' period filter is now wired (US-016):** its `action` slot holds a light `Segmented` driving its own period, independent of the band's, so the five figures recalculate and the same bar elements transition |
-| Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 | 🔄 Built (US-014) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. Per-hero content is a placeholder until US-034 to US-039 |
+| Insight sections | One per answered question — section head, narrative, cards, optional follow-up (recommendation panel) | US-014, US-024, US-034 to US-039 | 🔄 Built (US-014, US-024) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. **US-024 finished the section's two insight elements:** the prominent narrative line under the section header is US-005's caption strip in its `section` variant (AI glyph, wraps, never truncated), and the follow-up's advice is `app/components/tiles/recommendation-panel.tsx` — a gold-accented `aside`, structurally not a tile. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
 | Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started — the chip row's reset behaviour is already provided for: **derive** it from `useDashboard`'s `sections` (initial chips at the baseline, follow-up chips from the sections on screen) and Reset restores it with no logic of its own; `generation` covers anything US-028's input holds that cannot be derived |
 
@@ -113,6 +113,15 @@ does not.
 > already shifted. There is still exactly one canvas grid, measured at 12 columns in Chrome. The
 > Baseline row row now also credits US-016 for Top Products' period filter.
 >
+> 1.6.0 records US-024 and **closes Phase 2b (11/11 · 29/29 pts)**. No region and no route was
+> added: the story built the last two components an insight section needs. The narrative line is the
+> SAME element as a tile's caption strip (one implementation, two placements) and it renders BEFORE
+> the charts inside a section — asserted as DOM order, because the order is the product rule. The
+> recommendation panel is deliberately not a `Card`: an `aside` region, `rounded-panel`, tinted
+> surface, gold bar down the side, and an explicit "Recommendation" eyebrow, so advice can never be
+> mistaken for one more metric. Both render pre-authored strings verbatim — Phase 3b supplies the
+> copy.
+>
 > 1.4.0 records US-013: the **Baseline row region and the Baseline state are Built**. No region and
 > no route was added — the four tiles are grid items on the canvas that already existed. The region's
 > contents line is corrected: it listed only Top Products and Active Partners, but US-013's
@@ -128,9 +137,11 @@ does not.
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-09, after US-016)
+## 4. Drift Report (hand-checked 2026-09-09, after US-024)
 
 - **Stories referencing screens not in this map:** *(none)*
+- **Routes added by US-024:** *(none)*. Two components, no route, no loader, no request: the panel
+  and the caption strip take their text as a prop.
 - **Screen entries with no backing story (orphans):** *(none)*
 - **Navigation nodes missing a registry entry (or vice versa):** *(none — the three inert sidebar
   items are intentionally not registry entries; they are not screens)*

@@ -56,22 +56,22 @@ a human step
 ### [Phase 1b: Dummy Data Model & Seed Datasets](phase-1b-seed-data.md)
 **Goal:** The single source of truth for every figure in the prototype (E3), grounded in verified
 FCB facts and bundled locally.
-**Stories:** 5 | **Points:** 10 | **Status:** Not Started (0/5)
+**Stories:** 5 | **Points:** 10 | **Status:** ✅ Completed (5/5) — 2026-09-09
 
 ### [Phase 2a: Dashboard Shell & Persona Baseline](phase-2a-shell.md)
 **Goal:** The branded shell, the lived-in baseline dashboard, and the insertion mechanic that makes
 the dashboard *grow* rather than clear.
-**Stories:** 5 | **Points:** 16 | **Status:** Not Started (0/5)
+**Stories:** 5 | **Points:** 16 | **Status:** ✅ Completed (5/5) — 2026-09-09
 
 ### [Phase 2b: Chart & Tile Component Library](phase-2b-components.md)
 **Goal:** The eight reusable component types the heroes are composed from — stateless, token-styled,
 fed from E3.
-**Stories:** 11 | **Points:** 29 | **Status:** Not Started (0/11)
+**Stories:** 11 | **Points:** 29 | **Status:** ✅ Completed (11/11) — 2026-09-09
 
 ### [Phase 3a: Conversational Interface & Interaction Model](phase-3a-conversation.md)
 **Goal:** The choreography that stands in for the AI — prompt bar, intent matching, thinking beat,
 graceful fallback, follow-up gating.
-**Stories:** 6 | **Points:** 17 | **Status:** Not Started (0/6)
+**Stories:** 6 | **Points:** 17 | **Status:** 🔄 Active (0/6)
 
 ### [Phase 3b: Scripted Hero Flows & Narrative Orchestration](phase-3b-heroes.md)
 **Goal:** The three client questions, each wired end to end as a two-beat *what → so-what* flow.

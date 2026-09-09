@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (10/11 completed)
+**Status:** ✅ Completed (11/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (10/11 completed)
+**Status:** ✅ Completed (11/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -42,15 +42,13 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       dark backgrounds
     - Optional sparkline and optional supporting subtitle
   - **Dependencies:** US-005, US-027
-  - **Completion note (2026-09-09):** All three criteria met. `DeltaChip` is in
-    `app/components/tiles/delta-chip.tsx` on its own (US-019/US-022/US-016 want the chip without a
-    tile); `KpiSparkline` / `KpiFigure` / `KpiTile` are in `kpi-tile.tsx`. **Colour is never the sole
+  - **Completion note (2026-09-09):** All three criteria met. `DeltaChip` stands alone in
+    `app/components/tiles/delta-chip.tsx` (US-019/US-022/US-016 want the chip without a tile);
+    `KpiSparkline` / `KpiFigure` / `KpiTile` are in `kpi-tile.tsx`. **Colour is never the sole
     signal, and the `light` variant proves it:** on navy both directions share one white treatment
     while glyph, sign and an `sr-only` word still differ. Direction is arithmetic, judgement is
-    meaning — an optional `judgement` prop draws Marketing's overspend as an up arrow in the negative
-    token; a zero is a labelled zero. Also closed the US-012 `tailwind-merge` trap in
-    `app/lib/cn.ts`. 78 tests (722/722). *US-023 later added an optional `suffix` node to the chip,
-    for `-CHF 400k total` as one chip.*
+    meaning (`judgement` prop); a zero is a labelled zero. Also closed the US-012 `tailwind-merge`
+    trap in `app/lib/cn.ts`. 78 tests (722/722). *US-023 later added a `suffix` node to the chip.*
 
 - **US-018**: Vertical bar chart tile
   - **Story Points:** 3
@@ -65,13 +63,11 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       position via CSS while the label counts up — never a snap to zero
   - **Dependencies:** US-005, US-027
   - **Completion note (2026-09-09):** All three criteria met, in
-    `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure), `VBars` and `VBarTile`. **Criterion
-    3 is proven by a RE-RANK, not a rerender:** columns are keyed by category, so `Home` keeps the
-    *same* `<rect>` and its `x` / `y` / `height` CSS transition — identity is asserted across a data
-    change *and* a re-ordered dataset, and an index key fails exactly two tests; the surviving
-    instance keeps its `useCountUp` state and reduced motion lands on final heights with **zero
-    frames requested**. Gradient fills with rounded caps, gridlines behind, counting labels above, a
-    `filter` hover highlight, an optional `tooltip(index)`, wrapping DOM-text labels. 52 tests.
+    `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure), `VBars`, `VBarTile`. **Criterion 3
+    is proven by a RE-RANK, not a rerender:** columns keyed by category, so `Home` keeps the *same*
+    `<rect>` and transitions `x` / `y` / `height`; an index key fails exactly two tests, and the
+    surviving instance keeps its `useCountUp` state. Reduced motion lands on final heights with
+    **zero frames requested**. 52 tests.
 
 - **US-019**: Grouped bar chart tile
   - **Story Points:** 3
@@ -87,13 +83,12 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Dependencies:** US-005, US-027
   - **Notes:** The overlap fix is an explicit review decision — do not revert it.
   - **Completion note (2026-09-09):** All three criteria met, in
-    `app/components/charts/grouped-bars.tsx` — `groupedBarGeometry` (pure), `GroupedBars` and
+    `app/components/charts/grouped-bars.tsx` — `groupedBarGeometry` (pure), `GroupedBars`,
     `GroupedBarTile`. Eight fixtures, sixteen bars, one `DeltaChip` per pair. **CRITERION 2 IS
-    STRUCTURAL AND MEASURED:** the scale owns a 44-unit gutter, everything is inset to `plotLeft`
-    (all eight pairs), and the 34-unit chip band holds because the axis maximum is **derived from the
-    geometry** — a fixed 10% headroom fails the test. Chips are one flex strip of equal cells, so
-    overlap is impossible by layout. No per-bar value labels by design, except a labelled zero.
-    Pairs keyed by fixture; reduced motion lands final. 63 tests (1205/1205, 100%).
+    STRUCTURAL AND MEASURED:** the scale owns a 44-unit gutter, everything is inset to `plotLeft`,
+    and the 34-unit chip band holds because the axis maximum is **derived from the geometry** — a
+    fixed 10% headroom fails the test. Chips are one flex strip of equal cells, so overlap is
+    impossible by layout. Pairs keyed by fixture. 63 tests (1205/1205, 100%).
 
 - **US-020**: Donut / ring tile
   - **Story Points:** 3
@@ -111,13 +106,12 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Dependencies:** US-005, US-027
   - **Completion note (2026-09-09):** All four criteria met, in
     `app/components/charts/donut.tsx` — `donutGeometry` (pure), `Donut`, `DonutTile`; deliberately
-    NOT US-016's single-arc gold gauge. An arc and its legend row write ONE `hovered` index, proven
-    by a cross-surface test both ways (legend rows are real `<button>`s, so focus does what hover
-    does). Arcs and rows are keyed by SPONSOR, so a period press morphs the same `<circle>`'s
-    dasharray while one `useCountUp` counts the centre from the figure on screen — an index key
-    fails the re-rank test. `badgeSegments` (US-008) is reused rather than restated: segments sum
-    exactly to the centre total on all four period totals and ten adversarial ones. Gaps are arc
-    REMOVED from each segment; ids from `useUid`. 56 tests added (1261/1261, gates clean).
+    NOT US-016's single-arc gold gauge. An arc and its legend row write ONE `hovered` index (legend
+    rows are real `<button>`s, so focus does what hover does). Arcs and rows keyed by SPONSOR, so a
+    period press morphs the same `<circle>`'s dasharray while the centre counts from the figure on
+    screen — an index key fails the re-rank test. `badgeSegments` (US-008) is reused, not restated:
+    segments sum exactly to the centre total on all four periods and ten adversarial ones.
+    56 tests added (1261/1261, gates clean).
 
 - **US-021**: Horizontal bar tile
   - **Story Points:** 3
@@ -135,17 +129,14 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       (e.g. `CHF 150k`, `38%`)
   - **Dependencies:** US-005, US-027
   - **Completion note (2026-09-09):** All four criteria met, in
-    `app/components/charts/h-bars.tsx` — `HBarRow` (the unit of reuse), `HBars` (the ranked list) and
-    `HBarTile` (`Card` + rows, `action` slot passing through for Hero 2's `-CHF 400k total` badge).
-    **Both review decisions are read back off the rendered element by tests:** 150px label at weight
-    500 with `truncate` / `text-ellipsis` / `line-clamp` rejected (long labels wrap), and a 96px
-    `nowrap` column proven on three lists with `-CHF 150k` a single text node. One rule serves
-    all five consumers — the sign of the displayed figure sets the anchor side, the token and the
-    text sign — so `negative` mode is idempotent on a stored magnitude and mixed signs work
-    unchanged. Rows keyed by name, so a data change transitions the same bar while `useCountUp`
-    continues from the figure on screen; `hBarMax` / `hBarPercent` never yield `NaN`. 55 tests
-    (777/777, clean). *US-023 composes this, adding two seams here rather than forking:
-    `hBarDisplayedValue` and `HBarTile`'s `children` slot under the bars.*
+    `app/components/charts/h-bars.tsx` — `HBarRow` (the unit of reuse), `HBars`, `HBarTile`.
+    **Both review decisions are read back off the rendered element:** the 150px weight-500 label
+    wraps (`truncate` / `text-ellipsis` / `line-clamp` rejected) and the 96px `nowrap` value column
+    keeps `-CHF 150k` a single text node. One rule serves all five consumers: the sign of the
+    displayed figure sets anchor side, token and text sign, so `negative` mode is idempotent.
+    Rows keyed by name; `hBarMax` / `hBarPercent` never yield `NaN`. 55 tests (777/777, clean).
+    *US-023 composes this via two seams added here rather than forked: `hBarDisplayedValue` and
+    `HBarTile`'s `children` slot.*
 
 - **US-022**: Department table tile
   - **Story Points:** 3
@@ -166,16 +157,14 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     `app/components/tiles/department-table.tsx` — a real `<table>` (`scope="col"` headers, a
     `scope="row"` department name, `sr-only` caption), `DepartmentTable`, `DepartmentTableTile` and
     the pure `targetMark` / `targetBarPercent` / `columnAlignClass`. **THE REVENUE / COST TRAP IS
-    CLOSED BY CONSTRUCTION:** the colour comes from `row.judgement` (US-010's `varianceJudgement`)
-    through US-017's `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while Sponsoring's
-    +840 renders UP and FAVOURABLE; a source scan rejects `FAVOURABLE` / `ADVERSE`, any
-    `variance <>` test and any `DepartmentType` equality, and the flag is `needsAttention` (one row,
-    never named). **Both review decisions are asserted:** CHF **millions** with the unremovable
-    "figures in CHF millions" subtitle (a test rejects `/000/` in the rendered tile), and numeric
-    headers right-aligned **including "% of target"** by one `columnAlignClass` rule the header *and*
-    its cells read, compared column by column. Near-target gold is shape plus an `sr-only` word;
-    rows keyed by name; long names wrap inside a card-bounded scroll; totals from
-    `departmentTotals()` on the rows on screen, the club variance NEUTRAL. 54 tests (1315/1315).
+    CLOSED BY CONSTRUCTION:** colour comes from `row.judgement` (US-010) through `DeltaChip`, so
+    **Marketing's +410 renders UP and ADVERSE** while Sponsoring's +840 renders UP and FAVOURABLE;
+    a scan rejects `FAVOURABLE` / `ADVERSE`, `variance <>` tests and `DepartmentType` equality.
+    **Both review decisions are asserted:** CHF **millions** with the unremovable subtitle (`/000/`
+    rejected), and numeric headers right-aligned **including "% of target"** by one
+    `columnAlignClass` rule read by header *and* cells. Near-target gold is shape plus an `sr-only`
+    word; rows keyed by name; long names wrap inside a card-bounded scroll; totals from
+    `departmentTotals()` on the rows on screen. 54 tests (1315/1315).
 
 - **US-023**: Driver / breakdown tile
   - **Story Points:** 2
@@ -191,11 +180,11 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Completion note (2026-09-09):** All three criteria met, in
     `app/components/tiles/driver-tile.tsx` — `DriverTile`, `DriverTotalBadge` and the pure
     `rankDrivers` / `driverTotal`. **CRITERION 3 IS THE STORY, AND IT IS ENFORCED TWO WAYS:** every
-    row is US-021's `HBarRow` through `HBarTile` — the render tests read the 150px label and 96px
-    `nowrap` value columns back off the rows THIS tile produced — and a source scan rejects `h-bar-*`,
-    both width constants, `H_BAR_SERIES`, `width` / `toFixed` / `Math.min`, `useCountUp` / `useGrow` /
-    `transition`, every `useState` / timer and every gradient class, so a sixth copy of the row cannot
-    appear without failing tests. **What the tile adds, and nothing more:** (1) `rankDrivers` —
+    row is US-021's `HBarRow` through `HBarTile` (the render tests read the two column widths back
+    off the rows THIS tile produced) and a source scan rejects `h-bar-*`, both width constants,
+    `H_BAR_SERIES`, `width` / `toFixed`, the motion hooks, every `useState` / timer and every
+    gradient class — so a sixth copy of the row cannot appear without failing tests.
+    **What the tile adds, and nothing more:** (1) `rankDrivers` —
     magnitude-descending, **stable for ties**, asserted equal to US-009's `fixtureDeclines` order so
     Luzern precedes Sion, with `rank="none"` for an authored order (US-035 leads with Bitpanda);
     (2) `driverTotal` — **derived from the rows on screen** via the newly exported
@@ -211,7 +200,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The two elements that carry the insight beat — the peak moments of the demo.
   - **Acceptance Criteria:**
     - Recommendation panel is a gold-accented callout, **visually distinct from a data tile** — it is
@@ -220,6 +209,20 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       small AI glyph
     - The prominent narrative line renders under each section header, stated before the charts
   - **Dependencies:** US-005
+  - **Completion note (2026-09-09):** All three criteria met, in
+    `app/components/tiles/recommendation-panel.tsx` plus a second placement on US-005's
+    `CardCaption`. **The strip was REUSED, not rebuilt:** one implementation, two placements —
+    `tile` (hairline, truncated) and `section` (no hairline, wraps, never truncated) — so the AI
+    glyph and its decorative `aria-hidden` exist once; `SectionHead` renders that element now, and
+    source scans reject a second `Sparkles` in either consumer. **The panel is structurally not a
+    tile:** an `aside` region named by its "Recommendation" eyebrow, its own `data-slot` with no
+    card slot inside it, a 3px gold bar down the SIDE (a tile's runs across the top),
+    `rounded-panel` on a tinted surface with no tile shadow, and none of the card's metric chrome.
+    **Verbatim fidelity is asserted byte for byte** with US-039's string (straight quotes, ASCII
+    hyphens, `CHF 150k`, `2.2% vs 2.6%`); no clamp or casing touches the body. **Criterion 3 is
+    order,** so DOM order is asserted: the narrative precedes every `svg`, every card and the
+    panel. Gold stays sanctioned (no new-tile ring) and a navy `narrative` variant serves US-037.
+    35 tests (1393/1393, clean).
 
 - **US-025**: Line chart component
   - **Story Points:** 3
@@ -235,15 +238,13 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - Scales to its container via `viewBox` and `width: 100%`
   - **Dependencies:** US-005, US-027
   - **Completion note (2026-09-09):** All five criteria met, in
-    `app/components/charts/line-chart.tsx` — `lineChartGeometry` (pure), `LineChartLegend` (on its
-    own, because the band places its legend in its own header row), `LineChart` and `LineChartTile`.
-    Built for BOTH consumers at once: series count is a prop, style is per-series `area` / `dash`,
-    colour is a token NAME so no hex can enter. **The stroke draw survives reduced motion** —
-    `pathLength="1"` normalises the length and the offset transitions 1 → 0, so under the preference
-    a test reads `stroke-dashoffset="0"` with zero frames requested; a dashed line fades instead.
-    **It replays by being re-keyed** and by nothing else. Hover maps to the nearest index and the
-    tooltip lists EVERY series there; arrow/Home/End/Escape do the same without capturing Tab.
-    Gradient ids from `useUid`; a missing point is a labelled zero. 73 tests (953/953, clean).
+    `app/components/charts/line-chart.tsx` — `lineChartGeometry` (pure), `LineChartLegend` (alone,
+    for the band's own header row), `LineChart`, `LineChartTile`. Built for BOTH consumers at once:
+    series count is a prop, style is per-series `area` / `dash`, colour is a token NAME.
+    **The stroke draw survives reduced motion** — `pathLength="1"` plus an offset transition, so a
+    test reads `stroke-dashoffset="0"` with zero frames requested. **It replays by being re-keyed**
+    and nothing else. Hover maps to the nearest index and lists EVERY series; arrow/Home/End/Escape
+    do the same without capturing Tab. 73 tests (953/953, clean).
 
 - **US-026**: Segmented period filter control
   - **Story Points:** 2
@@ -258,11 +259,10 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Dependencies:** US-003
   - **Completion note (2026-09-09):** All three criteria met, in
     `app/components/controls/segmented.tsx` — `Segmented`, the pure `nextOptionIndex` and the
-    exported `CHIP_SURFACE_CLASS` US-029's chips reuse. Controlled, keys typed to the shared
-    `PeriodKey` with the label as data on each entry. 11px comes from `--radius-chip` plus the new
-    `.fcb-chip` rule (radius + 1px lift + transition) — `rounded-full` rejected by test. Radiogroup
-    semantics: one tab stop, wrapping arrows, Home/End, selection carried by shape, shadow, weight
-    *and* `aria-checked`, never colour alone. Wired in by US-016.
+    exported `CHIP_SURFACE_CLASS` US-029's chips reuse. Controlled, keys typed to `PeriodKey`.
+    11px comes from `--radius-chip` plus the `.fcb-chip` rule (radius + 1px lift + transition);
+    `rounded-full` is rejected by test. Radiogroup semantics: one tab stop, wrapping arrows,
+    Home/End, selection carried by shape, shadow, weight *and* `aria-checked`. Wired in by US-016.
 
 - **US-027**: Motion & animation hooks
   - **Story Points:** 3
@@ -292,7 +292,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 10 stories, 27 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 0
+**By Status:** ✅ 11 stories, 29 points · 🔄 0 · 📋 0 · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)

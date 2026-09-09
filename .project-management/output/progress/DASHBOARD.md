@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2b - Chart & Tile Component Library *(10/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
+**Current Phase:** Phase 3a - Conversation *(0/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
 
 ---
 
@@ -9,12 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 58% | 100% | 🟢 On Track |
-| **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
-| **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
-| **Phase 2a** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 26/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 67/116 | 116 | 🟢 On Track |
+| **Overall Progress** | 60% | 100% | 🟢 On Track |
+| **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
+| **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
+| **Stories Completed** | 27/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 69/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -23,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 26
-**Currently Working On:** US-024 — Recommendation panel & narrative caption strip (2 pts)
-**Story Points Completed Today:** 67
+**Stories Completed Today:** 27
+**Currently Working On:** None — Phase 2b complete
+**Story Points Completed Today:** 69
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — React Router 7 SSR scaffold (Railway
   deploy stays a human step) · ESLint 9 + Prettier + husky · one token set published as Tailwind v4
@@ -79,12 +78,10 @@
 - ✅ **US-021 — Horizontal bar tile (3 pts)** — the most reused chart in the product, built once in
   `app/components/charts/h-bars.tsx` for all five consumers as `HBarRow` / `HBars` / `HBarTile`.
   **The two review decisions are read back off the rendered element by tests:** the 150px label
-  column with `truncate` / `text-ellipsis` / `line-clamp` *rejected* (so `Cap "Rotblau"` cannot
-  regain its reported ellipsis) and the 96px `nowrap` value column proven through `getComputedStyle`
-  on three lists. **One rule serves every consumer: the sign of the displayed figure** — it sets the
-  anchor side, the token and the text sign, so `negative` mode is just "every row is a decline".
-  Rows keyed by name, so a filter change transitions the *same* bar while the figure counts on from
-  what is on screen; `hBarMax` / `hBarPercent` return zero width rather than `NaN`. 55 new tests.
+  column with `truncate` / `text-ellipsis` / `line-clamp` *rejected*, and the 96px `nowrap` value
+  column proven through `getComputedStyle`. **One rule serves every consumer: the sign of the
+  displayed figure** sets anchor side, token and text sign. Rows keyed by name, so a filter change
+  transitions the *same* bar while the figure counts on from screen. 55 new tests.
 
 - ✅ **US-013 — Baseline dashboard, four pre-existing tiles (3 pts)** — **the canvas stops being
   empty.** `baseline-row.tsx` composes `KpiTile` ×2, `HBarTile` and a new `PartnersTile` as direct
@@ -95,33 +92,28 @@
   US-017/US-021/US-027**: no scroll at 1920×1080, 54 distinct KPI strings. 103 tests.
 
 - ✅ **US-026 — Segmented period filter control (2 pts)** — one control in
-  `app/components/controls/segmented.tsx` for all three of its consumers: the dark hero band, Top
-  Products' `action` slot, and Hero 1's section header. **Controlled, with no opinion of its own** —
-  a press the caller ignores changes nothing on screen, which is what lets one control drive two
-  tiles (the band) or three (Hero 1) without them ever disagreeing. Keys are the shared `PeriodKey`,
-  never a local union. **11px, deliberately not a pill:** the reviewed radius already existed as
-  `--radius-chip`, and tests reject `rounded-full` in the markup, the source *and* the stylesheet.
-  Radiogroup semantics: one tab stop, wrapping arrows plus Home/End, selection carried by shape,
-  shadow, weight *and* `aria-checked` — never colour alone. 45 tests.
+  `app/components/controls/segmented.tsx` for all three consumers: the dark band, Top Products'
+  `action` slot, Hero 1's section header. **Controlled, with no opinion of its own** — a press the
+  caller ignores changes nothing, which is what lets one control drive two tiles without them
+  disagreeing. Keys are the shared `PeriodKey`. **11px, deliberately not a pill** (`rounded-full`
+  rejected in markup, source *and* stylesheet). Radiogroup semantics: one tab stop, wrapping arrows
+  plus Home/End, selection carried by shape, shadow, weight *and* `aria-checked`. 45 tests.
 
 - ✅ **US-025 — Line chart component (3 pts)** — one chart in
-  `app/components/charts/line-chart.tsx` for both consumers: the navy hero band (gold area line over
-  a dashed white one, keyed by period) and Hero 2's twelve-month two-season comparison. Series count
-  is a prop, `area` / `dash` is per series, colour is a token **name**, so no hex can enter. **The
-  stroke draw survives reduced motion:** `pathLength="1"` plus an offset transitioning 1 → 0, read
-  back as `stroke-dashoffset="0"` with **zero frames requested**; it replays by being re-keyed and by
-  nothing else. Hover lists **every** series at the nearest index, keyboard included. Gradient ids
-  from `useUid`; a missing point is a labelled zero. 73 new tests.
+  `app/components/charts/line-chart.tsx` for both consumers: the navy hero band and Hero 2's
+  twelve-month comparison. Series count is a prop, `area` / `dash` is per series, colour is a token
+  **name**, so no hex can enter. **The stroke draw survives reduced motion:** `pathLength="1"` plus
+  an offset transitioning 1 → 0, read back as `stroke-dashoffset="0"` with **zero frames
+  requested**; it replays by being re-keyed and nothing else. Hover lists **every** series at the
+  nearest index, keyboard included. 73 new tests.
 
 - ✅ **US-016 — Hero band: webshop trend & attendance ring (5 pts)** — **Phase 2a closes at 5/5 ·
   16/16 pts.** The navy greeting band, where **ONE `Segmented` drives both halves** from one
-  `BaselinePeriod` entry: the webshop `LineChart` (gold area over a dashed previous period, re-keyed
-  so the stroke draw replays) and the **one genuinely new visual** — a hand-built `AttendanceRing`
-  sweeping on `stroke-dasharray`, its centre swapping to "% of capacity" on hover *or focus*. Total
-  and delta are computed from the plotted series; the greeting comes from an injectable clock.
-  **Chrome at 1920×1080:** no scroll, 54 distinct KPI strings never touching zero, 43 distinct dash
-  pairs, one value each under reduced motion. One real defect found and fixed in `LineChart`:
-  clipped end axis labels now anchor inwards. 92 new tests.
+  `BaselinePeriod` entry: the webshop `LineChart` and the **one genuinely new visual** — a
+  hand-built `AttendanceRing` sweeping on `stroke-dasharray`, its centre swapping to "% of capacity"
+  on hover *or focus*. Total and delta are computed from the plotted series. **Chrome at 1920×1080:**
+  no scroll, 54 distinct KPI strings, 43 distinct dash pairs, one value each under reduced motion.
+  One real defect found and fixed in `LineChart`: clipped end axis labels anchor inwards. 92 tests.
 
 - ✅ **US-018 — Vertical bar chart tile (3 pts)** — the kit-split chart in
   `app/components/charts/v-bars.tsx` (`vBarGeometry` / `VBars` / `VBarTile`), built for US-034's
@@ -144,14 +136,11 @@
   keyed by fixture; an index key fails the re-rank test. 63 new tests, 1205 green.
 
 - ✅ **US-020 — Donut / ring tile (3 pts)** — the sponsor-badge ring in
-  `app/components/charts/donut.tsx` (`donutGeometry` / `Donut` / `DonutTile`), built for US-034's
-  "Sponsor badges printed": four segments with even gaps, a counting centre total and a legend. **Not
-  US-016's attendance ring** — that is a single-arc gold gauge on navy; this is four series arcs on a
-  white card, sharing only the dasharray technique. **Two hover surfaces, ONE state:** an arc and its
-  legend row write the same index, proven by a cross-surface test; rows are real buttons, so focus
-  does what hover does. **The segments morph rather than re-enter:** arcs keyed by sponsor, so a
-  period press transitions the *same* circle's dasharray while one `useCountUp` moves the centre.
-  **The arithmetic is `badgeSegments`'** (US-008), so the figures add up exactly. 56 tests, 1261.
+  `app/components/charts/donut.tsx`, built for US-034: four segments with even gaps, a counting
+  centre total and a legend. **Not US-016's attendance ring**, which is a single-arc gold gauge.
+  **Two hover surfaces, ONE state:** an arc and its legend row write the same index, and rows are
+  real buttons so focus does what hover does. **The segments morph rather than re-enter:** arcs
+  keyed by sponsor. **The arithmetic is `badgeSegments`'** (US-008). 56 tests, 1261.
 - ✅ **US-022 — Department table tile (3 pts)** — Hero 3's primary tile in
   `app/components/tiles/department-table.tsx`: a real `<table>`, six departments and a total row.
   **The revenue/cost trap is closed by construction, not by care:** the colour comes from
@@ -172,26 +161,36 @@
   from the rows on screen** so the `-CHF 400k total` badge cannot disagree with the bars (it matches
   `declineTotal` and Marketing's +410 variance), and a muted note line. Two seams were widened
   rather than forked: `HBarTile` gained a `children` slot, `DeltaChip` a `suffix`. 43 tests, 1358.
+- ✅ **US-024 — Recommendation panel & narrative caption strip (2 pts)** — **Phase 2b closes at
+  11/11 · 29/29 pts.** The two elements that carry the insight beat. **The caption strip was reused,
+  not rebuilt:** one implementation in `card.tsx`, two placements — a tile's truncated foot line and
+  the section narrative that wraps and is never truncated — so the AI glyph and its decorative
+  `aria-hidden` exist once. **The recommendation panel is structurally not a tile** (`aside` region,
+  its own eyebrow, a gold bar down the SIDE, `rounded-panel`, tinted surface, none of the card's
+  metric chrome), because advice must never read as one more metric. **Verbatim is tested byte for
+  byte** on US-039's string, and **criterion 3 is order**, so the tests assert the narrative precedes
+  every chart in the section. 35 tests, 1393.
 
 ---
 
-## 🏁 Phase 2a complete — Dashboard Shell & Persona Baseline
+## 🏁 Phase 2b complete — Chart & Tile Component Library
 
-**Phase 2a goal:** the frame the demo lives in — shell, persona, a dashboard that already looks
-lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Phases 1a and 1b**.
-**Duration:** 2026-09-09 (one day, ahead of the 2026-09-11 target)
-**Progress:** 100% (5/5 stories · 16/16 points)
+**Phase 2b goal:** the reusable visual kit the heroes are assembled from. Closed at 100% on
+2026-09-09 (11/11 · 29/29 pts), ahead of its 2026-09-12 target — as did **Phases 1a, 1b and 2a**.
+Every tile kind, chart geometry, control and hook a hero needs now exists and is shared, with no
+per-hero copy anywhere.
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-024: Recommendation panel & caption strip | ⏳ Ready | Next up, and the last of Phase 2b; must read as advice, not as a data tile, and must reuse `Card`'s existing caption strip |
+| None | — | Phase 2b complete; **Phase 3a (US-028, prompt bar) is next** |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-024: Recommendation panel & narrative caption strip | 2026-09-09 | 2 |
 | US-023: Driver / breakdown tile | 2026-09-09 | 2 |
 | US-022: Department table tile | 2026-09-09 | 3 |
 | US-020: Donut / ring tile | 2026-09-09 | 3 |
@@ -246,8 +245,8 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 99.81% stmts / 98.08% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1358/1358 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 99.82% stmts / 98.17% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
+| Passing Tests | 1393/1393 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -274,8 +273,8 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
-| Phase 2b: Component Library | 🔄 In Progress | 10/11 | 27/29 | 93% |
-| Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
+| Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
+| Phase 3a: Conversation | 🔄 Active | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
@@ -283,7 +282,8 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 ## 🔗 Quick Links
 
-- **[Current Phase Plan](../phases/phase-2b.md)** - Phase 2b, Chart & Tile Component Library
+- **[Current Phase Plan](../phases/phase-3a.md)** - Phase 3a, Conversation (US-028 to US-033)
+- **[Phase 2b Plan](../phases/phase-2b.md)** - Completed 2026-09-09 (11/11 · 29/29 pts)
 - **[Phase 2a Plan](../phases/phase-2a.md)** - Completed 2026-09-09 (5/5 · 16/16 pts)
 - **[Phase 1b Plan](../phases/phase-1b.md)** - Completed 2026-09-09
 - **[Phase 1a Plan](../phases/phase-1a.md)** - Completed 2026-09-09
@@ -297,4 +297,4 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
 
-**Last Auto-Update:** US-023 completed at 2026-09-09 — Phase 2b is at 10/11 · 27/29 pts. The driver tile (`DriverTile`, `DriverTotalBadge`, plus the pure `rankDrivers` / `driverTotal`) is the contribution list under all three causal follow-ups, and it is deliberately THIN: **every row is US-021's `HBarRow` through `HBarTile`** — the tests read the 150px label and 96px `nowrap` value columns back off the rows this tile produced, and a source scan rejects bar geometry, count-up, gradients and local state, so the shared row cannot be copied a sixth time. It adds exactly three things: **stable magnitude ranking** (equal to US-009's `fixtureDeclines`, so Luzern stays ahead of the tied Sion), a **total derived from the rows on screen** so the `-CHF 400k total` badge can never disagree with the bars (it matches `declineTotal`, and Marketing's drivers match the +410 variance), and a muted note line for US-037's attendance sentence. `HBarTile` gained a `children` slot and `DeltaChip` a `suffix` node — seams widened, not forked. **Next is US-024** — recommendation panel & narrative caption strip (2 pts), the last story in Phase 2b
+**Last Auto-Update:** US-024 completed at 2026-09-09 — **Phase 2b is CLOSED at 11/11 · 29/29 pts**, and with it the whole component library. The story built the two elements the client's framing calls the peak of the demo. **The caption strip was reused, not rebuilt:** US-005's `CardCaption` gained a second placement (`section`) rather than a second component, so a tile's truncated foot line and the section narrative that wraps share one implementation, one AI glyph and one decorative `aria-hidden`; `SectionHead` renders that element now, and source scans reject a second glyph in either consumer. **The recommendation panel is structurally not a data tile** — an `aside` region named by its "Recommendation" eyebrow, `rounded-panel` on a tinted surface, a 3px gold bar down the SIDE where a tile's runs across the top, and none of the card's metric chrome — because advice that reads as another metric is a product failure, not a styling nit. **Verbatim fidelity is the load-bearing test:** US-039's recommendation renders byte-identical, straight quotes, ASCII hyphens, `CHF 150k` and `2.2% vs 2.6%` intact, with no clamp and no casing. **Criterion 3 is order,** so DOM order is asserted: the narrative precedes every chart in a section. Gold stayed sanctioned; no new-tile ring appeared. **Next is Phase 3a** — US-028 to US-033: the prompt bar, suggestion chips, intent matching, the staged thinking beat and the fallback panel

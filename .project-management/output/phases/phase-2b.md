@@ -1,10 +1,10 @@
 # Phase 2b: Chart & Tile Component Library
 
 **Duration:** 2026-09-11 to 2026-09-12 (~12.0 AI-hours)
-**Status:** In Progress (10/11 stories · 27/29 points)
+**Status:** ✅ Completed (11/11 stories · 29/29 points)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-12
-**Actual Completion:** —
+**Actual Completion:** 2026-09-09
 
 > **Acceptance criteria live in** [`../../input/backlog/phase-2b-components.md`](../../input/backlog/phase-2b-components.md).
 > This file tracks execution.
@@ -29,7 +29,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 
 ### Epic 5: E6 — Chart & Tile Component Library (29 story points)
 
-**Priority:** P0 (US-026 is P1) · **Status:** In Progress (10/11) · **Dependencies:** US-003, US-005
+**Priority:** P0 (US-026 is P1) · **Status:** ✅ Completed (11/11) · **Dependencies:** US-003, US-005
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
@@ -40,7 +40,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 | US-021 | Horizontal bar tile | 3 | P0 | ✅ Done |
 | US-022 | Department table tile | 3 | P0 | ✅ Done |
 | US-023 | Driver / breakdown tile | 2 | P0 | ✅ Done |
-| US-024 | Recommendation panel & narrative caption strip | 2 | P0 | 📋 Todo |
+| US-024 | Recommendation panel & narrative caption strip | 2 | P0 | ✅ Done |
 | US-025 | Line chart component | 3 | P0 | ✅ Done |
 | US-026 | Segmented period filter control | 2 | **P1** | ✅ Done |
 | US-027 | Motion & animation hooks | 3 | P0 | ✅ Done |
@@ -87,9 +87,9 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 > find the estimate's SPEED_FACTOR too cautious.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 27 / 29 (93%)
-- **Completed Stories:** 10 / 11
-- **Tests Passing:** 1358 / 1358 · **Coverage:** 99.8% stmts / 98.1% branches · **Commits:** 9
+- **Completed Story Points:** 29 / 29 (100%)
+- **Completed Stories:** 11 / 11
+- **Tests Passing:** 1393 / 1393 · **Coverage:** 99.8% stmts / 98.2% branches · **Commits:** 10
 
 ---
 
@@ -136,10 +136,8 @@ and lands exactly on target. **Reduced motion is final state in the SAME render*
 
 **Delivered:** `delta-chip.tsx` (`DeltaChip`, wanted alone by US-019/US-022/US-016) and `kpi-tile.tsx`
 (`KpiSparkline`, `KpiFigure`, `KpiTile`). **Colour is never the sole signal, and it is TESTED that
-way:** direction is carried four times (glyph, explicit sign, `sr-only` word, token) and the `light`
-variant gives both directions one white treatment. Direction is not judgement (`judgement` prop from
-`varianceJudgement`); a zero is a labelled zero. **The US-012 trap is closed at the root** in
-`app/lib/cn.ts` (named type scale declared as `tailwind-merge`'s `font-size` group).
+way:** direction is carried four times (glyph, sign, `sr-only` word, token); direction is not
+judgement; a zero is a labelled zero. **The US-012 trap is closed at the root** in `app/lib/cn.ts`.
 **Gates:** 722/722 (78 new) · clean · 100% stmts. **Security:** none.
 
 ### 2026-09-09 — US-021 Horizontal bar tile ✅ (3 pts)
@@ -259,13 +257,43 @@ no IO, no dependency change, no raw SQL, no user-supplied URL; `note` / `totalLa
 React escapes, and a scan rejects `dangerouslySetInnerHTML`. **One seam:** no real-Chrome pass until
 US-035 / US-037 / US-039 mount it.
 
+### 2026-09-09 — US-024 Recommendation panel & narrative caption strip ✅ (2 pts) — PHASE CLOSED
+
+**Delivered:** `app/components/tiles/recommendation-panel.tsx` (`RecommendationPanel`,
+`RECOMMENDATION_VARIANTS`) plus a `section` placement on US-005's `CardCaption`.
+**THE CAPTION STRIP WAS REUSED, NOT REBUILT.** One implementation, two placements: `tile` (hairline,
+truncated) and `section` (no hairline, WRAPS, never truncated, body size) — the AI glyph, the
+escaping and the decorative `aria-hidden` exist once, and `SectionHead` now renders that element
+instead of its own `<p>`. Source scans reject a second `Sparkles` or `narrative-caption` in either
+consumer.
+**The panel is structurally not a tile, and each row of the difference is asserted:** an `aside`
+region named by its "Recommendation" eyebrow (vs a `div`), `data-slot="recommendation-panel"` with no
+`card` slot inside it, a 3px gold bar down the SIDE (a tile's runs across the top), `rounded-panel`
+(16px) on a tinted `bg-gold/10` surface with no `shadow-tile`, and none of the card's metric chrome —
+no icon badge, no uppercase heading, no KPI number. A card rendered beside it is told apart by test.
+**Verbatim fidelity is the load-bearing test:** US-039's recommendation string renders byte-identical
+(`toBe`), straight apostrophe and quotes intact, ASCII hyphens intact, `CHF 240k` / `CHF 150k` /
+`2.2% vs 2.6%` intact; no `truncate` / `line-clamp` / casing class on the body, and a scan rejects
+`toUpperCase` / `.replace(` / `.slice(` in the module.
+**Criterion 3 is order, so DOM ORDER is what is asserted:** in a section shaped the way Phase 3b will
+build one, the narrative precedes every `svg`, every card and the panel itself, and the head's last
+child is the narrative.
+**Gold stayed sanctioned:** three mentions in the module (accent name, tint, border) via
+`CARD_ACCENTS`, the glyph through `--color-accent-follow-up`; no ring or glow on an inserted panel,
+and the navy `narrative` variant serves US-037 without spending gold twice.
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1393/1393 (35 new) · build ✅ · coverage 99.8% stmts /
+98.2% branches. **Security triage:** no trigger fires — no endpoint, no loader, no IO, no dependency
+change, no raw SQL, no user-supplied URL, no `dangerouslySetInnerHTML` (asserted); text arrives as a
+React node and is escaped. **One seam:** no real-Chrome pass until US-035 / US-037 / US-039 mount it.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress — US-027, US-017, US-021, US-025, US-026, US-018, US-019, US-020,
-US-022, US-023 done (10/11 · 27/29). Phase 2a is CLOSED (5/5) after US-016, which gave
-US-025/US-026/US-027 their Chrome pass.
-**Next: US-024** — recommendation panel & narrative caption strip (2 pts), the last story in the
-phase; the caption strip already exists on `Card` (US-005) and must be reused, not rebuilt.
+**Phase Status:** ✅ **COMPLETED 2026-09-09 — 11/11 stories · 29/29 points.** The whole component
+library exists: seven tile kinds, three chart geometries, the segmented filter, the motion hooks and
+now the two insight elements. Phase 2a is CLOSED (5/5) too.
+**Next:** [Phase 3a — Conversation](phase-3a.md) (US-028 to US-033) — the prompt bar, chips,
+intent matching and the thinking beat; then Phase 3b composes these components into the six hero
+beats, where every narrative and recommendation string is verbatim.
 **Previous:** [Phase 2a](phase-2a.md) · **Next:** [Phase 3a — Conversation](phase-3a.md)
