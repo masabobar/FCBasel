@@ -5,7 +5,7 @@
 **Duration:** Day 1 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (4/6 completed)
+**Status:** In Progress (5/6 completed)
 
 > **Global guardrails apply to every story here** — see [`../constraints.md`](../constraints.md) §2.
 > No integration, no runtime model, no auth, no persistence, no salary/named-individual data.
@@ -64,7 +64,7 @@
 
 **Priority:** P0
 **Total Story Points:** 9
-**Status:** In Progress (2/4 completed)
+**Status:** In Progress (3/4 completed)
 **Source:** Build Specification E2; Reference Implementation Guide §4.
 
 > Getting this right is most of what sells the illusion to an audience that knows FC Basel
@@ -118,15 +118,21 @@
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** One reusable card shell every tile in the product uses.
   - **Acceptance Criteria:**
-    - White background, 1px border token, 12px radius, subtle layered shadow, 20px internal padding
-    - Top: uppercase title + optional period/subtitle in muted; optional icon badge; optional
+    - ✅ White background, 1px border token, 12px radius, subtle layered shadow, 20px internal padding
+    - ✅ Top: uppercase title + optional period/subtitle in muted; optional icon badge; optional
       right-hand action slot (used by period filters and badges); optional 3px top accent bar
-    - Bottom (optional): the narrative caption strip, one line, muted, prefixed with an AI glyph
-    - Defined once and reused — no per-hero copies
+    - ✅ Bottom (optional): the narrative caption strip, one line, muted, prefixed with an AI glyph
+    - ✅ Defined once and reused — no per-hero copies
   - **Dependencies:** US-003
+  - **Notes:** Delivered as `Card` + `CardCaption` in `app/components/tiles/card.tsx`. Slots, not
+    variants: `title`, `subtitle`, `headingLevel`, `icon`, `action`, `accent`, `caption`, `isNew`,
+    `delayMs`, `className`, `children`. `accent` takes a **token name**, never a colour string, so
+    no tile can smuggle a hex past the token set. `isNew`/`delayMs` are the hooks US-006's animation
+    attaches to — no ring, no glow. The title is a real heading (`h3` by default) so a dashboard
+    that grows tile by tile stays navigable.
 
 - **US-006**: Tile-insertion motion & reduced-motion support
   - **Story Points:** 3
@@ -157,7 +163,7 @@
 
 **By Priority:** P0: 6 stories, 14 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 4 stories, 9 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 0
+**By Status:** ✅ 5 stories, 11 points · 🔄 0 · 📋 1 story, 3 points · ⏸️ 0
 
 ---
 

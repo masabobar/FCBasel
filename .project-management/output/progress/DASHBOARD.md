@@ -9,10 +9,10 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 8% | 100% | 🟢 On Track |
-| **Current Phase** | 64% | 100% | 🟢 On Track |
-| **Stories Completed** | 4/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 9/116 | 116 | 🟢 On Track |
+| **Overall Progress** | 9% | 100% | 🟢 On Track |
+| **Current Phase** | 79% | 100% | 🟢 On Track |
+| **Stories Completed** | 5/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 11/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -21,9 +21,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 4
-**Currently Working On:** US-005 — Tile card anatomy (2 pts)
-**Story Points Completed Today:** 9
+**Stories Completed Today:** 5
+**Currently Working On:** US-006 — Tile-insertion motion & reduced-motion support (3 pts)
+**Story Points Completed Today:** 11
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -36,6 +36,9 @@
   its bytes, downsampled 608x648 → 120x128 with `sips` (194 KB → 17.9 KB, no new dependency),
   metadata chunks stripped. Served from `public/`; build and running server contain zero `fcb.ch`
   references.
+- ✅ **US-005 — Tile card anatomy (2 pts)** — one `Card` shell (plus its narrative caption strip) that
+  every Phase 2b tile and Phase 3b hero composes. Slots, not variants; `accent` takes a token name so
+  no hex can reach a tile. Entrance hooks only — US-006 owns the motion, and there is no gold ring.
 
 ---
 
@@ -44,18 +47,19 @@
 **Goal:** Stand up the project and its Railway deployment, then build the design token foundation
 (E2) that every later epic references.
 **Duration:** 2026-09-09 to 2026-09-09 (~5.8 AI-hours)
-**Progress:** 64% (4/6 stories · 9/14 points)
+**Progress:** 79% (5/6 stories · 11/14 points)
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-005: Tile card anatomy | 📋 Todo | 0% |
+| US-006: Tile-insertion motion & reduced-motion support | 📋 Todo | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-005: Tile card anatomy | 2026-09-09 | 2 |
 | US-004: Self-hosted FCB crest | 2026-09-09 | 1 |
 | US-003: Design token set | 2026-09-09 | 3 |
 | US-002: Developer tooling & local DX | 2026-09-09 | 2 |
@@ -92,13 +96,13 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 100% | 80% | 🟢 Good |
-| Passing Tests | 106/106 | TBD | 🟢 Good |
+| Passing Tests | 144/144 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
 | Open Bugs | 0 | < 5 | 🟢 Good |
 
-> Coverage is measured over `app/**` only. The surface is still small (26 statements), but the
+> Coverage is measured over `app/**` only. The surface is still small (35 statements), but the
 > US-003 suite is substantive rather than hollow: it pins every hex, the type scale and the colour
 > discipline, and fails the build if `app/app.css` and `app/lib/tokens.ts` ever disagree. Since
 > US-002 the gate is three-part: strict `tsc`, ESLint 9 flat config, and Prettier — the last two
@@ -110,7 +114,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Phase | Status | Stories | Points | Progress |
 |-------|--------|---------|--------|----------|
-| Phase 1a: Setup & Design System | 🔄 Active | 4/6 | 9/14 | 64% |
+| Phase 1a: Setup & Design System | 🔄 Active | 5/6 | 11/14 | 79% |
 | Phase 1b: Seed Data | ⏸️ Pending | 0/5 | 0/10 | 0% |
 | Phase 2a: Shell & Baseline | ⏸️ Pending | 0/5 | 0/16 | 0% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
@@ -133,4 +137,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-004 completed at 2026-09-09
+**Last Auto-Update:** US-005 completed at 2026-09-09

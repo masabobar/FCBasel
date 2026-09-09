@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 3 stories
-**Total Points:** 8 / 116
+**Total Completed:** 5 stories
+**Total Points:** 11 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 8 points/day
+**Average Velocity:** 11 points/day
 
 ---
 
@@ -111,6 +111,36 @@ extension is wrong and the bytes were trusted instead. No image dependency was a
   `src`/`href` is root-relative — zero external hosts
 - `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (106/106) and `pnpm build` all
   clean; coverage 100% of `app/**`
+
+### US-005: Tile card anatomy (2 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 8 (2 code, 1 test, 5 tracking docs)
+**Tests Added:** 38 (unit: 38)
+**Commit:** see phase-1a progress log
+**Notes:** All 4 acceptance criteria met. This is the DRY story — seven Phase 2b tile kinds and
+three Phase 3b heroes compose this one shell, so the prop set was designed for that, not for today.
+
+**What Was Done:**
+- Added `app/components/tiles/card.tsx` — `Card` (the shell) and `CardCaption` (the narrative strip
+  it can carry). Nothing else: no KPI tile, no chart, no table, no recommendation panel, no hero
+- **Slots, not variants:** `title`, `subtitle`, `headingLevel`, `icon`, `action`, `accent`,
+  `caption`, `isNew`, `delayMs`, `className`, `children`. Each optional part collapses on its own —
+  the header is not rendered at all when nothing would fill it — which is what lets a recommendation
+  panel (accent, no title) and a KPI tile (title, icon) share one implementation
+- `accent` takes a **token name**, never a colour string, so no tile can introduce a hex outside the
+  US-003 set; the colour discipline is enforced by the type rather than by review
+- The title is a real heading (`h3` by default, `headingLevel` to nest), because the dashboard grows
+  tile by tile and the structure is how a screen-reader user follows it
+- The caption strip is one muted line behind an `aria-hidden` AI glyph — decoration, never announced
+- `isNew` applies the exported `TILE_ENTER_CLASS` and `delayMs` sets `animationDelay`: **hooks only.
+  US-006 owns the keyframes, and there is no gold ring and no glow** (Guide supersedes the spec)
+- Added `app/lib/cn.ts` so the shell can carry base classes a caller can still override
+- 38 tests cover both directions of every optional slot, that the AC values resolve from tokens,
+  that no hex or `rgb()` literal exists in the component, that caller text is escaped rather than
+  parsed as markup, and that no ring or glow returns
+- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (144/144) and `pnpm build` all
+  clean; coverage 100% of `app/**`; generated utilities verified in the emitted CSS
 
 ---
 

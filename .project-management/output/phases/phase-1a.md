@@ -47,13 +47,13 @@ every later epic references rather than restates.
 
 ### Epic 2: E2 — FCB Brand Theming & Design System (9 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (2/4) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (3/4) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-003 | Design token set | 3 | ✅ Done |
 | US-004 | Self-hosted FCB crest | 1 | ✅ Done |
-| US-005 | Tile card anatomy | 2 | 📋 Todo |
+| US-005 | Tile card anatomy | 2 | ✅ Done |
 | US-006 | Tile-insertion motion & reduced-motion support | 3 | 📋 Todo |
 
 **Technical Notes:**
@@ -90,12 +90,12 @@ every later epic references rather than restates.
 - **Risk Level:** Low
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 9 / 14 (64%)
-- **Completed Stories:** 4 / 6
-- **Tests Passing:** 106 / 106
-- **Code Coverage:** 100% of `app/**` (26 statements, 8 functions)
+- **Completed Story Points:** 11 / 14 (79%)
+- **Completed Stories:** 5 / 6
+- **Tests Passing:** 144 / 144
+- **Code Coverage:** 100% of `app/**` (35 statements, 11 functions)
 - **Linter:** ESLint 9 flat config — clean (0 errors, 0 warnings)
-- **Commits:** 4
+- **Commits:** 5
 
 ---
 
@@ -261,6 +261,36 @@ are US-012 in Phase 2a and were not built here**.
   fire. No route, raw SQL, env var, auth or logging change.
 - **Trademark:** the genuine crest is used exactly as the client's Build Specification instructs.
   It stays in this repo; no further club branding was invented.
+
+### 2026-09-09 — US-005 Tile card anatomy (2 pts) ✅
+
+`Card` and `CardCaption` in `app/components/tiles/card.tsx` — the one shell the seven Phase 2b tile
+kinds and the three Phase 3b heroes compose. **Slots, not variants**, so a new tile kind never needs
+a new card: `title`, `subtitle`, `headingLevel`, `icon`, `action`, `accent`, `caption`, `isNew`,
+`delayMs`, `className`, `children`. Every optional part collapses on its own — the header is not
+rendered at all when nothing would go in it, which is what lets a recommendation panel (accent, no
+title) and a KPI tile (title, icon, no accent) share one implementation.
+
+Two deliberate constraints. `accent` takes a **token name**, not a colour string, so no tile can
+smuggle a hex past the closed token set — enforced by the type, not by review. And the title renders
+as a real heading (`h3` by default), because a dashboard that grows tile by tile needs structure.
+
+No value is retyped: `rounded-tile`, `p-tile`, `shadow-tile`, `border-border`, `bg-bg` and the
+`.tile-title` / `.narrative-caption` role classes come from US-003. `isNew` applies the exported
+`TILE_ENTER_CLASS`, `delayMs` sets `animationDelay` — hooks only; **US-006 owns the keyframes**, and
+there is no ring, no glow. Nothing beyond the shell and its caption strip was built.
+
+- **Tests:** 38 added (144 total, all passing). They cover the optionality of every slot in both
+  directions, that the AC values resolve from tokens, that no hex or `rgb()` literal exists in the
+  component, that the AI glyph is `aria-hidden` and announced as nothing, that caller text is
+  escaped rather than parsed as markup, and that no ring or glow returns.
+- **Coverage:** 100% of `app/**` (35/35 statements, 11/11 functions, 31/31 branches).
+- **Gates:** `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` clean.
+  Emitted CSS checked in `build/client/assets/root-*.css`: every utility the card names is generated.
+- **Security triage:** all `.claude/rules/security-review.md` §1 triggers considered — no dependency
+  or lockfile change, no route or handler, no SQL, no `fetch`, no upload, no env var, no auth, no
+  logging. Caller content is rendered as React children only: **no `dangerouslySetInnerHTML`**
+  (asserted by test), so slot content is escaped. **No security-relevant changes detected** (§4).
 
 ---
 
