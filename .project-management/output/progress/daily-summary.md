@@ -7,24 +7,31 @@
 
 ## Today's Summary
 
-**Stories Completed:** 0
-**Story Points:** 0
-**Time Worked:** 0 hours
-**Files Changed:** 0
-**Tests Added:** 0
+**Stories Completed:** 1
+**Story Points:** 3
+**Time Worked:** ~1 hour
+**Files Changed:** 21
+**Tests Added:** 8
 
 ---
 
 ## Work Log
 
-*No implementation work logged yet. Project management setup completed today: scope, backlog,
-documentation, phase structure and progress tracking generated from the client document set.*
+- Project management setup: scope, backlog, documentation, phase structure and progress tracking
+  generated from the client document set.
+- **US-001 — Environment & deployment setup.** React Router 7.18 framework mode with SSR scaffolded
+  at the repo root (Vite 6, Tailwind v4, strict TypeScript). Only the prototype's dependency set is
+  installed. Railway deploy config committed. Clean-checkout `pnpm install` / `build` / `start`
+  verified by execution, serving HTTP 200 with server-rendered markup, with no environment variable
+  and no database. 8 unit tests green, `tsc --noEmit` clean, `pnpm audit` clean after overriding a
+  vulnerable transitive `qs`.
 
 ---
 
 ## Stories Completed Today
 
-*None*
+- ✅ US-001 — Environment & deployment setup (3 pts) — 4/5 acceptance criteria met; the Railway
+  deploy AC is deferred to the human.
 
 ---
 
@@ -34,11 +41,18 @@ documentation, phase structure and progress tracking generated from the client d
 
 ---
 
+## Open Human Step
+
+- **Deploy to Railway** (US-001, the remaining AC). The repo is deploy-ready. Run
+  `railway login && railway init && railway up`, open the URL in Chrome, then record it in
+  `output/phases/phase-1a.md` and the backlog entry.
+
+---
+
 ## Next Day Plan
 
 **Immediate Focus:**
-- US-001 — Environment & deployment setup (3 pts, Human+AI) — the Railway URL is the deliverable
-- US-002 — Developer tooling & local DX (2 pts, AI)
+- US-002 — Developer tooling & local DX (2 pts, AI) — ESLint 9 flat config, Prettier, husky
 - US-003 — Design token set (3 pts) — blocks all visual work
 
 **Priority Stories for This Week:**

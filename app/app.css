@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Design tokens (colour, type scale, spacing, radii, motion) are introduced in
+   US-003. This file intentionally carries nothing but the Tailwind entry point. */

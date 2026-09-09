@@ -5,7 +5,7 @@
 **Duration:** Day 1 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 
 > **Global guardrails apply to every story here** — see [`../constraints.md`](../constraints.md) §2.
 > No integration, no runtime model, no auth, no persistence, no salary/named-individual data.
@@ -16,7 +16,7 @@
 
 **Priority:** P0
 **Total Story Points:** 5
-**Status:** Not Started (0/2 completed)
+**Status:** In Progress (1/2 completed)
 **Source:** Developer-owned; deliberately outside the Build Specification.
 
 ### Stories:
@@ -26,17 +26,20 @@
   - **Priority:** P0
   - **Component:** [DevOps]
   - **Owner:** Human+AI
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** Stand up the React Router 7 app, the repository, and a Railway deployment
     producing the shareable URL the prototype is delivered on.
   - **Acceptance Criteria:**
-    - React Router 7 (framework mode, SSR) app scaffolds and runs locally
-    - Deployed to Railway on a shareable URL that loads cleanly in Chrome
-    - Production build succeeds from a clean checkout
-    - No environment variable is required for the prototype to run
-    - No database is provisioned
+    - ✅ React Router 7 (framework mode, SSR) app scaffolds and runs locally
+    - ⏸️ Deployed to Railway on a shareable URL that loads cleanly in Chrome — **deferred, human
+      step** (no Railway account access from the AI session; the repo is deploy-ready)
+    - ✅ Production build succeeds from a clean checkout
+    - ✅ No environment variable is required for the prototype to run
+    - ✅ No database is provisioned
   - **Dependencies:** None
   - **Notes:** ~2-4 h. The URL is the deliverable — it is sent to the sponsor and opened in the meeting.
+    Deploy config is committed (`railway.json`, `build`/`start` scripts); the human runs
+    `railway init && railway up` to produce the URL.
 
 - **US-002**: Developer tooling & local DX
   - **Story Points:** 2
@@ -145,7 +148,7 @@
 
 **By Priority:** P0: 6 stories, 14 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 0 · 🔄 0 · 📋 6 stories, 14 points · ⏸️ 0
+**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 5 stories, 11 points · ⏸️ 0
 
 ---
 

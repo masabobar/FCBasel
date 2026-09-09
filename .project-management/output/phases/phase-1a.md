@@ -1,8 +1,8 @@
 # Phase 1a: Project Setup & Design System
 
 **Duration:** 2026-09-09 to 2026-09-09 (~5.8 AI-hours)
-**Status:** Planning
-**Started:** —
+**Status:** In Progress
+**Started:** 2026-09-09
 **Target Completion:** 2026-09-09
 **Actual Completion:** —
 
@@ -30,17 +30,20 @@ every later epic references rather than restates.
 
 ### Epic 1: Project Setup & Deployment (5 story points)
 
-**Priority:** P0 · **Status:** Todo · **Dependencies:** none
+**Priority:** P0 · **Status:** In Progress (1/2) · **Dependencies:** none
 
 | Story | Title | Pts | Owner | Status |
 |---|---|---:|---|---|
-| US-001 | Environment & deployment setup | 3 | Human+AI | 📋 Todo |
+| US-001 | Environment & deployment setup | 3 | Human+AI | ✅ Done (1 AC deferred) |
 | US-002 | Developer tooling & local DX | 2 | AI | 📋 Todo |
 
 **Technical Notes:**
 - React Router 7 framework mode with SSR; `@react-router/serve` in production
 - **No environment variables and no database** — the app must run with zero configuration
 - US-001 is the source of the infra figure in the effort estimate (~3 h)
+- **US-001 open human step:** the Railway deploy AC is deferred — the AI session has no Railway
+  account access. The repo is deploy-ready (`railway.json`, `pnpm build` / `pnpm start`); the human
+  runs `railway login && railway init && railway up` and records the URL here.
 
 ### Epic 2: E2 — FCB Brand Theming & Design System (9 story points) *(foundation)*
 
@@ -87,11 +90,11 @@ every later epic references rather than restates.
 - **Risk Level:** Low
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 0 / 14 (0%)
-- **Completed Stories:** 0 / 6
-- **Tests Passing:** 0 / 0
-- **Code Coverage:** 0%
-- **Commits:** 0
+- **Completed Story Points:** 3 / 14 (21%)
+- **Completed Stories:** 1 / 6
+- **Tests Passing:** 8 / 8
+- **Code Coverage:** 100% of `app/**` (small surface — 4 statements, 4 functions)
+- **Commits:** 1
 
 ---
 
@@ -112,7 +115,7 @@ every later epic references rather than restates.
 
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
-| Railway setup consumes more than the ~3 h budgeted | Medium | Low | Zero-config app: no env vars, no database, no migrations | Human+AI | Open |
+| Railway setup consumes more than the ~3 h budgeted | Medium | Low | Zero-config app: no env vars, no database, no migrations; `railway.json` committed so the deploy is one command | Human+AI | Open (human step) |
 | Crest asset unavailable or format-awkward | Medium | Low | Self-host from the committed copy; the build must never depend on the live CDN | AI | Open |
 | Token drift — a colour introduced outside the set | High | Medium | Not permitted by spec; choose the nearest token. Verified in US-044 brand QA | AI | Open |
 | Reduced-motion path leaves a value stuck at zero | Medium | Medium | Grow hook returns `true` immediately under reduced motion | AI | Open |
@@ -121,11 +124,35 @@ every later epic references rather than restates.
 
 ## Progress Log
 
-_Entries appear here as `/execute-work` completes stories._
+### 2026-09-09 — US-001 Environment & deployment setup (3 pts) ✅
+
+React Router 7.18 framework mode with SSR scaffolded at the repo root: `react-router.config.ts`
+(`ssr: true`), `vite.config.ts` (Tailwind v4 + React Router plugins), strict `tsconfig.json`,
+`app/root.tsx`, `app/routes.ts` and a deliberately minimal `app/routes/_index.tsx`. Only the
+packages this prototype needs are installed — Prisma, bcryptjs, msw, Recharts, TanStack Table,
+`@react-pdf/renderer`, resend, react-email and every i18next package are expansion-path only and
+absent, per `input/technologies.md`.
+
+Verified by running, not assumed: `pnpm install --frozen-lockfile`, `pnpm build` and `pnpm start`
+all succeed from a **clean checkout** (fresh tree, no `node_modules`), and the server returns
+HTTP 200 with server-rendered markup. No environment variable is required (`PORT` is honoured when
+the platform supplies it, defaulting to 3000); no database is provisioned.
+
+- **Tests:** 8 unit tests, all passing; coverage scoped to `app/**` only (100%, small surface).
+- **Typecheck:** `pnpm typecheck` clean under TypeScript strict.
+- **Security triage:** dependency trigger fired (`package.json` + lockfile added). `pnpm audit`
+  initially reported 2 moderate `qs` advisories reaching us through express under
+  `@react-router/serve`; a `qs: ">=6.16.0"` override in `pnpm-workspace.yaml` clears them.
+  **`pnpm audit` now reports no known vulnerabilities.** No high/critical. No secrets, no env vars,
+  no HTTP handlers, no database, no user input — no other trigger applies.
+- **⏸️ Deferred to the human:** the Railway deploy AC. The repo is deploy-ready (`railway.json`,
+  `build`/`start` scripts, `@react-router/serve` as the production server). Run
+  `railway login && railway init && railway up`, then record the shareable URL in this file and in
+  the backlog entry.
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** Planning
+**Phase Status:** In Progress
 **Next Phase:** [Phase 1b — Seed Data](phase-1b.md)

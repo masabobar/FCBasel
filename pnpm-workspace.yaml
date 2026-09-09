@@ -1,0 +1,12 @@
+# Single-application repository — no workspace packages are declared here.
+# pnpm 11 reads its settings from this file.
+
+# esbuild (a Vite dependency) needs its install script to run so the platform
+# binary is linked.
+allowBuilds:
+  esbuild: true
+
+# Transitive `qs` reaching us through express under @react-router/serve is
+# below the patched 6.16.0 (GHSA-x5fp-wj9c-mxmx, GHSA-4mjr-xmp4-gh2g).
+overrides:
+  qs: ">=6.16.0"

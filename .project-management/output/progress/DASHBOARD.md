@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 0% | 100% | 🟢 On Track |
-| **Current Phase** | 0% | 100% | 🟢 On Track |
-| **Stories Completed** | 0/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 0/116 | 116 | 🟢 On Track |
-| **Test Coverage** | 0% | 80% | ⚪ Not Started |
+| **Overall Progress** | 3% | 100% | 🟢 On Track |
+| **Current Phase** | 21% | 100% | 🟢 On Track |
+| **Stories Completed** | 1/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 3/116 | 116 | 🟢 On Track |
+| **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
 
@@ -21,11 +21,12 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 0
-**Currently Working On:** None
-**Story Points Completed Today:** 0
+**Stories Completed Today:** 1
+**Currently Working On:** US-002 — Developer tooling & local DX (2 pts)
+**Story Points Completed Today:** 3
 
-_Work will appear here as you use `/execute-work`_
+- ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
+  `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
 
 ---
 
@@ -34,23 +35,28 @@ _Work will appear here as you use `/execute-work`_
 **Goal:** Stand up the project and its Railway deployment, then build the design token foundation
 (E2) that every later epic references.
 **Duration:** 2026-09-09 to 2026-09-09 (~5.8 AI-hours)
-**Progress:** 0% (0/6 stories)
+**Progress:** 17% (1/6 stories · 3/14 points)
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-001: Environment & deployment setup | 📋 Todo | 0% |
+| US-002: Developer tooling & local DX | 📋 Todo | 0% |
 
 ### Recently Completed
 
-_Completed stories will appear here_
+| Story | Completed | Points |
+|-------|-----------|--------|
+| US-001: Environment & deployment setup | 2026-09-09 | 3 |
 
 ---
 
 ## ⚠️ Active Blockers
 
 ✅ No active blockers
+
+**Open human step (not a blocker):** the Railway deploy for US-001. The repo is deploy-ready —
+run `railway login && railway init && railway up`, then record the shareable URL.
 
 ---
 
@@ -73,10 +79,14 @@ _Completed stories will appear here_
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage | 0% | 80% | 🔴 Not Started |
-| Passing Tests | 0/0 | TBD | ⚪ N/A |
-| Linting Errors | 0 | 0 | 🟢 Good |
+| Test Coverage (`app/**`) | 100% | 80% | 🟢 Good |
+| Passing Tests | 8/8 | TBD | 🟢 Good |
+| TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
+| Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
 | Open Bugs | 0 | < 5 | 🟢 Good |
+
+> Coverage is measured over `app/**` only. The number is honest but thin — the application surface
+> is still four small modules. ESLint arrives with US-002; strict `tsc` is the current lint gate.
 
 ---
 
@@ -84,7 +94,7 @@ _Completed stories will appear here_
 
 | Phase | Status | Stories | Points | Progress |
 |-------|--------|---------|--------|----------|
-| Phase 1a: Setup & Design System | 🔄 Active | 0/6 | 0/14 | 0% |
+| Phase 1a: Setup & Design System | 🔄 Active | 1/6 | 3/14 | 21% |
 | Phase 1b: Seed Data | ⏸️ Pending | 0/5 | 0/10 | 0% |
 | Phase 2a: Shell & Baseline | ⏸️ Pending | 0/5 | 0/16 | 0% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
@@ -107,4 +117,4 @@ _Completed stories will appear here_
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** Initial creation at 2026-09-09
+**Last Auto-Update:** US-001 completed at 2026-09-09

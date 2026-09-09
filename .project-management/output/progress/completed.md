@@ -6,17 +6,34 @@
 
 ## Summary
 
-**Total Completed:** 0 stories
-**Total Points:** 0 / 116
-**Start Date:** TBD (project initialized 2026-09-09)
-**Days Active:** 0
-**Average Velocity:** - points/day
+**Total Completed:** 1 story
+**Total Points:** 3 / 116
+**Start Date:** 2026-09-09
+**Days Active:** 1
+**Average Velocity:** 3 points/day
 
 ---
 
 ## Completed Stories
 
-*No completed stories yet. This file will track all completed work chronologically.*
+### US-001: Environment & deployment setup (3 pts)
+**Completed:** 2026-09-09
+**By:** AI (Railway deploy step remains with the human)
+**Files Changed:** 21 (16 code/config, 5 tracking docs)
+**Tests Added:** 8 (unit: 8)
+**Commit:** see phase-1a progress log
+**Notes:** 4 of 5 acceptance criteria met and verified by execution. The Railway deploy AC is
+**deferred to the human** — no account access from the AI session.
+
+**What Was Done:**
+- Scaffolded React Router 7.18 in framework mode with SSR (`ssr: true`), Vite 6, Tailwind v4
+- Added strict TypeScript config, `app/root.tsx`, `app/routes.ts`, a minimal index route
+- Installed only the prototype's dependency set; no Prisma, msw, Recharts, TanStack Table,
+  PDF/email or i18next packages
+- Committed Railway deploy config (`railway.json`) with `pnpm build` / `pnpm start`
+- Verified from a **clean checkout**: install, build, and a production server returning HTTP 200
+  with server-rendered markup — no environment variable, no database
+- Cleared 2 moderate transitive `qs` advisories with a pnpm override; `pnpm audit` is now clean
 
 ---
 
