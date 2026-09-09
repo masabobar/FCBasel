@@ -1,7 +1,7 @@
 # Phase 3a: Conversational Interface & Interaction Model
 
 **Duration:** 2026-09-12 to 2026-09-13 (~8.7 AI-hours)
-**Status:** Active (3/6 stories)
+**Status:** Active (4/6 stories)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-13
 **Actual Completion:** —
@@ -30,14 +30,14 @@ the demo.
 
 ### Epic 6: E5 — Conversational Interface & Interaction Model (17 story points)
 
-**Priority:** P0 · **Status:** In Progress (3/6 · 10/17 pts) · **Dependencies:** US-003, US-006, US-014
+**Priority:** P0 · **Status:** In Progress (4/6 · 12/17 pts) · **Dependencies:** US-003, US-006, US-014
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-028 | Persistent prompt bar | 2 | ✅ Completed |
 | US-029 | Suggestion chips & chip lifecycle | 3 | ✅ Completed |
 | US-030 | Intent normalisation, scoring & tie-breaking | 5 | ✅ Completed |
-| US-031 | Thinking beat | 2 | 📋 Todo |
+| US-031 | Thinking beat | 2 | ✅ Completed |
 | US-032 | Graceful fallback panel | 2 | 📋 Todo |
 | US-033 | Follow-up context gating | 3 | 📋 Todo |
 
@@ -86,9 +86,9 @@ the demo.
 > paraphrases" is judged, not asserted.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 10 / 17 (59%)
-- **Completed Stories:** 3 / 6
-- **Tests Passing:** 1587 / 1587 · **Coverage:** 100% lines (`app/**`) · **Commits:** 3
+- **Completed Story Points:** 12 / 17 (71%)
+- **Completed Stories:** 4 / 6
+- **Tests Passing:** 1678 / 1678 · **Coverage:** 100% lines (`app/**`) · **Commits:** 4
 
 ---
 
@@ -110,7 +110,7 @@ E7 rather than following it.
 | A paraphrase the owner uses fails to match | High | Medium | Generous keyword sets; 8-14 phrasings tested per hero in US-030; fallback always catches | AI | Mitigated |
 | A follow-up steals its parent hero's phrasing | High | Medium | Threshold 3 vs 2, plus heroes ordered first so a tie goes to the hero; both pinned | AI | Mitigated |
 | Two intents score equally and both render | High | Low | Strictly-greater comparison over an ordered config; three-way tie and corpus-wide single-match invariant asserted | AI | Mitigated |
-| Thinking beat reads as slowness rather than effort | Medium | Low | Fixed ~600-1200ms; tuned on the demo hardware in US-043 | AI | Open |
+| Thinking beat reads as slowness rather than effort | Medium | Low | Fixed 1150ms (260ms reduced) in US-031, pinned by test inside the 600-1200ms band; every source chip lands before the answer; re-tune on the demo hardware in US-043 | AI | Mitigated |
 | Rapid submits overlap and corrupt state | Medium | Medium | Debounced in US-028: a submit consumes the question through a mirrored ref and `busy` disables the field; three rapid Enters yield one call | AI | Mitigated |
 
 ---
@@ -237,9 +237,56 @@ stmts / 98.26% branches.
   `INTENT_REQUIRES_PARENT` is the parent-gating flag US-033 reads. `busy` is still untouched
   (US-031).
 
+### 2026-09-09 — US-031 Thinking beat (2 pts) ✅
+
+`app/lib/dashboard/thinking.ts` (the six beats, the two delays, the chip stagger),
+`app/lib/dashboard/use-thinking.ts` (the runner) and
+`app/components/heroes/thinking-panel.tsx` (the panel), wired in `app/root.tsx`. 91 new tests
+(1678 green), coverage 100% lines / 99.83% stmts.
+
+- **THE BEAT COMES BEFORE THE TILES, AND THE ORDERING IS ASSERTED.** On a fake clock: at
+  `1150ms - 1` the panel is on screen and there is NO section; at `1150ms` the section is there and
+  the panel is gone. Mutating the runner to land the answer immediately fails **22** tests. The panel
+  is the LAST canvas grid item, so the answer appears exactly where the thinking was.
+- **BOTH QUESTION PATHS RUN THROUGH IT AND NEITHER MODULE CHANGED.** `useThinking(dashboard)` returns
+  a `ChipActions` — the interface `askQuestion` and `selectChip` already took — so a tapped chip and
+  a typed question both wait. The chip path therefore still bypasses US-030's scoring **by type**
+  (asserted again here), and the hook names no scoring function.
+- **ONE TIMER, STILL.** The delay is scheduled through `useDashboard`'s `schedule`; there is no
+  `setTimeout` in any new file, and a scan of every `.ts`/`.tsx` under `app/` pins the only two
+  places a timer may be created (`use-dashboard.ts`, and US-027's `requestAnimationFrame` fallback).
+  A second chip tap mid-beat REPLACES the beat rather than racing it — one panel, one timer, one
+  answer.
+- **US-015 CRITERION ④ IS NOW SATISFIED — the last of its four.** Reset mid-beat leaves no panel, no
+  section and **no timer** (asserted on `vi.getTimerCount()`), the cancelled answer never arrives
+  however far the clock is advanced, and the screen is immediately usable again. Proved by mutation:
+  deleting `cancelPending()` from `reset` fails 4 of these tests, and deleting the panel's
+  `generation` clear fails 4. `phase-2a.md` / `phase-2a-shell.md` updated.
+- **Per-flow copy verbatim, all six flows** (message + ordered source list), rendered on the real
+  `App` for each. Source chips stagger at 150 / 370 / 590ms (the reference's `0.15 + i·0.22s`), every
+  flow's last chip landing before the beat ends. A follow-up asked before its parent shows the
+  PARENT's beat, so the panel can never promise an answer the dashboard is not about to give.
+- **`busy` closes the field for the beat's length** (input, send button and `aria-busy`), and a
+  second submit during it is a no-op — removing US-028's `busy` guard fails that test.
+- **Reduced motion: ~260ms, animations at final state.** The delay shortens (and is asserted to be
+  genuinely shorter — the full beat is still running at 260ms), the source chips are VISIBLE rather
+  than stranded at `opacity: 0` (`.fcb-src` final state in the stylesheet, and nothing inline that
+  could override it), and the sweep hides, having no meaningful end state.
+- **No new keyframe and no new token.** The panel reuses US-006's `fcb-enter`, `fcb-scan`, `fcb-glow`
+  and `fcb-src`; `app/app.css` still contains exactly four `@keyframes`. No hex, no arbitrary value,
+  no dependency added. Accessibility: `role="status"` + `aria-live="polite"` announces the message
+  and the sources; the sweep and the glyph are `aria-hidden`.
+- **Security triage — no security-relevant changes detected.** No request is made (`fetch`,
+  `XMLHttpRequest`, `WebSocket`, `EventSource`, `sendBeacon`, `axios` and dynamic `import()` all
+  scanned across the three new modules), no endpoint, no dependency, no storage, no `innerHTML`, no
+  URL and no logging. The typed string never reaches the beat: the panel renders only strings from
+  its own static config, selected by a `HeroId` and a `ChipKind`.
+- **Seams left:** a no-match still shows no beat, which is exactly US-032's input; US-033's typed
+  follow-up gating slots in behind `askQuestion` with nothing here to change.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** Active (3/6 stories · 10/17 pts)
+**Phase Status:** Active (4/6 stories · 12/17 pts)
 **Previous:** [Phase 2b](phase-2b.md) · **Next:** [Phase 3b — Heroes](phase-3b.md)

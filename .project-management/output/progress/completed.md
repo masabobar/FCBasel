@@ -6,10 +6,10 @@
 
 ## Summary
 
-**Total Completed:** 30 stories
-**Total Points:** 79 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 79 points/day
-**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (3/6)**
+**Total Completed:** 31 stories
+**Total Points:** 81 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 81 points/day
+**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (4/6)**
 
 ---
 
@@ -57,7 +57,7 @@ entry stays in full below the table — it is the story that closed the phase.
 | US-012 Branded application shell | 3 | 57 | `chrome/{sidebar,top-bar,app-shell}.tsx` + `lib/persona.ts` — navy sidebar (hidden below `lg`), app bar with the self-hosted crest, and a 12/8/4 canvas grid left **empty** for US-013/014/015/016. No literal colour anywhere. **Persona is a role:** one module holds the label and the "SM" monogram, and a test asserts the app bar's entire text is exactly those labels. **Placeholders are inert structurally, not by handler** (`aria-disabled`, no href, no focus, `pointer-events-none`); status is decorative — no live region, no `fetch`, no timer. Chrome: `scrollWidth === clientWidth` at 1920x1080. |
 | US-014 Dynamic tile insertion & grid reflow | 3 | 77 | `lib/dashboard/sections.ts` (pure) + `use-dashboard.ts` (state, owned by `root.tsx`): the session as a memory-only `{heroId, phase, revision}` list. The dashboard **grows, it never clears**. **Dedupe by hero id** — re-asking keeps ONE section in place and bumps `revision` so it re-inserts rather than doing nothing, and a follow-up *flips* its parent's phase (what US-033 needs). **One grid, not two:** sections re-use US-012's tracks via `grid-cols-subgrid`. **Reflow, never jump** — every mutation runs through `animateReflow` with `flushSync` inside the callback; reduced motion gives zero transitions with an identical layout. A source scan bans every storage API. |
 | US-013 Baseline dashboard — four tiles | 3 | 103 | `dashboard/baseline-row.tsx` + `tiles/partner-tile.tsx` + `lib/dashboard/baseline.ts` + a `loader` on `_index.tsx`: **the canvas stops being empty.** Four tiles in order as direct children of the one canvas grid, composing `KpiTile` ×2, `HBarTile` and `PartnersTile` — no new tile kind, no second grid. **No figure re-typed:** every string asserted equal to `repository → derive → format.ts`, plus a source scan over four files for literals, `CHF`/`%` strings, product and partner names and `toLocaleString`/`toFixed`. `trendEndingAt` makes the sparkline END on the month the headline covers. Partner plates carry the partner's **own** brand colour (no hex, no FCB token in the file). Reset's baseline seam closed as static route chrome, driven end to end by a test. First real-Chrome pass for US-017/US-021/US-027. |
-| US-015 Reset to baseline | 2 | 40 | Reset built as a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS`, `reset` + `schedule` + `generation`, `scrollToTop`, `<AppShell onReset>`. It restores the same named constant that is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free. **The timer, proven by breaking it:** `reset` cancels the pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard. **Abuse-proof by construction** — the same reference comes back when there is nothing to clear, so 10 presses in one frame run **one** transition. 3 of 5 criteria met at the time; **criterion ② is now SATISFIED by US-029** (the chip row is derived from `sections`, so Reset restores it with no reset code), and half of ④'s thinking beat remains US-031's. |
+| US-015 Reset to baseline | 2 | 40 | Reset built as a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS`, `reset` + `schedule` + `generation`, `scrollToTop`, `<AppShell onReset>`. It restores the same named constant that is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free. **The timer, proven by breaking it:** `reset` cancels the pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard. **Abuse-proof by construction** — the same reference comes back when there is nothing to clear, so 10 presses in one frame run **one** transition. 3 of 5 criteria met at the time; **② is now SATISFIED by US-029** (the row is derived from `sections`) and **④ by US-031** (Reset mid-beat leaves no panel, no section and no timer) — **all five now met.** |
 
 ---
 
@@ -214,8 +214,7 @@ criteria met. Condensed; full detail in [`../phases/phase-3a.md`](../phases/phas
 - **A real HTML `<form>`** (the reference avoided one only for its sandbox), so Enter and the button
   are ONE code path. **Criterion 4 without a second clock:** a submit CONSUMES the question through
   a mirrored ref written *before* `onSubmit`, so three rapid Enters yield exactly one call
-- **`fixed`, not `sticky`** — the shell clips sideways overflow, so a sticky bar would settle at the
-  bottom of the content; fixed also leaves the PAGE scrolling, which US-014/US-015 depend on
+- **`fixed`, not `sticky`** — the shell clips sideways overflow, and fixed leaves the PAGE scrolling
 - **Security triage — the A03 user-input trigger FIRES and is closed:** the value is rendered only
   as an input `value`, never as markup; no injection sink, URL, storage key or built selector; an
   `<img onerror>` payload reaches the callback verbatim and creates no element
@@ -231,63 +230,70 @@ detail in [`../phases/phase-3a.md`](../phases/phase-3a.md).
   combinations. **US-015 criterion ② is thereby satisfied** with no reset code touched
 - **A tap bypasses scoring BY TYPE:** `selectChip` takes a chip and reads its `heroId`; a source
   scan rejects any scoring vocabulary in the module, and a `@ts-expect-error` case guards the seam
-- Surface reused, not restated (`CHIP_SURFACE_CLASS` + the shared `.fcb-chip` rule); only the gold
-  follow-up tint is new — a wash and a border, never a fill, and still no gold ring. Kind is not
-  colour alone: a trend glyph plus a hidden "Follow-up:" in the accessible name
+- Surface reused, not restated; only the gold follow-up tint is new — a wash and a border, never a
+  fill. Kind is not colour alone: a trend glyph plus a hidden "Follow-up:" in the accessible name
 - **Security triage — no security-relevant changes detected** (a chip carries a hero id from a
   closed enum, never text)
 
 ### US-030: Intent normalisation, scoring & tie-breaking (5 pts)
-
-**Completed:** 2026-09-09 · **Tests:** 89 new (1587 green) · **Coverage:** 100% lines, 99.83% stmts
-/ 98.26% branches · **Files:** `app/lib/dashboard/intents.ts` (new), `app/root.tsx`,
-`tests/unit/intent-matching.test.ts` (new), `tests/unit/root.test.tsx` · all 7 criteria met.
-
-**The highest-risk story in the build.** The owner typing an off-script paraphrase is the live,
-unrecoverable moment everything else in the prototype exists to protect, and the acceptance is
-qualitative — so the **test suite is the deliverable as much as the code**: 89 tests pin the matcher
-input by input and score by score.
+**Completed:** 2026-09-09 · 89 tests (1587 green), 100% lines · `app/lib/dashboard/intents.ts`,
+wired to US-028's `onSubmit`. **The highest-risk story in the build** — the owner typing an
+off-script paraphrase is the live, unrecoverable moment. Condensed; full detail in
+[`../phases/phase-3a.md`](../phases/phase-3a.md).
 
 - **A FAITHFUL PORT OF THE APPROVED REFERENCE ALGORITHM, VERIFIED RATHER THAN TRUSTED.** normalise
-  (lowercase → strip `/.,?!'"()` → collapse whitespace → trim → pad one space each side, which is
-  also why `25/26` becomes the `2526` keyword) → **+2 per strong keyword, +1 per weak** → threshold
-  **2 for a hero, 3 for a follow-up** → **strictly-greater** comparison over an ordered config. A
-  test re-implements the reference formula as an **oracle** (redundant disjunct included) and asserts
-  identical scores *and* identical winners across a 90-phrase corpus
-- **Static config, criterion 7:** six definitions (hero id from the shared `HeroId`, kind from
-  US-029's `ChipKind`, strong/weak keyword sets), the threshold and the **parent-gating flag**
-  (`INTENT_REQUIRES_PARENT`, which US-033 reads) held per kind. **The order IS the tie-break**
-- **Paraphrase tolerance is the acceptance, so it is table-driven:** 14 phrasings for Hero 1
-  (including the three named — `kit sales`, `how are shirts selling`, `trikot`), 10 for Hero 2, 10
-  for Hero 3. Each canonical chip label resolves to its own hero with an asserted **margin** over
-  that hero's follow-up (8v4, 4v0, 10v1); the loose `why is marketing high?` lands on Hero 3's
-  follow-up at **exactly 3** while Hero 3's primary scores 0
-- **Tie-break proven, not asserted:** `kit gate` 2/2 → Hero 1, `trikot budget` → Hero 1 over Hero 3,
-  `ticket budget` → Hero 2 over Hero 3, `shirt ticket budget` a **three-way** 2/2/2 → Hero 1, and
-  two hero-vs-own-follow-up ties (4/4, 5/5) that go to the hero. `over target` carries both
-  threshold halves on one input (2 matches the hero, the same 2 does not match the follow-up).
-  Corpus-wide, one input yields **one** `{heroId, kind}` or `null` — **two heroes never render**
-- **`sales` alone resolves to nothing** (1 < 2), like nine other lone common words; off-script,
-  gibberish, empty and whitespace all fall through to `null` — US-032's input, never an error
-- **The two inherited rough edges are DOCUMENTED AND PINNED AS THE CURRENT CONTRACT**, with a
-  comment saying tightening them is a deliberate future decision: strong keywords match a word
-  **prefix** (`kit` hits `kitchen`, `gate` hits `gateway`), weak keywords match **any substring**
-  (`over` hits `overall`/`recover`, `name` hits `nameplate`). The same leniency is what makes `kits`,
-  `kit-sales` and `shirts?` resolve with no keyword of their own
-- **The chip path was not touched.** `askQuestion` takes a `string`, `selectChip` takes a chip, and a
-  `@ts-expect-error` case in each suite fails typecheck if either seam loosens
-- **The golden rule is enforced by scan:** the module imports only `../repositories/enums` and
-  `./chips` (asserted exactly), with no `fetch`/`WebSocket`/`axios`, no model, embedding or
-  fuzzy-match reference, no `new RegExp`, no SQL, no `eval`/dynamic `import()`, and no dependency
-  added (`package.json` scanned)
-- **Security triage — the A03 user-input trigger FIRES and is closed:** the typed string is
-  lowercased into a local, tested against the fixed keyword list with `String.includes`, and
-  discarded; only a `HeroId` and a `ChipKind` escape. It never becomes markup, a URL, a query, a DOM
-  selector, a storage key, a React key or a log line (all scanned), and no regex is built from it, so
-  no pattern injection. An `<img onerror>` payload scores 0 everywhere, returns `null` and creates no
-  element on the real `App`. Cleared: A01 (no route or resource id), A06 (no dependency change), A10
-  (no `fetch`), plus SQL, upload, env/secret, logging, CSRF and storage. **One seam:** no real-Chrome
-  pass yet — the typed path is verified in Chrome once US-031/US-032 give it a rendered answer
+  → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** → **strictly-greater** over an
+  ordered static config, so the order IS the tie-break. A test re-implements the reference formula as
+  an **oracle** and asserts identical scores *and* winners across a 90-phrase corpus
+- **Paraphrase tolerance is the acceptance, so it is table-driven:** 34 phrasings across the three
+  heroes (the three named among them), each canonical chip label beating its own follow-up by an
+  asserted margin (8v4, 4v0, 10v1). Tie-breaks proven to a **three-way** 2/2/2 → Hero 1; corpus-wide
+  one input yields **one** match or `null` — **two heroes never render**. `sales` alone resolves to
+  nothing, and off-script/gibberish/empty fall through to `null` — US-032's input, never an error
+- **The two inherited rough edges are PINNED AS THE CURRENT CONTRACT** (strong keywords prefix-match,
+  weak keywords substring-match), with tightening flagged as a deliberate future decision
+- **Golden rule by scan:** two internal imports, no `fetch`, model, embedding, fuzzy-match library,
+  `new RegExp`, SQL or dependency added. **Security triage — A03 FIRES and is closed:** the typed
+  string is scored and discarded, never markup, a URL, a query, a selector, a storage key or a log
+  line; an `<img onerror>` payload scores 0 and creates no element
+
+### US-031: Thinking beat (2 pts)
+
+**Completed:** 2026-09-09 · **Tests:** 91 new (1678 green) · **Coverage:** 100% lines, 99.83% stmts
+· **Files:** `app/lib/dashboard/thinking.ts`, `app/lib/dashboard/use-thinking.ts`,
+`app/components/heroes/thinking-panel.tsx` (all new), `app/root.tsx`,
+`tests/unit/thinking-beat.test.tsx` + `tests/unit/support/thinking-harness.ts` (new),
+`tests/unit/root.test.tsx`, `tests/unit/suggestion-chips.test.tsx` · all 4 criteria met, **plus
+US-015 criterion ④**.
+
+- **STAGECRAFT, NOT A QUERY (criterion 4).** A fixed delay and six hand-authored copy blocks —
+  **no request is made** anywhere in the three new modules (`fetch`, `XMLHttpRequest`, `WebSocket`,
+  `EventSource`, `sendBeacon`, `axios` and dynamic `import()` all scanned), no dependency added
+- **THE BEAT COMES BEFORE THE TILES, AND THE ORDERING IS ASSERTED (criterion 1).** On a fake clock:
+  at `1150ms - 1` the panel is up and there is NO section; at `1150ms` the section is there and the
+  panel is gone. Mutating the runner to land the answer immediately fails **22** tests
+- **BOTH QUESTION PATHS PAUSE AND NEITHER MODULE CHANGED.** `useThinking(dashboard)` wraps the two
+  dashboard actions and returns the `ChipActions` that `askQuestion` and `selectChip` already took,
+  so a tapped chip waits as a typed question does — while a chip tap still bypasses scoring **by
+  type**. A no-match calls neither action, so an off-script question shows **no beat** (US-032's input)
+- **STILL ONE TIMER.** Scheduled through `useDashboard`'s `schedule`; no `setTimeout` in any new
+  file, and a scan of every `.ts`/`.tsx` under `app/` pins the only two places one may be created. A
+  second chip tap mid-beat *replaces* the beat rather than racing it, and `busy` closes the field for
+  its length so a second submit is a no-op (removing US-028's guard fails that test)
+- **US-015 CRITERION ④ IS NOW SATISFIED — the last of its five.** Reset mid-beat leaves no panel, no
+  section and **no timer** (`vi.getTimerCount()`), and the cancelled answer never arrives however far
+  the clock runs. Proved by mutation twice: deleting `cancelPending()` fails 4 tests, deleting the
+  beat's `generation` clear fails 4
+- **Per-flow copy verbatim for all six flows** (message + ordered sources), a sweeping scan line, and
+  source chips staggered at 150 / 370 / 590ms — every flow's last chip landing before the answer. A
+  follow-up without its parent shows the PARENT's beat, so the panel never over-promises
+- **Reduced motion: ~260ms (asserted genuinely shorter) with animations at final state** — the source
+  chips VISIBLE, not stranded at `opacity: 0`, nothing inline able to override the stylesheet, and
+  the sweep hidden for want of a meaningful end state. **No new keyframe, token, hex or dependency**;
+  US-006's four keyframes are reused. `role="status"` + `aria-live="polite"`; sweep and glyph hidden
+- **Security triage — no security-relevant changes detected.** No endpoint, route, storage,
+  `innerHTML`, URL, env var or logging; the typed string never reaches the beat, which renders only
+  its own static copy selected by a `HeroId` and a `ChipKind`
 
 ---
 

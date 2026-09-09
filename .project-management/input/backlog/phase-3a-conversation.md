@@ -6,7 +6,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 **Duration:** Day 3 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 17
-**Status:** In Progress (1/6 completed)
+**Status:** In Progress (4/6 completed)
 
 > **The golden rule:** no model is called, no SQL generated, no answer computed live. The
 > "intelligence" is choreography. See [`../constraints.md`](../constraints.md) §2 — *do not "upgrade"
@@ -18,7 +18,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **Priority:** P0
 **Total Story Points:** 17
-**Status:** In Progress (1/6 completed)
+**Status:** In Progress (4/6 completed)
 **Source:** Build Specification E5 and decision model §5.2; Reference Implementation Guide §6.
 
 ### Stories:
@@ -123,7 +123,7 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The short staged pause that makes the result feel earned.
   - **Acceptance Criteria:**
     - Every successful match shows the thinking indicator for a fixed short delay **before** tiles
@@ -133,6 +133,25 @@ off-script question never breaks the demo. This choreography is what stands in f
     - Under reduced motion the delay shortens to ~260ms and animations render at final state
     - **This is stagecraft, not a query** — no request is made
   - **Dependencies:** US-006, US-028
+  - **Implementation:** `app/lib/dashboard/thinking.ts` (the six beats, the two delays and the chip
+    stagger, as static config beside the intent config), `app/lib/dashboard/use-thinking.ts` (the
+    runner) and `app/components/heroes/thinking-panel.tsx` (the panel), wired in `app/root.tsx`.
+    **The beat wraps the two dashboard actions, so both question paths pause and neither module
+    changed:** `useThinking(dashboard)` hands back a `ChipActions` — the interface `askQuestion` and
+    `selectChip` already took — so a tapped chip waits exactly as a typed question does, while a chip
+    tap still bypasses US-030's scoring BY TYPE. A no-match calls neither action, so an off-script
+    question shows no beat (US-032's input). **Ordering is asserted, not assumed:** on a fake clock
+    the panel is up and no section exists at `1150ms - 1`, and the section is there with the panel
+    gone at `1150ms`; making the runner land immediately fails 22 tests. **ONE timer still** — the
+    delay goes through `useDashboard`'s `schedule`, there is no `setTimeout` in any new file, and a
+    scan of every file under `app/` pins the only two places a timer may be created. A second chip
+    tap mid-beat replaces the beat rather than racing it, and `busy` closes the field so a second
+    submit is a no-op. **This also closes US-015 criterion ④** — Reset mid-beat leaves no panel, no
+    section and no timer, proved by mutation (deleting `cancelPending()` fails 4 tests, deleting the
+    panel's `generation` clear fails 4). Reduced motion shortens the beat to 260ms and the source
+    chips render at their final state, visible rather than stranded at `opacity: 0`; the sweep hides,
+    having no meaningful end state. No new keyframe (US-006's four are reused), no token, no hex, no
+    dependency. 91 new tests, 1678 green.
 
 - **US-032**: Graceful fallback panel
   - **Story Points:** 2
@@ -176,7 +195,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **By Priority:** P0: 6 stories, 17 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 3 stories, 10 points · 🔄 0 · 📋 3 stories, 7 points · ⏸️ 0
+**By Status:** ✅ 4 stories, 12 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 0
 
 ---
 

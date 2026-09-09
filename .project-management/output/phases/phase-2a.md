@@ -177,7 +177,7 @@ three**, not a special case.
 - `app/lib/motion.ts` — `scrollToTop`, the mirror of `scrollRevealedIntoView`, reduced-motion-aware.
 - `app/root.tsx` — `<AppShell onReset={reset}>`. The US-012 control finally does something.
 
-**Two of the five criteria are a SEAM, not a claim** — stated plainly because the things they
+**Two of the five criteria WERE a SEAM, not a claim** (both are closed now — see below) — stated plainly because the things they
 describe are not built:
 - **① the four baseline tiles are US-013** (deferred to the Phase 2b run). Reset restores
   `BASELINE_SECTIONS`, which is *also* `useDashboard`'s initial state, so US-013 lists its tiles in
@@ -186,6 +186,12 @@ describe are not built:
   thinking panel was invented here. The chip seam is `sections` (derive the row from the session
   list and reset restores it with no logic of its own); the beat seam is `schedule`, and reset
   already cancels it, so US-031 needs no retrofit.
+  - **④ ✅ CLOSED BY US-031 (2026-09-09, in the Phase 3a run) — through the `schedule` seam, with
+    no reset code touched and no second timer added.** With a real beat to press through, the
+    criterion is now driven end to end: Reset mid-beat leaves no panel, no section and **no
+    timer**, and the cancelled answer never arrives. Both halves proved by mutation — deleting
+    `cancelPending()` fails 4 tests, deleting the beat's `generation` clear fails 4
+    (`tests/unit/thinking-beat.test.tsx`). **All five of US-015's criteria are now met.**
   - **② ✅ CLOSED BY US-029 (2026-09-09, in the Phase 3a run) — through the seam exactly as
     described, with no change to any reset code.** `suggestionChips(sections)`
     (`app/lib/dashboard/chips.ts`) is a pure function of the session list, `app/root.tsx` evaluates

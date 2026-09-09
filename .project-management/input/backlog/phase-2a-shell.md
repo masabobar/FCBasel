@@ -172,10 +172,16 @@ grow when a question is asked.
     - **③ Fully met.** `scrollToTop` (`app/lib/motion.ts`) returns the window to the top, reduced-
       motion-aware and focus-preserving; the session is replaced by one whole baseline snapshot,
       so sections, focus and counters all clear together — no residual state.
-    - **④ Partly — the mechanism is fully built, the thinking beat is US-031.** `schedule` owns the
-      single pending timer and `reset` cancels it **first**, before touching state. Proven by
-      deleting the cancel: the pending beat then inserted `HERO_2` into the freshly-reset
-      dashboard and two tests failed. US-031 schedules through this and needs no retrofit.
+    - **④ ✅ NOW SATISFIED BY US-031 (2026-09-09).** The mechanism was already complete here —
+      `schedule` owns the single pending timer and `reset` cancels it **first**, before touching
+      state, proven by deleting the cancel (the pending beat then inserted `HERO_2` into the
+      freshly-reset dashboard and two tests failed). US-031 built the beat ON that timer with no
+      retrofit and no second clock, so the criterion is now driven through a real thinking beat in
+      `tests/unit/thinking-beat.test.tsx`: Reset pressed mid-beat leaves **no panel, no section and
+      no timer** (asserted on `vi.getTimerCount()`), the cancelled answer never arrives however far
+      the clock is advanced, and the screen is usable again immediately. Proved by mutation twice
+      over — deleting `cancelPending()` fails 4 of those tests, and deleting the panel's
+      `generation` clear (which is how the beat's own state goes with the press) fails 4 more.
     - **⑤ Fully met.** `withBaselineRestored` returns the *same list reference* when there is
       nothing to clear, so a second press in the same frame (which reads the first press's
       committed snapshot, not a stale render) animates nothing. Ten presses in one frame → one

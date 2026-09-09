@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 3a - Conversation *(3/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
+**Current Phase:** Phase 3a - Conversation *(4/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 68% | 100% | 🟢 On Track |
+| **Overall Progress** | 70% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
-| **Stories Completed** | 30/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 79/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 31/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 81/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 30
-**Currently Working On:** US-031 — Thinking beat (2 pts)
-**Story Points Completed Today:** 79
+**Stories Completed Today:** 31
+**Currently Working On:** US-032 — Graceful fallback panel (2 pts)
+**Story Points Completed Today:** 81
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -45,11 +45,9 @@
   fourth transition restoring the same `BASELINE_SECTIONS`, cancelling the pending beat *first*.
 
 - ✅ **US-027 — Motion & animation hooks (3 pts)** — the four hooks the other ten E6 components are
-  built on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`. **Count-up tracks the figure on
-  screen in a ref**, so a filter changed mid-animation carries on from the old number rather than
-  snapping to zero (US-016 measured exactly that in Chrome). **Reduced motion means final state in
-  the same render**, so `width={grown ? w : 0}` geometry can never be stranded. One source via
-  `useSyncExternalStore`; every frame and listener freed on unmount. 42 new tests.
+  built on. **Count-up tracks the figure on screen in a ref**, so a filter changed mid-animation
+  carries on from the old number rather than snapping to zero. **Reduced motion means final state in
+  the same render**, so `width={grown ? w : 0}` geometry can never be stranded. 42 new tests.
 
 - ✅ **US-017 — KPI tile & variance chip (2 pts)** — `DeltaChip` plus `KpiSparkline` / `KpiFigure`
   / `KpiTile`, the shape the other nine components follow. **Colour is never the sole signal:** on
@@ -144,30 +142,33 @@
   byte** on US-039's string, and **criterion 3 is order**, so the tests assert the narrative precedes
   every chart in the section. 35 tests, 1393.
 - ✅ **US-028 — Persistent prompt bar (2 pts)** — **Phase 3a opens**, and with it the only user
-  input in the product. **ONE field, and the field itself is the typing area** (icon and send button
-  are siblings of the `<input>` inside the single bordered element; a test fails on any bordered
-  descendant — the nested box was the reported defect). A real `<form>`, so Enter and the button are
-  one code path. **Debounce without a second clock:** a submit clears a mirrored ref *before* the
-  callback, so three rapid Enters yield one call. `fixed`, not `sticky`. 48 tests, 1441.
+  input in the product. **ONE field, and the field itself is the typing area** (a test fails on any
+  bordered descendant — the nested box was the reported defect). A real `<form>`, so Enter and the
+  button are one code path. **Debounce without a second clock:** a submit clears a mirrored ref
+  *before* the callback, so three rapid Enters yield one call. 48 tests, 1441.
 
 - ✅ **US-029 — Suggestion chips & chip lifecycle (3 pts)** — **the screen can now be ASKED a
-  question.** **The row is DERIVED, not stored:** `suggestionChips(sections)` returns the three hero
-  chips always plus one follow-up chip per answer still at `primary`, so criterion ③'s "removed once
-  shown" is implemented *nowhere* — the phase flip stops deriving it. Proven over **all 27** hero ×
-  phase combinations, and **US-015 criterion ② is thereby satisfied** with no reset code touched. **A
-  tap bypasses scoring by TYPE** (`selectChip` takes a chip, the matcher takes a `string`). Surface
-  reused, not restated; only the gold follow-up tint is new. 57 tests, 1498 green.
+  question.** **The row is DERIVED, not stored**, so criterion ③'s "removed once shown" is
+  implemented *nowhere* — the phase flip stops deriving it. Proven over **all 27** hero × phase
+  combinations, and **US-015 criterion ② is thereby satisfied** with no reset code touched. **A tap
+  bypasses scoring by TYPE.** Surface reused, not restated. 57 tests, 1498 green.
 
 - ✅ **US-030 — Intent normalisation, scoring & tie-breaking (5 pts)** — **the riskiest story in the
-  build, and the one the whole prototype exists to protect: an off-script paraphrase, typed live.**
-  `app/lib/dashboard/intents.ts` is a **faithful port of the approved reference algorithm**, pinned
-  rather than trusted (an oracle test asserts identical scores *and* winners over a 90-phrase
-  corpus): normalise → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** →
-  **strictly-greater** over an ordered config, so a tie goes to the earlier intent. **34 paraphrases
-  across the three heroes**, each canonical prompt beating its own follow-up by an asserted margin
-  (8v4, 4v0, 10v1); a **three-way** 2/2/2 tie resolves to Hero 1; one input yields **one** match or
-  `null` — never two heroes. The two inherited over-matches are **pinned as the current contract**.
-  No `fetch`, no model, no dependency — scanned. 89 tests, 1587.
+  build: an off-script paraphrase, typed live.** A **faithful port of the approved reference
+  algorithm**, pinned rather than trusted (an oracle asserts identical scores *and* winners over a
+  90-phrase corpus): normalise → **+2 strong / +1 weak** → threshold **2 hero / 3 follow-up** →
+  **strictly-greater** over an ordered config. **34 paraphrases**, each canonical prompt beating its
+  own follow-up by an asserted margin; a three-way 2/2/2 tie resolves to Hero 1; one input yields
+  **one** match or `null` — never two heroes. No `fetch`, no model, no dependency. 89 tests, 1587.
+
+- ✅ **US-031 — Thinking beat (2 pts)** — **the pause that makes the answer feel earned, and it is
+  stagecraft: no request is made** (scanned). **Ordering asserted, not assumed:** at `1150ms - 1` the
+  panel is up and there is no section; at `1150ms` the section is there and the panel is gone —
+  mutating it to land immediately fails 22 tests. Both question paths pause because `useThinking`
+  returns the `ChipActions` the matcher and the chips already took, so **neither module changed** and
+  a chip tap still bypasses scoring by type. **Still ONE timer** (a scan pins the only two places in
+  `app/**` that may create one), so **US-015 criterion ④ is now satisfied**: Reset mid-beat leaves no
+  panel, no section and no timer. Reduced motion: 260ms, chips at final state. 91 tests, 1678.
 
 ---
 
@@ -181,12 +182,13 @@ builds the choreography that stands in for the AI, and its first story put a que
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-031: Thinking beat | 📋 Next | The staged pause before tiles render. Stagecraft, not a query — it schedules through `useDashboard`'s one timer |
+| US-032: Graceful fallback panel | 📋 Next | Dead-end prevention for anything off-script. A no-match shows NO beat, so the panel is the whole of the answer |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-031: Thinking beat | 2026-09-09 | 2 |
 | US-030: Intent normalisation, scoring & tie-breaking | 2026-09-09 | 5 |
 | US-029: Suggestion chips & chip lifecycle | 2026-09-09 | 3 |
 | US-028: Persistent prompt bar | 2026-09-09 | 2 |
@@ -274,14 +276,13 @@ builds the choreography that stands in for the AI, and its first story put a que
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
-| Phase 3a: Conversation | 🔄 Active | 3/6 | 10/17 | 59% |
+| Phase 3a: Conversation | 🔄 Active | 4/6 | 12/17 | 71% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
 ---
 
 ## 🔗 Quick Links
-
 - **[Current Phase Plan](../phases/phase-3a.md)** - Phase 3a, Conversation (US-028 to US-033)
 - **[Phase 2b Plan](../phases/phase-2b.md)** - Completed 2026-09-09 (11/11 · 29/29 pts)
 - **[Phase 2a Plan](../phases/phase-2a.md)** - Completed 2026-09-09 (5/5 · 16/16 pts)
@@ -296,5 +297,4 @@ builds the choreography that stands in for the AI, and its first story put a que
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-
-**Last Auto-Update:** US-030 completed at 2026-09-09 — **Phase 3a is at 3/6 · 10/17 pts**, and a freely TYPED question now resolves to a hero. This was the riskiest story in the build: the owner ignoring the chips and typing their own wording is the live, unrecoverable moment everything else protects, and its acceptance is qualitative — so **the test suite is the deliverable as much as the code is**, 89 tests pinning the matcher input by input and score by score. `app/lib/dashboard/intents.ts` is a **faithful port of the approved reference algorithm**: normalise (lowercase, strip `/.,?!'"()`, collapse whitespace, trim, pad — which is also why `25/26` becomes the `2526` keyword) → **+2 per strong keyword, +1 per weak** → threshold **2 for a hero, 3 for a follow-up** so a follow-up cannot steal its parent's simpler phrasings → **strictly-greater** comparison over an ordered static config, which is what makes the tie-break deterministic (Hero 1 > Hero 2 > Hero 3 > follow-ups). The port is **verified, not trusted**: a test re-implements the reference formula as an oracle, redundant disjunct included, and asserts identical scores *and* identical winners over a 90-phrase corpus. **Paraphrase tolerance is the acceptance, so it is table-driven** — 14 phrasings for Hero 1 (the three named among them: `kit sales`, `how are shirts selling`, `trikot`), 10 each for Heroes 2 and 3; each canonical chip label resolves to its own hero with an asserted **margin** over that hero's follow-up (8v4, 4v0, 10v1), and the loose `why is marketing high?` lands on Hero 3's follow-up at **exactly the threshold of 3** while Hero 3's primary scores 0. **Tie-breaks are proven, not asserted:** `kit gate` 2/2 → Hero 1, `trikot budget` → Hero 1 over Hero 3, `ticket budget` → Hero 2 over Hero 3, `shirt ticket budget` a **three-way** 2/2/2 → Hero 1, and two hero-vs-own-follow-up ties (4/4, 5/5) that go to the hero; `over target` carries both threshold halves on one input. Corpus-wide, one input yields **one** `{heroId, kind}` or `null` — **two heroes never render from one question**. `sales` alone resolves to nothing (1 < 2), like nine other lone common words, and off-script, gibberish, empty and whitespace all fall through to `null`, which is US-032's input rather than an error. **The two inherited rough edges are documented and PINNED as the current contract** — strong keywords prefix-match (`kit` hits `kitchen`, `gate` hits `gateway`), weak keywords substring-match (`over` hits `overall`/`recover`, `name` hits `nameplate`) — with a comment saying tightening them is a deliberate future decision, and the tests are the tripwire. The chip path was not touched: `askQuestion` takes a `string`, `selectChip` takes a chip, and a `@ts-expect-error` case in each suite breaks typecheck if either seam loosens. **Security triage — the A03 user-input trigger FIRES and is covered:** the typed string is lowercased into a local, tested against the fixed keyword list with `String.includes` and discarded, only a `HeroId` and a `ChipKind` escape, and it never becomes markup, a URL, a query, a selector, a storage key, a React key or a log line (all scanned) — nor is any regex built from it. **Golden rule enforced by scan:** two internal imports and nothing else, no `fetch`, no model call, no embedding, no fuzzy-match library, no SQL, no dependency added. **Next is US-031** — the thinking beat, which is stagecraft and not a query
+**Last Auto-Update:** US-031 completed at 2026-09-09 — **Phase 3a is at 4/6 · 12/17 pts**, and an answer no longer appears the instant it is asked. The thinking beat is the prototype's one moment of theatre and the Reference Guide is explicit about why it stays: *"the thinking delay is fake latency, not a query. Keep it — it is what makes the result feel earned."* So it is exactly that and nothing more — a fixed `setTimeout` scheduled through `useDashboard`'s single pending timer, with **no request made** anywhere in the three new modules (`fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, `sendBeacon`, `axios` and dynamic `import()` all scanned, no dependency added). **The ordering is asserted rather than assumed:** on a fake clock, one millisecond before the delay elapses the panel is on screen and there is NO section; at the delay the section is there and the panel is gone — and mutating the runner to land the answer immediately fails **22** tests. **Both question paths pause, and neither module changed to make that true:** `useThinking(dashboard)` wraps the hook's two actions and hands back a `ChipActions`, which is the interface `askQuestion` and `selectChip` already took, so a tapped chip waits exactly as a typed question does while a chip tap still bypasses US-030's scoring **by type**. An off-script question shows **no beat at all** — it never reaches the hook — which is precisely US-032's input. **There is still exactly ONE timer in the application:** no `setTimeout` in any new file, and a scan of every `.ts`/`.tsx` under `app/` pins the only two places one may be created. A second chip tap mid-beat therefore *replaces* the beat rather than racing it (one panel, one timer, one answer), and `busy` closes the field and the send button for the beat's length so a second submit is a no-op — removing US-028's guard fails that test. **This closes US-015 criterion ④, the last of its five:** Reset pressed mid-beat leaves no panel, no section and **no timer** (asserted on `vi.getTimerCount()`), the cancelled answer never arrives however far the clock is advanced, and the screen is usable again immediately — proved by mutation twice over (deleting `cancelPending()` fails 4 tests, deleting the beat's `generation` clear fails 4 more). **The panel is the reference's, verbatim:** the per-flow message and ordered source list for all six flows, a sweeping gold scan line, and the source chips lighting up one by one at 150 / 370 / 590ms — every flow's last chip landing before the answer does. A follow-up asked before its parent shows the PARENT's beat, so the panel can never promise something the dashboard is not about to give. **Reduced motion shortens the beat to ~260ms and renders the animations at their final state:** the source chips are VISIBLE rather than stranded at `opacity: 0`, with nothing inline that could override the stylesheet, and the sweep hides because a finished sweep has no meaningful end state. **No new keyframe and no new token** — US-006's four are reused and `app/app.css` still holds exactly four `@keyframes`. Announced politely via `role="status"`; the sweep and glyph are `aria-hidden`. **Next is US-032** — the graceful fallback panel, the catch for everything off-script

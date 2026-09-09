@@ -11,6 +11,7 @@ import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
 import { InsightPhase } from "../../app/lib/dashboard/sections";
 import { HeroId } from "../../app/lib/repositories/enums";
 import App, { Layout } from "../../app/root";
+import { settleThinkingBeat } from "./support/thinking-harness";
 
 const ROOT_SOURCE = readFileSync(
   resolve(process.cwd(), "app/root.tsx"),
@@ -124,9 +125,10 @@ describe("App", () => {
   it("wires the app bar's Reset to the dashboard's own reset", () => {
     // One implementation, one wiring point: the control is US-012's, the
     // behaviour is `useDashboard`'s, and this is where they meet (US-015).
-    expect(ROOT_SOURCE).toMatch(
-      /const \{[^}]*reset[^}]*\} =\s*useDashboard\(\)/,
-    );
+    // The hook is now held as a value as well as destructured, because US-031's
+    // `useThinking` takes the whole state; `reset` is still the hook's own.
+    expect(ROOT_SOURCE).toMatch(/const dashboard = useDashboard\(\);/);
+    expect(ROOT_SOURCE).toMatch(/const \{[^}]*reset[^}]*\} = dashboard;/);
     expect(ROOT_SOURCE).toMatch(/<AppShell\s+onReset=\{reset\}/);
   });
 
@@ -190,14 +192,14 @@ describe("App", () => {
     // question is a string and goes through `askQuestion`, which is the only
     // thing in the app that scores text.
     expect(ROOT_SOURCE).toMatch(/onSubmit=\{\(question\) => \{/);
-    expect(ROOT_SOURCE).toMatch(
-      /askQuestion\(question, \{ showHero, showFollowUp \}\)/,
-    );
+    // The actions are US-031's beat-wrapped pair (`useThinking`), which is
+    // structurally the same `ChipActions` the matcher always took.
+    expect(ROOT_SOURCE).toMatch(/askQuestion\(question, actions\)/);
   });
 
   it("answers a typed paraphrase with the hero it resolves to", async () => {
     // The live moment the whole prototype protects: off-script wording, typed,
-    // and the right hero arrives.
+    // and the right hero arrives — after US-031's thinking beat.
     const user = userEvent.setup();
     renderApp();
 
@@ -205,6 +207,7 @@ describe("App", () => {
       screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
       "how are shirts selling{Enter}",
     );
+    await settleThinkingBeat();
 
     const sections = document.querySelectorAll('[data-slot="insight-section"]');
     expect(sections).toHaveLength(1);
@@ -222,6 +225,7 @@ describe("App", () => {
       screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
       "shirt ticket budget{Enter}",
     );
+    await settleThinkingBeat();
 
     const sections = document.querySelectorAll('[data-slot="insight-section"]');
     expect(sections).toHaveLength(1);
@@ -234,7 +238,9 @@ describe("App", () => {
     const input = screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL });
 
     await user.type(input, "department budgets{Enter}");
+    await settleThinkingBeat();
     await user.type(input, "why is marketing high?{Enter}");
+    await settleThinkingBeat();
 
     const sections = document.querySelectorAll('[data-slot="insight-section"]');
     expect(sections).toHaveLength(1);

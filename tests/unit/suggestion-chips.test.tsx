@@ -50,6 +50,7 @@ import { HERO_IDS, HeroId } from "../../app/lib/repositories/enums";
 import { radius } from "../../app/lib/tokens";
 import App from "../../app/root";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
+import { settleThinkingBeat } from "./support/thinking-harness";
 
 /**
  * The component's source with comments stripped. Several checks below are about
@@ -406,8 +407,17 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
     return document.querySelectorAll('[data-slot="insight-section"]').length;
   }
 
+  /**
+   * Tap a chip (or Reset) and let US-031's thinking beat land.
+   *
+   * A chip tap now goes through the beat, so the section it asks for arrives a
+   * fixed delay later. This suite is about WHICH chips are offered for a given
+   * canvas, not about the pause in front of it, so it waits for the answer and
+   * asserts as before; the beat itself is `thinking-beat.test.tsx`'s subject.
+   */
   async function tap(name: string) {
     await userEvent.setup().click(screen.getByRole("button", { name }));
+    await settleThinkingBeat();
   }
 
   it("shows exactly the three hero chips on load, inside the prompt bar", () => {
