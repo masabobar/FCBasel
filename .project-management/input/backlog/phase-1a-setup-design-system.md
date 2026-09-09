@@ -5,7 +5,7 @@
 **Duration:** Day 1 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (3/6 completed)
+**Status:** In Progress (4/6 completed)
 
 > **Global guardrails apply to every story here** — see [`../constraints.md`](../constraints.md) §2.
 > No integration, no runtime model, no auth, no persistence, no salary/named-individual data.
@@ -64,7 +64,7 @@
 
 **Priority:** P0
 **Total Story Points:** 9
-**Status:** In Progress (1/4 completed)
+**Status:** In Progress (2/4 completed)
 **Source:** Build Specification E2; Reference Implementation Guide §4.
 
 > Getting this right is most of what sells the illusion to an audience that knows FC Basel
@@ -99,15 +99,20 @@
   - **Story Points:** 1
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** Download the genuine club crest and self-host it in the project.
   - **Acceptance Criteria:**
-    - Crest downloaded from the club source asset and committed to the repo
-    - Rendered top-left in the app bar at ~32px height
-    - **No runtime request to the club CDN** — verified with the network disconnected
+    - ✅ Crest downloaded from the club source asset and committed to the repo
+    - ✅ Rendered top-left in the app bar at ~32px height
+    - ✅ **No runtime request to the club CDN** — verified with the network disconnected
   - **Dependencies:** US-001
   - **Notes:** Replaces the reference build's placeholder `Monogram`. Trademarked asset; self-host,
     never hotlink — this also removes a CORS and availability risk during the demo.
+    The club's `logo.webp` URL serves **PNG** bytes, so the asset is committed under its real format
+    as `public/fcb-crest.png`, downsampled 608x648 → 120x128 with `sips` (194 KB → 17.9 KB, no new
+    dependency) and stripped of all ancillary chunks. Rendered by `Crest`
+    (`app/components/chrome/crest.tsx`) in a minimal `<header>` in `app/root.tsx`; the full app bar
+    remains US-012.
 
 - **US-005**: Tile card anatomy
   - **Story Points:** 2
@@ -152,7 +157,7 @@
 
 **By Priority:** P0: 6 stories, 14 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 3 stories, 8 points · 🔄 0 · 📋 3 stories, 6 points · ⏸️ 0
+**By Status:** ✅ 4 stories, 9 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 0
 
 ---
 

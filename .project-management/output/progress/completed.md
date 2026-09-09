@@ -84,6 +84,34 @@ surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`. No new-tile gold
 - `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (96/96) and `pnpm build` all clean;
   coverage 100% of `app/**`
 
+### US-004: Self-hosted FCB crest (1 pt)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 9 (1 asset, 2 code, 1 modified, 5 tracking docs)
+**Tests Added:** 10 (unit: 10)
+**Commit:** see phase-1a progress log
+**Notes:** All 3 acceptance criteria met. The club's `logo.webp` URL serves **PNG bytes** — the
+extension is wrong and the bytes were trusted instead. No image dependency was added.
+
+**What Was Done:**
+- Downloaded `https://fcb.ch/cdn/shop/files/logo.webp` and inspected it before committing anything:
+  `file` reports `PNG image data, 608 x 648, 8-bit/color RGBA`, so it is stored under its real
+  format as `public/fcb-crest.png`
+- Downsampled 608x648 → 120x128 with macOS `sips` (already on the machine), keeping the mark crisp
+  to 64px — 2x the 32px render size — and cutting 194,518 bytes to 17,908 (a 91% reduction)
+- Stripped every ancillary PNG chunk (including the XMP `iTXt` that `sips` re-attached, carrying the
+  source machine's `HostComputer` name), leaving only `IHDR`/`IDAT`/`IEND`
+- Added `app/components/chrome/crest.tsx` — `Crest` renders `/fcb-crest.png` with
+  `alt="FC Basel 1893"` and derives width from the asset's aspect ratio, so the app bar reserves the
+  right box and never shifts on decode
+- Rendered it top-left at 32px in a deliberately minimal `<header>` in `app/root.tsx`; the sidebar,
+  workspace label, avatar, connection status and Reset control are **US-012**, not this story
+- **Proved no CDN request survives:** `grep -rIa "fcb\.ch" build/` returns nothing, both bundles
+  carry the literal `"/fcb-crest.png"`, and the booted production server serves HTML in which every
+  `src`/`href` is root-relative — zero external hosts
+- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test` (106/106) and `pnpm build` all
+  clean; coverage 100% of `app/**`
+
 ---
 
 ## Format

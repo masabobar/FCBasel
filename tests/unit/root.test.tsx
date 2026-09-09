@@ -45,8 +45,8 @@ describe("Layout", () => {
 });
 
 describe("App", () => {
-  it("renders the matched child route through the outlet", () => {
-    render(
+  function renderApp() {
+    return render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<App />}>
@@ -55,7 +55,34 @@ describe("App", () => {
         </Routes>
       </MemoryRouter>,
     );
+  }
+
+  it("renders the matched child route through the outlet", () => {
+    renderApp();
 
     expect(screen.getByText("child route")).toBeInTheDocument();
+  });
+
+  it("renders the crest as the first item of the app bar", () => {
+    renderApp();
+
+    const appBar = screen.getByRole("banner");
+    const crest = screen.getByRole("img", { name: "FC Basel 1893" });
+
+    expect(appBar).toContainElement(crest);
+    expect(appBar.firstElementChild).toBe(crest);
+    expect(crest).toHaveAttribute("height", "32");
+  });
+
+  it("puts the app bar above the routed page content", () => {
+    const { container } = renderApp();
+
+    const appBar = screen.getByRole("banner");
+    const page = screen.getByText("child route");
+
+    expect(container.firstElementChild).toBe(appBar);
+    expect(appBar.compareDocumentPosition(page)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 });

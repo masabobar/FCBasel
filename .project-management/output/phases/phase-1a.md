@@ -47,12 +47,12 @@ every later epic references rather than restates.
 
 ### Epic 2: E2 — FCB Brand Theming & Design System (9 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (1/4) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (2/4) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-003 | Design token set | 3 | ✅ Done |
-| US-004 | Self-hosted FCB crest | 1 | 📋 Todo |
+| US-004 | Self-hosted FCB crest | 1 | ✅ Done |
 | US-005 | Tile card anatomy | 2 | 📋 Todo |
 | US-006 | Tile-insertion motion & reduced-motion support | 3 | 📋 Todo |
 
@@ -90,12 +90,12 @@ every later epic references rather than restates.
 - **Risk Level:** Low
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 8 / 14 (57%)
-- **Completed Stories:** 3 / 6
-- **Tests Passing:** 96 / 96
-- **Code Coverage:** 100% of `app/**` (21 statements, 7 functions)
+- **Completed Story Points:** 9 / 14 (64%)
+- **Completed Stories:** 4 / 6
+- **Tests Passing:** 106 / 106
+- **Code Coverage:** 100% of `app/**` (26 statements, 8 functions)
 - **Linter:** ESLint 9 flat config — clean (0 errors, 0 warnings)
-- **Commits:** 3
+- **Commits:** 4
 
 ---
 
@@ -117,7 +117,7 @@ every later epic references rather than restates.
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
 | Railway setup consumes more than the ~3 h budgeted | Medium | Low | Zero-config app: no env vars, no database, no migrations; `railway.json` committed so the deploy is one command | Human+AI | Open (human step) |
-| Crest asset unavailable or format-awkward | Medium | Low | Self-host from the committed copy; the build must never depend on the live CDN | AI | Open |
+| Crest asset unavailable or format-awkward | Medium | Low | Self-host from the committed copy; the build must never depend on the live CDN | AI | Closed (US-004) |
 | Token drift — a colour introduced outside the set | High | Medium | Not permitted by spec; choose the nearest token. US-003 pins the hex set with a test and fails the suite on any CSS/TS divergence. Re-verified in US-044 brand QA | AI | Mitigated |
 | Reduced-motion path leaves a value stuck at zero | Medium | Medium | Grow hook returns `true` immediately under reduced motion | AI | Open |
 
@@ -216,6 +216,51 @@ so US-005 references a role instead of restating "uppercase, 700, 0.04em"; `.kpi
   dependency or lockfile change, no HTTP handler or route, no raw SQL, no `dangerouslySetInnerHTML`,
   no `fetch`, no upload, no env var, no auth, no logging, no user input. **No security-relevant
   changes detected** (§4).
+
+### 2026-09-09 — US-004 Self-hosted FCB crest (1 pt) ✅
+
+The club serves the crest from `https://fcb.ch/cdn/shop/files/logo.webp` — but the **bytes are a
+PNG**, not a WebP; the extension lies and the `Content-Type` (`image/png`) tells the truth. The
+downloaded file was inspected before anything was committed (`file`: `PNG image data, 608 x 648,
+8-bit/color RGBA`), so it is stored as `public/fcb-crest.png` under its real format. Committing it
+as `.webp` would have shipped a file no build tool could reason about.
+
+194 KB of 608x648 artwork for a 32px app-bar mark is ~90x more pixels than the mark can show, so it
+was downsampled with macOS `sips` (already on the machine — **no image dependency was added**) to
+120x128, which stays crisp to 64px, i.e. 2x of the render size. `sips` re-attached an XMP `iTXt`
+chunk carrying the source machine's `HostComputer` name; every ancillary chunk was then stripped
+with a stdlib Python filter, leaving only `IHDR`/`IDAT`/`IEND`. Final asset: **17,908 bytes, a 91%
+reduction**, transparency intact, visually verified as the genuine crest.
+
+`app/components/chrome/crest.tsx` exports `Crest`, which renders `/fcb-crest.png` with
+`alt="FC Basel 1893"` and derives width from the asset's own aspect ratio so the app bar reserves
+the right box and never shifts on decode. A deliberately minimal `<header>` in `app/root.tsx` holds
+it top-left at 32px — **the sidebar, workspace label, avatar, connection status and Reset control
+are US-012 in Phase 2a and were not built here**.
+
+- **No CDN request — proved four ways, not assumed:** `grep -rIa "fcb\.ch" build/` returns nothing;
+  the only `fcb.ch` string in the repo is a warning comment in `crest.tsx`, which the bundler strips.
+  Both bundles reference the literal `"/fcb-crest.png"` and nothing else. The production server was
+  booted and the served HTML contains `<img src="/fcb-crest.png" … height="32">` with **every**
+  `src`/`href` on the page root-relative — zero external hosts of any kind. `/fcb-crest.png` answers
+  `200 image/png 17908` from the local server.
+- **Tests:** 10 added (106 total, all passing). They assert the accessible name, the root-relative
+  `src`, that `CREST_SRC` matches no absolute URL or `fcb.ch`, the 32px default and aspect-ratio
+  scaling, crest-first placement inside the `banner` landmark, and — reading the committed file — the
+  PNG magic bytes and the size budget. That last pair is what would catch a future "fix" that
+  re-hotlinks or swaps the asset for a mislabelled one.
+- **Coverage:** 100% of `app/**` (26/26 statements, 8/8 functions) — above the 80% gate.
+- **Gates:** `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm build` all clean.
+- **Security triage:** the **external-binary trigger fired (A04/A08)** — bytes verified against the
+  PNG magic number and the real format used, chunk table walked end-to-end (`IHDR`+`eXIf`+`iCCP`+
+  `pHYs`+`IDAT`x25+`IEND` consuming exactly 194,518 bytes, so **no data appended past `IEND`**), no
+  `tEXt`/`zTXt`/`iTXt` chunk survives in the committed file, so **no secret or tracking payload is
+  embedded**; the asset is static content that is never executed. `src` is a hardcoded constant, not
+  user input (A03 n/a). **No runtime `fetch` remains (A10 n/a)** — the download was a one-off
+  authoring step. `package.json` and the lockfile are untouched, so the A06 audit gate does not
+  fire. No route, raw SQL, env var, auth or logging change.
+- **Trademark:** the genuine crest is used exactly as the client's Build Specification instructs.
+  It stays in this repo; no further club branding was invented.
 
 ---
 

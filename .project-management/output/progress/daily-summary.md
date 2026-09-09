@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 3
-**Story Points:** 8
-**Time Worked:** ~2.5 hours
-**Files Changed:** 42
-**Tests Added:** 96
+**Stories Completed:** 4
+**Story Points:** 9
+**Time Worked:** ~2.8 hours
+**Files Changed:** 46
+**Tests Added:** 106
 
 ---
 
@@ -42,6 +42,17 @@
   tokens as the only good/bad carriers, `varianceNegative` deliberately separate from `red`, and
   gold restricted to two accent roles, each backed by a test. 96/96 tests green, coverage 100% of
   `app/**`, and lint / format / typecheck / build all clean.
+- **US-004 — Self-hosted FCB crest.** The club serves the crest from a `.webp` URL that actually
+  returns PNG bytes, so the download was inspected with `file` before anything was committed and
+  stored under its real format as `public/fcb-crest.png`. 608x648 at 194 KB is ~90x more pixels than
+  a 32px app-bar mark can show, so it was downsampled to 120x128 with macOS `sips` — no image
+  dependency added — and every ancillary PNG chunk stripped, including the XMP block `sips`
+  re-attached; the committed asset is 17,908 bytes of pure `IHDR`/`IDAT`/`IEND`. `Crest` in
+  `app/components/chrome/crest.tsx` renders it with an accessible name and an aspect-ratio-derived
+  width, placed top-left in a minimal `<header>` in `app/root.tsx` — the full shell stays US-012.
+  The no-CDN criterion was proved rather than assumed: nothing in `build/` matches `fcb.ch`, both
+  bundles reference the literal `/fcb-crest.png`, and the booted production server returns HTML
+  whose every `src`/`href` is root-relative. 106/106 tests green, coverage 100% of `app/**`.
 
 ---
 
@@ -53,6 +64,9 @@
   execution, including the pre-commit hook.
 - ✅ US-003 — Design token set (3 pts) — all 6 acceptance criteria met; CSS and TypeScript halves
   held in lockstep by a drift test.
+- ✅ US-004 — Self-hosted FCB crest (1 pt) — all 3 acceptance criteria met; the asset's real format
+  was verified from its bytes and the absence of any `fcb.ch` reference proved against the build and
+  the running server.
 
 ---
 
@@ -73,7 +87,6 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- US-004 — Self-hosted FCB crest (1 pt) — trademarked asset, commit it, never hotlink
 - US-005 — Tile card anatomy (2 pts) — consumes the US-003 tokens; no per-hero copies
 - US-006 — Tile-insertion motion (3 pts) — fade-and-rise only, no gold ring
 
