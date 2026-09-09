@@ -26,9 +26,11 @@ import { Crest } from "./crest";
  *    `app/lib/persona.ts`; no name and no photo appear here. See that module
  *    for why.
  *
- * 3. RESET IS RENDERED HERE, BUT ITS BEHAVIOUR IS US-015. The control takes an
- *    injected callback and does nothing without one, so the shell can ship
- *    before reset semantics exist and US-015 has one obvious wiring point.
+ * 3. RESET IS RENDERED HERE, BUT ITS BEHAVIOUR IS NOT. The control takes an
+ *    injected callback and does nothing without one; `app/root.tsx` injects
+ *    `useDashboard`'s `reset` (US-015), which clears the session back to its
+ *    baseline. Do not grow reset logic in this file — a second implementation
+ *    is how a Reset that half-works gets shipped.
  */
 
 /** How many club systems the demo narrative claims to span. */

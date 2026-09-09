@@ -6,7 +6,7 @@ grow when a question is asked.
 **Duration:** Day 2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 16
-**Status:** In Progress (2/5 completed)
+**Status:** In Progress (3/5 completed — US-013 and US-016 deferred to the Phase 2b run)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -16,7 +16,7 @@ grow when a question is asked.
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (2/5 completed)
+**Status:** In Progress (3/5 completed — US-013 and US-016 deferred to the Phase 2b run)
 **Source:** Build Specification E4; Reference Implementation Guide §8.
 
 > The dashboard **never clears to show a hero — it grows.** That single behaviour is what makes the
@@ -109,7 +109,7 @@ grow when a question is asked.
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** A visible Reset affordance that returns the dashboard to its initial state for
     the next demo run.
   - **Acceptance Criteria:**
@@ -119,6 +119,32 @@ grow when a question is asked.
     - Pressed mid-flow (during a thinking beat) leaves no broken state and no orphaned animation
     - Pressed repeatedly / rapidly: stable, no duplicate tiles, no overlapping animations
   - **Dependencies:** US-014
+  - **Completion note (2026-09-09):** Reset is a **pure transition beside the other three**
+    (`withBaselineRestored` in `app/lib/dashboard/sections.ts`) driven by `reset` on
+    `use-dashboard.ts`, wired to the app bar's existing US-012 control through `AppShell`'s
+    `onReset` in `app/root.tsx`. Which criteria are met now and which are a seam:
+    - **① Partly — seam-only for the four tiles (US-013).** Every hero section is cleared and the
+      session returns to `BASELINE_SECTIONS`, the single named constant that is *also*
+      `useDashboard`'s initial state. Nothing in the reset path says "empty"; US-013 lists its
+      tiles in that one constant and load-state and reset-state stay identical for free.
+    - **② Seam-only — the chips are US-029.** No chip is invented here. The intended wiring is
+      recorded in the hook: a chip row **derived** from `sections` (initial chips at the baseline,
+      follow-up chips from the sections on screen) is restored by reset with no reset logic of its
+      own; `generation` is there for anything US-028/US-029 hold that cannot be derived.
+    - **③ Fully met.** `scrollToTop` (`app/lib/motion.ts`) returns the window to the top, reduced-
+      motion-aware and focus-preserving; the session is replaced by one whole baseline snapshot,
+      so sections, focus and counters all clear together — no residual state.
+    - **④ Partly — the mechanism is fully built, the thinking beat is US-031.** `schedule` owns the
+      single pending timer and `reset` cancels it **first**, before touching state. Proven by
+      deleting the cancel: the pending beat then inserted `HERO_2` into the freshly-reset
+      dashboard and two tests failed. US-031 schedules through this and needs no retrofit.
+    - **⑤ Fully met.** `withBaselineRestored` returns the *same list reference* when there is
+      nothing to clear, so a second press in the same frame (which reads the first press's
+      committed snapshot, not a stale render) animates nothing. Ten presses in one frame → one
+      view transition, one baseline list, no duplicates. Real Chrome: three rapid presses from
+      `scrollY` 900 → 0, three scroll requests, **zero** `startViewTransition` calls, and
+      `behavior: "auto"` throughout under `prefers-reduced-motion`.
+    - No persistence — the `app/**` storage scan still passes. 40 new tests, 592 total green.
 
 - **US-016**: Hero band — webshop trend & attendance ring
   - **Story Points:** 5
@@ -152,7 +178,7 @@ grow when a question is asked.
 
 **By Priority:** P0: 4 stories, 11 points · P1: 1 story, 5 points · P2: 0
 
-**By Status:** ✅ 2 stories, 6 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 2 stories, 8 points (US-013, US-016 — dependencies live in Phase 2b)
+**By Status:** ✅ 3 stories, 8 points · 🔄 0 · 📋 0 · ⏸️ 2 stories, 8 points (US-013, US-016 — dependencies live in Phase 2b)
 
 ---
 

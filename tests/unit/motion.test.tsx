@@ -10,6 +10,7 @@ import {
   prefersReducedMotion,
   REDUCED_MOTION_QUERY,
   scrollRevealedIntoView,
+  scrollToTop,
   viewTransitionName,
 } from "../../app/lib/motion";
 import { duration, easing, spacing } from "../../app/lib/tokens";
@@ -474,6 +475,91 @@ describe("scrollRevealedIntoView", () => {
     expect(() =>
       scrollRevealedIntoView(document.createElement("div")),
     ).not.toThrow();
+  });
+});
+
+describe("scrollToTop — Reset's half of the scrolling", () => {
+  const originalMatchMedia = window.matchMedia;
+  const originalScrollTo = window.scrollTo;
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia;
+    window.scrollTo = originalScrollTo;
+    vi.restoreAllMocks();
+  });
+
+  function stubReducedMotion(matches: boolean): void {
+    window.matchMedia = vi.fn(
+      (query: string) => ({ matches, media: query }) as MediaQueryList,
+    );
+  }
+
+  /** jsdom implements no scrolling, so the method is installed as a spy. */
+  function scrollSpy(): ReturnType<typeof vi.fn> {
+    const scrollTo = vi.fn();
+    Object.assign(window, { scrollTo });
+    return scrollTo;
+  }
+
+  it("glides back to the top of the page", () => {
+    stubReducedMotion(false);
+    const scrollTo = scrollSpy();
+
+    scrollToTop();
+
+    expect(scrollTo).toHaveBeenCalledWith({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  });
+
+  it("jumps there under reduced motion", () => {
+    stubReducedMotion(true);
+    const scrollTo = scrollSpy();
+
+    scrollToTop();
+
+    expect(scrollTo).toHaveBeenCalledWith({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
+  });
+
+  it("moves focus nowhere", () => {
+    // Same reason the reveal does not: Reset must not steal the caret.
+    stubReducedMotion(false);
+    scrollSpy();
+    const button = document.createElement("button");
+    document.body.append(button);
+    button.focus();
+
+    scrollToTop();
+
+    expect(document.activeElement).toBe(button);
+    button.remove();
+  });
+
+  it("asks the browser to scroll once per call, never stacking two", () => {
+    // A browser replaces an in-flight smooth scroll, so repeated Resets do not
+    // overlap animations — but each press must still be one request, not none.
+    stubReducedMotion(false);
+    const scrollTo = scrollSpy();
+
+    scrollToTop();
+    scrollToTop();
+    scrollToTop();
+
+    expect(scrollTo).toHaveBeenCalledTimes(3);
+  });
+
+  it("does nothing where scrollTo is unavailable", () => {
+    // The server has no window scrolling; a Reset must not fail for it.
+    stubReducedMotion(false);
+    Object.assign(window, { scrollTo: undefined });
+
+    expect(() => scrollToTop()).not.toThrow();
   });
 });
 

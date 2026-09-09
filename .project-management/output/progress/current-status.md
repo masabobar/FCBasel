@@ -9,8 +9,8 @@
 
 **Project:** FC Basel — Intelligence Platform Prototype
 **Current Phase:** Phase 2a - Dashboard Shell & Persona Baseline
-**Overall Progress:** 26% (13/45 items completed)
-**Story Points Completed:** 30/116
+**Overall Progress:** 28% (14/45 items completed)
+**Story Points Completed:** 32/116
 
 ---
 
@@ -30,8 +30,8 @@
 - **Epics:** Epic 3 (E3 Seed Datasets)
 
 ### Phase 2a: Dashboard Shell & Persona Baseline (Current)
-- **Status:** 🔄 Active
-- **Progress:** 2/5 stories · **Points:** 6/16 — US-013 and US-016 deferred to the Phase 2b run
+- **Status:** 🔄 Partial — US-012, US-014, US-015 built; the phase is **not** closed
+- **Progress:** 3/5 stories · **Points:** 8/16 — US-013 and US-016 deferred to the Phase 2b run
 - **Epics:** Epic 4 (E4 Shell & Baseline)
 
 ### Phase 2b: Chart & Tile Component Library
@@ -72,7 +72,7 @@
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline
 - **Phase:** 2a · **Stories:** 5 (US-012 to US-016) · **Points:** 16
-- **Completed:** 2/5 · **Status:** 🔄 In Progress
+- **Completed:** 3/5 · **Status:** 🔄 Partial (US-013 + US-016 deferred to the Phase 2b run)
 
 ### Epic 5: E6 — Chart & Tile Component Library
 - **Phase:** 2b · **Stories:** 11 (US-017 to US-027) · **Points:** 29
@@ -94,9 +94,11 @@
 
 ## Active Work
 
-**Currently In Progress:** None — US-014 complete, Phase 2a at 2/5
+**Currently In Progress:** None — Phase 2a partial: 3/5, US-013 + US-016 deferred
 **Blocked Stories:** None
-**Next Up:** US-015 — Reset to baseline (2 pts)
+**Next Up:** Phase 2b — the chart & tile component library (US-017 to US-027, 29 pts), which
+unblocks US-013 (needs US-017 + US-021) and US-016 (needs US-025/026/027); complete both in that
+run rather than reopening Phase 2a later
 
 ---
 

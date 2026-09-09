@@ -39,8 +39,9 @@ export const CANVAS_GRID_CLASS =
 
 export interface AppShellProps {
   /**
-   * Reset handler, forwarded to the app-bar control. Behaviour is US-015; the
-   * shell only renders the affordance.
+   * Reset handler, forwarded to the app-bar control. The shell renders the
+   * affordance and nothing more; `app/root.tsx` passes `useDashboard`'s
+   * `reset` (US-015), which is the only implementation there should ever be.
    */
   onReset?: () => void;
   /** Grid items for the main canvas — baseline tiles and hero sections. */

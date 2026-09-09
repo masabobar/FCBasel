@@ -7,10 +7,11 @@
 
 ## Week Summary
 
-**Stories Completed:** 11
-**Story Points:** 24/116 (21%)
-**Current Phase:** Phase 2a - Shell & Baseline *(Phases 1a and 1b both completed 2026-09-09)*
-**Team Velocity:** 24 pts/day (one day of data — not yet a trend)
+**Stories Completed:** 14
+**Story Points:** 32/116 (28%)
+**Current Phase:** Phase 2a - Shell & Baseline, **partial at 3/5 stories / 8/16 points**
+*(Phases 1a and 1b both completed 2026-09-09; US-013 and US-016 deferred to the Phase 2b run)*
+**Team Velocity:** 32 pts/day (one day of data — not yet a trend)
 
 ---
 
@@ -45,6 +46,23 @@
   relationships rather than constants, sweeps every figure quoted in all six narratives, and
   **found no drift**.
 
+**🔄 Phase 2a — Dashboard Shell & Persona Baseline, partial (3/5 stories, 8/16 points):**
+- **US-012** — the branded shell: navy sidebar, app bar (crest, "Sales & Marketing", decorative
+  connection status, Reset) and a responsive 12/8/4 canvas grid. The persona is a *role*, the three
+  placeholder nav items are inert **structurally**, and both were measured in real Chrome.
+- **US-014** — the mechanic the demo turns on: the dashboard **grows, it never clears**. A
+  memory-only `{heroId, phase, revision}` list, dedupe by hero id, a follow-up that flips its
+  parent's phase, sections inserted into the *same* grid via `grid-cols-subgrid`, and a reflow tween
+  observed animating in Chrome.
+- **US-015** — Reset, built as a transition beside the other three. It restores a **named baseline**
+  rather than a literal empty list (so US-013 changes one constant), cancels the single pending
+  timer **first** — proven by deleting that line and watching two tests fail with an answer landing
+  in a just-cleared dashboard — and is abuse-proof by construction: ten presses in one frame run
+  one view transition. **Two of its five criteria are honestly a seam:** the suggestion chips are
+  US-029 and the thinking beat is US-031, and nothing was invented to make them look done.
+- **⏸️ US-013 and US-016 are deferred to the Phase 2b run**, not dropped: US-013 needs US-017 +
+  US-021 and US-016 needs US-025/026/027, all of which live in Phase 2b. Phase 2a stays open.
+
 **Non-story work completed 2026-09-09:**
 - HolyCode PM framework bootstrapped into the project
 - Client document set processed (33 pages of PDF + reference guide + reference JSX)
@@ -67,6 +85,7 @@
 - Requirements extraction and project initialization
 - **Phase 1a delivered end to end:** US-001, US-002, US-003, US-004, US-005, US-006 (14 pts)
 - **Phase 1b delivered end to end:** US-007, US-008, US-009, US-010, US-011 (10 pts)
+- **Phase 2a started:** US-012, US-014, US-015 (8 pts) — partial, 3/5 stories
 
 ### Thursday, 2026-09-10
 - (To be logged)
@@ -78,15 +97,16 @@
 
 ## Velocity Trend
 
-**This Week:** 24 pts
+**This Week:** 32 pts
 **Last Week:** N/A
-**Average:** 24 pts/day (1 day)
+**Average:** 32 pts/day (1 day)
 **Trend:** N/A (insufficient data)
 
 > Phase 1a landed 14 points in ~4.2 AI hours against a ~5.8 AI-core-hour estimate; Phase 1b landed
-> 10 points in ~2.8 AI hours against ~4.5. Both phases together: 24 points in ~7.0 AI hours against
-> a ~10.3 AI-core-hour estimate, so `actual_factor ≈ 0.17` against the planned 0.25 — running ahead.
-> Re-run the estimate if Phase 2a (the first non-foundation phase) does not hold that factor.
+> 10 points in ~2.8 AI hours against ~4.5. Phase 2a's three buildable stories landed 8 points in
+> ~1.9 AI hours against a ~8.1 AI-core-hour estimate for all five. Across all three phases: 32
+> points in ~8.9 AI hours, `actual_factor ≈ 0.19` against the planned 0.25 — still running ahead,
+> and the first non-foundation phase held the factor.
 
 ---
 
@@ -96,7 +116,8 @@
 
 **Planned Stories:**
 1. Phases 1a + 1b — foundations and seed data (24 pts): **complete**
-2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts)
+2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts): 2a **partial** (8/16);
+   Phase 2b is next and closes US-013 + US-016 inside that run
 3. Phases 3a + 3b — conversation engine and the three hero flows (33 pts)
 4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts)
 
@@ -130,4 +151,4 @@
 
 ---
 
-**Auto-Generated** | Updates end of week (Friday) | Version 3.1.0
+**Auto-Generated** | Updates end of week (Friday) | Version 3.2.0

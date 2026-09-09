@@ -29,14 +29,14 @@ is asked.
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline (16 story points)
 
-**Priority:** P0 (US-016 is P1) · **Status:** In Progress (2/5 completed) · **Dependencies:** US-003, US-004, US-005, US-007
+**Priority:** P0 (US-016 is P1) · **Status:** In Progress (3/5 completed) · **Dependencies:** US-003, US-004, US-005, US-007
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
 | US-012 | Branded application shell | 3 | P0 | ✅ Completed |
 | US-013 | Baseline dashboard — four pre-existing tiles | 3 | P0 | ⏸️ Deferred to Phase 2b run |
 | US-014 | Dynamic tile insertion & grid reflow | 3 | P0 | ✅ Completed |
-| US-015 | Reset to baseline | 2 | P0 | 📋 Todo |
+| US-015 | Reset to baseline | 2 | P0 | ✅ Completed |
 | US-016 | Hero band — webshop trend & attendance ring | 5 | **P1** | ⏸️ Deferred to Phase 2b run |
 
 **Technical Notes:**
@@ -77,9 +77,11 @@ is asked.
 - **Risk Level:** Medium — US-014's reflow behaviour is where visual polish is won or lost
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 6 / 16 (38%)
-- **Completed Stories:** 2 / 5
-- **Tests Passing:** 552 / 552 · **Coverage:** 100% stmts / 99.1% branches (`app/**`) · **Commits:** 2
+- **Completed Story Points:** 8 / 16 (50%)
+- **Completed Stories:** 3 / 5 — **the phase is NOT complete**
+- **Deferred:** US-013 (3 pts) and US-016 (5 pts) → the **Phase 2b run**; their component
+  dependencies (US-017, US-021, US-025, US-026, US-027) all live in Phase 2b
+- **Tests Passing:** 592 / 592 · **Coverage:** 100% stmts / 99.2% branches / 100% funcs (`app/**`) · **Commits:** 3
 
 ---
 
@@ -104,7 +106,7 @@ is asked.
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
 | Grid jumps instead of reflowing when tiles insert | High | Medium | Existing tiles animate to new positions; verified in US-043 polish | AI | Mitigated — US-014 wraps every insertion in a view transition; `::view-transition-group(fcb-tile-HERO_1)` observed animating in real Chrome while a second section inserted |
-| Reset mid-flow leaves an orphaned timeout or animation | Medium | Medium | Reset clears the pending timeout ref; verified in US-042 and US-045 | AI | Open |
+| Reset mid-flow leaves an orphaned timeout or animation | Medium | Medium | Reset clears the pending timeout ref; verified in US-042 and US-045 | AI | Mitigated — US-015 owns the single pending timer (`schedule`) and cancels it **first**, before touching state. Proven by deleting the cancel: the beat then inserted `HERO_2` into the reset dashboard and two tests failed. Repeated presses run one transition, not several |
 | Cross-phase dependency stalls US-013 / US-016 | Medium | High | See sequencing note above — reorder within the phase rather than blocking | AI | Open |
 | Horizontal scroll appears at 1080p | High | Low | Responsive 12-column grid; verified in US-040 | AI | Mitigated — US-012 shell measured in Chrome at 1920×1080, `scrollWidth === clientWidth` |
 
@@ -208,9 +210,64 @@ change, and no storage API. All rendered text comes from module constants and is
 **Next:** US-015 — Reset to baseline (2 pts); it adds `reset` to `useDashboard` and wires the app
 bar's existing `onReset`. US-013 and US-016 stay deferred to the Phase 2b run.
 
+### 2026-09-09 — US-015 Reset to baseline ✅ (2 pts)
+
+**Delivered:** the control that lets the demo be run twice. Reset is a **transition beside the other
+three**, not a special case.
+- `app/lib/dashboard/sections.ts` — `BASELINE_SECTIONS` (the named baseline), `withBaselineRestored`,
+  `isBaseline`, `sameSections`. Pure, and the reset path nowhere says "empty".
+- `app/lib/dashboard/use-dashboard.ts` — `reset`, plus `schedule` (the single pending timer) and
+  `generation`. The session is now ONE committed snapshot mirrored into a ref, so a second press in
+  the same frame reads the first press's result instead of a stale render.
+- `app/lib/motion.ts` — `scrollToTop`, the mirror of `scrollRevealedIntoView`, reduced-motion-aware.
+- `app/root.tsx` — `<AppShell onReset={reset}>`. The US-012 control finally does something.
+
+**Two of the five criteria are a SEAM, not a claim** — stated plainly because the things they
+describe are not built:
+- **① the four baseline tiles are US-013** (deferred to the Phase 2b run). Reset restores
+  `BASELINE_SECTIONS`, which is *also* `useDashboard`'s initial state, so US-013 lists its tiles in
+  that one constant and gets reset for free. Sections are genuinely all cleared today.
+- **② the suggestion chips are US-029** and **④'s thinking beat is US-031.** No chip and no
+  thinking panel was invented here. The chip seam is `sections` (derive the row from the session
+  list and reset restores it with no logic of its own); the beat seam is `schedule`, and reset
+  already cancels it, so US-031 needs no retrofit.
+- **③ and ⑤ are fully met today.**
+
+**THE TIMER, PROVEN BY BREAKING IT.** `reset` calls `cancelPending()` first, before it touches
+state. Deleting that one line makes two tests fail with
+`expected [ { heroId: 'HERO_2', … } ] to deeply equal []` — the pending beat inserting an answer
+into a dashboard the presenter had just cleared. `schedule` also keeps only ONE timer pending
+(a second replaces the first), and an unmount cancels it as a reset the user did not press.
+
+**Abuse-proof by construction, not by a guard clause.** `withBaselineRestored` hands back the *same
+list reference* when there is nothing to clear, which is how the hook tells "something to clear"
+from "nothing to clear". Ten presses in one frame → **one** view transition, one baseline list, zero
+duplicates; a press with an empty canvas starts no transition at all; interleaved
+question/reset/question bursts end with exactly one section.
+
+**Verified in real Chrome (1280×620):** from `scrollY` 900, three rapid Reset presses land at
+`scrollY` 0 with three scroll requests (a browser replaces an in-flight smooth scroll rather than
+stacking) and **zero** `startViewTransition` calls despite the browser supporting them — the no-op
+path under abuse. Under `prefers-reduced-motion: reduce` all three presses requested
+`behavior: "auto"`. Shell, canvas and Reset control intact, no page error. The *clearing* reflow
+cannot yet be driven from the UI (no prompt bar until US-028), so it is covered by jsdom against a
+real-shaped `startViewTransition` and gets its browser pass with US-029's chips.
+
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 592/592 tests ✅ (40 new) · build ✅ · coverage 100%
+stmts / 99.2% branches / 100% funcs. **Security triage:** no security-relevant changes detected —
+no endpoint, no raw SQL, no `dangerouslySetInnerHTML`, no user-supplied URL, no upload, no env var,
+no dependency or lockfile change, no logging, and no storage API (the `app/**` scan still passes).
+`reset` takes no arguments, so no user input reaches it; the only new resource is one timer, bounded
+to one at a time and cleared on reset and on unmount.
+
+**Next:** Phase 2b — the tile components (US-017 to US-027). US-013 and US-016 are completed **in
+that run**, once their dependencies exist; Phase 2a therefore closes at **3/5 stories, 8/16 points**
+and is deliberately left open.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress (2/5 stories · 6/16 points)
+**Phase Status:** In Progress (3/5 stories · 8/16 points) — US-013 and US-016 **deferred to the
+Phase 2b run**, so this phase does **not** close here
 **Previous:** [Phase 1b](phase-1b.md) · **Next:** [Phase 2b — Components](phase-2b.md)

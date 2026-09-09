@@ -9,8 +9,9 @@
  *      a rename stays a one-line change;
  *   2. the reduced-motion query, shared by CSS and by the hooks that read it;
  *   3. the view-transition wrapper that makes the grid reflow smoothly;
- *   4. the auto-scroll that brings a just-revealed section into view, which is
- *      motion too and so reads the same preference.
+ *   4. the two scrolls — bringing a just-revealed section into view, and
+ *      returning to the top on Reset — which are motion too and so read the
+ *      same preference.
  *
  * The `useReducedMotion` / `useGrow` / `useCountUp` hooks that drive chart
  * geometry are US-027's; they build on `REDUCED_MOTION_QUERY` and
@@ -139,5 +140,33 @@ export function scrollRevealedIntoView(target: Element | null): void {
   target.scrollIntoView({
     behavior: prefersReducedMotion() ? "auto" : "smooth",
     block: "start",
+  });
+}
+
+/**
+ * Return the view to the top of the dashboard — Reset's half of the scrolling
+ * (US-015), the mirror image of {@link scrollRevealedIntoView}.
+ *
+ * The dashboard grows downwards and the presenter is usually far down it by the
+ * end of a run, so a Reset that cleared the sections but left the viewport
+ * scrolled would show a blank stretch of canvas rather than the baseline. It
+ * is the PAGE that scrolls, not the canvas (the shell's `main` clips only
+ * horizontally), so this scrolls the window.
+ *
+ * It reads the motion preference for the same reason the reveal does — a smooth
+ * scroll is motion — and it moves focus nowhere. Repeated calls are safe: a
+ * browser replaces an in-flight smooth scroll rather than stacking a second
+ * one, which is what keeps Reset pressed repeatedly free of overlapping
+ * animation. An environment without `scrollTo` (the server) is a no-op.
+ */
+export function scrollToTop(): void {
+  if (typeof window === "undefined" || typeof window.scrollTo !== "function") {
+    return;
+  }
+
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
   });
 }

@@ -3,12 +3,16 @@ import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  BASELINE_SECTIONS,
   findSection,
   hasSection,
   InsightPhase,
   type InsightSections,
+  isBaseline,
   NO_SECTIONS,
+  sameSections,
   sectionKey,
+  withBaselineRestored,
   withFollowUpShown,
   withHeroShown,
 } from "../../app/lib/dashboard/sections";
@@ -178,6 +182,93 @@ describe("lookups", () => {
     expect(sectionKey({ heroId: HERO_1, phase: "primary", revision: 2 })).toBe(
       `${HERO_1}#2`,
     );
+  });
+});
+
+/* --------------------------------------------------------------- RESET -- */
+
+describe("comparing two sessions", () => {
+  it("treats the same list as the same session", () => {
+    const sections = asked(HERO_1, HERO_2);
+
+    expect(sameSections(sections, sections)).toBe(true);
+  });
+
+  it("compares element by element, not by reference", () => {
+    expect(sameSections(asked(HERO_1, HERO_2), asked(HERO_1, HERO_2))).toBe(
+      true,
+    );
+  });
+
+  it("separates sessions of different length", () => {
+    expect(sameSections(asked(HERO_1), asked(HERO_1, HERO_2))).toBe(false);
+  });
+
+  it("separates the same heroes in a different order", () => {
+    expect(sameSections(asked(HERO_1, HERO_2), asked(HERO_2, HERO_1))).toBe(
+      false,
+    );
+  });
+
+  it("separates a re-asked hero from a first-asked one", () => {
+    // The case a length check would miss, and the reason this is a deep
+    // comparison: once the baseline holds descriptors, a baseline hero that
+    // was re-asked has the same length and a bumped revision.
+    expect(sameSections(asked(HERO_1), asked(HERO_1, HERO_1))).toBe(false);
+  });
+
+  it("separates a sharpened section from its primary", () => {
+    const primary = asked(HERO_1);
+
+    expect(sameSections(withFollowUpShown(primary, HERO_1), primary)).toBe(
+      false,
+    );
+  });
+});
+
+describe("the baseline — what reset restores", () => {
+  it("is the state the session starts in", () => {
+    // Named once, so US-013's four tiles change this constant and nothing
+    // else. Nothing in the reset path says "empty".
+    expect(isBaseline(BASELINE_SECTIONS)).toBe(true);
+  });
+
+  it("is empty today because US-013 is deferred to the Phase 2b run", () => {
+    expect(BASELINE_SECTIONS).toHaveLength(0);
+  });
+
+  it("recognises an answered session as away from the baseline", () => {
+    expect(isBaseline(asked(HERO_1))).toBe(false);
+    expect(isBaseline(asked(HERO_1, HERO_2, HERO_3))).toBe(false);
+  });
+});
+
+describe("restoring the baseline", () => {
+  it("clears every answered section", () => {
+    const grown = withFollowUpShown(asked(HERO_1, HERO_2, HERO_3), HERO_2);
+
+    expect(withBaselineRestored(grown)).toEqual(BASELINE_SECTIONS);
+    expect(isBaseline(withBaselineRestored(grown))).toBe(true);
+  });
+
+  it("hands back the very same list when there is nothing to clear", () => {
+    // Identity, not equality: the hook reads this to tell "something to clear"
+    // from "nothing to clear", so a second press animates nothing.
+    expect(withBaselineRestored(BASELINE_SECTIONS)).toBe(BASELINE_SECTIONS);
+  });
+
+  it("is idempotent — restoring twice changes nothing further", () => {
+    const once = withBaselineRestored(asked(HERO_1, HERO_2));
+
+    expect(withBaselineRestored(once)).toBe(once);
+  });
+
+  it("leaves the session it was given untouched", () => {
+    const grown = asked(HERO_1, HERO_2);
+
+    withBaselineRestored(grown);
+
+    expect(heroOrder(grown)).toEqual([HERO_1, HERO_2]);
   });
 });
 

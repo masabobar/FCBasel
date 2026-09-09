@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import App, { Layout } from "../../app/root";
 
@@ -52,6 +53,13 @@ describe("Layout", () => {
 });
 
 describe("App", () => {
+  const originalScrollTo = window.scrollTo;
+
+  afterEach(() => {
+    window.scrollTo = originalScrollTo;
+    vi.restoreAllMocks();
+  });
+
   function renderApp() {
     return render(
       <MemoryRouter initialEntries={["/"]}>
@@ -107,6 +115,30 @@ describe("App", () => {
     expect(ROOT_SOURCE.indexOf("<Outlet />")).toBeLessThan(
       ROOT_SOURCE.indexOf("<InsightSections"),
     );
+  });
+
+  it("wires the app bar's Reset to the dashboard's own reset", () => {
+    // One implementation, one wiring point: the control is US-012's, the
+    // behaviour is `useDashboard`'s, and this is where they meet (US-015).
+    expect(ROOT_SOURCE).toMatch(/const \{[^}]*reset[^}]*\} = useDashboard\(\)/);
+    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}>/);
+  });
+
+  it("presses Reset on a baseline dashboard without breaking the screen", async () => {
+    // Nothing to reset is the state the demo starts in, so the very first
+    // press a presenter can make must be a safe no-op.
+    const scrollTo = vi.fn();
+    Object.assign(window, { scrollTo });
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+
+    expect(
+      document.querySelectorAll('[data-slot="insight-section"]'),
+    ).toHaveLength(0);
+    expect(screen.getByText("child route")).toBeInTheDocument();
+    expect(scrollTo).toHaveBeenCalledTimes(1);
   });
 
   it("renders the crest as the first item of the app bar", () => {

@@ -9,7 +9,7 @@
  * `app/components/heroes/`, so the rules below can be read and tested without
  * rendering anything.
  *
- * Three rules, all of them load-bearing:
+ * Four rules, all of them load-bearing:
  *
  *   1. **One section per hero, keyed by hero id.** Asking the same question
  *      twice refreshes the section that is already there; it never appends a
@@ -21,6 +21,9 @@
  *      same answer sharpened from *what happened* to *why, and what to do*, so
  *      it belongs to the section that is already on screen
  *      ({@link withFollowUpShown}). US-033 gates when that is allowed.
+ *   4. **Reset returns to the BASELINE, not to "empty".** It is a transition
+ *      beside the other three, not a special case ({@link withBaselineRestored}),
+ *      and the state it restores is named once ({@link BASELINE_SECTIONS}).
  *
  * NO PERSISTENCE. This list is memory-only, by specification
  * (`technical-spec.md` §4.3): no `localStorage`, no `sessionStorage`, no
@@ -74,6 +77,24 @@ export type InsightSections = readonly InsightSection[];
 
 /** The empty session. A module-level constant so a reset is a stable value. */
 export const NO_SECTIONS: InsightSections = Object.freeze([]);
+
+/**
+ * THE BASELINE — the session list as it is on load, and as Reset restores it.
+ *
+ * **This constant is the seam, and it is the only thing US-013 has to change.**
+ * Reset is specified as "back to the initial state", not as "empty", so both
+ * `useDashboard`'s initial state and {@link withBaselineRestored} read this one
+ * name. The day the four baseline tiles arrive as descriptors, they are listed
+ * here and load-state and reset-state stay identical for free — nothing in the
+ * reset path says "empty" and so nothing has to be unpicked.
+ *
+ * It is empty **today** because the four pre-existing tiles (US-013) are
+ * deferred to the Phase 2b run, so the canvas starts bare on purpose. Note that
+ * a baseline tile which is static chrome — always on the canvas, never removed
+ * by an answer — needs no entry here at all: reset only has to restore what a
+ * question can change.
+ */
+export const BASELINE_SECTIONS: InsightSections = NO_SECTIONS;
 
 /** The section for a hero, if it has been asked this session. */
 export function findSection(
@@ -149,4 +170,49 @@ export function withFollowUpShown(
       ? { ...section, phase: InsightPhase.WITH_FOLLOW_UP }
       : section,
   );
+}
+
+/* ---------------------------------------------------------------- RESET -- */
+
+/** Whether two descriptors say the same thing. Every field, no exceptions. */
+function sameSection(a: InsightSection, b: InsightSection): boolean {
+  return (
+    a.heroId === b.heroId && a.phase === b.phase && a.revision === b.revision
+  );
+}
+
+/**
+ * Whether two section lists are the same session, element by element.
+ *
+ * Exported and general because {@link isBaseline} is only as future-proof as
+ * its comparison: once the baseline holds descriptors, "is there anything to
+ * clear?" cannot be answered by a length check alone — a baseline hero that was
+ * re-asked has the same length and a bumped `revision`.
+ */
+export function sameSections(a: InsightSections, b: InsightSections): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  return a.every((section, index) => sameSection(section, b[index]!));
+}
+
+/** Whether the session is already at {@link BASELINE_SECTIONS} — nothing to clear. */
+export function isBaseline(sections: InsightSections): boolean {
+  return sameSections(sections, BASELINE_SECTIONS);
+}
+
+/**
+ * Reset: return the session to {@link BASELINE_SECTIONS}.
+ *
+ * IDEMPOTENT BY REFERENCE. A session that is already at the baseline gets its
+ * OWN list back, unchanged and identity-equal. That is not a micro-optimisation
+ * — it is how the hook above tells "there is something to clear" from "there is
+ * not", so a second Reset in the same frame runs no second animation and
+ * inserts no second anything. Reset pressed with nothing to reset is therefore
+ * a no-op all the way down, by construction rather than by a guard clause the
+ * caller has to remember.
+ */
+export function withBaselineRestored(
+  sections: InsightSections,
+): InsightSections {
+  return isBaseline(sections) ? sections : BASELINE_SECTIONS;
 }

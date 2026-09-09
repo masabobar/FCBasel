@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-014 — insertion machinery built; hero content still pending)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-015 — Reset now behaves; the baseline state is a named seam, chips and thinking beat still pending)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -44,7 +44,7 @@ The three inert items are deliberate: they imply a fuller product without preten
 | **Path** | `/` (single route) |
 | **Auth** | Public — no authentication model exists in the prototype |
 | **Stories** | US-012, US-013, US-014, US-015, US-016, US-028 to US-039 |
-| **Status** | *(generated)* In Progress (2/17 completed — US-012 shell + US-014 insertion machinery; hero content pending) |
+| **Status** | *(generated)* In Progress (3/17 completed — US-012 shell, US-014 insertion machinery, US-015 reset; hero content pending) |
 
 **Description:** The persona's dashboard. On arrival it already looks lived-in — four baseline tiles,
 not an empty canvas. The user types a business question or taps a suggestion chip; after a staged
@@ -66,9 +66,9 @@ between them, and all of them share the same grid.
 
 | State | When | Built by | Status |
 |---|---|---|---|
-| **Baseline** | On load, and after Reset | US-013 | ⏸️ Deferred to the Phase 2b run — the shell renders the frame with an empty canvas until then |
+| **Baseline** | On load, and after Reset | US-013, US-015 | ⏸️ Tiles deferred to the Phase 2b run — but the state itself is now **named and reachable**: US-015's `BASELINE_SECTIONS` is both the session's initial value and what Reset restores, so US-013 lists its four tiles in that one constant and load-state and reset-state cannot diverge. The canvas is empty until then |
 | **Empty prompt** | Before any question is asked — light branded-red panel with heading and subtext | US-032 | 📋 Not started |
-| **Thinking** | During the fixed staged delay after a confident match | US-031 | 📋 Not started |
+| **Thinking** | During the fixed staged delay after a confident match | US-031 | 📋 Not started — but its **timer seam exists**: US-015's `schedule` owns the single pending beat and Reset already cancels it, so US-031 schedules through it rather than calling `setTimeout` itself |
 | **Grown** | One or more hero sections inserted, in the order asked | US-014, US-034 to US-039 | 🔄 Mechanic built (US-014) — sections insert into the canvas grid, dedupe by hero id, reflow and auto-scroll; their **content** is a marked placeholder until US-034 to US-039 |
 | **Fallback** | Typed input matched nothing — re-surfaces the prepared questions | US-032 | 📋 Not started |
 
@@ -83,13 +83,13 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 | Region | Contents | Stories | Status |
 |---|---|---|---|
 | Sidebar | Dashboard (active) + three inert items | US-012 | ✅ Built — `app/components/chrome/sidebar.tsx`; hides below `lg` |
-| Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 | ✅ Built — `app/components/chrome/top-bar.tsx`; Reset control renders, behaviour pending US-015 (which clears the US-014 session state) |
+| Top app bar | Self-hosted crest, workspace label, avatar, connection status, Reset | US-012, US-015 | ✅ Built — `app/components/chrome/top-bar.tsx`. **Reset now behaves:** the button stays a pure affordance taking an injected callback, and `app/root.tsx` injects `useDashboard`'s `reset`, which clears the US-014 session back to `BASELINE_SECTIONS`, cancels any pending beat and scrolls to top. Idempotent and abuse-proof — ten presses in one frame run one transition |
 | Canvas grid | The 12-column container every tile and section is inserted into | US-012, US-014 | ✅ Built — `app/components/chrome/app-shell.tsx`; 12 cols at `lg`, 8 at `sm`, 4 below. Empty on load; US-014's sections insert into **this** grid as direct children |
 | Hero band | Greeting, period filter, webshop trend chart, attendance ring | US-016 | ⏸️ Deferred to the Phase 2b run |
 | Baseline row | Top Products (own period filter), Active Partners | US-013 | ⏸️ Deferred to the Phase 2b run |
 | Insight sections | One per answered question — section head, narrative, cards, optional follow-up | US-014, US-034 to US-039 | 🔄 Built (US-014) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
-| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started |
+| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started — the chip row's reset behaviour is already provided for: **derive** it from `useDashboard`'s `sections` (initial chips at the baseline, follow-up chips from the sections on screen) and Reset restores it with no logic of its own; `generation` covers anything US-028's input holds that cannot be derived |
 
 > The **canvas grid** row is new in 1.1.0. It was implicit before — US-012 made it a real region
 > with its own component, and US-013/US-014 both insert into it rather than owning a grid each.
@@ -98,6 +98,11 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 > one grid — each section spans it and re-uses its column tracks (`grid-cols-subgrid`), so no second
 > grid was introduced. Session state is memory-only, so the Grown state always starts from Baseline
 > after a reload.
+>
+> 1.3.0 records US-015: **Grown → Baseline is now a real transition**, not just a reload. No region
+> was added or removed — Reset changes which state the single screen is in. The two things a future
+> story must not reimplement are named here: the Baseline state (`BASELINE_SECTIONS`) and the
+> pending-beat timer (`schedule`).
 
 ---
 
@@ -107,12 +112,16 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-09, after US-014)
+## 4. Drift Report (hand-checked 2026-09-09, after US-015)
 
 - **Stories referencing screens not in this map:** *(none)*
 - **Screen entries with no backing story (orphans):** *(none)*
 - **Navigation nodes missing a registry entry (or vice versa):** *(none — the three inert sidebar
   items are intentionally not registry entries; they are not screens)*
+- **Routes added by US-015:** *(none)*. Reset is a state change on SCREEN-001, not a navigation:
+  `app/routes.ts` is untouched, no history entry is pushed, and the window is scrolled rather than
+  the router being asked to navigate. It adds no region and no screen — only the Baseline state's
+  reachability, recorded above.
 - **Routes added by US-014:** *(none)*. An answer is inserted into the existing screen — it is a
   state of SCREEN-001, not a navigation. `app/routes.ts` is unchanged and `root.tsx` renders the
   sections beside the routed page inside the same canvas.
@@ -123,6 +132,7 @@ The sidebar and app bar halves of that chrome ship as of US-012; the hero band a
   drift (`constraints.md` §2). US-012 makes no network call at runtime, and the app-bar tests assert
   the absence of `fetch`, `axios` and any timer. US-014 adds no endpoint either: inserting a section
   is a React state change, and a source scan asserts no storage API is used anywhere in `app/**`.
+  US-015 adds none either: Reset is memory-only, makes no request, and the storage scan still passes.
 
 ---
 

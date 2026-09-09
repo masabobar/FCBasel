@@ -37,15 +37,19 @@ export function Layout({ children }: { children: ReactNode }) {
  * canvas, so both are grid items on the SAME grid: an answer joins the
  * dashboard instead of replacing the view. It grows; it never clears.
  *
- * Still to be wired here: `onReset` (US-015, to a `reset` on this hook) and
- * the prompt bar and suggestion chips (US-028 to US-033, to `showHero` /
- * `showFollowUp`).
+ * The app bar's Reset is wired straight to the hook's `reset` (US-015): the
+ * control renders in `TopBar`, the behaviour lives in `useDashboard`, and this
+ * is the one place the two meet.
+ *
+ * Still to be wired here: the prompt bar and suggestion chips (US-028 to
+ * US-033, to `showHero` / `showFollowUp`, and to `schedule` for the thinking
+ * beat so Reset cancels it).
  */
 export default function App() {
-  const { sections, focus } = useDashboard();
+  const { sections, focus, reset } = useDashboard();
 
   return (
-    <AppShell>
+    <AppShell onReset={reset}>
       <Outlet />
       <InsightSections sections={sections} focus={focus} />
     </AppShell>
