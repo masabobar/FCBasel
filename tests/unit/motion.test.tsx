@@ -6,9 +6,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Card, TILE_ENTER_CLASS } from "../../app/components/tiles/card";
 import {
   animateReflow,
+  cssIdentifier,
   MOTION_CLASS,
   prefersReducedMotion,
   REDUCED_MOTION_QUERY,
+  reducedMotionQuery,
   scrollRevealedIntoView,
   scrollToTop,
   viewTransitionName,
@@ -394,6 +396,60 @@ describe("grid reflow", () => {
       "fcb-tile-2026-kit-away",
     );
     expect(viewTransitionName("a")).not.toBe(viewTransitionName("b"));
+  });
+});
+
+/* --------------------------------------------------------- CSS IDENTIFIER -- */
+
+describe("cssIdentifier", () => {
+  // Shared by `viewTransitionName` above and by US-027's `useUid`, which has to
+  // launder React's `useId()` into something legal inside `url(#…)`.
+  it("keeps a string that is already a legal identifier", () => {
+    expect(cssIdentifier("bars-fill_2")).toBe("bars-fill_2");
+  });
+
+  it("collapses each run of illegal characters to a single hyphen", () => {
+    expect(cssIdentifier("2026 kit / away")).toBe("2026-kit-away");
+  });
+
+  it("drops leading and trailing hyphens so it composes behind a prefix", () => {
+    expect(cssIdentifier("«r0»")).toBe("r0");
+  });
+
+  it("can reduce a string of nothing but illegal characters to empty", () => {
+    // The caller decides what to do with that — `useUid` falls back to its
+    // house prefix rather than emitting a bare hyphen.
+    expect(cssIdentifier("«»")).toBe("");
+  });
+});
+
+/* ------------------------------------------------- REDUCED MOTION QUERY -- */
+
+describe("reducedMotionQuery", () => {
+  const originalMatchMedia = window.matchMedia;
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia;
+    vi.restoreAllMocks();
+  });
+
+  it("hands out the live query list for the one shared query", () => {
+    // The list, not just its boolean: US-027's `useReducedMotion` subscribes to
+    // its `change` event, and must subscribe to the same query the stylesheet
+    // matches on.
+    const matchMedia = vi.fn(
+      (query: string) => ({ matches: true, media: query }) as MediaQueryList,
+    );
+    window.matchMedia = matchMedia;
+
+    expect(reducedMotionQuery()?.media).toBe(REDUCED_MOTION_QUERY);
+    expect(matchMedia).toHaveBeenCalledWith(REDUCED_MOTION_QUERY);
+  });
+
+  it("is null where there is no matchMedia to ask", () => {
+    Object.assign(window, { matchMedia: undefined });
+
+    expect(reducedMotionQuery()).toBeNull();
   });
 });
 

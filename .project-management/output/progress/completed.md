@@ -6,111 +6,34 @@
 
 ## Summary
 
-**Total Completed:** 14 stories
-**Total Points:** 32 / 116
+**Total Completed:** 15 stories
+**Total Points:** 35 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 32 points/day
+**Average Velocity:** 35 points/day
 **Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
 
 ---
 
 ## Completed Stories
 
-### US-001: Environment & deployment setup (3 pts)
-**Completed:** 2026-09-09
-**By:** AI (Railway deploy step remains with the human)
-**Files Changed:** 21 (16 code/config, 5 tracking docs)
-**Tests Added:** 8 (unit: 8)
-**Commit:** see phase-1a progress log
-**Notes:** 4 of 5 criteria verified by execution; the Railway deploy AC is **deferred to the human**.
+## Phase 1a: Setup & Design System — closed 2026-09-09 (6 stories · 14 pts)
 
-**What Was Done:** *(full detail in the phase-1a progress log)*
-- React Router 7.18 (framework mode, SSR), Vite 6, Tailwind v4, strict TS, and only the prototype's
-  dependency set — no Prisma, msw, Recharts, TanStack Table, PDF/email or i18n
-- Railway config committed; from a **clean checkout** install/build/production server return HTTP 200
-  with SSR markup, no env var, no database. Two moderate `qs` advisories overridden; audit clean
+Condensed to keep this log inside its 300-line limit; the **full per-story detail lives in
+[`../phases/phase-1a.md`](../phases/phase-1a.md)**, which is the authoritative record.
 
-### US-002: Developer tooling & local DX (2 pts)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 13 (8 code/config, 5 tracking docs)
-**Tests Added:** 0 (tooling config carries no behaviour worth a hollow test; the 8 stay green)
-**Commit:** see phase-1a progress log
-**Notes:** All 4 acceptance criteria met and verified by execution, including the pre-commit hook.
+| Story | Pts | Tests | What it left behind |
+|---|---:|---:|---|
+| US-001 Environment & deployment setup | 3 | 8 | React Router 7.18 SSR + Vite 6 + Tailwind v4 + strict TS, prototype-only dependency set. From a clean checkout, install/build/serve returns SSR markup with no env var and no database. **The Railway deploy itself remains a human step.** |
+| US-002 Developer tooling & local DX | 2 | 0 | ESLint 9 flat config, Prettier with Tailwind class sorting, husky + lint-staged — the pre-commit hook proved to fire by throwaway commits. |
+| US-003 Design token set | 3 | 88 | One token set: Tailwind v4 `@theme static` properties in `app/app.css` mirrored as typed objects in `app/lib/tokens.ts`, held in lockstep by a `var()`-resolving parity test. Colour discipline encoded in the token *names* — gold limited to two accent roles, `varianceNegative` kept separate from `red`. |
+| US-004 Self-hosted FCB crest | 1 | 10 | The club's `logo.webp` serves **PNG bytes**; the bytes were trusted over the extension. Stored as `public/fcb-crest.png` at 120x128, 194,518 → 17,908 bytes via `sips`, no image dependency. Nothing in `build/` matches `fcb.ch`. |
+| US-005 Tile card anatomy | 2 | 38 | `app/components/tiles/card.tsx` — one `Card` shell (plus `CardCaption`) that every 2b tile and 3b hero composes. **Slots, not variants**; `accent` takes a token name so no hex can reach a tile; `isNew` / `delayMs` are hooks only. |
+| US-006 Tile-insertion motion & reduced-motion | 3 | 37 | The four reveal keyframes (`fcbUp`, `fcbGlow`, `fcbScan`, `fcbSrc`) defined once and timed from motion tokens, plus `app/lib/motion.ts` (`MOTION_CLASS`, `REDUCED_MOTION_QUERY`, `animateReflow`, `viewTransitionName`). **Reduced motion renders final state, not "no animation"** — an unlayered block collapses every animation to ~1ms on `*`. Fade-and-rise only; no gold ring, guarded structurally. |
 
-**What Was Done:**
-- ESLint 9 flat config (TS + React hooks, `eslint-config-prettier` last), Prettier with
-  `prettier-plugin-tailwindcss`, husky v9 + lint-staged — the hook **proved** to fire by throwaway commits.
-  All gates clean
+---
 
-### US-003: Design token set (3 pts)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 8 (3 code, 5 tracking docs)
-**Tests Added:** 88 (unit: 88)
-**Commit:** see phase-1a progress log
-**Notes:** All 6 acceptance criteria met. Guide precedence applied to the three known divergences:
-surface `#F1F4F9`, text `#161A20`, positive variance `#0E9F6E`. No new-tile gold ring introduced.
-
-**What Was Done:** *(full detail in the phase-1a progress log)*
-- The colour, type, spacing, radii, shadow and motion set defined once as Tailwind v4 `@theme static`
-  properties in `app/app.css`, mirrored as a typed object in `app/lib/tokens.ts` for the SVG charts
-  and guarded by a parity test that resolves `var()` aliases
-- Colour discipline encoded in the token *names* (gold limited to two accent roles;
-  `varianceNegative` kept separate from `red` so red can never drift into meaning "bad"), plus
-  typography roles so US-005 cites a role, never a type spec. All gates clean (96/96)
-
-### US-004: Self-hosted FCB crest (1 pt)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 9 (1 asset, 2 code, 1 modified, 5 tracking docs)
-**Tests Added:** 10 (unit: 10)
-**Commit:** see phase-1a progress log
-**Notes:** All 3 acceptance criteria met. The club's `logo.webp` URL serves **PNG bytes** — the
-extension is wrong and the bytes were trusted instead. No image dependency was added.
-
-**What Was Done:** *(full detail in the phase-1a progress log)*
-- The bytes were inspected before committing (`PNG image data, 608 x 648`), so the file is stored
-  under its real format as `public/fcb-crest.png`, downsampled to 120x128 with macOS `sips`
-  (194,518 → 17,908 bytes) and stripped to `IHDR`/`IDAT`/`IEND` — no image dependency
-- **No CDN request survives:** nothing in `build/` matches `fcb.ch` (106/106)
-
-### US-005: Tile card anatomy (2 pts)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 8 (2 code, 1 test, 5 tracking docs)
-**Tests Added:** 38 (unit: 38)
-**Commit:** see phase-1a progress log
-**Notes:** All 4 acceptance criteria met. This is the DRY story — seven Phase 2b tile kinds and
-three Phase 3b heroes compose this one shell, so the prop set was designed for that, not for today.
-
-**What Was Done:** *(full detail in the phase-1a progress log)*
-- `app/components/tiles/card.tsx` — `Card` plus `CardCaption`. Nothing else: no KPI tile, no chart
-- **Slots, not variants** (eleven independently collapsing props), so a recommendation panel and a
-  KPI tile share one implementation; `accent` takes a **token name**, never a hex, so colour
-  discipline is enforced by the type rather than by review. Real `h3`; `isNew` / `delayMs` are hooks
-  only (US-006 owns the keyframes). 38 tests cover both directions of every slot (144/144)
-
-### US-006: Tile-insertion motion & reduced-motion support (3 pts)
-**Completed:** 2026-09-09
-**By:** AI
-**Files Changed:** 9 (3 code, 1 test, 5 tracking docs)
-**Tests Added:** 37 (unit: 37)
-**Commit:** see phase-1a progress log
-**Notes:** All 5 acceptance criteria met. **Closes Phase 1a** (6/6 stories, 14/14 points). The
-resolved conflict holds: fade-and-rise only, no gold ring on an inserted tile.
-
-**What Was Done:** *(full detail in the phase-1a progress log)*
-- The four reveal keyframes defined once in `app/app.css` — `fcbUp` (entrance), `fcbGlow`, `fcbScan`,
-  `fcbSrc` — every value from a motion token, so the choreography retimes from the token set
-- `app/lib/motion.ts`: `MOTION_CLASS` (the single spelling of each class name),
-  `REDUCED_MOTION_QUERY` / `prefersReducedMotion`, `animateReflow`, `viewTransitionName`
-- **Reduced motion renders final state, not "no animation":** an unlayered
-  `prefers-reduced-motion` block collapses every animation to ~1ms on `*`, so filled animations
-  land on their closing frame; each primitive also restates its end state outright
-- **Grid reflow** wraps an insertion in a view transition. **No gold ring, guarded structurally:**
-  every class opening at `opacity: 0` must be restored by the reduced-motion block (181/181)
+## Completed Stories *(Phase 1b onward)*
 
 ### US-007: Persona baseline datasets (2 pts)
 **Completed:** 2026-09-09
@@ -294,6 +217,40 @@ Nothing was invented to make an unbuilt criterion look done.
   nothing to clear, so 10 presses in one frame run **one** transition and an empty-canvas press
   runs none. Real Chrome: `scrollY` 900 -> 0 over three rapid presses, three scroll requests, zero
   `startViewTransition` calls, `behavior: "auto"` throughout under reduced motion
+
+### US-027: Motion & animation hooks (3 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 4 code (1 new, 3 modified) + 3 test files + 5 tracking docs
+**Tests Added:** 52 (unit: 52) - 644/644 green, 100% stmts / 99.4% branches / 100% funcs of `app/**`
+**Commit:** see phase-2b progress log
+**Notes:** All 4 acceptance criteria met. **Built first in Phase 2b on purpose** — the other ten E6
+components consume these hooks, so the API was designed for them and documented in the module
+header (the precedent US-007 set with `app/lib/repositories/README.md`).
+
+**What Was Done:**
+- `app/lib/hooks/use-motion.ts` (the `lib/hooks/` slot the technical spec reserved):
+  `useReducedMotion()`, `useGrow()`, `useCountUp(target, animationMs?)`, `useUid(prefix?)`
+- **Count-up counts from the CURRENT DISPLAYED VALUE.** The figure on screen is mirrored in a ref as
+  each frame commits it and read (never depended on) when the target changes, so a filter switched
+  mid-animation carries on from the old number. Tests prove the retargeted animation's *opening
+  sample is* the mid-flight figure, that it climbs monotonically from there, that it never dips, and
+  that it lands **exactly** on the target — upwards and downwards both
+- **Reduced motion = final state in the same render.** `useGrow` returns `grown || reduced` and
+  `useCountUp` returns `reduced ? target : displayed`, so `width={grown ? w : 0}` geometry and every
+  KPI number are final the moment the preference is read: under the preference `useGrow` is `true`
+  on the first render with **zero** frames requested. US-006's CSS rule, restated in JS
+- **One reduced-motion source:** `motion.ts` gained `reducedMotionQuery()` and `prefersReducedMotion`
+  now reads through it; the hook subscribes via `useSyncExternalStore` (explicit server snapshot,
+  React owns the unsubscribe) and reacts to a *change*, not just the value at mount. A test greps the
+  comment-stripped hook source and fails if it ever calls `matchMedia` itself
+- **Nothing outlives a component:** every rAF, fallback timer and media listener cancelled on
+  unmount, asserted per hook and once with ten tiles unmounted mid-count
+- ~900ms is now the `duration.countUp` token (`--duration-count-up`, parity-tested) read as a number
+  through a new `tokens.durationMs()`; `cssIdentifier` was extracted from `viewTransitionName` and is
+  shared with `useUid`, so an SVG gradient id is always legal in `url(#…)` and in a selector
+- **SSR proven, not asserted:** a `renderToString` with `window` and the frame APIs stubbed away,
+  plus a real `hydrateRoot` pass that fails on any `console.error` — including under reduced motion
 
 ---
 

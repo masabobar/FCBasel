@@ -13,9 +13,21 @@
  *      returning to the top on Reset — which are motion too and so read the
  *      same preference.
  *
- * The `useReducedMotion` / `useGrow` / `useCountUp` hooks that drive chart
- * geometry are US-027's; they build on `REDUCED_MOTION_QUERY` and
- * `prefersReducedMotion` below rather than restating the query.
+ * CONSUMERS: THE FOUR HOOKS LIVE NEXT DOOR (US-027)
+ * Anything that animates from React — chart geometry, a KPI number, an SVG
+ * gradient id — imports from `app/lib/hooks/use-motion.ts`, which builds on
+ * `reducedMotionQuery` / `prefersReducedMotion` below rather than restating the
+ * query:
+ *
+ *   const reduced = useReducedMotion();          // boolean, reacts to changes
+ *   const grown   = useGrow();                   // false -> true after a frame;
+ *                                                // true AT ONCE under reduced motion
+ *   const shown   = useCountUp(value);           // counts from the figure on
+ *                                                // screen to `value` (~900ms)
+ *   const uid     = useUid("bars");              // stable id for `url(#…)`
+ *
+ * This module stays the CSS-side half: class names, the query itself, the view
+ * transition and the two scrolls. Do not add a second reduced-motion read.
  */
 
 /* --------------------------------------------------------- CLASS NAMES -- */
@@ -48,6 +60,25 @@ export type MotionClass = (typeof MOTION_CLASS)[keyof typeof MOTION_CLASS];
 export const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 /**
+ * The live {@link MediaQueryList} for the preference, or `null` where there is
+ * no `matchMedia` to ask — the server, and any DOM-less renderer.
+ *
+ * The list, not just its boolean: `useReducedMotion` subscribes to its `change`
+ * event so a preference flipped mid-session is honoured, and it must subscribe
+ * to the same query the stylesheet uses. Handing out the list is what keeps
+ * that a single spelling instead of two.
+ */
+export function reducedMotionQuery(): MediaQueryList | null {
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function"
+  ) {
+    return null;
+  }
+  return window.matchMedia(REDUCED_MOTION_QUERY);
+}
+
+/**
  * Whether the visitor has asked for reduced motion, read once.
  *
  * Returns `false` during server rendering and wherever `matchMedia` is absent:
@@ -55,16 +86,11 @@ export const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
  * the stylesheet decide" rather than to a broken screen. React components
  * should subscribe via US-027's `useReducedMotion` so a change of preference
  * mid-session is picked up; this direct read is for one-shot callers such as
- * `animateReflow`.
+ * `animateReflow` — and it is the snapshot that hook reads, so the two can
+ * never disagree.
  */
 export function prefersReducedMotion(): boolean {
-  if (
-    typeof window === "undefined" ||
-    typeof window.matchMedia !== "function"
-  ) {
-    return false;
-  }
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+  return reducedMotionQuery()?.matches ?? false;
 }
 
 /* --------------------------------------------------------- GRID REFLOW -- */
@@ -75,16 +101,29 @@ type ViewTransitionDocument = Document & {
 };
 
 /**
+ * A string reduced to something safe to use as a CSS identifier: anything
+ * outside `[A-Za-z0-9_-]` collapses to a single hyphen, and leading/trailing
+ * hyphens are dropped so the result composes cleanly behind a prefix.
+ *
+ * Two callers, which is why it is a function and not two regexes: the
+ * `view-transition-name` below, and `useUid`, which has to launder React's
+ * `useId()` (`«r0»` in some versions) into something legal inside `url(#…)`
+ * and in a `querySelector`.
+ */
+export function cssIdentifier(value: string): string {
+  return value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+/**
  * A stable `view-transition-name` for a tile, so the browser can match the
  * same tile before and after an insertion and tween it to its new position.
  *
  * Names must be CSS identifiers and must be unique on the page, so a tile's
- * own id is sanitised rather than trusted: anything outside `[A-Za-z0-9_-]`
- * becomes a hyphen, and the constant prefix keeps a name that starts with a
- * digit legal.
+ * own id is sanitised rather than trusted, and the constant prefix keeps a name
+ * that starts with a digit legal.
  */
 export function viewTransitionName(key: string): string {
-  return `fcb-tile-${key.replace(/[^A-Za-z0-9_-]+/g, "-")}`;
+  return `fcb-tile-${cssIdentifier(key)}`;
 }
 
 /**

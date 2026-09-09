@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2a - Shell & Baseline *(3/5 stories complete — US-013 + US-016 deferred to the Phase 2b run)* · Phase 1b complete
+**Current Phase:** Phase 2b - Chart & Tile Component Library *(1/11 stories complete)* · Phase 2a partial (3/5, US-013 + US-016 folded into the 2b run) · Phases 1a + 1b complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 28% | 100% | 🟢 On Track |
+| **Overall Progress** | 30% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 14/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 32/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 15/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 35/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 14
-**Currently Working On:** None — Phase 2a partial: 3/5, US-013 + US-016 deferred
-**Story Points Completed Today:** 32
+**Stories Completed Today:** 15
+**Currently Working On:** US-017 — KPI tile & variance chip (2 pts)
+**Story Points Completed Today:** 35
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -135,6 +135,23 @@
   are US-029 and the thinking beat is US-031 — neither was invented here; they wire into `sections`
   and `schedule` respectively.
 
+- ✅ **US-027 — Motion & animation hooks (3 pts)** — the four hooks the other ten E6 components are
+  built on, and the reason those stories can be mechanical: `useReducedMotion`, `useGrow`,
+  `useCountUp`, `useUid` in `app/lib/hooks/use-motion.ts`. **Count-up tracks the figure on screen in
+  a ref**, so a period filter changed mid-animation carries on from the old number instead of
+  snapping to zero and re-counting — a test asserts the new animation's opening sample *is* the
+  displayed value, climbs from there, and lands exactly on the target. **Reduced motion means final
+  state in the same render, never an effect later:** `useGrow` returns `true` and `useCountUp`
+  returns the target the moment the preference is read, so `width={grown ? w : 0}` geometry can never
+  be stranded at zero by a transition that will not run — US-006's CSS principle restated in JS.
+  One reduced-motion source of truth: the hooks subscribe to US-006's `REDUCED_MOTION_QUERY` through
+  `useSyncExternalStore` (SSR snapshot by construction, React owns the unsubscribe), and a test
+  greps the hook layer to prove it never calls `matchMedia` itself. Every frame, timer and listener
+  is cancelled on unmount, proven with ten simultaneous tiles. The ~900ms count-up is now a token
+  (`--duration-count-up`), read as a number through a new `durationMs()` so no timing is written
+  twice. 42 new tests, including a real `renderToString` + `hydrateRoot` pass that fails on any
+  hydration mismatch.
+
 ---
 
 ## 🏁 Phase 1b complete — Seed Data
@@ -148,12 +165,14 @@ grounded in verified FCB facts. Closed at 100% on 2026-09-09, as did **Phase 1a*
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| *(none)* — Phase 2a is partial: US-013 + US-016 await Phase 2b components | ⏸️ Deferred | — |
+| US-017: KPI tile & variance chip | 🔄 Next | Unblocked by US-027 |
+| US-013 + US-016 (Phase 2a) | ⏸️ Deferred | Await US-021 / US-025 + US-026 |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-027: Motion & animation hooks | 2026-09-09 | 3 |
 | US-015: Reset to baseline | 2026-09-09 | 2 |
 | US-014: Dynamic tile insertion & grid reflow | 2026-09-09 | 3 |
 | US-012: Branded application shell | 2026-09-09 | 3 |
@@ -199,8 +218,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 100% stmts / 99.2% branches / 100% funcs | 80% | 🟢 Good |
-| Passing Tests | 592/592 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 100% stmts / 99.4% branches / 100% funcs | 80% | 🟢 Good |
+| Passing Tests | 644/644 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -233,7 +252,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | 🔄 Partial | 3/5 | 8/16 | 50% |
-| Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
+| Phase 2b: Component Library | 🔄 In Progress | 1/11 | 3/29 | 10% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
@@ -242,7 +261,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 ## 🔗 Quick Links
 
-- **[Next Phase Plan](../phases/phase-2a.md)** - Phase 2a, Shell & Baseline
+- **[Current Phase Plan](../phases/phase-2b.md)** - Phase 2b, Chart & Tile Component Library
+- **[Phase 2a Plan](../phases/phase-2a.md)** - Partial (3/5); US-013 + US-016 run with Phase 2b
 - **[Phase 1b Plan](../phases/phase-1b.md)** - Completed 2026-09-09
 - **[Phase 1a Plan](../phases/phase-1a.md)** - Completed 2026-09-09
 - **[Backlog](../../input/backlog/)** - All project backlogs
@@ -255,4 +275,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-015 completed at 2026-09-09 — Phase 2a partial (3/5 · 8/16 pts); US-013 and US-016 deferred to the Phase 2b run, so the phase stays open
+**Last Auto-Update:** US-027 completed at 2026-09-09 — Phase 2b open (1/11 · 3/29 pts). The motion hooks land first because every remaining E6 component consumes them; next is US-017

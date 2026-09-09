@@ -7,71 +7,30 @@
 
 ## Today's Summary
 
-**Stories Completed:** 14 — **Phase 1a and Phase 1b complete; Phase 2a at 3/5 (partial)**
-**Story Points:** 32
-**Time Worked:** ~8.9 hours
-**Files Changed:** 138
-**Tests Added:** 592
+**Stories Completed:** 15 — **Phase 1a and Phase 1b complete; Phase 2a at 3/5 (partial); Phase 2b
+open at 1/11**
+**Story Points:** 35
+**Time Worked:** ~9.4 hours
+**Files Changed:** 150
+**Tests Added:** 644
 
 ---
 
 ## Work Log
 
 - Project management setup: scope, backlog, docs, phases and tracking from the client documents.
-- **US-001 — Environment & deployment setup.** React Router 7.18 framework mode with SSR scaffolded
-  at the repo root (Vite 6, Tailwind v4, strict TypeScript), only the prototype's dependency set,
-  Railway deploy config committed. Clean-checkout `install` / `build` / `start` verified by
-  execution: HTTP 200 with SSR markup, no env var, no database. `pnpm audit` clean after
-  overriding a vulnerable transitive `qs`.
-- **US-002 — Developer tooling & local DX.** ESLint 9 flat config (TypeScript + React hooks) with
-  `eslint-config-prettier` last, Prettier with `prettier-plugin-tailwindcss`, husky v9 +
-  lint-staged. Every acceptance-criteria script was executed rather than assumed, and the hook was
-  proven with throwaway commits later reset away: a lint error blocked the commit, a badly
-  formatted file landed already formatted. All gates clean, 8/8 tests green.
-- **US-003 — Design token set.** One token set, published twice on purpose: Tailwind v4 CSS custom
-  properties in `app/app.css` (`@theme static`), and a typed object in `app/lib/tokens.ts` for the
-  hand-built SVG charts. A parity test parses the stylesheet, resolves the `var()` aliases and
-  fails on drift in either direction.
-  Reference Guide values win on the three known divergences (surface `#F1F4F9`, text `#161A20`,
-  positive variance `#0E9F6E`), and the Specification-only gold ring was not introduced. Colour
-  discipline is encoded rather than documented — variance tokens as the only good/bad carriers,
-  `varianceNegative` separate from `red`, gold restricted to two accent roles, each backed by a
-  test. 96/96 green, coverage 100% of `app/**`, all gates clean.
-- **US-004 — Self-hosted FCB crest.** The club serves the crest from a `.webp` URL that actually
-  returns PNG bytes, so the download was inspected with `file` before anything was committed and
-  stored under its real format as `public/fcb-crest.png`. 608x648 at 194 KB is ~90x more pixels than
-  a 32px mark can show, so it was downsampled to 120x128 with macOS `sips` — no image dependency —
-  and every ancillary chunk stripped; the asset is 17,908 bytes of `IHDR`/`IDAT`/`IEND`. `Crest`
-  renders it with an accessible name and an aspect-ratio-derived width. The no-CDN criterion was
-  proved rather than assumed: nothing in `build/` matches `fcb.ch`, both bundles reference the
-  literal `/fcb-crest.png`, and the booted server returns HTML whose every `src`/`href` is
-  root-relative. 106/106 tests green, coverage 100% of `app/**`.
-- **US-005 — Tile card anatomy.** `Card` and `CardCaption` in `app/components/tiles/card.tsx`: the
-  one shell that seven Phase 2b tile kinds and three Phase 3b heroes compose, so the prop set was
-  designed for those eleven callers rather than for today. Slots, not variants — eleven optional
-  props, each collapsing on its own and the header disappearing entirely when nothing would fill it,
-  which is what lets an accent-only recommendation panel and a titled KPI tile share one
-  implementation. `accent` takes a token name rather than a colour string, so the US-003 colour
-  discipline is enforced by the type instead of by review; the title is a real heading; the caption
-  strip is one muted line behind an `aria-hidden` AI glyph. `isNew` and `delayMs` are hooks only —
-  US-006 owns the keyframes, and there is no gold ring and no glow. 38 tests added (144/144), 100%
-  coverage of `app/**`, all gates clean.
-- **US-006 — Tile-insertion motion & reduced-motion support.** The four keyframes the orchestrated
-  reveal is built from, defined once in `app/app.css` and timed entirely from motion tokens: `fcbUp`
-  (a new tile fades in while rising 12px over 400ms on the gentle insertion ease), `fcbGlow` (the
-  ambient brand pulse for the sidebar dot and AI orbs — never an inserted tile), `fcbScan` (the
-  thinking scan line) and `fcbSrc` (the source-chip reveal). `app/lib/motion.ts` holds the class
-  names, so `TILE_ENTER_CLASS` derives from `MOTION_CLASS.enter` instead of repeating the string,
-  and the entrance attaches to the card's existing `isNew`/`delayMs` hooks. The subtle criterion
-  — nothing stuck at zero under reduced motion — is met by
-  *collapsing* animations rather than removing them: `animation: none` would strand any element
-  whose opening frame is `opacity: 0`, so the unlayered `prefers-reduced-motion` block gives every
-  animation one ~1ms iteration and every transition ~1ms, landing each on its final value at once,
-  and then restates each primitive's end state outright. Being unlayered it beats every cascade
-  layer and Tailwind utility; written against `*` it will cover US-027's chart geometry before that
-  exists. Smooth grid reflow uses a view transition, since CSS cannot transition a grid position;
-  the update always runs, wrapped or not. 37 tests added (181/181), gates clean.
-
+- **Phase 1a — US-001 to US-006 (14 pts), closed.** Condensed here to keep this file inside its
+  300-line limit; the full account is in [`completed.md`](completed.md) and
+  [`../phases/phase-1a.md`](../phases/phase-1a.md). In short: the React Router 7.18 SSR scaffold with
+  the prototype's dependency set and a clean-checkout install/build/serve verified by execution
+  (US-001, Railway deploy still a human step); ESLint 9 + Prettier + husky with the pre-commit hook
+  *proved* to fire (US-002); one design-token set published as Tailwind v4 `@theme static` properties
+  and as typed objects, held in lockstep by a drift test, with colour discipline encoded in the token
+  names (US-003); the crest self-hosted after verifying its bytes were PNG despite the `.webp` URL,
+  downsampled with `sips` and with no `fcb.ch` reference left anywhere (US-004); one `Card` shell of
+  independently collapsing slots that every 2b tile and 3b hero composes (US-005); and the four
+  reveal keyframes plus `app/lib/motion.ts`, where **reduced motion renders final state rather than
+  switching animation off** — the principle US-027 later restated in JavaScript (US-006).
 - **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 / US-009 /
   US-010 follow: enum keys in `app/lib/repositories/enums.ts`, domain types and the repository
   interface in `types.ts`, derived figures in `derive.ts`, fixtures plus the in-memory implementation
@@ -208,6 +167,29 @@
   (derive the row from `sections`) and the thinking beat is US-031 (schedule it through
   `schedule`). 40 tests added, 592/592 green. **Phase 2a now 3/5 stories, 8/16 points — and it
   stays open: US-013 and US-016 are deferred to the Phase 2b run.**
+- **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
+  depends on: `useReducedMotion`, `useGrow`, `useCountUp` and `useUid` in
+  `app/lib/hooks/use-motion.ts`, with the consumer API documented in the module header so the next
+  ten stories are composition rather than invention. **Count-up counts from the figure on screen,
+  not from zero** — the displayed value is mirrored in a ref as each frame commits it, and a test
+  proves a target changed mid-flight makes the new animation *open on that very figure*, climb
+  monotonically, never dip, and land **exactly** on the target (both upwards and downwards, because
+  a period filter moves numbers both ways). Without that ref, every filter press in all ten
+  consuming components would flash back to zero and re-count. **Reduced motion means final state in
+  the same render, not one effect later:** `useGrow` returns `grown || reduced` and `useCountUp`
+  returns `reduced ? target : displayed`, so `width={grown ? w : 0}` geometry is never stranded at
+  zero by a transition that will not run — under the preference `useGrow` is `true` on the first
+  render with **zero** frames requested. One reduced-motion source of truth: the hooks subscribe to
+  US-006's `REDUCED_MOTION_QUERY` through `useSyncExternalStore` (an explicit server snapshot, so
+  SSR-safety is structural and React owns the unsubscribe), and a test greps the comment-stripped
+  hook source to prove it never calls `matchMedia` itself. Every rAF, fallback timer and listener is
+  cancelled on unmount, asserted per hook and once with ten tiles unmounted mid-count. The ~900ms
+  count-up became the `duration.countUp` token read through a new `tokens.durationMs()`, and
+  `cssIdentifier` was extracted from `viewTransitionName` so `useUid`'s SVG gradient ids are always
+  legal in `url(#…)`. SSR is *proven*: a `renderToString` with `window` and the frame APIs stubbed
+  away, plus a real `hydrateRoot` pass that fails on any hydration `console.error`. **No browser
+  pass, stated plainly — hooks have no UI of their own; US-017 is the first consumer and owns that
+  verification.** 52 tests added, 644/644 green.
 
 ---
 
@@ -247,6 +229,12 @@
   by hero id proven in unit tests and in real Chrome, a follow-up flips its parent's phase, the
   reflow tween observed animating, auto-scroll measured, and no storage API anywhere.
   **Phase 2a now 2/5 stories, 6/16 points.**
+- ✅ US-015 — Reset to baseline (2 pts) — 3 of 5 acceptance criteria fully met; the chips (US-029)
+  and the thinking beat (US-031) are recorded as seams rather than claimed.
+  **Phase 2a partial: 3/5 stories, 8/16 points, left open.**
+- ✅ US-027 — Motion & animation hooks (3 pts) — all 4 acceptance criteria met, including the two
+  subtle ones: count-up continues from the current displayed value, and nothing is stranded at zero
+  under reduced motion. **Phase 2b opens here: 1/11 stories, 3/29 points.**
 
 ---
 
@@ -269,9 +257,10 @@
 **Immediate Focus:**
 - **Phase 2a is done for now at 3/5 stories, 8/16 points** — US-012, US-014, US-015 built. It is
   deliberately left open, not closed.
-- **Phase 2b — the component library (US-017 to US-027)** is next. It unblocks the two deferred
-  Phase 2a stories: US-013 needs US-017 + US-021, US-016 needs US-025/026/027. Complete both **in
-  that run** rather than reopening Phase 2a later.
+- **Phase 2b — the component library** is under way: US-027 (the motion hooks) is done, so the ten
+  remaining components are unblocked. Next is **US-017 — KPI tile & variance chip (2 pts)**, then
+  US-021, US-013, US-025, US-026, US-016, and the rest of the charts. Every one of them should
+  import from `app/lib/hooks/use-motion.ts` rather than animate by hand.
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -286,8 +275,11 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phases 1a and 1b are complete and Phase 2a is at 3/5 (32/116 points); continue with
-  `/holycode-pm:execute-work phase 2b`, finishing US-013 and US-016 inside that run.
+- Phases 1a and 1b are complete, Phase 2a is at 3/5 and Phase 2b at 1/11 (35/116 points); continue
+  with `/holycode-pm:execute-work phase 2b`, finishing US-013 and US-016 inside that run.
+- **The motion hooks are the shared contract for Phase 2b:** `useCountUp` from the current value and
+  `useGrow`'s reduced-motion short-circuit are what keep ten charts consistent. A component that
+  reimplements either is a review finding, not a style choice.
 - **Reset's seams are recorded in code, not just here:** US-029's chips should be *derived* from
   `useDashboard`'s `sections` and US-031's thinking beat *scheduled* through its `schedule`, so
   neither story needs reset logic of its own.

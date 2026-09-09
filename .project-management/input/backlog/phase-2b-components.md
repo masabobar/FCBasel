@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** Not Started (0/11 completed)
+**Status:** In Progress (1/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** Not Started (0/11 completed)
+**Status:** In Progress (1/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -173,7 +173,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** The four small hooks every animated component depends on.
   - **Acceptance Criteria:**
     - Reduced-motion hook tracking `prefers-reduced-motion`
@@ -184,6 +184,12 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       under reduced motion
     - Stable unique-id hook for SVG gradient ids, so multiple charts on screen never collide
   - **Dependencies:** US-003
+  - **Delivered:** `app/lib/hooks/use-motion.ts` — `useReducedMotion()`, `useGrow()`,
+    `useCountUp(target, animationMs?)`, `useUid(prefix?)`. Count-up continues from the displayed
+    figure (ref-tracked, proven by test); `useGrow` and `useCountUp` return final state in the same
+    render under reduced motion, so nothing is stranded at zero. One reduced-motion source
+    (US-006's `REDUCED_MOTION_QUERY`, via `useSyncExternalStore`); ~900ms is now the
+    `duration.countUp` token.
 
 ---
 
@@ -191,7 +197,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 0 · 🔄 0 · 📋 11 stories, 29 points · ⏸️ 0
+**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 10 stories, 26 points · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)

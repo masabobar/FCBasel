@@ -7,6 +7,9 @@ import {
   color,
   cssVariable,
   cssVariableName,
+  duration,
+  type DurationToken,
+  durationMs,
   fontSize,
   fontWeight,
   letterSpacing,
@@ -220,5 +223,29 @@ describe("css variable helpers", () => {
   it("wraps a token reference for inline styles and SVG attributes", () => {
     expect(cssVariable("color", "red")).toBe("var(--color-red)");
     expect(cssVariable("shadow", "tile")).toBe("var(--shadow-tile)");
+  });
+});
+
+describe("duration tokens in milliseconds", () => {
+  // `requestAnimationFrame` cannot be handed "900ms", so the JavaScript half of
+  // the motion system (US-027's hooks) reads its timings through here rather
+  // than restating them — one place a timing is written, still.
+  it("reads a token as a plain number", () => {
+    expect(durationMs("countUp")).toBe(900);
+    expect(durationMs("enter")).toBe(400);
+    expect(durationMs("grow")).toBe(700);
+  });
+
+  it("agrees with the string spelling for every duration token", () => {
+    for (const [key, value] of Object.entries(duration)) {
+      expect(`${durationMs(key as DurationToken)}ms`).toBe(value);
+    }
+  });
+
+  it("gives the count-up its own timing, distinct from the CSS growth", () => {
+    // Bars and rings grow over 700ms via CSS; a number counts over ~900ms in
+    // JavaScript. Two values on purpose — do not collapse them.
+    expect(duration.countUp).toBe("900ms");
+    expect(duration.countUp).not.toBe(duration.grow);
   });
 });

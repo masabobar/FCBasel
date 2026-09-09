@@ -175,13 +175,34 @@ export const duration = {
   fast: "150ms",
   /** Tile insertion — fade and rise. */
   enter: "400ms",
-  /** Bars, rings and count-ups growing to their value. */
+  /** Bars, rings and areas growing to their value (a CSS transition). */
   grow: "700ms",
+  /**
+   * A number counting from its current figure to a new one — the only motion
+   * value driven from JavaScript rather than CSS, because a count-up
+   * interpolates a NUMBER and no stylesheet can do that. Read it as
+   * milliseconds through {@link durationMs}; `useCountUp` does.
+   */
+  countUp: "900ms",
   /** Thinking scan line sweep. */
   scan: "1400ms",
   /** Slow accent glow pulse. */
   glow: "2400ms",
 } as const;
+
+export type DurationToken = keyof typeof duration;
+
+/**
+ * A duration token as a plain number of milliseconds.
+ *
+ * `requestAnimationFrame` cannot be handed `"900ms"`, so the JavaScript half of
+ * the motion system (`app/lib/hooks/use-motion.ts`) reads its timings through
+ * here rather than restating them as numeric literals — the token stays the one
+ * place a timing is written. Every duration token is spelled in `ms`.
+ */
+export function durationMs(key: DurationToken): number {
+  return Number.parseFloat(duration[key]);
+}
 
 export const easing = {
   /** Gentle overshoot-free ease used by the insertion animation. */
