@@ -49,6 +49,21 @@ import {
 
 /* ------------------------------------------------ WEBSHOP AND ATTENDANCE -- */
 
+/**
+ * The periods this dataset covers, in display order. `PeriodKey` is the shared
+ * enum across every tile and carries keys other datasets need (Hero 1 adds
+ * `SEASON_TO_DATE`); the baseline band offers these four, so it names them
+ * rather than iterating the whole enum and inventing figures for the rest.
+ */
+const BASELINE_PERIOD_KEYS = [
+  PeriodKey.THIS_MONTH,
+  PeriodKey.LAST_MONTH,
+  PeriodKey.LAST_3_MONTHS,
+  PeriodKey.YEAR_TO_DATE,
+] as const;
+
+type BaselinePeriodKey = (typeof BASELINE_PERIOD_KEYS)[number];
+
 /** St. Jakob-Park usable capacity, quoted in the UI as "~38,000". */
 const HOME_CAPACITY = 38_000;
 
@@ -210,7 +225,7 @@ const PRODUCT = {
  */
 const PRODUCT_SALES: readonly {
   product: string;
-  units: Record<PeriodKey, number>;
+  units: Record<BaselinePeriodKey, number>;
 }[] = [
   {
     product: PRODUCT.HOME_SHIRT,
@@ -259,16 +274,15 @@ const PRODUCT_SALES: readonly {
   },
 ];
 
-const TOP_PRODUCT_PERIODS: readonly TopProductsPeriod[] = Object.values(
-  PeriodKey,
-).map((key) => ({
-  key,
-  label: PERIOD_LABEL[key],
-  rows: PRODUCT_SALES.map((sales) => ({
-    product: sales.product,
-    units: sales.units[key],
-  })),
-}));
+const TOP_PRODUCT_PERIODS: readonly TopProductsPeriod[] =
+  BASELINE_PERIOD_KEYS.map((key) => ({
+    key,
+    label: PERIOD_LABEL[key],
+    rows: PRODUCT_SALES.map((sales) => ({
+      product: sales.product,
+      units: sales.units[key],
+    })),
+  }));
 
 /* ------------------------------------------------------------- PARTNERS -- */
 

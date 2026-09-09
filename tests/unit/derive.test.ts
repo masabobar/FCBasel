@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import {
   CLUB_SHORT_NAME,
+  SHIRT_PRICE_CHF,
   attendanceChangePercent,
   attendanceShare,
+  badgeSegments,
+  kitRevenue,
   percentChange,
   scoreline,
   seriesTotals,
 } from "../../app/lib/repositories/derive";
+import { type BadgeSponsorShare } from "../../app/lib/repositories/types";
 
 describe("percentChange", () => {
   it("reports a rise and a fall with the correct sign", () => {
@@ -88,5 +92,105 @@ describe("scoreline", () => {
 
   it("uses a plain hyphen, never an en or em dash", () => {
     expect(scoreline(match)).not.toMatch(/[–—]/);
+  });
+});
+
+describe("kitRevenue", () => {
+  it("prices shirts at CHF 99", () => {
+    expect(SHIRT_PRICE_CHF).toBe(99);
+    expect(kitRevenue(22_400)).toBe(2_217_600);
+    expect(kitRevenue(0)).toBe(0);
+  });
+});
+
+describe("badgeSegments", () => {
+  /** The Hero 1 sponsor split: 44 + 24 + 20 + 12 = 100. */
+  const SPLIT: readonly BadgeSponsorShare[] = [
+    { sponsor: "Bitpanda", percent: 44 },
+    { sponsor: "Sunrise", percent: 24 },
+    { sponsor: "Allianz", percent: 20 },
+    { sponsor: "IWB", percent: 12 },
+  ];
+
+  function values(total: number): number[] {
+    return badgeSegments(total, SPLIT).map((segment) => segment.value);
+  }
+
+  function segmentSum(total: number): number {
+    return values(total).reduce((sum, value) => sum + value, 0);
+  }
+
+  it("splits the season-to-date badge total by the sponsor percentages", () => {
+    expect(badgeSegments(3_080, SPLIT)).toEqual([
+      { sponsor: "Bitpanda", percent: 44, value: 1_355 },
+      { sponsor: "Sunrise", percent: 24, value: 739 },
+      { sponsor: "Allianz", percent: 20, value: 616 },
+      { sponsor: "IWB", percent: 12, value: 370 },
+    ]);
+  });
+
+  it("sums exactly to the total for every Hero 1 period total", () => {
+    for (const total of [3_080, 1_136, 430, 334]) {
+      expect(segmentSum(total)).toBe(total);
+    }
+  });
+
+  /**
+   * The single most bug-prone line in the dataset. Rounding four percentages
+   * independently drops or gains shirts at small and awkward totals, and a
+   * donut whose slices do not add up to the number printed inside it is exactly
+   * what this audience notices.
+   */
+  it("sums exactly to the total at adversarial totals", () => {
+    const adversarial = [
+      0, 1, 2, 3, 7, 11, 13, 17, 19, 23, 97, 101, 997, 9_973,
+    ];
+
+    for (const total of adversarial) {
+      expect(segmentSum(total)).toBe(total);
+    }
+  });
+
+  it("sums exactly to the total across an exhaustive sweep", () => {
+    for (let total = 0; total <= 2_000; total += 1) {
+      expect(segmentSum(total)).toBe(total);
+    }
+  });
+
+  it("adds the rounding remainder to the first segment", () => {
+    // 1 splits to 0 + 0 + 0 + 0 before correction; the whole shirt lands on
+    // Bitpanda, the largest share.
+    expect(values(1)).toEqual([1, 0, 0, 0]);
+    // 7 rounds to 3 + 2 + 1 + 1 = 7 with no remainder to move.
+    expect(values(7)).toEqual([3, 2, 1, 1]);
+  });
+
+  it("returns a zero segment per sponsor when there are no badges", () => {
+    expect(values(0)).toEqual([0, 0, 0, 0]);
+  });
+
+  it("keeps the sponsor and its percentage untouched", () => {
+    expect(
+      badgeSegments(500, SPLIT).map((segment) => [
+        segment.sponsor,
+        segment.percent,
+      ]),
+    ).toEqual([
+      ["Bitpanda", 44],
+      ["Sunrise", 24],
+      ["Allianz", 20],
+      ["IWB", 12],
+    ]);
+  });
+
+  it("does not mutate the split it is given", () => {
+    const before = JSON.stringify(SPLIT);
+    badgeSegments(3_080, SPLIT);
+
+    expect(JSON.stringify(SPLIT)).toBe(before);
+  });
+
+  it("returns nothing when there are no sponsors", () => {
+    expect(badgeSegments(3_080, [])).toEqual([]);
   });
 });

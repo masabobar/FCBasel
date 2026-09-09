@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 7 stories
-**Total Points:** 16 / 116
+**Total Completed:** 8 stories
+**Total Points:** 18 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 16 points/day
+**Average Velocity:** 18 points/day
 **Phases Completed:** Phase 1a (2026-09-09)
 
 ---
@@ -206,6 +206,43 @@ the experience, `scope.md` §10) drives all four.
   FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners
 - 47 tests added (228/228 green), coverage 100% statements / 98% branches of `app/**`; lint, format,
   typecheck and build all clean
+
+### US-008: Hero 1 dataset - shirt sales, badges, printed names (2 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 9 (2 new, 7 modified)
+**Tests Added:** 45 (unit: 45)
+**Commit:** see phase-1b progress log
+**Notes:** Delivered set intentionally **exceeds the written acceptance criteria**, per the user's
+approved decision: all four periods (season to date, last 3 months, last month, current month), not
+only the season-to-date figures the criteria describe. `scope.md` §10 makes the Reference Guide
+definitive for the experience, and the tile has a period switch that must have data behind it.
+
+**What Was Done:**
+- Followed the US-007 four-step recipe exactly: `SEASON_TO_DATE` added to the existing `PeriodKey`
+  (plus a new `KitVariant` enum with its label map), domain types and `Hero1Repository` in
+  `types.ts`, derived figures in `derive.ts`, fixtures and the in-memory implementation in
+  `app/lib/mock/hero1.ts`, one line of selection in `index.server.ts`
+- One hero object with `primary` and `followUp`, per the epic rule, so the tile and its escalation
+  cannot drift apart; `scopeLabel` is "Season-to-date merchandising" so the tile can state its scope
+- **Nothing derivable is stored.** Kit revenue is units x CHF 99, the Home share is 22,400 / 38,500
+  = 58.18% (displays 58%), the badge share is 3,080 / 38,500 = exactly 8%, and the four sponsor
+  segments come from `badgeSegments`. The Reference Guide's stored `homeShare: 58` deliberately did
+  not survive the port - a stored 58 can outlive an edit to the units beneath it
+- `badgeSegments(total, split)` corrects its rounding remainder into the first segment (Bitpanda,
+  the largest share), reproducing the reference behaviour. Proved by an exhaustive sweep: the four
+  segments sum *exactly* to the total for every total from 0 to 2,000, for all four period totals,
+  and at adversarial values (0, 1, 7 and a run of primes)
+- Season-to-date arithmetic asserted: 22,400 + 10,300 + 5,800 = 38,500 shirts; CHF 2,217,600 /
+  1,019,700 / 574,200 = CHF 3,811,500 (~3.81M); badge split 44/24/20/12 summing to 100
+- Both narratives are **verbatim**, verified byte-for-byte against the source by SHA-256, and a test
+  pins each one's exact text and length so a later "improvement" fails the suite
+- Guardrail held: squad names appear only as printed-name counts, and a test asserts no salary,
+  goals, assists, appearances, minutes or rating value exists anywhere in the dataset
+- Baseline fixture narrowed to its own four period keys so extending the shared enum could not
+  silently demand invented figures from it
+- 45 tests added (273/273 green), coverage 100% statements / 98.4% branches of `app/**`; lint,
+  format, typecheck and build all clean
 
 ---
 

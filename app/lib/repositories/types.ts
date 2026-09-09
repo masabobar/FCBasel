@@ -12,7 +12,7 @@
  *     data - formatting is US-011's job and happens at render time.
  */
 
-import { type PartnerRole, type PeriodKey } from "./enums";
+import { type KitVariant, type PartnerRole, type PeriodKey } from "./enums";
 
 /* ---------------------------------------------------------- PRIMITIVES -- */
 
@@ -98,6 +98,98 @@ export interface Partner {
   readonly brandColor: string;
 }
 
+/* ---------------------------------------------------------- HERO 1 DATA -- */
+
+/**
+ * Units sold of one kit variant in one period.
+ *
+ * Revenue is NOT here. It is units x the shirt price and is computed by
+ * `kitRevenue` in `./derive.ts`, so a units figure and its revenue figure
+ * cannot be edited into disagreement.
+ */
+export interface KitUnits {
+  readonly variant: KitVariant;
+  readonly label: string;
+  readonly units: number;
+}
+
+/**
+ * Shirts sold carrying one printed name.
+ *
+ * MERCHANDISING DATA, NOT PERFORMANCE DATA. These are print counts for public
+ * figures - how many fans bought a shirt with that name on the back. No
+ * appearance, goal, rating or salary figure belongs on this type, and adding
+ * one would engage the named-individual guardrail that print counts do not.
+ * "Custom" is a fan's own name and is a row like any other.
+ */
+export interface PrintedNameUnits {
+  readonly name: string;
+  readonly units: number;
+}
+
+/** One sponsor's fixed share of badge printing, in percent. */
+export interface BadgeSponsorShare {
+  readonly sponsor: string;
+  readonly percent: number;
+}
+
+/**
+ * One selectable period of the Hero 1 merchandising tile: kit units, the number
+ * of shirts carrying a sponsor badge, and the top printed names.
+ *
+ * Everything a tile shows on top of these - total units, kit revenue, the home
+ * share, the badge share, the per-sponsor badge segments - is DERIVED in
+ * `./derive.ts`.
+ */
+export interface Hero1Period {
+  readonly key: PeriodKey;
+  readonly label: string;
+  /** Kit units, in display order: Home, Away, 3rd. */
+  readonly kits: readonly KitUnits[];
+  /** Shirts carrying a sponsor badge. Split by `badgeSegments`. */
+  readonly badgeTotal: number;
+  /** Top printed names, ordered most-printed first. */
+  readonly printedNames: readonly PrintedNameUnits[];
+}
+
+/** Movement in one sponsor's badge selection over the last three drops. */
+export interface BadgeTrendEntry {
+  readonly sponsor: string;
+  /** Signed percentage movement. */
+  readonly deltaPercent: number;
+}
+
+/** The Hero 1 tile as first shown. */
+export interface Hero1Primary {
+  /**
+   * What the figures cover, stated on the tile. Hero scopes differ on purpose
+   * (Hero 2 is per-fixture matchday revenue, Hero 3 is full-year departmental
+   * totals) and an unlabelled tile reads as an arithmetic bug in the room.
+   */
+  readonly scopeLabel: string;
+  readonly periods: readonly Hero1Period[];
+  /** The fixed sponsor split behind `badgeTotal`. Percentages sum to 100. */
+  readonly badgeSplit: readonly BadgeSponsorShare[];
+  /** Hand-authored copy. Verbatim from the Reference Guide - never paraphrased. */
+  readonly narrative: string;
+}
+
+/** The escalation shown when the user asks Hero 1 the follow-up question. */
+export interface Hero1FollowUp {
+  readonly trend: readonly BadgeTrendEntry[];
+  readonly narrative: string;
+}
+
+/**
+ * Hero 1 as ONE object. The primary view and its follow-up travel together
+ * because the follow-up's narrative quotes the primary's figures - splitting
+ * them lets the two drift apart.
+ */
+export interface Hero1 {
+  readonly primary: Hero1Primary;
+  readonly followUp: Hero1FollowUp;
+}
+
 /* -------------------------------------------------------- REPOSITORIES -- */
 
 /**
@@ -117,4 +209,14 @@ export interface BaselineRepository {
   topProductsFor(key: PeriodKey): Promise<TopProductsPeriod | null>;
   /** Active commercial partners. */
   partners(): Promise<Partner[]>;
+}
+
+/** Hero 1: season-to-date merchandising, plus its badge-trend follow-up. */
+export interface Hero1Repository {
+  /** The whole hero - primary and follow-up in one object. */
+  hero(): Promise<Hero1>;
+  /** Every selectable period, in display order. */
+  periods(): Promise<Hero1Period[]>;
+  /** One period, or `null` when the key is unknown. */
+  period(key: PeriodKey): Promise<Hero1Period | null>;
 }

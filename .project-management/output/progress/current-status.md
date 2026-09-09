@@ -95,7 +95,7 @@
 
 **Currently In Progress:** None — Phase 1a complete
 **Blocked Stories:** None
-**Next Up:** US-007 — the first Phase 1b seed-data story
+**Next Up:** US-009 — Hero 2 dataset (US-007 and US-008 are complete)
 
 ---
 

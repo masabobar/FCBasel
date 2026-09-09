@@ -23,6 +23,7 @@ export const PeriodKey = {
   LAST_MONTH: "LAST_MONTH",
   LAST_3_MONTHS: "LAST_3_MONTHS",
   YEAR_TO_DATE: "YEAR_TO_DATE",
+  SEASON_TO_DATE: "SEASON_TO_DATE",
 } as const;
 
 export type PeriodKey = (typeof PeriodKey)[keyof typeof PeriodKey];
@@ -38,6 +39,29 @@ export const PERIOD_LABEL: Record<PeriodKey, string> = {
   [PeriodKey.LAST_MONTH]: "Last month",
   [PeriodKey.LAST_3_MONTHS]: "Last 3 months",
   [PeriodKey.YEAR_TO_DATE]: "Year to date",
+  [PeriodKey.SEASON_TO_DATE]: "Season to date",
+};
+
+/* ------------------------------------------------------------ KIT VARIANTS -- */
+
+/**
+ * The three shirts in a season's kit range. Enum-like and it crosses the
+ * data-to-UI boundary, so it gets a wire value here rather than a bare display
+ * string on the fixture: "3rd" is a label, `THIRD` is the identifier.
+ */
+export const KitVariant = {
+  HOME: "HOME",
+  AWAY: "AWAY",
+  THIRD: "THIRD",
+} as const;
+
+export type KitVariant = (typeof KitVariant)[keyof typeof KitVariant];
+
+/** How each kit is named on a chart axis or in a table row. */
+export const KIT_VARIANT_LABEL: Record<KitVariant, string> = {
+  [KitVariant.HOME]: "Home",
+  [KitVariant.AWAY]: "Away",
+  [KitVariant.THIRD]: "3rd",
 };
 
 /* ------------------------------------------------------- PARTNER ROLES -- */

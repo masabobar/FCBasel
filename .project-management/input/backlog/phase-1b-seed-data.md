@@ -5,7 +5,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 **Duration:** Day 1-2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 10
-**Status:** In Progress (1/5 completed)
+**Status:** In Progress (2/5 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 
 **Priority:** P0
 **Total Story Points:** 10
-**Status:** In Progress (1/5 completed)
+**Status:** In Progress (2/5 completed)
 **Source:** Build Specification E3.
 
 > **Applies to every story in this epic:**
@@ -61,7 +61,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Season-to-date merchandising figures plus the badge-trend follow-up data.
   - **Acceptance Criteria:**
     - Kit split at CHF 99: Home 22,400 (CHF 2.218M); Away 10,300 (CHF 1.020M); 3rd 5,800
@@ -75,6 +75,11 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
   - **Dependencies:** US-001
   - **Notes:** Squad names are real and verified — merchandising data, not performance data, so the
     named-individual guardrail is not engaged. Print counts only; no player performance figures.
+    **Delivered set exceeds the written AC, per the user's approved scope decision:** all four
+    periods (season to date, last 3 months, last month, current month) are seeded, not only the
+    season-to-date figures above — the tile has a period switch and `scope.md` §10 makes the
+    Reference Guide definitive for the experience. Kit revenue, the 58% Home share, the 8% badge
+    share and the four sponsor segments are **derived**, never stored.
 
 - **US-009**: Hero 2 dataset — ticket revenue year on year
   - **Story Points:** 2
@@ -145,7 +150,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
 
 **By Priority:** P0: 5 stories, 10 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 4 stories, 8 points · ⏸️ 0
+**By Status:** ✅ 2 stories, 4 points · 🔄 0 · 📋 3 stories, 6 points · ⏸️ 0
 
 ---
 

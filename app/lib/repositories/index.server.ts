@@ -8,7 +8,10 @@
  */
 
 import { createMockBaselineRepository } from "../mock/baseline";
-import { type BaselineRepository } from "./types";
+import { createMockHero1Repository } from "../mock/hero1";
+import { type BaselineRepository, type Hero1Repository } from "./types";
 
 export const baselineRepository: BaselineRepository =
   createMockBaselineRepository();
+
+export const hero1Repository: Hero1Repository = createMockHero1Repository();

@@ -241,9 +241,14 @@ describe("top products", () => {
   it("covers every period with the same five products in the same order", async () => {
     const periods = await repository.topProducts();
 
-    expect(periods.map((period) => period.key)).toEqual(
-      Object.values(PeriodKey),
-    );
+    // The four the baseline band offers. `PeriodKey` also carries Hero 1's
+    // SEASON_TO_DATE, which this dataset deliberately has no figures for.
+    expect(periods.map((period) => period.key)).toEqual([
+      PeriodKey.THIS_MONTH,
+      PeriodKey.LAST_MONTH,
+      PeriodKey.LAST_3_MONTHS,
+      PeriodKey.YEAR_TO_DATE,
+    ]);
     for (const period of periods) {
       expect(period.label).toBe(PERIOD_LABEL[period.key]);
       expect(period.rows.map((row) => row.product)).toEqual([

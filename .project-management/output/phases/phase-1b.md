@@ -28,12 +28,12 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets (10 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (1/5) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (2/5) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-007 | Persona baseline datasets (4 tiles) | 2 | ✅ Completed |
-| US-008 | Hero 1 dataset — shirt sales, badges, printed names | 2 | 📋 Todo |
+| US-008 | Hero 1 dataset — shirt sales, badges, printed names | 2 | ✅ Completed |
 | US-009 | Hero 2 dataset — ticket revenue year on year | 2 | 📋 Todo |
 | US-010 | Hero 3 dataset — departmental performance | 2 | 📋 Todo |
 | US-011 | Formatters & cross-hero reconciliation | 2 | 📋 Todo |
@@ -77,9 +77,9 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 - **Risk Level:** Low (mechanical work — every figure is pinned in the specification)
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 2 / 10 (20%)
-- **Completed Stories:** 1 / 5
-- **Tests Passing:** 228 / 228 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 1
+- **Completed Story Points:** 4 / 10 (40%)
+- **Completed Stories:** 2 / 5
+- **Tests Passing:** 273 / 273 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 2
 
 ---
 
@@ -103,7 +103,7 @@ tokens are independent, so 1a and 1b could run in parallel if capacity allowed.
 |------|--------|-------|------------|-------|--------|
 | Figures re-typed in a component instead of referenced | High | Medium | US-011 enforces store-once-reference-everywhere; a figure in two tiles must come from one constant | AI | Open |
 | Cross-hero totals appear contradictory in the room | High | Medium | Scope labels on every affected tile (see Technical Notes) | AI | Open |
-| Rounding makes segments not sum to the total | Medium | Medium | `badgeSegs` corrects the remainder explicitly | AI | Open |
+| Rounding makes segments not sum to the total | Medium | Medium | `badgeSegments` corrects the remainder explicitly; proved exhaustively for totals 0-2,000 (US-008) | AI | ✅ Closed |
 | Narrative copy edited and figures no longer match | High | Low | Narratives are verbatim and live beside the figures in the same hero object | AI | Open |
 
 ---
@@ -136,6 +136,43 @@ not the single period the criteria describe. The Reference Guide is definitive f
 - 47 tests added (228/228 green), coverage 100% statements over `app/**`; lint, format, typecheck
   and build all clean. Security triage: no security-relevant changes (static local data, no
   endpoint, no dependency, no environment variable, no user input).
+
+### 2026-09-09 — US-008: Hero 1 dataset, shirt sales, badges, printed names (2 pts) ✅
+
+The first hero dataset, and the first test of whether the US-007 recipe actually generalises. It did:
+`SEASON_TO_DATE` extends the existing `PeriodKey` (joined by a new `KitVariant` enum and its label
+map), domain types plus `Hero1Repository` go in `types.ts`, derived figures in `derive.ts`, fixtures
+and the implementation in `app/lib/mock/hero1.ts`, one line of selection in `index.server.ts`.
+
+**Scope:** the delivered set intentionally exceeds the written acceptance criteria, per the user's
+approved decision — all four periods (season to date, last 3 months, last month, current month),
+not only the season-to-date figures the criteria describe. The tile has a period switch and every
+position on it must have data behind it; the Reference Guide is definitive for the experience
+(`scope.md` §10).
+
+- **One hero object with `primary` and `followUp`**, per the epic rule, so the badge-trend
+  escalation cannot drift from the figures its narrative quotes. `scopeLabel` is
+  "Season-to-date merchandising" — the scope difference against Hero 2 and Hero 3 is stated on the
+  tile, not left for someone in the room to reconcile.
+- **Nothing derivable is stored.** Kit revenue is units x CHF 99, the Home share is 22,400 / 38,500
+  = 58.18% (displays 58%), the badge share is 3,080 / 38,500 = exactly 8%, and the four sponsor
+  segments are computed. The Reference Guide stores `homeShare: 58`; that deliberately did not
+  survive the port, because a stored 58 outlives an edit to the units beneath it.
+- **`badgeSegments` closes the rounding risk on this phase's risk register.** It corrects the
+  remainder into the first segment (Bitpanda, the largest share), and the proof is exhaustive rather
+  than anecdotal: the four parts sum *exactly* to the total for every total from 0 to 2,000, for all
+  four real period totals, and at adversarial values (0, 1, 7, and a run of primes).
+- Season-to-date arithmetic asserted: 38,500 shirts; CHF 2,217,600 / 1,019,700 / 574,200 =
+  CHF 3,811,500 (~3.81M); badge percentages 44/24/20/12 summing to 100.
+- **Both narratives are verbatim**, verified byte-for-byte against the source by SHA-256 and pinned
+  in the suite by exact text *and* exact length, so a later reword fails rather than ships.
+- Guardrail held and tested: squad names appear only as shirt-print counts, and no salary, goals,
+  assists, appearances, minutes or rating value exists anywhere in the dataset.
+- The baseline fixture was narrowed to its own four period keys so extending the shared enum could
+  not silently demand invented figures from a dataset that has none.
+- 45 tests added (273/273 green), coverage 100% statements / 98.4% branches over `app/**`; lint,
+  format, typecheck and build all clean. Security triage: no security-relevant changes (static local
+  data, no endpoint, no dependency, no environment variable, no user input, no network call).
 
 ---
 

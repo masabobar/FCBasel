@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 7 — **Phase 1a complete, Phase 1b under way**
-**Story Points:** 16
-**Time Worked:** ~4.7 hours
-**Files Changed:** 67
-**Tests Added:** 228
+**Stories Completed:** 8 — **Phase 1a complete, Phase 1b under way**
+**Story Points:** 18
+**Time Worked:** ~5.3 hours
+**Files Changed:** 74
+**Tests Added:** 273
 
 ---
 
@@ -102,6 +102,25 @@
   "fix" them into tokens. 47 tests added (228/228 green), coverage 100% statements / 98% branches of
   `app/**`, and lint / format / typecheck / build all clean.
 
+- **US-008 — Hero 1 dataset: shirt sales, badges, printed names.** Mechanical, exactly as US-007
+  predicted: `SEASON_TO_DATE` extends the shared `PeriodKey` (a new `KitVariant` enum joins it),
+  domain types and `Hero1Repository` land in `types.ts`, derived figures in `derive.ts`, fixtures in
+  `app/lib/mock/hero1.ts`, one line of selection. Per the user's approved decision the delivered set
+  exceeds the written criteria — all four periods, not just season to date, because the tile has a
+  period switch. One hero object with `primary` and `followUp` so the tile and its escalation cannot
+  drift, and a `scopeLabel` of "Season-to-date merchandising" so the tile states what it covers,
+  which matters when Hero 2 and Hero 3 quote different scopes in the same room. **Nothing derivable
+  is stored:** kit revenue is units x CHF 99, the Home share is 22,400/38,500 = 58.18% shown as 58%,
+  the badge share is exactly 8%, and the sponsor segments are computed — the Reference Guide's
+  `homeShare: 58` deliberately did not survive the port. `badgeSegments` corrects its rounding
+  remainder into Bitpanda's segment, and the proof is exhaustive rather than anecdotal: the four
+  parts sum *exactly* to the total for every total from 0 to 2,000, plus the four real period totals
+  and a set of adversarial primes. Both narratives are verbatim, checked byte-for-byte against the
+  source by SHA-256 and pinned by text and length in the suite. The guardrail is tested, not just
+  documented: squad names exist only as print counts, and no salary, goals, assists, appearances,
+  minutes or rating value appears anywhere. 45 tests added (273/273 green), coverage 100%
+  statements / 98.4% branches of `app/**`, and lint / format / typecheck / build all clean.
+
 ---
 
 ## Stories Completed Today
@@ -122,6 +141,9 @@
   **Phase 1a closes here: 6/6 stories, 14/14 points.**
 - ✅ US-007 — Persona baseline datasets (2 pts) — all 4 acceptance criteria met and deliberately
   exceeded (all four periods, per the user's approved scope decision). Phase 1b: 1/5 stories.
+- ✅ US-008 — Hero 1 dataset: shirt sales, badges, printed names (2 pts) — all 5 acceptance criteria
+  met and deliberately exceeded (all four periods, per the user's approved scope decision).
+  Phase 1b: 2/5 stories.
 
 ---
 
@@ -142,9 +164,9 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 1b — seed data (8 pts remaining). US-008 (Hero 1: shirt sales, badges, printed names) is
-  next and is mechanical: the repository pattern, enum source of truth and injectable clock from
-  US-007 are already in place
+- Phase 1b — seed data (6 pts remaining). US-009 (Hero 2: ticket revenue year on year) is next and
+  is mechanical: the repository pattern, the enum source of truth and the primary/followUp hero
+  shape are all now in place
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -159,7 +181,7 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phase 1a is complete and Phase 1b is 1/5; continue with `/holycode-pm:execute-work story US-008`.
+- Phase 1a is complete and Phase 1b is 2/5; continue with `/holycode-pm:execute-work story US-009`.
 
 ---
 
