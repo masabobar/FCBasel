@@ -6,12 +6,12 @@
 
 ## Summary
 
-**Total Completed:** 20 stories
-**Total Points:** 48 / 116
+**Total Completed:** 21 stories
+**Total Points:** 53 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 48 points/day
-**Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
+**Average Velocity:** 53 points/day
+**Phases Completed:** Phase 1a, Phase 1b, Phase 2a (all 2026-09-09)
 
 ---
 
@@ -48,17 +48,66 @@ Condensed to keep this log inside its 300-line limit; the **full per-story detai
 
 ---
 
-## Phase 2a: Shell & Baseline — 4/5 stories (US-016 deferred, now unblocked)
+## Phase 2a: Shell & Baseline — closed 2026-09-09 (5 stories · 16 pts)
 
-US-012 / US-014 / US-015 condensed to keep this log inside its 300-line limit; the **full per-story
-detail lives in [`../phases/phase-2a.md`](../phases/phase-2a.md)**, the authoritative record.
-US-013's entry stays in full below, with the Phase 2b components it was the first to mount.
+US-012 to US-015 condensed to keep this log inside its 300-line limit; the **full per-story detail
+lives in [`../phases/phase-2a.md`](../phases/phase-2a.md)**, the authoritative record. US-016's
+entry stays in full below the table — it is the story that closed the phase.
 
 | Story | Pts | Tests | What it left behind |
 |---|---:|---:|---|
 | US-012 Branded application shell | 3 | 57 | `chrome/{sidebar,top-bar,app-shell}.tsx` + `lib/persona.ts` — navy sidebar (hidden below `lg`), app bar with the self-hosted crest, and a 12/8/4 canvas grid left **empty** for US-013/014/015/016. No literal colour anywhere. **Persona is a role:** one module holds the label and the "SM" monogram, and a test asserts the app bar's entire text is exactly those labels. **Placeholders are inert structurally, not by handler** (`aria-disabled`, no href, no focus, `pointer-events-none`); status is decorative — no live region, no `fetch`, no timer. Chrome: `scrollWidth === clientWidth` at 1920x1080. |
 | US-014 Dynamic tile insertion & grid reflow | 3 | 77 | `lib/dashboard/sections.ts` (pure) + `use-dashboard.ts` (state, owned by `root.tsx`): the session as a memory-only `{heroId, phase, revision}` list. The dashboard **grows, it never clears**. **Dedupe by hero id** — re-asking keeps ONE section in place and bumps `revision` so it re-inserts rather than doing nothing, and a follow-up *flips* its parent's phase (what US-033 needs). **One grid, not two:** sections re-use US-012's tracks via `grid-cols-subgrid`. **Reflow, never jump** — every mutation runs through `animateReflow` with `flushSync` inside the callback; reduced motion gives zero transitions with an identical layout. A source scan bans every storage API. |
+| US-013 Baseline dashboard — four tiles | 3 | 103 | `dashboard/baseline-row.tsx` + `tiles/partner-tile.tsx` + `lib/dashboard/baseline.ts` + a `loader` on `_index.tsx`: **the canvas stops being empty.** Four tiles in order as direct children of the one canvas grid, composing `KpiTile` ×2, `HBarTile` and `PartnersTile` — no new tile kind, no second grid. **No figure re-typed:** every string asserted equal to `repository → derive → format.ts`, plus a source scan over four files for literals, `CHF`/`%` strings, product and partner names and `toLocaleString`/`toFixed`. `trendEndingAt` makes the sparkline END on the month the headline covers. Partner plates carry the partner's **own** brand colour (no hex, no FCB token in the file). Reset's baseline seam closed as static route chrome, driven end to end by a test. First real-Chrome pass for US-017/US-021/US-027. |
 | US-015 Reset to baseline | 2 | 40 | Reset built as a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS`, `reset` + `schedule` + `generation`, `scrollToTop`, `<AppShell onReset>`. It restores the same named constant that is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free. **The timer, proven by breaking it:** `reset` cancels the pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard. **Abuse-proof by construction** — the same reference comes back when there is nothing to clear, so 10 presses in one frame run **one** transition. 3 of 5 criteria met; the chips (US-029) and half the thinking beat (US-031) are a stated SEAM, not a claim. |
+
+---
+
+### US-016: Hero band — webshop trend & attendance ring (5 pts)
+**Completed:** 2026-09-09 (Phase 2a story, executed in the Phase 2b run once US-025, US-026 and US-027 existed) — **it closes Phase 2a at 5/5 · 16/16 pts**
+**Files Changed:** 13 (2 new code, 5 modified code, 2 new test files, 4 modified test files) + 7 tracking docs
+**Tests Added:** 92 (unit) — 1090/1090 green, 99.75% stmts / 98.61% branches / 100% funcs / 100% lines of `app/**`
+**Notes:** All 6 acceptance criteria met, **plus** the loose end US-013 left (Top Products' period
+filter). A Reference Guide refinement beyond the Build Specification, and first in the documented cut
+order — so it shipped deliberately self-contained.
+
+**What Was Done:**
+- `app/components/dashboard/hero-band.tsx` — the band: greeting, ONE period filter, the webshop chart
+  in the wider left column, the ring and its stats in the narrower right one. One full-width grid
+  item on US-012's canvas; it **composes** `Segmented`, `LineChart` + `LineChartLegend`,
+  `KpiFigure onDark`, `DeltaChip` and the US-027 hooks, and invents only layout, copy and one piece
+  of state. A test asserts it contains no `<svg>`, no timer and no `requestAnimationFrame`
+- `app/components/charts/attendance-ring.tsx` — **the one genuinely new visual.** Hand-built SVG, no
+  library: pure `ringGeometry` (clamped to 0–1, because an arc longer than its circumference wraps
+  back and reads as a shorter one; a non-finite share draws nothing rather than `NaN`), the sweep as
+  a `stroke-dasharray` transition off `useGrow`, the centre counting through `useCountUp`, and a
+  hover that swaps average attendance for "% of capacity" **and answers focus identically**
+- `app/lib/persona.ts` — `personaGreeting(now)`. It takes the DATE and does not read the clock: the
+  greeting is resolved in the loader, so the server and the browser cannot disagree about the hour
+- `app/lib/dashboard/baseline.ts` — extended rather than duplicated: one `periods()` read now feeds
+  both the band and the webshop tile, `topProducts` carries every period, and `HeroBandData` holds
+  the greeting and the periods — **and no total and no delta**, so there is nothing to read instead
+  of computing. `app/app.css` gained three token-only rules (`.fcb-band`, `.fcb-band-wash`,
+  `.fcb-ring-glow`); the reference's plum gradient stop is not in the token set, so the ramp is
+  navy → navy-light → navy with a red wash at 32%
+- **① One control, two widgets, proven twice:** structurally (exactly one `useState` and one
+  `<Segmented>` in the file, both counts pinned) and behaviourally (one click moves the line's `d`,
+  the KPI, the arc and the stats together). Top Products keeps its own filter by design — a test
+  proves the band's press leaves it untouched
+- **⑤ / ⑥ measured in real Chrome at 1920×1080:** no horizontal scroll (nor at 1440/1280/834/390),
+  chart column 1056px against the ring column's 520px, the KPI settled at `CHF 148’200` and **still
+  `CHF 148’200` in the frame after the click**, then 54 distinct strings to `CHF 132’400`; the
+  re-keyed line's offset 1px → 0px over 44 values; the ring transitioning on the SAME element over 43
+  dash pairs; Top Products showing 48 width frames and 54 value frames on the same rows. Under
+  `prefers-reduced-motion`: one KPI string, one ring value, arc at its share, line drawn, bars final
+- **One real defect found and fixed in `LineChart`:** its end axis labels were clipped by the svg's
+  own bounds (`W1`/`W4`), so `axisLabelAnchor` anchors the first and last inwards
+- **Security triage: no security-relevant changes detected.** Considered and cleared: HTTP handler or
+  route (none — the loader's shape is unchanged and it is an SSR data hop), IDOR, raw SQL,
+  `dangerouslySetInnerHTML` / `innerHTML`, user-supplied URL / SSRF (zero network calls), upload,
+  dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API. Every
+  rendered string is an escaped text node; the only dynamic style values are `var(--…)` token
+  references and numeric geometry
 
 ---
 
@@ -146,59 +195,6 @@ since given both stories their browser pass — see below.)*
   than `NaN`, so an all-zero list still renders **labelled zeros** with their tracks
 - **One deliberate deviation from the reference, flagged for review:** a decline grows *leftwards*
   here (the reference drew every bar rightwards), so direction survives a washed-out projector
-
-### US-013: Baseline dashboard — four pre-existing tiles (3 pts)
-**Completed:** 2026-09-09 (Phase 2a story, executed in the Phase 2b run once US-017 and US-021 existed)
-**Files Changed:** 9 (3 new code, 2 modified code, 1 route, 4 new/modified test files) + 7 tracking docs
-**Tests Added:** 103 (unit) — 880/880 green, 100% stmts / 99.58% branches / 100% funcs / 100% lines of `app/**` · **Commit:** see phase-2a progress log
-**Notes:** All 4 acceptance criteria met, **plus** US-015's deferred criterion ① (Reset restores the
-four baseline tiles). This is the story that makes the prototype look real: the persona sees a
-dashboard that already looks lived-in, and their questions ADD to it.
-
-**What Was Done:**
-- `app/components/dashboard/baseline-row.tsx` — the four tiles in order, as a **fragment**, so each
-  is a direct child of US-012's one canvas grid (3 + 3 + 6 columns and a full-width partner strip at
-  `lg`). It composes `KpiTile` ×2 (US-017), `HBarTile` (US-021) and `PartnersTile` on the US-005
-  `Card`; it invents no tile kind, no grid, no formatter and no figure. The two KPI tiles are
-  `self-start`, so a one-number tile is not stretched to a five-row bar list's height
-- `app/components/tiles/partner-tile.tsx` — the one new component: `PartnersTile` / `PartnerCard` /
-  `PartnerMonogram` / `partnerMonogram()`. Six plates in each partner's **own brand colour, from the
-  data**, with its `PARTNER_ROLE_LABEL` role tag. A test asserts **no hex and no FCB colour token
-  appears in the file at all** — a plate in club red is wrong to a sponsor in the room
-- `app/lib/dashboard/baseline.ts` + a `loader` on `app/routes/_index.tsx` — the repository is async
-  and server-only, so the fetch is an SSR route loader (not an HTTP endpoint) and the components stay
-  data-in / DOM-out. A `grep` over `build/client/` proves the fixtures never reach the bundle
-- `app/lib/repositories/derive.ts` — three pure additions: `trailingPoints`, `capacityShare` (which
-  `attendanceShare` and `matchCapacityShare` both delegate to, so the ring and the match tile cannot
-  round the same ratio two ways), and **`trendEndingAt`**, which windows the sparkline so it **ends
-  on the month the headline figure covers** — a test pins that it still holds in December
-- **NO FIGURE IS RE-TYPED, proven two ways.** Every rendered string is asserted equal to
-  `repository → derive → format.ts` output, and a **source scan** over the four files that touch a
-  figure fails on any displayed figure as a literal in three spellings, on any `CHF <digit>` or
-  `<n>%` string, on `FCB`/`Sion`, on a product or partner name, and on `toLocaleString` / `toFixed`
-- **Reset's baseline seam is closed the way US-015 described it:** a baseline tile that is static
-  chrome "needs no entry here at all". The tiles are rendered by the route, outside the session list,
-  so no question can remove them. `tests/unit/baseline-reset.test.tsx` drives it: four tiles on load
-  → two sections inserted below → Reset → four tiles in order, canvas `innerHTML` identical
-- **FIRST REAL-CHROME PASS FOR US-017, US-021 AND US-027**, all of which had deferred it. At
-  1920×1080 on the production SSR build: four tiles plus a full-width strip on row 2, canvas grid
-  reporting **12 columns**, and `documentElement.scrollWidth === clientWidth` — no horizontal scroll,
-  the same at 1440/1280/834/390, with the strip folding 6 → 3 → 2 and **no label clipped**. A
-  per-frame probe recorded **54 distinct KPI strings**, **43 distinct bar widths**, the sparkline
-  drawing from `dashoffset` 1 → 0 and the tile entrance fading through **25 opacity steps** — it
-  counts and grows, it does not snap. Under `prefers-reduced-motion: reduce` the same probe recorded
-  **2** KPI strings and **2** bar widths: final state within one frame, **nothing stranded at zero**
-- **Labels whole, measured end to end:** all five Top Products labels in a 150px column with
-  `scrollWidth <= clientWidth`, `text-overflow: clip` and `white-space: normal` — US-021's guarantee
-  proven at the point of use
-- **Scope held:** no hero band (US-016), no period filter (US-026 — Top Products' `action` slot is
-  empty and says why), no prompt bar, no thinking panel, no narrative caption on any tile
-- **Security triage: no security-relevant changes detected.** Considered and cleared: new route
-  handler (a loader is not an HTTP endpoint — no path, params, query, body or user input), IDOR, raw
-  SQL, `dangerouslySetInnerHTML`, user-supplied URL / SSRF, upload, dependency or lockfile change
-  (**none**), env var or secret, logging, CSRF, storage API. The one value-driven style is
-  `style={{ backgroundColor: partner.brandColor }}`: a module constant set through the CSSOM, with a
-  test asserting every `brandColor` matches `/^#[0-9A-Fa-f]{6}$/`
 
 ### US-025: Line chart component (3 pts)
 **Completed:** 2026-09-09 · **Phase:** 2b · **Tests:** 73 new (953/953 green)

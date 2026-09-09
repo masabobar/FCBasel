@@ -29,9 +29,12 @@
  * their x-axis from today's date).
  */
 
+import { type Clock, systemClock } from "../calendar";
+import { personaGreeting } from "../persona";
 import { PERIOD_LABEL, PeriodKey } from "../repositories/enums";
 import { seriesTotals, trendEndingAt } from "../repositories/derive";
 import {
+  type BaselinePeriod,
   type BaselineRepository,
   type HomeMatch,
   type Partner,
@@ -41,12 +44,14 @@ import {
 /* ------------------------------------------------------------- PERIODS -- */
 
 /**
- * The period the baseline row is fixed to.
+ * The period every period-aware widget on the baseline dashboard STARTS on —
+ * the hero band, and Top Products' own filter.
  *
- * FIXED, not selectable. Top Products' own period filter is US-026's segmented
- * control arriving with US-016's hero band, which is what will drive this key;
- * until then the row shows the month the Build Specification pins its four
- * figures to, and the tile's `action` slot is deliberately left empty.
+ * It is the initial selection, not a fixed scope: US-016 mounted US-026's
+ * segmented control in both places, so the band's chart and ring move together
+ * off this key and Top Products moves independently off its own copy of it. The
+ * month itself is the one the Build Specification pins its four figures to, so
+ * the FIRST paint still shows exactly the Specification's dashboard.
  */
 export const BASELINE_PERIOD: PeriodKey = PeriodKey.THIS_MONTH;
 
@@ -96,22 +101,58 @@ export interface WebshopHeadline {
   readonly trend: readonly number[];
 }
 
+/* ----------------------------------------------------------- HERO BAND -- */
+
+/**
+ * What the navy hero band renders (US-016).
+ *
+ * IT CARRIES THE PERIODS, NOT A SELECTED ONE. The band's segmented filter is
+ * client state and drives BOTH the webshop chart and the attendance ring, so
+ * every period has to be on the client already — a loader that resolved one
+ * period would turn a filter press into a round trip, and the prototype makes
+ * no request after load.
+ *
+ * NO TOTAL AND NO DELTA IS CARRIED EITHER. Both are `seriesTotals` off the very
+ * array the chart plots, computed in the band at render time — which is the
+ * acceptance criterion, and the reason there is no `total` field here to read
+ * one from.
+ */
+export interface HeroBandData {
+  /**
+   * `Good morning, Sales & Marketing` — resolved from the loader's clock, so
+   * the server and the browser cannot disagree about the hour.
+   */
+  readonly greeting: string;
+  /** The selectable periods, in display order. Four in the seeded dataset. */
+  readonly periods: readonly BaselinePeriod[];
+}
+
 /* --------------------------------------------------------------- MODEL -- */
 
 /**
- * Everything the four baseline tiles render, in the order they render.
+ * Everything the baseline dashboard renders — the hero band above, then the
+ * four tiles, in the order they render.
  *
  * It crosses the loader-to-component boundary, so it holds plain numbers and
  * strings only — no functions, no `Date`, nothing React Router cannot
  * serialise.
  */
 export interface BaselineData {
+  /** The hero band above the row — the same periods, as a chart and a ring. */
+  readonly band: HeroBandData;
   /** Tile 1 — Webshop revenue. */
   readonly webshop: WebshopHeadline;
   /** Tile 2 — Last home match. */
   readonly match: HomeMatch;
-  /** Tile 3 — Top products, already ordered best-selling first. */
-  readonly topProducts: TopProductsPeriod;
+  /**
+   * Tile 3 — Top products, EVERY period, in display order and each already
+   * ordered best-selling first.
+   *
+   * All of them, for the same reason the band carries all of its: the tile's
+   * `action` slot now holds a period filter (US-026), and recalculating its
+   * five figures must not become a request.
+   */
+  readonly topProducts: readonly TopProductsPeriod[];
   /** Tile 4 — Active partners, in the order the dataset lists them. */
   readonly partners: readonly Partner[];
 }
@@ -134,27 +175,37 @@ function required<T>(value: T | null, what: string): T {
 /**
  * Read the baseline dashboard out of a repository.
  *
- * Every call is issued at once: the four tiles are independent and the
- * repository is asynchronous, so awaiting them in sequence would serialise a
- * fetch that has no ordering requirement.
+ * Every call is issued at once: the tiles are independent and the repository is
+ * asynchronous, so awaiting them in sequence would serialise a fetch that has
+ * no ordering requirement.
+ *
+ * The PERIOD LIST is read once and the two periods the webshop KPI needs are
+ * found inside it, rather than fetched again beside it: the band and that tile
+ * must be describing the same arrays, and one read makes that structural.
+ *
+ * The clock is a parameter for the same reason the fixtures take one — the
+ * greeting is time-derived, and a test pins it rather than depending on the
+ * hour the suite happens to run at.
  */
 export async function loadBaseline(
   repository: BaselineRepository,
+  clock: Clock = systemClock,
 ): Promise<BaselineData> {
-  const [period, trendPeriod, match, topProducts, partners] = await Promise.all(
-    [
-      repository.period(BASELINE_PERIOD),
-      repository.period(BASELINE_TREND_PERIOD),
-      repository.lastHomeMatch(),
-      repository.topProductsFor(BASELINE_PERIOD),
-      repository.partners(),
-    ],
-  );
+  const [periods, match, topProducts, partners] = await Promise.all([
+    repository.periods(),
+    repository.lastHomeMatch(),
+    repository.topProducts(),
+    repository.partners(),
+  ]);
 
-  const baselinePeriod = required(period, `period ${BASELINE_PERIOD}`);
+  const period = (key: PeriodKey): BaselinePeriod =>
+    required(periods.find((one) => one.key === key) ?? null, `period ${key}`);
+
+  const baselinePeriod = period(BASELINE_PERIOD);
   const totals = seriesTotals(baselinePeriod.webshop);
 
   return {
+    band: { greeting: personaGreeting(clock()), periods },
     webshop: {
       periodLabel: baselinePeriod.label,
       comparisonLabel: PERIOD_LABEL[BASELINE_COMPARISON_PERIOD],
@@ -163,14 +214,13 @@ export async function loadBaseline(
       // Ends on the headline figure above, not on whatever the year-to-date
       // series happens to end on: the number and its own glyph cannot disagree.
       trend: trendEndingAt(
-        required(trendPeriod, `period ${BASELINE_TREND_PERIOD}`).webshop
-          .current,
+        period(BASELINE_TREND_PERIOD).webshop.current,
         totals.current,
         SPARKLINE_POINTS,
       ),
     },
     match,
-    topProducts: required(topProducts, `top products for ${BASELINE_PERIOD}`),
+    topProducts,
     partners,
   };
 }

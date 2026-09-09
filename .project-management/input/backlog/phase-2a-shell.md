@@ -6,7 +6,7 @@ grow when a question is asked.
 **Duration:** Day 2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 16
-**Status:** In Progress (4/5 completed — US-016 deferred but UNBLOCKED; US-025/US-026/US-027 all exist)
+**Status:** ✅ Completed (5/5 stories · 16/16 points, 2026-09-09)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -16,7 +16,7 @@ grow when a question is asked.
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (4/5 completed — US-016 deferred but UNBLOCKED; US-025/US-026/US-027 all exist)
+**Status:** ✅ Completed (5/5 stories · 16/16 points, 2026-09-09)
 **Source:** Build Specification E4; Reference Implementation Guide §8.
 
 > The dashboard **never clears to show a hero — it grows.** That single behaviour is what makes the
@@ -180,7 +180,7 @@ grow when a question is asked.
   - **Story Points:** 5
   - **Priority:** P1
   - **Component:** [Web]
-  - **Status:** ⏸️ Deferred to the Phase 2b run
+  - **Status:** ✅ Completed (2026-09-09, in the Phase 2b run)
   - **Description:** The navy greeting band above the baseline row: a persona greeting, a period
     filter, the webshop line chart, and the attendance ring.
   - **Acceptance Criteria:**
@@ -195,9 +195,48 @@ grow when a question is asked.
       ring sweeps to the new value
     - Webshop total and its delta are **computed** from the series, never stored separately
   - **Dependencies:** US-007, US-025, US-026, US-027
-  - **Status note (2026-09-09):** ⏸️ **Deferred to the Phase 2b run** — US-025 (line chart),
-    US-026 (segmented filter) and US-027 (motion hooks) all live in Phase 2b — **all three landed
-    2026-09-09, so US-016 is now unblocked**.
+  - **Completion note (2026-09-09, built in the Phase 2b run once US-025, US-026 and US-027
+    existed):** all six criteria met, and nothing was reinvented — the band **composes** `Segmented`
+    (US-026), `LineChart` + `LineChartLegend` (US-025), `KpiFigure onDark` + `DeltaChip` (US-017),
+    the US-027 motion hooks and the US-011 formatters. `app/components/dashboard/hero-band.tsx` is
+    one full-width grid item on US-012's canvas, above the baseline row.
+    - **①** The band holds **exactly one** `useState` and **exactly one** `<Segmented>` — both counts
+      are pinned by a test — and the chart and the ring read the SAME `BaselinePeriod` entry, so one
+      press moves both. Proven in real Chrome by a single click: the line's `d`, the KPI, the ring's
+      arc and the supporting stats all changed together. Top Products keeps its own INDEPENDENT
+      filter by design, and a test proves the band's press does not move it.
+    - **②** Gold area line (current) over a dashed white previous period — passed as one array in
+      DRAWING order, so the gold is stroked on top — with the legend beside the KPI
+      (`legend={false}` on the chart, `LineChartLegend` placed by the band) in the wider left column
+      (8 of 12; measured 1056px against the ring column's 520px at 1920×1080).
+    - **③** Hover renders a vertical guide plus one dot per series and a tooltip listing **both**
+      readings: Chrome at W3 showed `Previous CHF 30’200` and `This month CHF 33’900`.
+    - **④** `app/components/charts/attendance-ring.tsx` — the one genuinely new visual, hand-built
+      SVG with no chart library. `ringGeometry` is pure and CLAMPS a share outside 0–1 (an arc longer
+      than its circumference wraps back and reads as a shorter one). The centre swaps to "% of
+      capacity" on hover **or focus** — a ring that answers only a mouse hides its second reading
+      from a keyboard — and the arc gains `.fcb-ring-glow`, a `color-mix()` over the accent token.
+      Gold is an ACCENT on a 12px arc, never a fill; `motion.test.tsx` now permits exactly three
+      consumers of `--color-accent-target-hit` and still rejects a gold ring on an inserted tile.
+    - **⑤** Chrome, at 1920×1080: settled at `CHF 148’200`, still `CHF 148’200` in the frame after
+      the click, then **54 distinct strings** down to `CHF 132’400` — it counts from the figure on
+      screen, never from zero. The chart is **re-keyed** by period (a new element at
+      `stroke-dashoffset: 1px` → `0px` across 44 values) while the ring transitions **on the same
+      element** (43 dash pairs, 315.38px → 300.1px). Under `prefers-reduced-motion`: one KPI string,
+      one ring value, the arc at its share and the line fully drawn — nothing stranded at zero.
+    - **⑥** `seriesTotals` sums the plotted array on every render, and `HeroBandData` carries **no**
+      total and no delta field to read a stored one from; a source scan rejects `total:` and
+      `deltaPercent:` in the band, along with any hex, any dataset figure as a literal, any
+      pre-formatted `CHF`/`%` string and any hand-assembled scoreline.
+    - **US-013's loose end is closed:** Top Products' `action` slot now holds a light `Segmented`.
+      Chrome recorded 48 distinct bar-width frames and 54 value frames on a filter change, on the
+      **same** row elements — the numbers recalculate and the bars move, as the review asked.
+    - **One real defect, found by this first mount and fixed in `LineChart`:** the end axis labels
+      were clipped by the svg's own bounds (`W1` and `W4` at 1080p), so `axisLabelAnchor` anchors the
+      first and last labels inwards. All four now measure fully inside the plot.
+    - **Kept cuttable (P1, first in the cut order):** the baseline row neither imports nor mentions
+      the band — a test asserts it — so deleting the file and one line in the route removes it.
+      92 new tests, 1090 total green.
   - **Notes:** A Reference Guide addition beyond the Build Specification, added at the lead owner's
     direction. P1 because the three heroes are the demo's core; this is the frame around them.
 
@@ -209,7 +248,7 @@ grow when a question is asked.
 
 **By Priority:** P0: 4 stories, 11 points · P1: 1 story, 5 points · P2: 0
 
-**By Status:** ✅ 4 stories, 11 points · 🔄 0 · 📋 0 · ⏸️ 1 story, 5 points (US-016 — now unblocked)
+**By Status:** ✅ 5 stories, 16 points · 🔄 0 · 📋 0 · ⏸️ 0 — **the phase is complete**
 
 ---
 

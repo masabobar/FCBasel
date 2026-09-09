@@ -311,6 +311,29 @@ export function axisLabelShown(index: number, count: number): boolean {
   return index % every === 0 || index === count - 1;
 }
 
+/**
+ * How a label is anchored horizontally: centred over its point, EXCEPT at the
+ * two ends, where it is anchored to its own side.
+ *
+ * WHY THE ENDS ARE SPECIAL. The plot's horizontal padding is 6 view-box units
+ * and an svg clips at its own bounds, so a CENTRED first or last label loses
+ * its outer half. US-016's hero band is the first thing to mount this chart,
+ * and real Chrome showed exactly that: a clipped `W1` on the left and a clipped
+ * `W4` on the right at 1920×1080. Anchoring the ends inwards costs no geometry
+ * and no space (E8: legible at 1080p from the back of a room).
+ *
+ * A single-point series keeps `middle`: its one point is drawn at the CENTRE of
+ * the plot, not at an edge, so there is nothing to anchor away from.
+ */
+export function axisLabelAnchor(
+  index: number,
+  count: number,
+): "start" | "middle" | "end" {
+  if (count <= 1) return "middle";
+  if (index === 0) return "start";
+  return index === count - 1 ? "end" : "middle";
+}
+
 /* --------------------------------------------------------------- HOVER -- */
 
 /**
@@ -830,7 +853,8 @@ export function LineChart({
                 data-slot="line-chart-axis-label"
                 x={geometry.xs[index]}
                 y={geometry.height - AXIS_BASELINE_OFFSET}
-                textAnchor="middle"
+                // Centred, except at the ends — see {@link axisLabelAnchor}.
+                textAnchor={axisLabelAnchor(index, xs.length)}
                 // 12px from the token set, not the reference's 10px: the axis
                 // has to be readable at 1080p from the back of a room (E8).
                 className={cn("chart-axis-label", dark && "fill-bg/60")}

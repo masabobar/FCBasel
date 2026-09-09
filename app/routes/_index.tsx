@@ -1,4 +1,5 @@
 import { BaselineRow } from "../components/dashboard/baseline-row";
+import { HeroBand } from "../components/dashboard/hero-band";
 import { loadBaseline } from "../lib/dashboard/baseline";
 import { WORKSPACE_LABEL } from "../lib/persona";
 import { baselineRepository } from "../lib/repositories/index.server";
@@ -27,7 +28,7 @@ export async function loader() {
 }
 
 /**
- * The single dashboard route — the four baseline tiles.
+ * The single dashboard route — the hero band and the four baseline tiles.
  *
  * The chrome around it — navy sidebar, app bar, and the 12-column canvas grid
  * this renders into — is the US-012 shell in `app/components/chrome/`. What
@@ -37,7 +38,7 @@ export async function loader() {
  * ABOVE every answer, on the same grid: the dashboard grows beneath a row that
  * was already there.
  *
- * THE FOUR TILES ARE STATIC CHROME, and that is how they "inherit reset"
+ * THE BAND AND THE FOUR TILES ARE STATIC CHROME, and that is how they "inherit reset"
  * (US-015). They are rendered by the route rather than held in the session
  * list, so a question cannot remove them and Reset — which replaces the
  * session list with `BASELINE_SECTIONS` — cannot either. Load state and
@@ -54,6 +55,10 @@ export default function Index({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <h1 className="sr-only">{WORKSPACE_LABEL} dashboard</h1>
+      {/* The band is ONE full-width grid item above the row, and the row does
+          not know it exists (US-016 is first in the cut order — removing these
+          two lines removes the band and nothing else). */}
+      <HeroBand {...loaderData.band} latest={loaderData.match} />
       <BaselineRow data={loaderData} />
     </>
   );

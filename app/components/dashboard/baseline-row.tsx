@@ -1,16 +1,22 @@
 import { Handshake, Package, ShoppingBag, Trophy } from "lucide-react";
+import { useState } from "react";
 
 import { HBarTile } from "../charts/h-bars";
+import { Segmented } from "../controls/segmented";
 import { tileDelayMs } from "../heroes/hero-section";
 import { KpiTile } from "../tiles/kpi-tile";
 import { PartnersTile } from "../tiles/partner-tile";
-import { type BaselineData } from "../../lib/dashboard/baseline";
+import {
+  BASELINE_PERIOD,
+  type BaselineData,
+} from "../../lib/dashboard/baseline";
 import {
   formatMoney,
   formatNumber,
   formatSharePercent,
 } from "../../lib/format";
 import { matchCapacityShare, scoreline } from "../../lib/repositories/derive";
+import { type PeriodKey } from "../../lib/repositories/enums";
 
 /**
  * THE BASELINE ROW — the four tiles that are on the canvas before a single
@@ -35,14 +41,20 @@ import { matchCapacityShare, scoreline } from "../../lib/repositories/derive";
  * products, Active partners. It is the DOM order below, so a reordering is a
  * visible diff rather than a CSS accident.
  *
+ * TOP PRODUCTS HAS ITS OWN PERIOD, AND THAT IS DELIBERATE (US-016). Its
+ * `action` slot now holds US-026's `Segmented`, so the five figures
+ * recalculate and the bars transition on a press. The filter is INDEPENDENT of
+ * the hero band's: the band's one control drives its chart and its ring because
+ * those are two views of a single reading, whereas a presenter comparing this
+ * month's best sellers against a year-to-date revenue trend is asking a
+ * reasonable question. `HBars` keys its rows by product name, so a press
+ * transitions the same five bars instead of remounting them at zero width.
+ *
  * WHAT IS DELIBERATELY MISSING
- *   - **The hero band** (US-016) — the navy greeting strip with the webshop
- *     LINE CHART and the attendance ring. It mounts above this row and is a
- *     different presentation of the same period dataset, not a duplicate of
- *     these two KPI tiles.
- *   - **Top Products' period filter** — US-026's segmented control, which
- *     US-016 wires to the shared period key. Until then the tile's `action`
- *     slot is empty and the row is fixed to `BASELINE_PERIOD`.
+ *   - **The hero band** (US-016) is not here — it is a sibling on the canvas
+ *     (`app/components/dashboard/hero-band.tsx`, mounted by the route above
+ *     this row) and nothing in this file imports it, so the band can be cut
+ *     without touching the baseline.
  *   - **Any narrative.** No tile carries a `caption`: the baseline states
  *     figures, and the assistant's prose belongs to the answers (Phase 3b).
  */
@@ -81,6 +93,15 @@ const DOT_SEPARATOR = "·";
 
 /** The scope line above the Top Products bars. */
 const UNITS_SOLD = "Units sold";
+
+/**
+ * The accessible name of Top Products' period filter.
+ *
+ * Named for what it DRIVES, because the hero band shows a second period filter
+ * at the same time and "Period" twice on one screen is ambiguous to anyone
+ * hearing it rather than seeing it.
+ */
+export const TOP_PRODUCTS_PERIOD_LABEL = "Period for top products";
 
 /* ------------------------------------------------------------ GEOMETRY ---- */
 
@@ -130,6 +151,22 @@ export interface BaselineRowProps {
 export function BaselineRow({ data }: BaselineRowProps) {
   const { webshop, match, topProducts, partners } = data;
 
+  /**
+   * Top Products' own period. Held here rather than in `HBarTile`, because the
+   * card's header (its scope line) and its bars have to move together — and
+   * because a tile component that owned a filter could not be reused by a hero
+   * that drives three tiles from one (US-034).
+   */
+  const [productsPeriod, setProductsPeriod] =
+    useState<PeriodKey>(BASELINE_PERIOD);
+
+  // A key with no entry falls back to the first period rather than dropping the
+  // tile; the fallback also means `products.key` — not the state — is what the
+  // control shows as selected, so the highlight can never lead the bars.
+  const products =
+    topProducts.find((period) => period.key === productsPeriod) ??
+    topProducts[0];
+
   return (
     // A fragment, so all four tiles are direct children of the canvas grid.
     // There is exactly one grid on this screen (`chrome/app-shell.tsx`).
@@ -173,26 +210,36 @@ export function BaselineRow({ data }: BaselineRowProps) {
         className={KPI_SPAN}
       />
 
-      <HBarTile
-        title={BASELINE_TILE_TITLES.topProducts}
-        period={`${UNITS_SOLD} ${DOT_SEPARATOR} ${topProducts.label}`}
-        headingLevel={BASELINE_HEADING_LEVEL}
-        icon={<Package size={ICON_SIZE} />}
-        // Club blue, per `H_BAR_SERIES` — Top Products is the blue list. The
-        // fixed 150px label column that keeps `Cap "Rotblau"` and
-        // `Home shirt 26/27` whole belongs to `HBarRow`, and is asserted end to
-        // end here.
-        series="blue"
-        rows={topProducts.rows.map((row) => ({
-          name: row.product,
-          value: row.units,
-        }))}
-        // `action` is intentionally empty: the period filter is US-026, wired
-        // by US-016.
-        isNew
-        delayMs={tileDelayMs(2)}
-        className={WIDE_SPAN}
-      />
+      {products && (
+        <HBarTile
+          title={BASELINE_TILE_TITLES.topProducts}
+          period={`${UNITS_SOLD} ${DOT_SEPARATOR} ${products.label}`}
+          headingLevel={BASELINE_HEADING_LEVEL}
+          icon={<Package size={ICON_SIZE} />}
+          // Club blue, per `H_BAR_SERIES` — Top Products is the blue list. The
+          // fixed 150px label column that keeps `Cap "Rotblau"` and
+          // `Home shirt 26/27` whole belongs to `HBarRow`, and is asserted end
+          // to end here.
+          series="blue"
+          rows={products.rows.map((row) => ({
+            name: row.product,
+            value: row.units,
+          }))}
+          // The period filter US-013 left this slot empty for. `light`, because
+          // it sits on a white card rather than on the navy band.
+          action={
+            <Segmented
+              options={topProducts}
+              value={products.key}
+              onChange={setProductsPeriod}
+              label={TOP_PRODUCTS_PERIOD_LABEL}
+            />
+          }
+          isNew
+          delayMs={tileDelayMs(2)}
+          className={WIDE_SPAN}
+        />
+      )}
 
       <PartnersTile
         title={BASELINE_TILE_TITLES.partners}

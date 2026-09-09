@@ -25,6 +25,11 @@ import {
 } from "../../app/lib/dashboard/baseline";
 import { type Clock } from "../../app/lib/calendar";
 import { createMockBaselineRepository } from "../../app/lib/mock/baseline";
+import {
+  GREETING,
+  personaGreeting,
+  WORKSPACE_LABEL,
+} from "../../app/lib/persona";
 import { seriesTotals, trendEndingAt } from "../../app/lib/repositories/derive";
 import { PERIOD_LABEL, PeriodKey } from "../../app/lib/repositories/enums";
 import { type BaselineRepository } from "../../app/lib/repositories/types";
@@ -43,8 +48,9 @@ function repository(clock: Clock = SEPTEMBER): BaselineRepository {
 }
 
 describe("loadBaseline — periods", () => {
-  it("is fixed to this month, compared against last month", () => {
-    // The row has no period filter yet: US-026's control arrives with US-016.
+  it("starts on this month, compared against last month", () => {
+    // The initial selection of both period filters (the band's and Top
+    // Products'), which US-016 wired to US-026's control.
     expect(BASELINE_PERIOD).toBe(PeriodKey.THIS_MONTH);
     expect(BASELINE_COMPARISON_PERIOD).toBe(PeriodKey.LAST_MONTH);
   });
@@ -160,26 +166,97 @@ describe("loadBaseline — last home match", () => {
 });
 
 describe("loadBaseline — top products", () => {
-  it("returns the baseline period's rows, best-selling first", async () => {
+  it("returns EVERY period, so the tile's filter needs no request", async () => {
+    // US-016 mounted a period filter in the tile's `action` slot; the prototype
+    // makes no network call after load, so all four periods travel at once.
     const repo = repository();
-    const [data, period] = await Promise.all([
+    const [data, periods] = await Promise.all([
       loadBaseline(repo),
-      repo.topProductsFor(BASELINE_PERIOD),
+      repo.topProducts(),
     ]);
 
-    expect(data.topProducts).toEqual(period);
-    expect(data.topProducts.key).toBe(BASELINE_PERIOD);
+    expect(data.topProducts).toEqual(periods);
+    expect(data.topProducts).toHaveLength(4);
+    expect(data.topProducts.map((period) => period.key)).toContain(
+      BASELINE_PERIOD,
+    );
+  });
 
-    const units = data.topProducts.rows.map((row) => row.units);
-    expect([...units].sort((left, right) => right - left)).toEqual(units);
+  it("orders every period's rows best-selling first", async () => {
+    const data = await loadBaseline(repository());
+
+    for (const period of data.topProducts) {
+      const units = period.rows.map((row) => row.units);
+      expect([...units].sort((left, right) => right - left)).toEqual(units);
+    }
   });
 
   it("keeps the two long product names whole in the data", async () => {
     const data = await loadBaseline(repository());
-    const names = data.topProducts.rows.map((row) => row.product);
+    const baseline = data.topProducts.find(
+      (period) => period.key === BASELINE_PERIOD,
+    );
+    const names = baseline!.rows.map((row) => row.product);
 
     expect(names).toContain("Home shirt 26/27");
     expect(names).toContain('Cap "Rotblau"');
+  });
+});
+
+describe("loadBaseline — the hero band (US-016)", () => {
+  it("carries every period the shared filter offers, in display order", async () => {
+    const repo = repository();
+    const [data, periods] = await Promise.all([
+      loadBaseline(repo),
+      repo.periods(),
+    ]);
+
+    expect(data.band.periods).toEqual(periods);
+    expect(data.band.periods).toHaveLength(4);
+  });
+
+  it("carries NO total and NO delta — both are computed in the band", async () => {
+    // The acceptance criterion, as a shape: there is no field here to read a
+    // stored total from, so the band cannot accidentally show one.
+    const data = await loadBaseline(repository());
+
+    expect(Object.keys(data.band).sort()).toEqual(["greeting", "periods"]);
+    for (const period of data.band.periods) {
+      expect(Object.keys(period).sort()).toEqual([
+        "attendance",
+        "key",
+        "label",
+        "webshop",
+      ]);
+    }
+  });
+
+  it("greets the persona from the loader's clock, not the wall clock", async () => {
+    const morning = await loadBaseline(
+      repository(),
+      () => new Date(2026, 8, 9, 9),
+    );
+    const afternoon = await loadBaseline(
+      repository(),
+      () => new Date(2026, 8, 9, 14),
+    );
+    const evening = await loadBaseline(
+      repository(),
+      () => new Date(2026, 8, 9, 20),
+    );
+
+    expect(morning.band.greeting).toBe(
+      personaGreeting(new Date(2026, 8, 9, 9)),
+    );
+    expect(morning.band.greeting).toContain(GREETING.MORNING);
+    expect(afternoon.band.greeting).toContain(GREETING.AFTERNOON);
+    expect(evening.band.greeting).toContain(GREETING.EVENING);
+  });
+
+  it("names the workspace, never an individual", async () => {
+    const data = await loadBaseline(repository());
+
+    expect(data.band.greeting).toContain(WORKSPACE_LABEL);
   });
 });
 
@@ -210,15 +287,20 @@ describe("loadBaseline — a dataset with a hole in it", () => {
 
   it("throws rather than rendering CHF 0 when the period is missing", async () => {
     await expect(
-      loadBaseline(brokenRepository({ period: () => Promise.resolve(null) })),
+      loadBaseline(brokenRepository({ periods: () => Promise.resolve([]) })),
     ).rejects.toThrow(/missing period/);
   });
 
-  it("throws when the top-products period is missing", async () => {
+  it("names the period that is missing, so the drift is findable", async () => {
+    const periods = await repository().periods();
+    const withoutTrend = periods.filter(
+      (period) => period.key !== BASELINE_TREND_PERIOD,
+    );
+
     await expect(
       loadBaseline(
-        brokenRepository({ topProductsFor: () => Promise.resolve(null) }),
+        brokenRepository({ periods: () => Promise.resolve(withoutTrend) }),
       ),
-    ).rejects.toThrow(/missing top products/);
+    ).rejects.toThrow(BASELINE_TREND_PERIOD);
   });
 });

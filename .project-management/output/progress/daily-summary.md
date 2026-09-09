@@ -1,74 +1,62 @@
 # Daily Work Summary
 
-**Date:** 2026-09-09 (Wednesday)
-**Last Updated:** 2026-09-09
+**Date:** 2026-09-09 (Wednesday) · **Last Updated:** 2026-09-09
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 20 — **Phase 1a and Phase 1b complete; Phase 2a at 4/5 (partial, US-016
-now unblocked); Phase 2b at 5/11**
-**Story Points:** 48
-**Time Worked:** ~13.0 hours · **Files Changed:** 185 · **Tests Added:** 998
+**Stories Completed:** 21 — **Phases 1a, 1b and 2a all complete (2a closed by US-016); Phase 2b at
+5/11**
+**Story Points:** 53
+**Time Worked:** ~14.5 hours · **Files Changed:** 198 · **Tests Added:** 1090
 
 ---
 
 ## Work Log
 
-- Project management setup: scope, backlog, docs, phases and tracking from the client documents.
-- **Phase 1a — US-001 to US-006 (14 pts), closed.** Condensed here to keep this file inside its
-  300-line limit; the full account is in [`../phases/phase-1a.md`](../phases/phase-1a.md). In short:
-  the React Router 7.18 SSR scaffold with a clean-checkout install/build/serve verified by execution
-  (US-001, Railway deploy still a human step); ESLint 9 + Prettier + husky with the pre-commit hook
-  *proved* to fire (US-002); one design-token set published as Tailwind v4 `@theme static` properties
-  and as typed objects, held in lockstep by a drift test (US-003); the crest self-hosted after
-  verifying its bytes were PNG despite the `.webp` URL (US-004); one `Card` shell of independently
-  collapsing slots (US-005); and the four reveal keyframes plus `app/lib/motion.ts`, where **reduced
-  motion renders final state rather than switching animation off** (US-006).
-- **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 / US-009
-  / US-010 follow: enums, domain types and the repository interface in `app/lib/repositories/`,
-  fixtures and the in-memory implementation in `app/lib/mock/`, one line of selection in
-  `index.server.ts` — recorded in the README as a four-step recipe. Per the user's approved decision
-  the delivered set exceeds the written criteria (all four periods). The headline webshop figure and
-  its delta are **computed from the series**, so a number cannot disagree with the chart under it;
-  the long periods label their x-axis from an injectable clock. Partner brand colours stay outside
-  the FCB palette, guarded by a test. 228/228, gates clean.
-- **US-008 — Hero 1 dataset: shirt sales, badges, printed names.** Mechanical, exactly as US-007
-  predicted, and again exceeding the written criteria by the user's approved decision. One hero
-  object with `primary` and `followUp` so a tile and its escalation cannot drift. **Nothing derivable
-  is stored:** kit revenue is units x CHF 99, the Home share 58% and the badge share exactly 8% —
-  the Guide's `homeShare: 58` did not survive the port. `badgeSegments` corrects its rounding
-  remainder so the four parts sum *exactly* to the total, proved for every total from 0 to 2,000.
-  Narratives verbatim by SHA-256; squad names exist only as shirt-print counts (273/273).
+- **Phase 1a — US-001 to US-006 (14 pts), closed.** Condensed; the full account is in
+  [`../phases/phase-1a.md`](../phases/phase-1a.md). In short: the React Router 7.18 SSR scaffold
+  verified by execution (US-001, Railway deploy still a human step); ESLint 9 + Prettier + husky with
+  the hook *proved* to fire (US-002); one design-token set published as Tailwind v4 properties and as
+  typed objects, held in lockstep by a drift test (US-003); the crest self-hosted after verifying its
+  bytes were PNG (US-004); one `Card` shell of collapsing slots (US-005); and the four reveal
+  keyframes plus `app/lib/motion.ts`, where **reduced motion renders final state rather than
+  switching animation off** (US-006).
+- **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 to
+  US-010 follow: enums, domain types and the repository interface in `app/lib/repositories/`,
+  fixtures in `app/lib/mock/`, one line of selection in `index.server.ts`. All four periods, per the
+  user's approved decision. The headline webshop figure and its delta are **computed from the
+  series**, so a number cannot disagree with the chart under it; the long periods label their x-axis
+  from an injectable clock. Partner brand colours stay outside the FCB palette. 228/228.
+- **US-008 — Hero 1 dataset: shirt sales, badges, printed names.** One hero object with `primary`
+  and `followUp` so a tile and its escalation cannot drift. **Nothing derivable is stored:** kit
+  revenue is units × CHF 99, the Home share 58% and the badge share exactly 8%. `badgeSegments`
+  corrects its rounding remainder so the four parts sum *exactly* to the total, proved for every
+  total from 0 to 2,000. Narratives verbatim by SHA-256 (273/273).
 - **US-009 — Hero 2 dataset: ticket revenue year on year.** Eight home fixtures in CHF thousands
-  (7,880 -> 7,830) plus the twelve-month series the Guide adds. The real risk was labelling, not
-  arithmetic: the two charts sit at deliberately different scopes, so `scopeLabel` is a field on each
-  series and tests assert the labels differ and that the monthly total is the larger. Nothing
-  derivable is stored — the headline -0.6%, the four declines and the -CHF 400k badge all come off
-  the fixture pairs. Narratives verbatim (304/304).
+  (7,880 → 7,830) plus the twelve-month series. The real risk was labelling, not arithmetic: the two
+  charts sit at deliberately different scopes, so `scopeLabel` is a field on each series and tests
+  assert the labels differ and that the monthly total is the larger. Nothing derivable is stored —
+  the headline -0.6%, the four declines and the -CHF 400k badge all come off the fixture pairs.
+  Narratives verbatim (304/304).
 - **US-010 — Hero 3 dataset: departmental performance.** Six departments in CHF thousands
-  (69,000 -> 69,680, +680 / +1.0% derived). The new idea is that a TAG carries the meaning of a
-  number: above budget is money earned for the five revenue departments and an **overspend** for the
-  Marketing cost centre, so `varianceJudgement` decides good-or-bad once from `DepartmentType` and
-  every row carries the verdict as data — Marketing's +410 comes back `ADVERSE` where Sponsoring's
-  +840 comes back `FAVOURABLE`, and one test proves a naive "variance > 0 is good" rule misreads
-  exactly one department. The attention flag is derived, not read from the Guide's `flag: true`. The
-  one stored figure is `blendedTargetPercent: 96`, a measured attainment no arithmetic over the rows
-  reproduces, pinned so it cannot be "fixed" into a mean. The follow-up reconciles: 240 + 150 + 20 =
-  410, exactly Marketing's variance. Departments, never people. 44 tests (348/348).
+  (69,000 → 69,680, +680 / +1.0% derived). The new idea is that a TAG carries the meaning of a
+  number: above budget is money earned for five departments and an **overspend** for the Marketing
+  cost centre, so `varianceJudgement` decides good-or-bad once from `DepartmentType` — and one test
+  proves a naive "variance > 0 is good" rule misreads exactly one department. `blendedTargetPercent`
+  is the one stored figure, a measurement no arithmetic over the rows reproduces. The follow-up
+  reconciles: 240 + 150 + 20 = 410, exactly Marketing's variance. Departments, never people. 44
+  tests (348/348).
 - **US-011 — Formatters & cross-hero reconciliation.** Phase 1b closes with the two things that keep
   the other four data stories honest. `app/lib/format.ts` is the one place a number becomes a string:
-  money always carries `CHF` (no bare-amount variant to reach for), the sign goes *before* the unit
-  as the declining-fixtures badge reads (`-CHF 400k`), and millions render bare under the "figures in
-  CHF millions" subtitle. `Intl.NumberFormat("en-CH")` per the Guide groups thousands with the Swiss
-  U+2019 mark — pinned as a constant and made independent of the runtime's ICU, which two tests prove
-  by stubbing `Intl` to `en-US` and `de-DE`. `oneDecimal` is imported from `derive.ts`, so there is
-  exactly one rounding rule, and `chfFromThousands` is the only factor of 1000. The reconciliation
-  suite asserts relationships rather than restating constants — kit units to 38,500 at 58.18% -> 58%,
-  the fixture fall of 50 becoming -0.6% with declines summing to 400, 69,000 -> 69,680 = +1.0% with
-  Marketing's drivers summing to exactly its 410, and every narrative number swept against what the
-  data can produce. **No drift was found in any dataset.** 418/418.
+  money always carries `CHF`, the sign goes *before* the unit (`-CHF 400k`), and millions render bare
+  under the "figures in CHF millions" subtitle. `en-CH` groups thousands with the Swiss U+2019 mark —
+  pinned as a constant and made independent of the runtime's ICU, proved by stubbing `Intl` to
+  `en-US` and `de-DE`. `oneDecimal` is imported from `derive.ts`, so there is exactly one rounding
+  rule. The reconciliation suite asserts relationships rather than constants — 58.18% → 58%, the
+  fixture fall of 50 becoming -0.6%, Marketing's drivers summing to exactly 410, and every narrative
+  number swept against what the data can produce. **No drift found.** 418/418.
 - **US-012 — Branded application shell.** `app/components/chrome/{sidebar,top-bar,app-shell}.tsx`
   plus `app/lib/persona.ts`: the navy sidebar (hidden below `lg`), the app bar carrying the US-004
   crest, the workspace label, a decorative connection status and Reset, and a canvas grid stepping
@@ -77,10 +65,9 @@ now unblocked); Phase 2b at 5/11**
   grid. The canvas is deliberately **empty** — the tiles are US-013, insertion US-014. Three things
   were made structural rather than trusted. **The persona is a role:** the label and the "SM"
   monogram live in one module and a test asserts the app bar renders no text beyond those labels.
-  **The placeholders are inert by construction** (`aria-disabled`, no href, no handler, no focus,
-  `pointer-events-none` — Chrome reports `tabIndex` -1 on all three). **The connection status is
-  decorative:** static text, `data-decorative`, no live region, no `fetch` / `useEffect` / timer.
-  No horizontal scroll at 1920×1080. 475/475 green.
+  **The placeholders are inert by construction** (`aria-disabled`, no href, no focus — Chrome reports
+  `tabIndex` -1 on all three). **The connection status is decorative:** static, no live region, no
+  `fetch` and no timer. No horizontal scroll at 1920×1080. 475/475 green.
 - **US-014 — Dynamic tile insertion & grid reflow.** The mechanic the demo turns on: the dashboard
   **grows, it never clears**. The session is a memory-only list of `{heroId, phase, revision}` —
   pure transitions in `sections.ts`, React state in `use-dashboard.ts`, owned by `root.tsx`. Sections
@@ -93,15 +80,12 @@ now unblocked); Phase 2b at 5/11**
   **Phase 2a now 2/5 stories, 6/16 points.**
 - **US-015 — Reset to baseline.** The control that lets the demo be run twice, built as a
   **transition beside the other three** rather than a mode: `withBaselineRestored` and the named
-  `BASELINE_SECTIONS`, `reset` / `schedule` / `generation` on `use-dashboard.ts`, `scrollToTop`, and
-  `<AppShell onReset={reset}>`. **Reset restores a named baseline, never a literal empty list**, and
-  that constant is *also* the hook's initial state. **The pending timer is the story:** `reset` calls
-  `cancelPending()` first, and deleting that line makes two tests fail with the thinking beat
-  dropping an answer into a just-cleared dashboard. Abuse-proofing is structural — the *same list
-  reference* comes back when there is nothing to clear, so ten presses in one frame run **one** view
-  transition (Chrome: `scrollY` 900 → 0, zero `startViewTransition` under reduced motion). The chips
-  (US-029) and the thinking beat (US-031) are honestly a seam. 592/592.
-  **Phase 2a now 3/5 stories, 8/16 points — left open.**
+  `BASELINE_SECTIONS`, `reset` / `schedule` / `generation`, `scrollToTop`, `<AppShell onReset>`.
+  **Reset restores a named baseline, never a literal empty list**, and that constant is *also* the
+  hook's initial state. **The pending timer is the story:** `reset` cancels it first, and deleting
+  that line makes two tests fail with the beat dropping an answer into a just-cleared dashboard. The
+  *same list reference* comes back when there is nothing to clear, so ten presses in one frame run
+  **one** view transition. The chips (US-029) and the beat (US-031) are honestly a seam. 592/592.
 - **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
   depends on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`, with the consumer API in the
   module header so the next ten stories are composition rather than invention. **Count-up counts
@@ -118,21 +102,33 @@ now unblocked); Phase 2b at 5/11**
   the `light` variant is the proof: on navy it drops colour coding altogether, and a test asserts the
   up and down chips' class strings are **identical** while glyph, sign and spoken word still differ.
   **Direction is arithmetic, judgement is meaning:** an optional `judgement` prop draws Marketing's
-  overspend as an up arrow in the *negative* token, and a zero is a **labelled zero**. **No variant
-  per hero** — extras arrive as `children`, and US-016's band composes `KpiFigure onDark`. Motion is
-  US-027's, with a test failing on any local `useState`, timer or rAF, and **the US-012
+  overspend as an up arrow in the *negative* token. **No variant per hero** — extras arrive as
+  `children`, and US-016's band composes `KpiFigure onDark`. Motion is US-027's, and **the US-012
   `tailwind-merge` trap is closed at the root**. 78 tests, 722/722.
 - **US-021 — Horizontal bar tile.** The most reused chart in the product, built once for five
   consumers as `HBarRow` / `HBars` / `HBarTile`. **The two review decisions are read back off the
-  rendered element by tests, not just written down:** the label column is 150px and a test *rejects*
-  `truncate` / `text-ellipsis` / `line-clamp`, so `Cap "Rotblau"` cannot regain the ellipsis it was
-  reported with; the value column is 96px `nowrap`, asserted through `getComputedStyle` on three
-  lists with `-CHF 150k` a single text node. **One rule serves every consumer: the sign of the
-  displayed figure** — it sets the anchor side, the token and the sign in the text, so `negative`
-  mode is only "every row is a decline" and the badge trend's mixed signs need nothing extra. Rows
-  are keyed by name, so a filter change transitions the *same* bar (identity held while the width
-  moves 100% → 50%) while the figure counts on from what is on screen. One deviation flagged for
-  review: a decline grows *leftwards* where the reference drew every bar rightwards. 55 tests.
+  rendered element by tests:** a 150px label column with `truncate` / `text-ellipsis` /
+  `line-clamp` *rejected*, so `Cap "Rotblau"` cannot regain its reported ellipsis, and a 96px
+  `nowrap` value column asserted through `getComputedStyle`. **One rule serves every consumer: the
+  sign of the displayed figure** — it sets the anchor side, the token and the sign in the text. Rows
+  are keyed by name, so a filter change transitions the *same* bar while the figure counts on from
+  what is on screen. One deviation flagged: a decline grows *leftwards*. 55 tests.
+- **US-016 — Hero band. Phase 2a is closed (5/5 · 16/16).** The navy band above the baseline row,
+  and the first thing to mount `LineChart` and `Segmented` in the app.
+  **ONE `Segmented` drives both halves** from a single `BaselinePeriod` entry — one `useState` and
+  one `<Segmented>` in the file, both counts pinned by tests — so the gold-area-over-dashed-white
+  chart (re-keyed by period, which is what replays the stroke draw) and the new hand-built
+  `AttendanceRing` (arc sweeping on `stroke-dasharray`, centre swapping to "% of capacity" on hover
+  *or focus*, with a gold glow that is an accent on a 12px arc and never a fill) cannot disagree
+  about the month. **The total and its delta are `seriesTotals` off the plotted array on every
+  render**, and `HeroBandData` deliberately has no field to read a stored one from. The greeting is
+  resolved in the loader from an injectable clock, so server and browser cannot differ on the hour.
+  **US-013's loose end closed:** Top Products' `action` slot now holds a light `Segmented`, its own
+  period, independent of the band's by design. Chrome at 1920×1080: **54 distinct KPI strings from
+  `CHF 148’200` → `CHF 132’400`, still the old figure in the frame after the click**, 44 stroke
+  offsets on the re-keyed line, 43 arc dash pairs on the same element, and one KPI / one ring value
+  under reduced motion. One defect exposed by first mount, fixed in `LineChart`: clipped end axis
+  labels. 92 tests, 1090/1090.
 ---
 
 ## Stories Completed Today
@@ -223,7 +219,12 @@ now unblocked); Phase 2b at 5/11**
   + 1px lift + transition, shared ahead with US-029's chips), with `rounded-full` rejected in the
   markup, the source *and* the stylesheet. Radiogroup semantics with one tab stop, wrapping arrows on
   both axes plus Home/End, and selection carried by shape, shadow, weight *and* `aria-checked` —
-  never colour alone. 45 tests, 998/998 green. **This unblocks US-016.**
+  never colour alone. 45 tests, 998/998 green.
+- ✅ **US-016 — Hero band: webshop trend & attendance ring (5 pts). All 6 criteria met, and Phase 2a
+  is CLOSED at 5/5 · 16/16.** One control drives the chart and the ring; hover gives a guide plus
+  both series' values; the ring swaps its centre and glows; a filter change counts from the figure on
+  screen, redraws the line and sweeps the arc; the total and delta are computed from the series.
+  Top Products' filter is wired too. 92 tests, 1090/1090 green.
 
 ---
 
@@ -243,15 +244,14 @@ now unblocked); Phase 2b at 5/11**
 ## Next Day Plan
 
 **Immediate Focus:**
-- **Phase 2a is at 4/5 stories, 11/16 points, and US-016 is now UNBLOCKED** — it needed US-025 +
-  US-026 + US-027, and all three exist. Building it closes Phase 2a.
-- **Phase 2b — the component library** is at 5/11 · 13/29: the motion hooks (US-027), the KPI tile
-  (US-017), the horizontal bar row (US-021), the line chart (US-025) and the segmented period filter
-  (US-026). Next is **US-016 — hero band: webshop trend & attendance ring (5 pts)**, the first story
-  to actually mount `LineChart` and `Segmented` in the app and therefore their first Chrome pass.
-  Every remaining component should import from `app/lib/hooks/use-motion.ts` rather than animate by
-  hand, and compose `Card`, `DeltaChip`, `HBars`, `LineChart` and `Segmented` rather than restate
-  them — US-023 in particular must reuse US-021's bar row.
+- **Phases 1a, 1b and 2a are all closed** (14 + 10 + 16 = 40 points). Nothing in Phase 2a is
+  outstanding: US-013 and US-016 were both finished inside the Phase 2b run on the day their
+  dependencies landed.
+- **Phase 2b — the component library** is at 5/11 · 13/29. Next is **US-018 — vertical bar chart
+  tile (3 pts)**. Every remaining component should import from `app/lib/hooks/use-motion.ts` rather
+  than animate by hand, and compose `Card`, `DeltaChip`, `HBars`, `LineChart` and `Segmented` rather
+  than restate them — US-023 in particular must reuse US-021's bar row. `LineChart` and `Segmented`
+  are now proven in the app (US-016's Chrome pass), so US-036 and US-034 can mount them as they are.
 
 **Priority Stories for This Week:** Phase 1a + 1b foundations (24 pts, done) → Phase 2a + 2b shell
 and component library (45 pts, the largest block) → Phase 3a + 3b conversation and the three heroes
@@ -264,8 +264,8 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
 - **The deadline is this week.** Sponsor showing first, owner audience the following week.
   Estimated ~52 AI-core / ~68 AI-realistic hours for the full 116 points; if the week gets tight,
   extend daily runtime before cutting scope — the P1 cut set is worth only ~0.82 days at 8h/day.
-- Phases 1a and 1b are complete, Phase 2a is at 4/5 and Phase 2b at 5/11 (48/116 points); continue
-  with `/holycode-pm:execute-work phase 2b`, taking US-016 first now that it is unblocked.
+- Phases 1a, 1b and 2a are complete and Phase 2b is at 5/11 (53/116 points); continue with
+  `/holycode-pm:execute-work phase 2b`, starting at US-018.
 - **US-021 is the reuse test for the whole epic:** `HBars` / `HBarRow` must be the only horizontal
   bar row in the codebase. Its 150px no-truncate label and 96px `nowrap` value column are review
   decisions, and a second implementation would silently drop both.
@@ -284,10 +284,14 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
 - **US-025's chart is the only line chart** and both heroes must key it, not fork it: `key={period}`
   is the replay mechanism, `legend={false}` plus `LineChartLegend` is how the band places its own
   legend, and a second `smoothPath` anywhere is a review finding.
-- **US-026's `Segmented` is the only period control**, and the period stays the CALLER's state — the
-  band holds one value that drives both the chart's `key` and the attendance ring. Its 11px radius is
-  a reviewed decision: `rounded-full` on it or on US-029's chips is a review finding, and US-029
-  should wear `CHIP_SURFACE_CLASS` rather than restate the radius and hover.
+- **US-026's `Segmented` is the only period control**, and the period stays the CALLER's state —
+  US-016 proved the pattern: one value in the band drives both the chart's `key` and the ring, while
+  Top Products holds its own. Its 11px radius is a reviewed decision: `rounded-full` on it or on
+  US-029's chips is a review finding, and US-029 should wear `CHIP_SURFACE_CLASS`.
+- **US-016's band is first in the cut order and was built to stay cuttable:** one grid item, no
+  shared state, and no import from the baseline row (a test asserts it). Anything added to it must
+  keep that property. Its `AttendanceRing` is the only ring in the product — US-020's donut is a
+  different component and must not be folded into it.
 - The shell keeps two guardrails as *tests*: the app bar's whole text must equal the known role
   labels, and the connection status file must contain no `fetch`, `useEffect` or timer.
 

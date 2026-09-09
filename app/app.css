@@ -208,6 +208,61 @@
 }
 
 /**
+ * HERO BAND SURFACE — the navy greeting band (US-016), written once here.
+ *
+ * Three rules, and none of them is motion: they are the band's ground, its
+ * corner bloom and the attendance ring's hover glow. They live in the
+ * stylesheet for the same reason the chip surface above does — a `color-mix()`
+ * over a token cannot be spelled as a utility class without baking a colour
+ * into a component.
+ *
+ * THE GRADIENT IS TOKENS ONLY, NOT THE REFERENCE'S THREE STOPS. The reference
+ * build ends its band gradient on a plum that is not in the token set and may
+ * not be added for one component (colour discipline 5), so the ramp runs
+ * navy → navy-light → navy instead. The warm cast comes from the red wash
+ * below, which is a token at low opacity.
+ *
+ * THE RING GLOW IS GOLD, AND THAT IS ALLOWED. Rule 4 permits gold as an ACCENT,
+ * and the Reference Guide lists the attendance ring among its uses. It is a
+ * hover response on a 12px arc — never a fill, and never the insertion ring the
+ * Guide removed (see the motion block below, which still has no gold ring).
+ */
+@layer components {
+  .fcb-band {
+    background-image: linear-gradient(
+      120deg,
+      var(--color-navy) 0%,
+      var(--color-navy-light) 62%,
+      var(--color-navy) 100%
+    );
+  }
+
+  /* The warm bloom in the band's top-right corner. Decoration, and inert: it
+     sits above the gradient and below the content, and takes no pointer. */
+  .fcb-band-wash {
+    position: absolute;
+    top: -60px;
+    right: -30px;
+    width: 280px;
+    height: 280px;
+    border-radius: var(--radius-pill);
+    background-image: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-red) 32%, transparent),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .fcb-ring-glow {
+    filter: drop-shadow(
+      0 0 6px
+        color-mix(in srgb, var(--color-accent-target-hit) 60%, transparent)
+    );
+  }
+}
+
+/**
  * MOTION PRIMITIVES — defined exactly once, here.
  *
  * The dashboard's "wow" is an orchestrated reveal: the thinking panel appears

@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { RING_GLOW_CLASS } from "../../app/components/charts/attendance-ring";
 import { Card, TILE_ENTER_CLASS } from "../../app/components/tiles/card";
 import {
   animateReflow,
@@ -307,18 +308,33 @@ describe("no gold ring on an inserted tile", () => {
     expect(container.firstElementChild!.className).not.toMatch(/ring|glow/);
   });
 
-  it("leaves gold used only by the ambient glow and the scan line", () => {
+  it("leaves gold to the ambient glow, the scan line and the attendance ring", () => {
     const glow = blockAfter(APP_CSS, `@keyframes ${KEYFRAMES.accentGlow}`);
     const scan = classRule(APP_CSS, MOTION_CLASS.scan);
+    const ring = classRule(APP_CSS, RING_GLOW_CLASS);
 
     expect(glow).toContain("--color-accent-target-hit");
     expect(scan).toContain("--color-accent-target-hit");
+    // The third consumer, added by US-016 and the ONLY one the Reference Guide
+    // permits beyond the two above: the attendance ring's hover glow. It is an
+    // accent on a 12px arc, not a fill, and not on a tile.
+    expect(ring).toContain("--color-accent-target-hit");
+    expect(ring).toContain("drop-shadow");
 
-    // Exactly two consumers below the token definitions. A third means a gold
-    // treatment has been added somewhere — most likely the removed ring.
+    // Exactly three consumers below the token definitions. A fourth means a
+    // gold treatment has been added somewhere — most likely the removed ring.
     const rules = APP_CSS.slice(APP_CSS.indexOf("@layer base"));
     const consumers = rules.match(/--color-accent-target-hit/g) ?? [];
-    expect(consumers.length).toBe(2);
+    expect(consumers.length).toBe(3);
+  });
+
+  it("keeps that ring off the tile entrance — it is the ring's, not a tile's", () => {
+    // The distinction the Guide drew: an attendance ARC may be gold; a newly
+    // inserted tile may not carry a gold ring or glow of any kind.
+    const entrance = classRule(APP_CSS, MOTION_CLASS.enter);
+
+    expect(entrance).not.toContain("--color-accent-target-hit");
+    expect(CARD_SOURCE).not.toContain(RING_GLOW_CLASS);
   });
 });
 

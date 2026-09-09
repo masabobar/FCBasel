@@ -1,10 +1,10 @@
 # Phase 2a: Dashboard Shell & Persona Baseline
 
 **Duration:** 2026-09-10 to 2026-09-11 (~8.1 AI-hours)
-**Status:** In Progress
+**Status:** ✅ Completed
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-11
-**Actual Completion:** —
+**Actual Completion:** 2026-09-09
 
 > **Acceptance criteria live in** [`../../input/backlog/phase-2a-shell.md`](../../input/backlog/phase-2a-shell.md).
 > This file tracks execution.
@@ -29,7 +29,7 @@ is asked.
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline (16 story points)
 
-**Priority:** P0 (US-016 is P1) · **Status:** In Progress (4/5 completed) · **Dependencies:** US-003, US-004, US-005, US-007
+**Priority:** P0 (US-016 is P1) · **Status:** ✅ Completed (5/5) · **Dependencies:** US-003, US-004, US-005, US-007
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
@@ -37,7 +37,7 @@ is asked.
 | US-013 | Baseline dashboard — four pre-existing tiles | 3 | P0 | ✅ Completed |
 | US-014 | Dynamic tile insertion & grid reflow | 3 | P0 | ✅ Completed |
 | US-015 | Reset to baseline | 2 | P0 | ✅ Completed |
-| US-016 | Hero band — webshop trend & attendance ring | 5 | **P1** | ⏸️ Deferred to Phase 2b run |
+| US-016 | Hero band — webshop trend & attendance ring | 5 | **P1** | ✅ Completed |
 
 **Technical Notes:**
 
@@ -53,17 +53,20 @@ is asked.
 - Re-asking the same hero **refreshes in place** (dedupe by hero id), never duplicates tiles.
 - Grid state is an in-memory list of tile descriptors. No persistence, by specification.
 - **US-016 is first in the cut order.** It is a Reference Guide refinement beyond the Specification;
-  it makes the frame richer but is not one of the three demonstrations.
+  it makes the frame richer but is not one of the three demonstrations. It shipped **self-contained**
+  for exactly that reason: one grid item, no state anything else reads, and no import from the
+  baseline row — a test asserts the row never mentions it, so the cut stays cheap.
 
 ---
 
 ## Definition of Done *(applies to every story in this phase)*
 
-- [ ] Code implemented and reviewed against `.claude/rules/code-quality.md`
-- [ ] Tests written and passing; coverage ≥ 80%
-- [ ] Security triage run per `.claude/rules/security-review.md`
-- [ ] Linter clean · Git commit created · Progress tracking updated
-- [ ] Screen map refreshed if the story changes the single screen's structure
+- [x] Code implemented and reviewed against `.claude/rules/code-quality.md`
+- [x] Tests written and passing; coverage ≥ 80%
+- [x] Security triage run per `.claude/rules/security-review.md` — no security-relevant changes in
+      any of the five stories
+- [x] Linter clean · Git commit created · Progress tracking updated
+- [x] Screen map refreshed — every region of SCREEN-001 this phase owns is now Built
 
 *Not applicable:* API status-code matrix · i18n.
 
@@ -77,12 +80,12 @@ is asked.
 - **Risk Level:** Medium — US-014's reflow behaviour is where visual polish is won or lost
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 11 / 16 (69%)
-- **Completed Stories:** 4 / 5 — **the phase is NOT complete**
-- **Deferred:** US-016 (5 pts) → still open but **UNBLOCKED as of 2026-09-09**: US-025 (line chart),
-  US-026 (segmented filter) and US-027 (motion hooks) all now exist. US-013 was completed in the
-  Phase 2b run on 2026-09-09, once US-017 and US-021 existed
-- **Tests Passing:** 880 / 880 · **Coverage:** 100% stmts / 99.6% branches / 100% funcs (`app/**`) · **Commits:** 4
+- **Completed Story Points:** 16 / 16 (100%)
+- **Completed Stories:** 5 / 5 — **the phase is COMPLETE**
+- **Deferred:** none. US-013 and US-016 were both completed **in the Phase 2b run** once their
+  cross-phase dependencies existed (US-017 + US-021 for the row; US-025 + US-026 + US-027 for the
+  band), with no rework to either
+- **Tests Passing:** 1090 / 1090 · **Coverage:** 99.75% stmts / 98.61% branches / 100% funcs / 100% lines (`app/**`) · **Commits:** 6
 
 ---
 
@@ -93,13 +96,14 @@ is asked.
 - US-007 baseline datasets (Phase 1b)
 - US-017 KPI tile + US-021 horizontal bar tile — **needed by US-013**; both landed 2026-09-09 and
   US-013 shipped immediately after
-- US-025, US-026, US-027 — **needed by US-016** for the hero band; **all three landed 2026-09-09**
+- US-025, US-026, US-027 — **needed by US-016** for the hero band; all three landed 2026-09-09 and
+  US-016 shipped the same day, composing them without changing any of their APIs
 
 **Blocks:** US-033 (follow-up gating) needs US-014's insertion mechanic.
 
-> ⚠️ **Sequencing note:** US-013 and US-016 have dependencies that live in Phase 2b. If Phase 2a runs
-> strictly before 2b, build US-012, US-014 and US-015 first and complete US-013/US-016 after the
-> relevant components exist — or pull US-021/US-025/US-026/US-027 forward.
+> ✅ **Sequencing note, closed:** US-013 and US-016 had dependencies in Phase 2b, so the phase ran
+> US-012 / US-014 / US-015 first and completed both inside the Phase 2b run once US-017, US-021,
+> US-025, US-026 and US-027 existed. Reordering within the run cost nothing and required no rework.
 
 ---
 
@@ -203,98 +207,80 @@ and is deliberately left open.
 
 ### 2026-09-09 — US-013 Baseline dashboard: four pre-existing tiles ✅ (3 pts, in the Phase 2b run)
 
-**Delivered: the canvas stops being empty.** This is the first impression in the owner meeting and
-the client's own framing of the mechanic — the persona sees a dashboard that already looks lived-in,
-and their questions ADD to it rather than filling a blank one. Everything here **composes** the
-Phase 1a/2b parts; no tile kind, grid, formatter or figure was invented.
+**Delivered: the canvas stops being empty** — the first impression in the owner meeting. Everything
+**composes** the Phase 1a/2b parts: `baseline-row.tsx` renders `KpiTile` ×2, `HBarTile` and the new
+`PartnersTile` as **direct children of the one canvas grid**, fed by `lib/dashboard/baseline.ts`
+through the route's SSR loader; `derive.ts` gained `trailingPoints`, `trendEndingAt` and
+`capacityShare`.
 
-- `app/lib/dashboard/baseline.ts` — `loadBaseline(repository)`, the view model the route's loader
-  hands to the row. One place reads the US-007 repository, derives the webshop total and delta, and
-  windows the sparkline; nothing downstream holds a number it did not receive.
-- `app/components/dashboard/baseline-row.tsx` — the four tiles, in order, as **direct children of
-  the US-012 canvas grid** (a fragment, so there is still exactly one grid). `KpiTile` ×2,
-  `HBarTile`, `PartnersTile`; layout is four span constants and nothing else.
-- `app/components/tiles/partner-tile.tsx` — `PartnersTile` / `PartnerCard` / `PartnerMonogram` /
-  `partnerMonogram()`. The one new component, and it is a `Card` composition.
-- `app/routes/_index.tsx` — gains a `loader` (React Router 7 framework mode, SSR). The repository is
-  async and server-only, so the fetch happens there and the components stay data-in / DOM-out.
-- `app/lib/repositories/derive.ts` — three pure additions: `trailingPoints`, `trendEndingAt`, and
-  `capacityShare` (which `attendanceShare` and the new `matchCapacityShare` now both delegate to, so
-  the ring and the match tile cannot round the same ratio two ways).
+**② NO FIGURE IS RE-TYPED — proven two ways.** Every rendered string is asserted EQUAL to
+`repository → derive → format.ts` output, and a **source scan** fails on any displayed figure as a
+literal in three spellings, any `CHF <digit>` or `<n>%` string, any product or partner name, and on
+`toLocaleString` / `toFixed`. The headline and its `+11.9%` are `seriesTotals` off the same array the
+sparkline draws, and `trendEndingAt` makes the window **end on the month the headline covers**.
+**③** Six monogram plates in each partner's **own** brand colour (no hex, no FCB token in the file);
+hover lift measured at exactly 2px. **④** All five Top Products labels whole in a 150px column,
+`scrollWidth <= clientWidth`, measured on the real data.
 
-**② NO FIGURE IS RE-TYPED — proven two ways, not asserted.** Every rendered string is asserted
-EQUAL to `repository → derive → format.ts` output, and a **source scan** over `baseline-row.tsx`,
-`partner-tile.tsx`, `baseline.ts` and `_index.tsx` fails on any displayed figure appearing as a
-literal in three spellings (`148200`, `148_200`, `CHF 148’200`), on any `CHF <digit>` or `<n>%`
-string, on `FCB`/`Sion`, on any product or partner name, and on `toLocaleString` /
-`Intl.NumberFormat` / `toFixed`. The webshop headline and its `+11.9%` are `seriesTotals` off the
-same array the sparkline draws, so the number and its own glyph cannot disagree — and
-`trendEndingAt` makes that structural: the six-point window **ends on the month the headline
-covers**, located inside the monthly series rather than taken off its tail, so it still holds in
-December when the year-to-date series runs past the baseline month (a test pins that).
+**RESET'S BASELINE SEAM IS CLOSED** the way US-015 described: the tiles are static route chrome
+outside the session list, so no question can remove them and Reset cannot fail to restore them —
+`baseline-reset.test.tsx` drives insert → Reset and compares the canvas `innerHTML` to its load
+state. **First real-Chrome pass for US-017, US-021 and US-027:** no horizontal scroll at 1920×1080
+(nor 1440/1280/834/390), 54 distinct KPI strings and 43 bar widths per frame, two values only under
+reduced motion. **Gates:** all ✅ · 880/880 tests (103 new) · coverage 100% stmts / 99.58% branches.
+**Security triage:** no security-relevant changes detected (the loader is an SSR data hop, not an
+HTTP endpoint). Full detail in `completed.md`.
 
-**③ Partner plates.** Six monograms (`BI`, `MA`, `AL`, `SU`, `FE`, `HO`) on plates painted in the
-partner's OWN brand colour, each with its `PARTNER_ROLE_LABEL` role tag. The colour arrives as data
-and is applied as an inline style: a test asserts **no hex and no `bg-red`/`bg-navy` token appears
-in the file at all**, because a partner plate rendered in club red is wrong to a sponsor in the
-room. Monograms are `aria-hidden` — the name is text beside them. Hover lift measured in real
-Chrome: **exactly 2px** and `shadow-raised`, timed off `--duration-fast`.
+**Next:** US-016 — hero band (5 pts), the last story in this phase.
 
-**④ Top Products labels are whole, end to end.** Measured in Chrome on the real data:
-`scrollWidth <= clientWidth` on all five labels (nothing ellipsised), each in a 150px column,
-`text-overflow: clip`, `white-space: normal` — `Cap "Rotblau"` and `Home shirt 26/27` both complete.
+### 2026-09-09 — US-016 Hero band: webshop trend & attendance ring ✅ (5 pts, in the Phase 2b run)
 
-**RESET INHERITS THE BASELINE, and the seam US-015 left is closed the way US-015 itself described.**
-US-015 offered two routes and named both; US-013 took the second — a baseline tile that is static
-chrome "needs no entry here at all". The four tiles are rendered by the ROUTE, above and outside the
-session list, so **no question can remove them and Reset cannot fail to restore them**: load state
-and post-reset state are the same DOM by construction, with no baseline special-case anywhere in the
-reset path. Inventing a `HeroId` per tile would have made them dedupeable, re-askable,
-phase-flippable and removable — none of which a baseline tile is — and forced a discriminated union
-through every pure transition. `tests/unit/baseline-reset.test.tsx` drives the whole mechanic: four
-tiles on load → two sections inserted **below** them, order and figures intact → Reset → zero
-sections, exactly four tiles in order, and the canvas `innerHTML` byte-identical to its load state
-(only React's `useId` gradient ids normalised). Repeated presses stay stable.
+**Delivered: the band that closes Phase 2a.** The navy greeting strip above the baseline row —
+persona greeting, period filter, webshop line chart in the wider left column, attendance ring and
+its stats in the narrower right one. New: `components/dashboard/hero-band.tsx`,
+`components/charts/attendance-ring.tsx`, `personaGreeting` in `lib/persona.ts`, a `HeroBandData`
+half on the existing loader view model, and three token-only rules in `app/app.css` (`.fcb-band`,
+`.fcb-band-wash`, `.fcb-ring-glow`).
 
-**FIRST REAL-CHROME PASS FOR US-017, US-021 AND US-027** — all three deferred visual verification
-because nothing mounted them. At 1920×1080 on the production SSR build:
-- four tiles in order at x=256/672/1088 and a full-width partner strip on row 2; canvas grid
-  reports **12 columns**; `documentElement.scrollWidth === clientWidth` (1920) — **no horizontal
-  scroll**, and the same at 1440, 1280, 834 and 390, with the partner strip folding 6 → 3 → 2 and
-  no label clipped at any width;
-- **the number counts up and the bars grow, they do not snap:** a per-frame probe recorded **54
-  distinct KPI strings** (`CHF 0 → 8’098 → 15’849 → … → CHF 148’200`), **43 distinct bar widths**
-  (`0px → 48px → 97px → … → 504px`), the sparkline stroke drawing from `dashoffset` 1 → 0, and the
-  tile entrance fading through **25 opacity steps**;
-- under `prefers-reduced-motion: reduce` the same probe recorded **2** distinct KPI strings and **2**
-  bar widths — final state within one frame, opacity 1, `transform: none`, bars at 504px, sparkline
-  at `dashoffset: 0`. **Nothing is stranded at zero.**
+- **① ONE control drives BOTH widgets.** The band holds exactly one `useState` and exactly one
+  `<Segmented>` — a test pins both counts — and the chart and the ring read the SAME
+  `BaselinePeriod` entry. One click in Chrome moved the line's `d`, the KPI, the ring's arc and the
+  stats together. Top Products keeps its **own** filter deliberately (a presenter may compare this
+  month's best sellers against a year-to-date trend); a test proves the band's press leaves it alone.
+- **② / ③** Gold area line (current) over a dashed white previous period, in DRAWING order so the
+  gold is on top, legend beside the KPI (`legend={false}` on the chart, `LineChartLegend` placed by
+  the band), 8 of 12 columns. Hover: a vertical guide, one dot per series, and a tooltip carrying
+  **both** readings — Chrome at W3 showed `Previous CHF 30’200` and `This month CHF 33’900`.
+- **④ The ring is the one genuinely new visual.** Hand-built SVG, no library: `ringGeometry` is pure
+  and clamps a share outside 0–1 (a sell-out would otherwise wrap the arc back over itself), the arc
+  sweeps on `stroke-dasharray`, and hover **or focus** swaps the centre to "% of capacity" and adds
+  `.fcb-ring-glow`. Gold is an accent on a 12px arc, never a fill — `motion.test.tsx` now allows
+  exactly three consumers of `--color-accent-target-hit` and still rejects a gold ring on a tile.
+- **⑤ The number counts from what is on screen.** Chrome: settled at `CHF 148’200`, still
+  `CHF 148’200` in the frame after the click, then **54 distinct strings** down to `CHF 132’400`.
+  The line is **re-keyed** (a new element at `stroke-dashoffset: 1px` → `0px` across 44 values) while
+  the ring transitions **on the same element** (43 dash pairs, 315.38px → 300.1px).
+- **⑥** `seriesTotals` sums the plotted array on every render; `HeroBandData` has **no** total or
+  delta field to read one from, and a scan rejects `total:` / `deltaPercent:` in the band.
+- **US-013's loose end closed:** Top Products' `action` slot now holds a light `Segmented` — 48
+  distinct bar-width frames, 54 value frames, and the **same** row elements throughout.
+- **One real defect found by first mount and fixed in `LineChart`:** end axis labels were clipped by
+  the svg's own bounds (`W1`/`W4` at 1080p), so `axisLabelAnchor` now anchors the ends inwards.
+- **Reduced motion:** one KPI string, one ring value, arc at 315.38px, line at offset 0, area at
+  opacity 1, bars at final width — nothing stranded at zero.
 
-**Scope held.** No hero band (US-016), no period filter (Top Products' `action` slot is empty and
-says why), no prompt bar, no thinking panel, no narrative caption on any tile. The client build
-confirms the `.server` boundary: `grep` for `Bitpanda`, `148200` and `Rotblau` over `build/client/`
-returns nothing, so the fixtures never reach the browser bundle.
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1090/1090 tests ✅ (92 new) · build ✅ · coverage
+**99.75% stmts / 98.61% branches / 100% funcs / 100% lines** (`app/**`). **Security triage:** no
+security-relevant changes detected — no route, no handler, no endpoint (the loader's shape is
+unchanged), no SQL, no `innerHTML`, no user-supplied URL, no upload, **no dependency change**, no env
+var, no logging, no storage API; every rendered string is an escaped text node and the only dynamic
+style values are token references and numeric geometry.
 
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 880/880 tests ✅ (103 new) · build ✅ · coverage
-**100% stmts / 99.58% branches / 100% funcs / 100% lines** (`app/**`). **Security triage:** no
-security-relevant changes detected. Triggers considered — new route handler (a React Router loader
-is not an HTTP endpoint: no path, no params, no query, no body, no user input, and it reads a static
-in-repo fixture), resource-by-id lookup (none), raw SQL (none), `dangerouslySetInnerHTML` /
-`innerHTML` (none), user-supplied `href`/`src`/URL and SSRF (none — zero network calls),
-file upload (none), dependency or lockfile change (**none** — `package.json` and `pnpm-lock.yaml`
-untouched), env var or secret (none), logging (none), state-changing endpoint / CSRF (none), storage
-API (none — the `app/**` scan still passes). The one value-driven style in the change is
-`style={{ backgroundColor: partner.brandColor }}`; the value is a module constant, React sets it
-through the CSSOM (which rejects anything that is not a colour), and a test asserts every partner's
-`brandColor` matches `/^#[0-9A-Fa-f]{6}$/`.
-
-**Next:** US-016 — hero band: webshop trend & attendance ring (5 pts). Now unblocked (US-025 +
-US-026 + US-027 all exist) and the last story in this phase; build it inside the Phase 2b run.
+**Next:** Phase 2b continues with US-018 — vertical bar chart tile (3 pts).
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress (4/5 stories · 11/16 points) — US-016 remains **deferred**, so this
-phase does **not** close here
+**Phase Status:** ✅ **Completed** (5/5 stories · 16/16 points) — closed 2026-09-09 with US-016
 **Previous:** [Phase 1b](phase-1b.md) · **Next:** [Phase 2b — Components](phase-2b.md)

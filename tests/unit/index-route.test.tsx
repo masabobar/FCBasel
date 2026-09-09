@@ -1,10 +1,15 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import Index, { loader, meta } from "../../app/routes/_index";
-import { BASELINE_TILE_ORDER } from "../../app/components/dashboard/baseline-row";
+import {
+  BASELINE_TILE_ORDER,
+  TOP_PRODUCTS_PERIOD_LABEL,
+} from "../../app/components/dashboard/baseline-row";
+import { HERO_BAND_PERIOD_LABEL } from "../../app/components/dashboard/hero-band";
 import { type BaselineData } from "../../app/lib/dashboard/baseline";
 import { WORKSPACE_LABEL } from "../../app/lib/persona";
 import { baselineRepository } from "../../app/lib/repositories/index.server";
@@ -42,8 +47,9 @@ describe("index route — loader", () => {
     expect(DATA.match).toEqual(match);
   });
 
-  it("returns every figure the four tiles need, and nothing else", () => {
+  it("returns every figure the band and the four tiles need, and nothing else", () => {
     expect(Object.keys(DATA).sort()).toEqual([
+      "band",
       "match",
       "partners",
       "topProducts",
@@ -101,18 +107,84 @@ describe("index route — the baseline dashboard", () => {
 
     expect(container.querySelectorAll('[data-slot="card"]')).toHaveLength(4);
     expect(
-      [...container.querySelectorAll("h2")].map((node) => node.textContent),
+      [...container.querySelectorAll('[data-slot="card"] h2')].map(
+        (node) => node.textContent,
+      ),
     ).toEqual([...BASELINE_TILE_ORDER]);
   });
 
-  it("adds nothing to the canvas but the heading and those four tiles", () => {
+  it("mounts the hero band ABOVE that row, as one grid item", () => {
     const { container } = renderRoute();
 
-    // The heading plus four tiles — no wrapper, so every tile is a grid item.
-    expect(container.childElementCount).toBe(5);
+    const band = container.querySelector('[data-slot="hero-band"]')!;
+    const firstTile = container.querySelector('[data-slot="card"]')!;
+
+    expect(band).toBeInTheDocument();
+    expect(
+      band.compareDocumentPosition(firstTile) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // A grid ITEM, not a grid: it spans the canvas's columns and divides its
+    // own padded interior.
+    expect(band.className).toContain("col-span-full");
+    expect(
+      container.querySelectorAll('[data-slot="canvas-grid"]'),
+    ).toHaveLength(0);
+  });
+
+  it("greets the persona with the string the loader resolved", () => {
+    renderRoute();
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: DATA.band.greeting }),
+    ).toBeInTheDocument();
+  });
+
+  it("adds nothing to the canvas but the heading, the band and those four tiles", () => {
+    const { container } = renderRoute();
+
+    // The heading, the band, then four tiles — no wrapper, so every one of
+    // them is a grid item of US-012's canvas.
+    expect(container.childElementCount).toBe(6);
   });
 
   it("sets the document title", () => {
     expect(meta()).toEqual([{ title: "FC Basel Intelligence Platform" }]);
+  });
+});
+
+describe("index route — the two period filters are independent", () => {
+  it("shows both, each named for what it drives", () => {
+    // Two radiogroups on one screen: the band's (chart + ring) and Top
+    // Products'. "Period" twice would be ambiguous to anyone hearing it.
+    renderRoute();
+
+    const names = screen
+      .getAllByRole("radiogroup")
+      .map((group) => group.getAttribute("aria-label"));
+
+    expect(names).toEqual([HERO_BAND_PERIOD_LABEL, TOP_PRODUCTS_PERIOD_LABEL]);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it("leaves Top Products where it is when the band's period changes", async () => {
+    // The band's ONE control drives its own two widgets — deliberately not the
+    // whole dashboard: a presenter may compare this month's best sellers with
+    // a year-to-date revenue trend.
+    const user = userEvent.setup();
+    renderRoute();
+
+    const [bandFilter, productsFilter] = screen.getAllByRole("radiogroup");
+    const productsBefore = within(productsFilter!).getByRole("radio", {
+      checked: true,
+    }).textContent;
+
+    await user.click(
+      within(bandFilter!).getAllByRole("radio", { checked: false })[0]!,
+    );
+
+    expect(
+      within(productsFilter!).getByRole("radio", { checked: true }),
+    ).toHaveTextContent(productsBefore!);
   });
 });

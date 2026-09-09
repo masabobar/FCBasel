@@ -18,6 +18,7 @@
  */
 
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ReactElement } from "react";
@@ -26,6 +27,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   BASELINE_TILE_ORDER,
   BaselineRow,
+  TOP_PRODUCTS_PERIOD_LABEL,
 } from "../../app/components/dashboard/baseline-row";
 import {
   H_BAR_LABEL_WIDTH_PX,
@@ -34,6 +36,7 @@ import {
 import { sparklineGeometry } from "../../app/components/tiles/kpi-tile";
 import { type Clock } from "../../app/lib/calendar";
 import {
+  BASELINE_PERIOD,
   type BaselineData,
   loadBaseline,
   SPARKLINE_POINTS,
@@ -65,7 +68,22 @@ const SEPTEMBER: Clock = () => new Date(2026, 8, 9);
 /** The real dataset, read through the real loader. No hand-written figures. */
 const DATA: BaselineData = await loadBaseline(
   createMockBaselineRepository(SEPTEMBER),
+  SEPTEMBER,
 );
+
+/**
+ * The Top Products period the row shows FIRST. The tile now carries US-026's
+ * filter (wired by US-016), so the data holds every period and this is the one
+ * the initial paint renders.
+ */
+const PRODUCTS = DATA.topProducts.find(
+  (period) => period.key === BASELINE_PERIOD,
+)!;
+
+/** Another period, for the filter cases — never the one already on screen. */
+const OTHER_PRODUCTS = DATA.topProducts.find(
+  (period) => period.key !== BASELINE_PERIOD,
+)!;
 
 /* --------------------------------------------------------------- SOURCE -- */
 
@@ -105,7 +123,7 @@ const DISPLAYED_FIGURES: readonly number[] = [
   ...DATA.webshop.trend,
   DATA.match.attendance,
   DATA.match.capacity,
-  ...DATA.topProducts.rows.map((row) => row.units),
+  ...DATA.topProducts.flatMap((period) => period.rows.map((row) => row.units)),
 ].filter((value) => Math.abs(value) >= FIGURE_FLOOR);
 
 /* ------------------------------------------------------------- HARNESS -- */
@@ -298,22 +316,20 @@ describe("BaselineRow — top products", () => {
     renderRow();
 
     const labels = slots("h-bar-label").map((node) => node.textContent);
-    expect(labels).toEqual(DATA.topProducts.rows.map((row) => row.product));
+    expect(labels).toEqual(PRODUCTS.rows.map((row) => row.product));
   });
 
   it("renders every unit count through the shared number formatter", () => {
     renderRow();
 
     const values = slots("h-bar-value").map((node) => node.textContent);
-    expect(values).toEqual(
-      DATA.topProducts.rows.map((row) => formatNumber(row.units)),
-    );
+    expect(values).toEqual(PRODUCTS.rows.map((row) => formatNumber(row.units)));
   });
 
   it("scopes the tile with the dataset's period label", () => {
     renderRow();
 
-    expect(slots("card-subtitle")[2]).toHaveTextContent(DATA.topProducts.label);
+    expect(slots("card-subtitle")[2]).toHaveTextContent(PRODUCTS.label);
   });
 
   it("uses the club-blue series, as H_BAR_SERIES assigns Top Products", () => {
@@ -325,10 +341,82 @@ describe("BaselineRow — top products", () => {
     }
   });
 
-  it("leaves the action slot empty — the period filter is US-026 / US-016", () => {
+  it("fills the action slot with the period filter US-013 left room for", () => {
     renderRow();
 
-    expect(slots("card-action")).toHaveLength(0);
+    const action = slot("card-action")!;
+    const group = action.querySelector('[data-slot="segmented"]')!;
+
+    expect(slots("card-action")).toHaveLength(1);
+    expect(group).toHaveAttribute("role", "radiogroup");
+    expect(group).toHaveAttribute("aria-label", TOP_PRODUCTS_PERIOD_LABEL);
+    // Light, not dark: it sits on a white card, not on the navy band.
+    expect(group).toHaveAttribute("data-variant", "light");
+  });
+
+  it("offers exactly the dataset's periods, with this month selected", () => {
+    renderRow();
+
+    expect(
+      slots("segmented-option").map((option) => option.textContent),
+    ).toEqual(DATA.topProducts.map((period) => period.label));
+    expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
+      PRODUCTS.label,
+    );
+  });
+
+  it("recalculates every figure when the filter changes", async () => {
+    // The loose end US-013 left, and the review decision US-016 records:
+    // "recalculating numbers and moving bars".
+    const user = userEvent.setup();
+    const { frames } = renderRow();
+
+    await user.click(screen.getByRole("radio", { name: OTHER_PRODUCTS.label }));
+    frames.advance(COUNT_UP_DURATION_MS);
+    frames.advance(COUNT_UP_DURATION_MS);
+
+    expect(slots("card-subtitle")[2]).toHaveTextContent(OTHER_PRODUCTS.label);
+    expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
+      OTHER_PRODUCTS.label,
+    );
+    expect(slots("h-bar-value").map((node) => node.textContent)).toEqual(
+      OTHER_PRODUCTS.rows.map((row) => formatNumber(row.units)),
+    );
+  });
+
+  it("moves the bars to their new widths instead of remounting them", async () => {
+    const user = userEvent.setup();
+    renderRow();
+
+    const before = slots("h-bar-row");
+    const widthsBefore = slots("h-bar-fill").map((fill) => fill.style.width);
+
+    await user.click(screen.getByRole("radio", { name: OTHER_PRODUCTS.label }));
+
+    // The SAME elements — `HBars` keys its rows by product name, so the width
+    // is a transition rather than a remount from zero.
+    const after = slots("h-bar-row");
+    expect(after).toHaveLength(before.length);
+    after.forEach((row, index) => expect(row).toBe(before[index]));
+
+    const fills = slots("h-bar-fill");
+    for (const fill of fills) {
+      expect(fill.className).toContain("transition-[width]");
+      expect(fill.style.width).not.toBe("0%");
+    }
+    // The proportions genuinely changed: a filter that recalculated nothing
+    // would leave every width byte-identical.
+    expect(fills.map((fill) => fill.style.width)).not.toEqual(widthsBefore);
+  });
+
+  it("drops only its own tile if the dataset carries no period at all", () => {
+    // Degradation, not a crash: the other three tiles still render and the
+    // dashboard is still lived-in.
+    renderSettled(<BaselineRow data={{ ...DATA, topProducts: [] }} />);
+
+    expect(slots("card")).toHaveLength(3);
+    expect(slots("h-bar-row")).toHaveLength(0);
+    expect(slots("segmented")).toHaveLength(0);
   });
 
   it("grows the bars rather than snapping them to width", () => {
@@ -361,7 +449,7 @@ describe("BaselineRow — Top Products labels show in full", () => {
     renderRow();
 
     const labels = slots("h-bar-label");
-    expect(labels).toHaveLength(DATA.topProducts.rows.length);
+    expect(labels).toHaveLength(PRODUCTS.rows.length);
 
     for (const label of labels) {
       expect(label.style.width).toBe(`${H_BAR_LABEL_WIDTH_PX}px`);
@@ -468,7 +556,7 @@ describe("BaselineRow — no figure is re-typed in a component", () => {
 
   it("names no product and no partner", () => {
     const names = [
-      ...DATA.topProducts.rows.map((row) => row.product),
+      ...PRODUCTS.rows.map((row) => row.product),
       ...DATA.partners.map((partner) => partner.name),
     ];
 
@@ -503,7 +591,7 @@ describe("BaselineRow — reduced motion renders the final state", () => {
       formatNumber(DATA.match.attendance),
     );
     expect(slots("h-bar-value").map((node) => node.textContent)).toEqual(
-      DATA.topProducts.rows.map((row) => formatNumber(row.units)),
+      PRODUCTS.rows.map((row) => formatNumber(row.units)),
     );
 
     // And no bar and no sparkline is stranded at its zero geometry.

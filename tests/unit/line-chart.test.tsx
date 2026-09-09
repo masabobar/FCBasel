@@ -5,6 +5,7 @@ import type { ReactElement } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  axisLabelAnchor,
   axisLabelShown,
   DEFAULT_LINE_CHART_HEIGHT,
   hoverIndex,
@@ -318,6 +319,44 @@ describe("axisLabelShown — legible at 1080p", () => {
 
     expect(shown.length).toBeLessThan(40);
     expect(axisLabelShown(39, 40)).toBe(true);
+  });
+});
+
+describe("axisLabelAnchor — the end labels are not clipped", () => {
+  it("anchors the first label to the start and the last to the end", () => {
+    // The defect US-016's first real mount of this chart exposed in Chrome: a
+    // CENTRED end label loses its outer half to the svg's own bounds.
+    expect(axisLabelAnchor(0, 4)).toBe("start");
+    expect(axisLabelAnchor(3, 4)).toBe("end");
+  });
+
+  it("centres every label in between", () => {
+    expect(axisLabelAnchor(1, 4)).toBe("middle");
+    expect(axisLabelAnchor(2, 4)).toBe("middle");
+  });
+
+  it("centres a single label, whose point is drawn mid-plot", () => {
+    expect(axisLabelAnchor(0, 1)).toBe("middle");
+    expect(axisLabelAnchor(0, 0)).toBe("middle");
+  });
+
+  it("anchors the rendered labels the same way", () => {
+    renderDrawn(
+      <LineChart
+        xs={[...BAND_XS]}
+        series={[{ name: "Current", values: [...BAND_CURRENT] }]}
+      />,
+    );
+
+    const anchors = slots("line-chart-axis-label").map((label) =>
+      label.getAttribute("text-anchor"),
+    );
+
+    expect(anchors.at(0)).toBe("start");
+    expect(anchors.at(-1)).toBe("end");
+    expect(anchors.slice(1, -1).every((anchor) => anchor === "middle")).toBe(
+      true,
+    );
   });
 });
 

@@ -194,7 +194,7 @@ describe("Reset restores exactly the four baseline tiles", () => {
       document.querySelectorAll('[data-slot="partner-card"]'),
     ).toHaveLength(DATA.partners.length);
     expect(document.querySelectorAll('[data-slot="h-bar-row"]')).toHaveLength(
-      DATA.topProducts.rows.length,
+      DATA.topProducts[0]!.rows.length,
     );
     expect(document.querySelectorAll('[data-slot="kpi-value"]')).toHaveLength(
       2,
