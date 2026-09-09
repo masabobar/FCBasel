@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (2/11 completed)
+**Status:** In Progress (3/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (2/11 completed)
+**Status:** In Progress (3/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -45,18 +45,14 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Completion note (2026-09-09):** All three criteria met. `DeltaChip` lives in
     `app/components/tiles/delta-chip.tsx` on its own, because US-019, US-022 and US-016 want the chip
     without a tile around it; `KpiSparkline`, `KpiFigure` and `KpiTile` are in
-    `app/components/tiles/kpi-tile.tsx`. The 30px/700/tight/tabular treatment is the existing
-    `.kpi-number` role class, not four utilities restated. **Colour is never the sole signal, and the
-    `light` variant proves it:** on navy both directions share one white treatment (the negative
-    token is ~2:1 there), and a test asserts the two chips' class strings are identical while the
-    glyph, the explicit sign and an `sr-only` word still differ. Direction is arithmetic and
-    judgement is meaning, so an optional `judgement` prop (from US-010's `varianceJudgement`) draws
-    Marketing's overspend as an **up arrow in the negative token**; a zero renders as a labelled zero
-    in the neutral treatment, never a variance token. Hero 2 and Hero 3's extra content arrives as
-    `children` and the navy band composes `KpiFigure onDark` — **no variant per hero**. Motion is
-    US-027's only (a test fails on any local `useState` / timer / rAF here) and every string comes
-    from US-011. Also closed the US-012 `tailwind-merge` trap at the root: `app/lib/cn.ts` declares
-    the named type scale, derived from the token set. 78 tests added (722/722, gates clean).
+    `app/components/tiles/kpi-tile.tsx`. **Colour is never the sole signal, and the `light` variant
+    proves it:** on navy both directions share one white treatment, and a test asserts the two chips'
+    class strings are identical while the glyph, the explicit sign and an `sr-only` word still differ.
+    Direction is arithmetic and judgement is meaning, so an optional `judgement` prop draws
+    Marketing's overspend as an up arrow in the negative token; a zero is a labelled zero. Hero extras
+    arrive as `children` and the navy band composes `KpiFigure onDark` — **no variant per hero**.
+    Motion is US-027's only and every string comes from US-011. Also closed the US-012
+    `tailwind-merge` trap at the root in `app/lib/cn.ts`. 78 tests added (722/722, gates clean).
 
 - **US-018**: Vertical bar chart tile
   - **Story Points:** 3
@@ -104,7 +100,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Ranked-list bars for top products, printed names, badge trend, declining
     fixtures and Marketing drivers.
   - **Acceptance Criteria:**
@@ -115,6 +111,19 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - Supports a `negative` mode (for revenue-drop bars) and a custom value formatter
       (e.g. `CHF 150k`, `38%`)
   - **Dependencies:** US-005, US-027
+  - **Completion note (2026-09-09):** All four criteria met, in
+    `app/components/charts/h-bars.tsx` — `HBarRow` (the unit of reuse), `HBars` (the ranked list) and
+    `HBarTile` (`Card` + rows, `action` slot passing through for Hero 2's `-CHF 400k total` badge).
+    **Both review decisions are read back off the rendered element by tests**, not merely written:
+    150px label at weight 500 with `truncate` / `text-ellipsis` / `line-clamp` rejected (long labels
+    wrap), and a 96px `nowrap` value column proven on three different lists with `-CHF 150k` a single
+    text node. One rule serves all five consumers — the sign of the displayed figure sets the anchor
+    side, the token and the text sign — so `negative` mode is just "every row is a decline" (it
+    negates the stored magnitude, idempotently) and the badge trend's mixed signs work unchanged.
+    Rows keyed by name, so a data change transitions the same bar (100% → 50%) while `useCountUp`
+    continues from the figure on screen; `hBarMax` / `hBarPercent` are pure and return zero width,
+    never `NaN`, so a zero is a labelled zero. US-023 composes this, with nothing to reimplement.
+    55 tests added (777/777, gates clean, coverage 100% stmts).
 
 - **US-022**: Department table tile
   - **Story Points:** 3

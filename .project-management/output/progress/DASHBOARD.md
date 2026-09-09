@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2b - Chart & Tile Component Library *(2/11 stories complete)* · Phase 2a partial (3/5, US-013 + US-016 folded into the 2b run) · Phases 1a + 1b complete
+**Current Phase:** Phase 2b - Chart & Tile Component Library *(3/11 stories complete)* · Phase 2a partial (3/5, US-013 + US-016 folded into the 2b run) · Phases 1a + 1b complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 32% | 100% | 🟢 On Track |
+| **Overall Progress** | 34% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 16/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 37/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 17/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 40/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 16
-**Currently Working On:** US-021 — Horizontal bar tile (3 pts)
-**Story Points Completed Today:** 37
+**Stories Completed Today:** 17
+**Currently Working On:** US-013 — Baseline dashboard, four pre-existing tiles (3 pts)
+**Story Points Completed Today:** 40
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -54,33 +54,25 @@
   outside the token palette on purpose.
 
 - ✅ **US-008 — Hero 1 dataset (2 pts)** — season-to-date merchandising: three kits, the sponsor badge
-  split and the top five printed names, across all four periods rather than the single period the
-  written AC describes (the user's approved decision). Kit revenue (units x CHF 99), the 58% Home
-  share and the exactly-8% badge share are *derived*, never stored — the Reference Guide's
-  `homeShare: 58` deliberately did not survive the port. `badgeSegments` corrects its rounding
-  remainder into the first segment so the donut always adds up to the number printed inside it. Both
-  narratives are byte-identical to the source, proven by SHA-256, and squad names appear only as
-  shirt-print counts.
+  split and the top five printed names, across all four periods (the user's approved decision). Kit
+  revenue (units x CHF 99), the 58% Home share and the exactly-8% badge share are *derived*, never
+  stored. `badgeSegments` corrects its rounding remainder into the first segment so the donut always
+  adds up to the number printed inside it. Both narratives are byte-identical, proven by SHA-256.
 
 - ✅ **US-009 — Hero 2 dataset (2 pts)** — matchday ticket revenue year on year: eight home fixtures
-  (7,880 → 7,830 CHF thousands) plus the twelve-month series the Reference Guide adds beyond the
-  Specification. The two charts sit at *different scopes on purpose* — eight fixtures against all
-  home fixtures — so each series carries its own `scopeLabel` and a test proves they differ and that
-  the monthly total is the larger. Totals, the -0.6%, the four declining fixtures and their
-  -CHF 400k badge are all *derived* from the fixture pairs; the Guide's stored `totalPrev`,
-  `totalCurr`, `deltaPct` and second `declines` list did not survive the port. Both narratives
-  verbatim, pinned by text, length and ASCII range.
+  (7,880 → 7,830 CHF thousands) plus the twelve-month series the Reference Guide adds. The two charts
+  sit at *different scopes on purpose*, so each series carries its own `scopeLabel` and a test proves
+  they differ. Totals, the -0.6%, the four declining fixtures and their -CHF 400k badge are all
+  *derived* from the fixture pairs. Both narratives verbatim, pinned by text, length and ASCII range.
 
 - ✅ **US-010 — Hero 3 dataset (2 pts)** — full-year departmental performance: six departments
   (69,000 → 69,680 CHF thousands, +680 / +1.0%, all derived) each tagged Revenue or Cost. That tag is
   *load-bearing*: above budget is money earned for the five revenue departments and an **overspend**
-  for the Marketing cost centre, so every row carries a derived `VarianceJudgement` — Marketing's
-  +410 comes back `ADVERSE` while Sponsoring's +840 comes back `FAVOURABLE`, and a test shows a naive
-  "variance > 0 is good" rule would misread exactly one department. Marketing being the *only*
-  department both over budget and behind target is derived too (the Guide's `flag: true` did not
-  survive the port), and the three follow-up drivers (240 + 150 + 20) reconcile *exactly* with its
-  derived 410 overspend. Ticketing's 24,360 legitimately exceeds Hero 2's 7,830 because it includes
-  the season-ticket base, and the `scopeLabel` says so on the tile.
+  for the Marketing cost centre, so every row carries a derived `VarianceJudgement` — and a test
+  shows a naive "variance > 0 is good" rule would misread exactly one department. Marketing being the
+  *only* department both over budget and behind target is derived too, and the three follow-up
+  drivers (240 + 150 + 20) reconcile *exactly* with its derived 410 overspend. Ticketing's 24,360
+  legitimately exceeds Hero 2's 7,830 (it includes the season-ticket base); the `scopeLabel` says so.
 
 - ✅ **US-011 — Formatters & cross-hero reconciliation (2 pts)** — the shared display layer
   (`app/lib/format.ts`, pure and stateless) plus the drift alarm that closes Phase 1b
@@ -110,14 +102,11 @@
   revision}` (`app/lib/dashboard/`), owned by `root.tsx` so the canvas and the app bar share one
   source. Re-asking a hero **refreshes in place** — one section, same position, revision bumped —
   and a follow-up **flips an existing section's phase** instead of appending, which is exactly what
-  US-033 builds on. Sections are direct children of the US-012 canvas grid and re-use its column
-  tracks via `grid-cols-subgrid`, so there is still only **one grid**. Verified in real Chrome:
-  `::view-transition-group(fcb-tile-HERO_1)` animates while a second section inserts (existing tiles
-  glide, never jump), the view auto-scrolls to the newest section once the canvas overflows, and
-  under `prefers-reduced-motion` the tween is skipped entirely while the final layout renders
-  identically. Hero content is deliberately a marked placeholder — tiles are Phase 2b, narratives
-  Phase 3b — and a source scan asserts no `localStorage`, `sessionStorage`, cookie or IndexedDB
-  anywhere in `app/**`.
+  US-033 builds on. Sections re-use the US-012 canvas grid's column tracks via `grid-cols-subgrid`,
+  so there is still only **one grid**. Verified in real Chrome: existing tiles glide rather than jump
+  while a second section inserts, the view auto-scrolls to the newest section, and under
+  `prefers-reduced-motion` the tween is skipped while the final layout renders identically. A source
+  scan asserts no `localStorage`, `sessionStorage`, cookie or IndexedDB anywhere in `app/**`.
 
 - ✅ **US-015 — Reset to baseline (2 pts)** — the control that lets the demo be run twice, built as a
   **transition beside the other three** rather than a special case: `withBaselineRestored` in
@@ -127,13 +116,11 @@
   four tiles will be restored for free by listing them there. **The timer is the story:** `reset`
   cancels the single pending beat *first*, before it touches state; deleting that one line makes two
   tests fail with a `HERO_2` section landing in a dashboard that was just cleared. Abuse-proofing is
-  structural, not a guard clause — `withBaselineRestored` returns the *same list reference* when
-  there is nothing to clear, so ten presses in one frame run **one** view transition and a press on
-  an empty canvas runs none. Verified in real Chrome: `scrollY` 900 → 0 across three rapid presses,
-  three scroll requests, zero `startViewTransition` calls, and `behavior: "auto"` throughout under
-  `prefers-reduced-motion`. **Two criteria are honestly a seam, not a claim:** the suggestion chips
-  are US-029 and the thinking beat is US-031 — neither was invented here; they wire into `sections`
-  and `schedule` respectively.
+  structural — `withBaselineRestored` returns the *same list reference* when there is nothing to
+  clear, so ten presses in one frame run **one** view transition. Verified in real Chrome:
+  `scrollY` 900 → 0 across three rapid presses, zero `startViewTransition` calls under
+  `prefers-reduced-motion`. **Two criteria are honestly a seam:** the suggestion chips are US-029 and
+  the thinking beat is US-031 — they wire into `sections` and `schedule` respectively.
 
 - ✅ **US-027 — Motion & animation hooks (3 pts)** — the four hooks the other ten E6 components are
   built on, and the reason those stories can be mechanical: `useReducedMotion`, `useGrow`,
@@ -170,6 +157,24 @@
   be passed in. **The US-012 `tailwind-merge` trap is closed at the root:** `app/lib/cn.ts` declares
   the named type scale as a font-size group, derived from the token set, so a size and a colour can
   share an element everywhere from here on. 78 new tests.
+
+- ✅ **US-021 — Horizontal bar tile (3 pts)** — the most reused chart in the product, built once in
+  `app/components/charts/h-bars.tsx` for all five of its consumers (Top Products, top printed names,
+  the badge trend, the declining fixtures, the Marketing drivers) as `HBarRow` / `HBars` /
+  `HBarTile`. **The two review decisions are read back off the rendered element by tests, not just
+  written down:** the label column is 150px at weight 500 and a test *rejects* `truncate`,
+  `text-ellipsis` and `line-clamp` on it, so `Cap "Rotblau"` and `Home shirt 26/27` can never regain
+  the ellipsis they were reported with — a long label wraps instead; and the value column is 96px
+  with `white-space: nowrap`, proven through `getComputedStyle` on three different lists, with
+  `-CHF 150k` and `-CHF 110k` each a single text node. **One rule serves every consumer: the sign of
+  the displayed figure.** It sets the side the bar grows from, the token, and the sign in the text —
+  so `negative` mode is just "every row is a decline" (it negates the stored magnitude,
+  idempotently, and `formatMoneyCompact` puts the minus *before* the unit) and the badge trend's
+  mixed signs need nothing extra. Rows are keyed by name, so a filter change transitions the *same*
+  bar element (a test holds its identity while the width moves 100% → 50%) while the figure counts
+  on from what is on screen — never a snap to zero. Widths come from pure, exported `hBarMax` /
+  `hBarPercent` that return zero width rather than `NaN`, so an all-zero list still renders labelled
+  zeros with their tracks. US-023 now has nothing to reimplement. 55 new tests.
 ---
 
 ## 🏁 Phase 1b complete — Seed Data
@@ -183,13 +188,15 @@ grounded in verified FCB facts. Closed at 100% on 2026-09-09, as did **Phase 1a*
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-021: Horizontal bar tile | 🔄 Next | Unblocked; US-023 waits on it |
-| US-013 + US-016 (Phase 2a) | ⏸️ Deferred | Await US-021 / US-025 + US-026 |
+| US-013: Baseline dashboard, four tiles (Phase 2a) | 🔄 Next | Unblocked — US-017 + US-021 done |
+| US-016 (Phase 2a) | ⏸️ Deferred | Awaits US-025 + US-026 |
+| US-023: Driver / breakdown tile | ⏳ Ready | Composes US-021's row; no new row to write |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-021: Horizontal bar tile | 2026-09-09 | 3 |
 | US-017: KPI tile & variance chip | 2026-09-09 | 2 |
 | US-027: Motion & animation hooks | 2026-09-09 | 3 |
 | US-015: Reset to baseline | 2026-09-09 | 2 |
@@ -220,9 +227,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 ## 📈 Velocity & Timeline
 
-**Current Velocity:** - points/day
-**Average Velocity:** - points/day
-**Velocity Trend:** N/A (insufficient data)
+**Current / Average Velocity:** - points/day · **Velocity Trend:** N/A (insufficient data)
 
 **Projected Completion:** 2026-09-15 (8h/day) · 2026-09-11 (24/7)
 **Target Completion:** end of this week — sponsor showing follows
@@ -237,32 +242,27 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 100% stmts / 99.5% branches / 100% funcs | 80% | 🟢 Good |
-| Passing Tests | 722/722 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 100% stmts / 99.6% branches / 100% funcs | 80% | 🟢 Good |
+| Passing Tests | 777/777 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
 | Open Bugs | 0 | < 5 | 🟢 Good |
 
-> Coverage is measured over `app/**` only. The surface is still small (154 statements), but the suite
-> is substantive rather than hollow: it pins every hex, the type scale and the colour discipline,
-> fails the build if `app/app.css` and `app/lib/tokens.ts` ever disagree, asserts structurally that
-> no reduced-motion path can leave an element stranded at zero, and — since US-007 — pins the four
-> Specification baseline figures, proves the webshop total is derived from its chart series, and
-> fails if a partner's brand colour is ever "corrected" into a design token. US-008 adds a rounding
-> torture test: the four sponsor badge segments must sum *exactly* to the badge total at every total
-> from 0 to 2,000 and at a set of adversarial primes, and US-009 pins both of Hero 2's deliberately
-> different scope labels so the fixture total and the larger monthly total cannot read as a bug.
-> US-010 goes further and tests the *meaning* of a number: a naive "variance > 0 is good" rule is
-> shown to misread exactly one department, so the Revenue/Cost tag cannot be dropped unnoticed.
-> US-017 adds the component-level version: the two variance directions must stay distinguishable with
-> the colour *removed*, and a named size token must survive beside a colour token.
-> US-011 closes the phase with a cross-dataset reconciliation suite that fails if any figure drifts
-> from any other, sweeps every number in all six hero narratives against the data, and pins the
-> formatter output glyph by glyph — including a stubbed-ICU test proving the output does not move
-> between Node builds. Since
-> US-002 the gate is three-part: strict `tsc`, ESLint 9 flat config, and Prettier — the last two
-> enforced on every commit by husky + lint-staged.
+> Coverage is measured over `app/**` only (531 statements), and the suite is substantive rather than
+> hollow: it pins every hex, the type scale and the colour discipline, fails the build if
+> `app/app.css` and `app/lib/tokens.ts` ever disagree, and asserts structurally that no
+> reduced-motion path can leave an element stranded at zero. The data suites pin the Specification
+> baseline figures, prove every total is *derived* from its series, force the four sponsor badge
+> segments to sum exactly to their total at every total from 0 to 2,000, keep Hero 2's two
+> deliberately different scope labels apart, and show that a naive "variance > 0 is good" rule
+> misreads exactly one department — so the Revenue/Cost tag cannot be dropped unnoticed. US-011
+> closes them with a cross-dataset reconciliation suite that sweeps every number in all six hero
+> narratives against the data and pins formatter output glyph by glyph, ICU stubbed. The component
+> suites test the same way: the two variance directions must stay distinguishable with the colour
+> *removed* (US-017), and US-021's two review decisions are read back off the rendered element —
+> 150px, no truncation class, 96px, `nowrap`. Since US-002 the gate is three-part: strict `tsc`,
+> ESLint 9 flat config and Prettier, the last two enforced on every commit by husky + lint-staged.
 
 ---
 
@@ -273,7 +273,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | 🔄 Partial | 3/5 | 8/16 | 50% |
-| Phase 2b: Component Library | 🔄 In Progress | 2/11 | 5/29 | 17% |
+| Phase 2b: Component Library | 🔄 In Progress | 3/11 | 8/29 | 28% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
@@ -296,4 +296,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-017 completed at 2026-09-09 — Phase 2b at 2/11 · 5/29 pts. The KPI tile is the first consumer of the motion hooks and closed the `tailwind-merge` size-token trap for every component after it; next is US-021
+**Last Auto-Update:** US-021 completed at 2026-09-09 — Phase 2b at 3/11 · 8/29 pts. The shared horizontal bar row now holds the 150px no-truncate label and the 96px `nowrap` value column for all five of its consumers, and US-023 composes it rather than reimplementing it; next is US-013, the deferred Phase 2a baseline, now unblocked
