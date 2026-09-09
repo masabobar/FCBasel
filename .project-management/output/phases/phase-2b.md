@@ -1,7 +1,7 @@
 # Phase 2b: Chart & Tile Component Library
 
 **Duration:** 2026-09-11 to 2026-09-12 (~12.0 AI-hours)
-**Status:** In Progress (8/11 stories · 22/29 points)
+**Status:** In Progress (9/11 stories · 25/29 points)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-12
 **Actual Completion:** —
@@ -29,7 +29,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 
 ### Epic 5: E6 — Chart & Tile Component Library (29 story points)
 
-**Priority:** P0 (US-026 is P1) · **Status:** In Progress (8/11) · **Dependencies:** US-003, US-005
+**Priority:** P0 (US-026 is P1) · **Status:** In Progress (9/11) · **Dependencies:** US-003, US-005
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
@@ -38,7 +38,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 | US-019 | Grouped bar chart tile | 3 | P0 | ✅ Done |
 | US-020 | Donut / ring tile | 3 | P0 | ✅ Done |
 | US-021 | Horizontal bar tile | 3 | P0 | ✅ Done |
-| US-022 | Department table tile | 3 | P0 | 📋 Todo |
+| US-022 | Department table tile | 3 | P0 | ✅ Done |
 | US-023 | Driver / breakdown tile | 2 | P0 | 📋 Todo |
 | US-024 | Recommendation panel & narrative caption strip | 2 | P0 | 📋 Todo |
 | US-025 | Line chart component | 3 | P0 | ✅ Done |
@@ -55,7 +55,10 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
   explicit sign and arrow alongside the token.
 - Three explicit review decisions that must not be reverted: the grouped-bar y-axis gutter with
   headroom (US-019); the 96px `nowrap` value column (US-021, keeps `-CHF 150k` on one line
-  **everywhere** the shared row is used); right-aligned numeric headers incl. "% of target" (US-022).
+  **everywhere** the shared row is used); right-aligned numeric headers incl. "% of target" (US-022,
+  now structural — one `columnAlignClass` rule read by the header *and* its cells). US-022 adds a
+  fourth: the department table is quoted in **CHF millions with a subtitle saying so**, never in
+  "CHF 000".
 - The recommendation panel must be **visually distinct from a data tile** — it is advice, not a
   metric. It carries the peak moment of each follow-up.
 
@@ -84,9 +87,9 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 > find the estimate's SPEED_FACTOR too cautious.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 22 / 29 (76%)
-- **Completed Stories:** 8 / 11
-- **Tests Passing:** 1261 / 1261 · **Coverage:** 99.7% stmts / 97.6% branches · **Commits:** 7
+- **Completed Story Points:** 25 / 29 (86%)
+- **Completed Stories:** 9 / 11
+- **Tests Passing:** 1315 / 1315 · **Coverage:** 99.8% stmts / 98.1% branches · **Commits:** 8
 
 ---
 
@@ -111,7 +114,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 | Filter change snaps values to zero instead of transitioning | High | Medium | Count-up tracks the last displayed value in a ref; bars keyed by category | AI | ✅ Closed — proven for every geometry in the kit: US-021's rows are keyed by name, so a test shows the same bar element surviving a data change and its width moving 100% → 50% while the figure counts from the one on screen. US-025 adds the LINE proof: a re-key replays the stroke draw while a data-only change leaves the line drawn, so nothing flashes. US-018 adds the VERTICAL BAR proof, and it is a re-rank rather than a rerender: the same `<rect>` survives, transitions height *and* position, and each label stays with its own category — switching the key to the index fails two tests. US-019 adds the GROUPED proof (pairs and chip cells keyed by fixture; an index key fails the re-rank test). **✅ Closed by US-020**, the last geometry left: the donut's arcs are keyed by SPONSOR, so a period press morphs the same `<circle>`'s `stroke-dasharray` / `stroke-dashoffset` while the centre counts from the figure on screen — an index key fails the re-rank test |
 | SVG gradient ids collide across simultaneous charts | Medium | Medium | Stable unique-id hook per component instance (US-027) | AI | ✅ Closed — `useUid` (US-027) and now proven on a real component: two KPI sparklines carry different gradient ids (US-017), and US-025's band + Hero 2 charts on one screen carry distinct ids with each area fill pointing at its own |
 | Hand-built SVG takes longer than a library would | Medium | Medium | Port from the reference rather than writing fresh; the components already exist and work | AI | Open |
-| Long labels overflow their tile | Low | Medium | Wrap or truncate-with-tooltip; never overflow | AI | ✅ Closed for the shared bar row (US-021): the 150px label column wraps (`break-words`) and a test rejects `truncate` / `text-ellipsis` / `line-clamp`. US-025's legend wraps and its tooltip flips inside the plot near an edge, so neither clips at 1080p. US-018 keeps its category labels as DOM text under the plot *because* SVG text cannot wrap, and US-019 does the same for `St. Gallen` while moving the y-axis into its own gutter so eight delta chips clear both the scale and each other |
+| Long labels overflow their tile | Low | Medium | Wrap or truncate-with-tooltip; never overflow | AI | ✅ Closed for the shared bar row (US-021): the 150px label column wraps (`break-words`) and a test rejects `truncate` / `text-ellipsis` / `line-clamp`. US-025's legend wraps and its tooltip flips inside the plot near an edge, so neither clips at 1080p. US-018 keeps its category labels as DOM text under the plot *because* SVG text cannot wrap, and US-019 does the same for `St. Gallen` while moving the y-axis into its own gutter so eight delta chips clear both the scale and each other. US-022 closes the TABLE case: `Marketing & Communications` and `Merchandising (Fanshop)` wrap (`break-words`, ellipsis classes rejected) and the table scrolls inside the card rather than widening it |
 | A named type-size token is silently dropped beside a colour token | Medium | **High** | `tailwind-merge` reads `text-caption` as a colour; the type scale is now declared in `app/lib/cn.ts`, derived from the token set | AI | ✅ Closed by US-017 for every component that follows |
 
 ---
@@ -180,83 +183,31 @@ opinion of its own**, so ONE control drives two tiles on the band or three on He
 
 ### 2026-09-09 — US-018 Vertical bar chart tile ✅ (3 pts)
 
-**Delivered:** `app/components/charts/v-bars.tsx` — the only vertical bar chart in the product, built
-for US-034's kit split, three exports, one per seam:
-```tsx
-<VBarTile title="Shirt sales by kit" period={`${p.label} · ${fmt(total)} shirts · ${fmtM(rev)}`}
-  bars={[{ name: "Home", value: 22_400 }, { name: "Away", value: 10_300 },
-         { name: "3rd", value: 5_800 }]} tooltip={kitTip} />   // Card + chart, colours by position
-<VBars bars={kits} format={formatNumber} tooltip={(i) => …} height={206} label="…" />  // no card
-export function vBarGeometry(bars, height?): VBarGeometry | null    // pure, testable with no DOM
-```
-
-**Criterion 3 is the story, and the proof is a RE-RANK, not a rerender.** Columns are keyed by
-category, so a filter press hands `Home` the *same* `<rect>` and the `x` / `y` / `height` CSS
-transition carries it from the geometry on screen — element identity is asserted across a data
-change *and* across a re-ordered dataset, and each label is shown to stay with its own category.
-Switching that key to the array index fails exactly two tests, which is the defect stated as an
-assertion. Nothing snaps to zero: the surviving instance keeps its `useCountUp` state, so the figure
-counts on from what is displayed, and under reduced motion `useGrow` is already `true` — final
-heights and final figures with **zero frames requested**.
-
-**Everything else is the epic's shared rules, not new ones.** Gradient fills with rounded caps, one
-gradient per *distinct* token colour (ids from `useUid`); gridlines behind, counting labels above; a
-hover highlight that is a `filter`, so the series colour is never swapped; and an **optional per-bar
-renderer** taking the index — Hero 1's units + share + revenue box — falling back to category +
-figure so a hover is never silent. US-025's `tooltipAnchor` / `nextHoverIndex` are imported, not
-restated. **Category labels are DOM text under the plot** because SVG text cannot wrap (a test
-rejects `truncate` / `line-clamp`). `niceMax` + `vBarHeight` return a usable scale rather than `NaN`
-for a zero, a negative, a hole or an all-zero list; a zero is a labelled zero; gold is absent.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1142/1142 (52 new) · build ✅ · coverage 100% stmts on
-the new file, 94.9% branches (unreachable `?? "red"` fallbacks); 99.8% / 98.3% overall. Every new
-utility confirmed in the compiled stylesheet, including `transition-property: x,y,height`.
-**Security triage:** no security-relevant changes detected — a presentational chart with no IO and no
-dependency change; the only values reaching `style` are rounded geometry numbers, and the tooltip
-renderer's output is React-escaped. **One seam:** no real-Chrome pass until US-034.
+**Delivered:** `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure), `VBars`, `VBarTile`, for
+US-034's kit split. **Criterion 3 is proven by a RE-RANK, not a rerender:** columns are keyed by
+category, so `Home` keeps the *same* `<rect>` while its `x` / `y` / `height` transition; element
+identity is asserted across a data change *and* a re-ordered dataset, each label stays with its own
+category, and switching that key to the index fails exactly two tests. The surviving instance keeps
+its `useCountUp` state, and reduced motion lands on final heights with **zero frames requested**.
+Gradient fills with rounded caps (one per distinct token colour, ids from `useUid`), gridlines
+behind, labels above, a `filter` hover highlight and an optional per-bar tooltip renderer; category
+labels are DOM text so a long one wraps; `niceMax` / `vBarHeight` never yield `NaN`.
+**Gates:** 1142/1142 (52 new) · clean · 100% stmts on the new file. **Security:** none.
 
 ### 2026-09-09 — US-019 Grouped bar chart tile ✅ (3 pts)
 
-**Delivered:** `app/components/charts/grouped-bars.tsx` — two seasons per fixture for US-036's
-ticket-revenue hero, three exports, one per seam:
-```tsx
-<GroupedBarTile title="Matchday ticket revenue by fixture (CHF 000)"   // Card + chart
-  period="eight highest-grossing home fixtures" groups={fixtures}
-  previousLabel="25/26" currentLabel="26/27" format={money} formatDelta={signedMoney} />
-<GroupedBars groups={fixtures} height={260} label="…" tooltip={(i) => …} />   // no card
-export function groupedBarGeometry(groups, height?): GroupedBarGeometry | null   // pure, no DOM
-```
-
-**THE OVERLAP FIX IS STRUCTURAL, AND BOTH HALVES ARE MEASURED — it cannot be reverted by accident.**
-The reported defect was overlapping numbers: the y-axis figures collided with the delta chips, and at
-eight pairs the chips collided with each other.
-1. **The gutter.** `AXIS_GUTTER` (44 units) belongs to the scale alone; `plotLeft` is its right edge
-   and *every* bar, chip cell, fixture label and legend row is inset to it. Tests assert
-   `axisLabelX < plotLeft` and `chipLeft >= plotLeft` for all eight pairs, and read the rendered
-   strip's own `left` percentage back off the DOM.
-2. **The headroom.** `CHIP_BAND` (34 units) at the top of the plot is reserved for the chips, and the
-   axis maximum is **derived from the geometry** (`plotHeight / barZoneHeight`, fed to US-018's
-   `niceMax`, which only rounds up) so no bar can enter it whatever the data. The test proves
-   `tallestBarTop - plotTop >= CHIP_BAND` across seven datasets × three heights — including
-   `previous: 500, current: 500`, which a fixed 10% headroom fails. Replacing the derived factor with
-   `1.1` fails that test, so the decision is pinned by an assertion, not by a comment.
-
-The chips are one flex strip across that band, one equal-width cell per pair, so **neighbour overlap
-is impossible by layout** as well as by arithmetic (`chipRight[i] <= chipLeft[i+1]`, verified at 8
-and at 14 pairs). Each chip is US-017's `DeltaChip` — arrow, explicit sign, spoken direction — and
-the tooltip's is its `light` variant on the navy box. **There are deliberately no per-bar value
-labels:** sixteen figures above sixteen bars *was* the collision, so the gutter carries the
-magnitudes, the chip the movement and the hover box the exact readings; the one exception is a
-**labelled zero** at the baseline, where a bar with no height would otherwise be an invisible
-reading. Pairs and chip cells are keyed by fixture, so a data change transitions the same rects —
-element identity is asserted across a change *and* a re-rank, and an index key fails exactly that
-test. Reduced motion lands on final heights with **zero frames requested**. `niceMax` / `vBarHeight`
-/ `V_BAR_SERIES` (US-018) and `tooltipAnchor` / `nextHoverIndex` (US-025) are imported, not restated.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1205/1205 (63 new) · build ✅ · coverage **100% on
-the new file** (all four metrics); 99.8% stmts / 98.4% branches overall. **Security triage:** no
-security-relevant changes detected — a presentational chart with no IO, no dependency change, no
-`dangerouslySetInnerHTML` (asserted absent). **One seam:** no real-Chrome pass until US-036.
+**Delivered:** `app/components/charts/grouped-bars.tsx` — `groupedBarGeometry` (pure), `GroupedBars`,
+`GroupedBarTile`, for US-036. **The overlap fix is STRUCTURAL and both halves are measured:**
+`AXIS_GUTTER` (44) belongs to the scale alone and every bar, chip, label and legend row is inset to
+`plotLeft` (`axisLabelX < plotLeft` and `chipLeft >= plotLeft` for all eight pairs), and `CHIP_BAND`
+(34) is reserved headroom whose axis maximum is DERIVED from the geometry, so no bar can enter it
+whatever the data — replacing the derived factor with `1.1` fails that test. The chips are one flex
+strip of equal cells, so neighbour overlap is impossible by layout (verified at 8 and at 14 pairs);
+each is US-017's `DeltaChip`, `light` on the navy tooltip. **No per-bar value labels** — sixteen
+figures above sixteen bars WAS the collision — except a labelled zero at the baseline. Pairs and
+chip cells keyed by fixture (an index key fails the re-rank test); reduced motion lands final with
+zero frames.
+**Gates:** 1205/1205 (63 new) · clean · 100% on the new file. **Security:** none.
 
 ### 2026-09-09 — US-020 Donut / ring tile ✅ (3 pts)
 
@@ -288,13 +239,44 @@ chart with no IO, no dependency change, no raw SQL / `dangerouslySetInnerHTML` /
 the only values reaching `style` are rounded geometry numbers and closed token references.
 **One seam:** no real-Chrome pass — nothing mounts a donut until US-034.
 
+### 2026-09-09 — US-022 Department table tile ✅ (3 pts)
+
+**Delivered:** `app/components/tiles/department-table.tsx` — a real `<table>` (thead / tbody / tfoot,
+`scope="col"` headers, a `scope="row"` department name, `sr-only` caption) with `DepartmentTable`,
+`DepartmentTableTile` and the pure `targetMark` / `targetBarPercent` / `columnAlignClass` helpers. No
+TanStack Table: six rows and a total.
+**THE REVENUE / COST TRAP IS CLOSED BY CONSTRUCTION, not by care.** The colour comes from
+`row.judgement` (US-010's `varianceJudgement`) handed to US-017's `DeltaChip`, so Marketing's **+410
+renders UP and ADVERSE** — an up arrow in the negative token — while Sponsoring's +840 renders UP and
+FAVOURABLE; a test asserts the two chips share a `data-direction` and differ in class. The words
+`FAVOURABLE` and `ADVERSE` do not appear in the component at all, and a source scan rejects them
+along with any `variance <>` comparison or `DepartmentType` equality — the judgement cannot migrate
+back in. The flag is `needsAttention` (exactly one row, and it is Marketing); the department name is
+absent from the source, so giving another row both conditions moves the flag.
+**Both review decisions are asserted:** figures are **CHF millions** via `formatMillions` with the
+unremovable `MILLIONS_NOTE` subtitle ("figures in CHF millions") — a test rejects `/000/` anywhere in
+the rendered tile and pins the currency word to a single occurrence in that note; and the numeric
+headers are right-aligned **including "% of target"** through `columnAlignClass`, one rule read by
+the header AND its cells, with header-to-cell column position compared element by element.
+**Gold band:** Hospitality (95) takes a near-target ring in the deep gold, Merchandising (92) takes
+no mark at all, and 100+ takes a filled gold dot — shape as well as tone, each with an `sr-only`
+word. Row hover is a background-only highlight on the `fast` token; rows keyed by name (a re-order
+moves the row); long names wrap (`break-words`, no ellipsis) and the table scrolls inside the card.
+Totals come from `departmentTotals()` on the rows on screen, so the footer cannot disagree with them,
+and the club variance is deliberately NEUTRAL — a fact, not a verdict.
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1315/1315 (54 new) · build ✅ · coverage 100% on the
+new file; 99.8% stmts / 98.1% branches overall. **Security triage:** no security-relevant changes
+detected — a presentational component with no IO, no dependency change, no raw SQL /
+`dangerouslySetInnerHTML` / user-supplied URL; the only values reaching `style` are a clamped
+percentage and a stagger. **One seam:** no real-Chrome pass until US-038 mounts it.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress — US-027, US-017, US-021, US-025, US-026, US-018, US-019, US-020 done
-(8/11 · 22/29). Phase 2a is CLOSED (5/5) after US-016, which gave US-025/US-026/US-027 their
-Chrome pass.
-**Next: US-022** — department table tile; right-aligned numeric headers including "% of target" is a
-review decision that must not be reverted.
+**Phase Status:** In Progress — US-027, US-017, US-021, US-025, US-026, US-018, US-019, US-020,
+US-022 done (9/11 · 25/29). Phase 2a is CLOSED (5/5) after US-016, which gave US-025/US-026/US-027
+their Chrome pass.
+**Next: US-023** — driver / breakdown tile; it must COMPOSE US-021's `HBarRow`, not write a second
+bar row.
 **Previous:** [Phase 2a](phase-2a.md) · **Next:** [Phase 3a — Conversation](phase-3a.md)

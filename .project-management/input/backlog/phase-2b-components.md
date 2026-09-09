@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (8/11 completed)
+**Status:** In Progress (9/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (8/11 completed)
+**Status:** In Progress (9/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -67,16 +67,12 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Completion note (2026-09-09):** All three criteria met, in
     `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure), `VBars` and `VBarTile`. **Criterion
     3 is proven by a RE-RANK, not a rerender:** columns are keyed by category, so `Home` keeps the
-    *same* `<rect>` and its `x` / `y` / `height` CSS transition — element identity is asserted across
-    a data change and a re-ordered dataset, each label stays with its own category, and switching
-    that key to the array index fails exactly two tests. The surviving instance keeps its
-    `useCountUp` state, so the label counts on from the figure on screen; reduced motion lands on
-    final heights with **zero frames requested**. Gradient fills with rounded caps, one gradient per
-    distinct token colour (ids from `useUid`, distinct with two charts on screen), gridlines behind,
-    labels above, a `filter` hover highlight, and an optional `tooltip(index)` renderer for Hero 1's
-    units + share + revenue (falling back to category + figure). Category labels are DOM text so a
-    long one wraps; `niceMax` / `vBarHeight` never yield `NaN`; a zero is a labelled zero; US-025's
-    `tooltipAnchor` / `nextHoverIndex` reused. 52 tests added (1142/1142, gates clean).
+    *same* `<rect>` and its `x` / `y` / `height` CSS transition — identity is asserted across a data
+    change *and* a re-ordered dataset, each label stays with its own category, and an index key fails
+    exactly two tests; the surviving instance keeps its `useCountUp` state and reduced motion lands
+    on final heights with **zero frames requested**. Gradient fills with rounded caps (one per
+    distinct token colour), gridlines behind, counting labels above, a `filter` hover highlight, an
+    optional `tooltip(index)` renderer, wrapping DOM-text labels. 52 tests (1142/1142, clean).
 
 - **US-019**: Grouped bar chart tile
   - **Story Points:** 3
@@ -93,21 +89,14 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Notes:** The overlap fix is an explicit review decision — do not revert it.
   - **Completion note (2026-09-09):** All three criteria met, in
     `app/components/charts/grouped-bars.tsx` — `groupedBarGeometry` (pure), `GroupedBars` and
-    `GroupedBarTile`. Eight fixtures render sixteen bars (navy previous / red current, gradients from
-    the US-018 series tokens) with one `DeltaChip` above each pair. **CRITERION 2 IS STRUCTURAL AND
-    MEASURED, so it cannot be reverted by accident:** the scale owns a 44-unit left gutter and every
-    bar, chip, label and legend row is inset to `plotLeft` (tests assert `axisLabelX < plotLeft` and
-    `chipLeft >= plotLeft` for all eight, and read the rendered strip's inset back off the DOM); the
-    34-unit chip band above the bars is guaranteed because the axis maximum is **derived from the
-    geometry** (`plotHeight / barZoneHeight` fed to `niceMax`, which only rounds up), proven over
-    seven datasets × three heights — replacing that factor with a fixed 10% fails the test. Chips are
-    one flex strip of equal cells, so neighbour overlap is impossible by layout as well as by
-    arithmetic (verified at 8 and 14 pairs). No per-bar value labels by design (sixteen figures over
-    sixteen bars *was* the defect) — the gutter carries the magnitudes, the chip the movement and the
-    hover box both seasons plus the delta; a zero is still a labelled zero at the baseline. Pairs and
-    chip cells keyed by fixture, so a data change transitions the same rects and an index key fails
-    the re-rank test; mixed-sign deltas render both directions; reduced motion lands on final heights
-    with zero frames requested. 63 tests added (1205/1205, gates clean, 100% coverage on the file).
+    `GroupedBarTile`. Eight fixtures, sixteen bars, one `DeltaChip` per pair. **CRITERION 2 IS
+    STRUCTURAL AND MEASURED:** the scale owns a 44-unit gutter and everything is inset to `plotLeft`
+    (`axisLabelX < plotLeft`, `chipLeft >= plotLeft`, all eight), and the 34-unit chip band holds
+    because the axis maximum is **derived from the geometry** — a fixed 10% headroom fails the test.
+    Chips are one flex strip of equal cells, so neighbour overlap is impossible by layout (8 and 14
+    pairs). No per-bar value labels by design (sixteen figures over sixteen bars *was* the defect)
+    except a labelled zero at the baseline. Pairs and chip cells keyed by fixture (an index key fails
+    the re-rank test); reduced motion lands final. 63 tests (1205/1205, 100% coverage).
 
 - **US-020**: Donut / ring tile
   - **Story Points:** 3
@@ -176,7 +165,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The departmental table for Hero 3.
   - **Acceptance Criteria:**
     - Columns: Department · Type (revenue/cost tag chip) · Budget · Actual · Variance (sign + token)
@@ -187,6 +176,22 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - The Marketing row is visibly flagged; near-target (95-99%) marks use the gold accent
     - Row hover highlight
   - **Dependencies:** US-005, US-027
+  - **Completion note (2026-09-09):** All five criteria met, in
+    `app/components/tiles/department-table.tsx` — a real `<table>` (`scope="col"` headers, a
+    `scope="row"` department name, `sr-only` caption), `DepartmentTable`, `DepartmentTableTile` and
+    the pure `targetMark` / `targetBarPercent` / `columnAlignClass`. **THE REVENUE / COST TRAP IS
+    CLOSED BY CONSTRUCTION:** the colour comes from `row.judgement` (US-010's `varianceJudgement`)
+    through US-017's `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while Sponsoring's
+    +840 renders UP and FAVOURABLE — the two chips share a `data-direction` and differ in class; a
+    source scan rejects the words `FAVOURABLE` / `ADVERSE`, any `variance <>` test and any
+    `DepartmentType` equality, and the flag is `needsAttention` (one row, Marketing, never named in
+    the component). **Both review decisions are asserted:** CHF **millions** with the unremovable
+    "figures in CHF millions" subtitle (a test rejects `/000/` in the rendered tile), and numeric
+    headers right-aligned **including "% of target"** by one `columnAlignClass` rule the header *and*
+    its cells read, compared column by column. Near-target gold: Hospitality (95) rings,
+    Merchandising (92) nothing, 100+ a filled dot — shape plus an `sr-only` word. Background-only row
+    hover; rows keyed by name; long names wrap inside a card-bounded scroll; totals from
+    `departmentTotals()` on the rows on screen, the club variance NEUTRAL. 54 tests (1315/1315).
 
 - **US-023**: Driver / breakdown tile
   - **Story Points:** 2
@@ -235,10 +240,9 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     solid line normalises `pathLength="1"` and transitions its offset 1 → 0, and under the
     preference `useGrow` is `true` in the first render (`stroke-dashoffset="0"`, zero frames
     requested); a dashed line fades instead, its dasharray being its pattern. **It replays by being
-    re-keyed** and by nothing else. Hover maps the pointer over the wrapper to the nearest index and
-    the tooltip lists EVERY series there through US-011; arrow/Home/End/Escape do the same without
-    capturing Tab. Gradient ids from `useUid`, distinct with both charts on screen. A zero or
-    missing point is a labelled zero, never a `NaN` in a `d`. 73 tests (953/953, clean).
+    re-keyed** and by nothing else. Hover maps the pointer to the nearest index and the tooltip lists
+    EVERY series there through US-011; arrow/Home/End/Escape do the same without capturing Tab.
+    Gradient ids from `useUid`; a missing point is a labelled zero. 73 tests (953/953, clean).
 
 - **US-026**: Segmented period filter control
   - **Story Points:** 2
@@ -288,7 +292,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 8 stories, 22 points · 🔄 0 · 📋 3 stories, 7 points · ⏸️ 0
+**By Status:** ✅ 9 stories, 25 points · 🔄 0 · 📋 2 stories, 4 points · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)

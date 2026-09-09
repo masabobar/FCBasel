@@ -6,9 +6,9 @@
 
 ## Summary
 
-**Total Completed:** 24 stories
-**Total Points:** 62 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 62 points/day
+**Total Completed:** 25 stories
+**Total Points:** 65 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 65 points/day
 **Phases Completed:** Phase 1a, Phase 1b, Phase 2a (all 2026-09-09)
 
 ---
@@ -91,7 +91,7 @@ filter). Full detail in [`../phases/phase-2a.md`](../phases/phase-2a.md).
 
 ---
 
-## Phase 2b: Component Library — 8/11 complete (the three most recent in full)
+## Phase 2b: Component Library — 9/11 complete (the three most recent in full)
 
 Condensed to keep this log inside its 300-line limit; the **full per-story detail lives in
 [`../phases/phase-2b.md`](../phases/phase-2b.md)** and in the completion notes in
@@ -104,34 +104,7 @@ Condensed to keep this log inside its 300-line limit; the **full per-story detai
 | US-021 Horizontal bar tile | 3 | 55 | `charts/h-bars.tsx` — the most reused chart in the product: `HBarRow` / `HBars` / `HBarTile`, five consumers, one row. **Both review decisions are read back off the rendered element:** the 150px weight-500 label column with `truncate` / `text-ellipsis` / `line-clamp` *rejected*, and the 96px `nowrap` value column proven via `getComputedStyle` with `-CHF 150k` a single text node. **One rule serves every consumer: the sign of the displayed figure** — anchor side, token and text sign, so `negative` mode is idempotent on a stored magnitude. Rows keyed by name; `hBarMax` / `hBarPercent` return zero, never `NaN`. A decline grows **leftwards** (deliberate deviation). |
 | US-025 Line chart component | 3 | 73 | `charts/line-chart.tsx` — the only line chart, built for both consumers at once: `lineChartGeometry` (pure), `LineChartLegend` (standalone, because the band puts its legend in its own header row), `LineChart`, `LineChartTile`. Variable series count, per-series `area` / `dash`, colour by token **name**. **The stroke draw survives reduced motion:** `pathLength="1"` + an offset transitioning 1 → 0, and a test reads `stroke-dashoffset="0"` with zero frames requested. **It replays by being re-keyed and by nothing else.** Hover lists every series at the nearest index; `hoverIndex` / `nextHoverIndex` / `tooltipAnchor` are the pure helpers every later chart imports. |
 | US-026 Segmented period filter control | 2 | 45 | `controls/segmented.tsx` — one control for all three consumers, **wired into none** (mounting belongs to US-016 / US-034), which unblocked US-016. **11px is a reviewed radius, not a pill:** `rounded-chip` + the new `.fcb-chip`, whose `border-radius: var(--radius-chip)` a test reads back out of `app/app.css`, with `rounded-full` / `9999px` / `--radius-pill` rejected in markup, source *and* stylesheet. **`PeriodKey` reused, never re-declared** (a `@ts-expect-error` fails typecheck if the key loosens to `string`); the label is data on the entry. **Controlled with no opinion of its own**, so one control drives two tiles or three. Radiogroup semantics, one tab stop, wrapping arrows + Home/End. |
-
-### US-018: Vertical bar chart tile (3 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 1 code (new) + 1 test file (new) + 5 tracking docs
-**Tests Added:** 52 (unit: 52) - 1142/1142 green, 100% lines / funcs / stmts on the new file (94.9% branches — both misses unreachable `?? "red"` fallbacks), 99.8% stmts / 98.3% branches of `app/**`
-**Notes:** All 3 acceptance criteria met. Built for US-034's "Shirt sales by kit", which sits under a
-section-level filter driving three tiles — the reason criterion 3 exists.
-
-**What Was Done:**
-- `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure: slots, bar widths, gridlines, the
-  `niceMax` axis top), `VBars` and `VBarTile` (`Card` + chart, card slots passing through) — three
-  exports, matching the shape US-021 and US-025 set
-- **Criterion 3 is proven by a RE-RANK, not a rerender.** Columns are keyed by category name, so a
-  filter press hands `Home` the *same* `<rect>` and the `x` / `y` / `height` CSS transition carries
-  it from the geometry on screen. Identity is asserted across a data change **and** a re-ordered
-  dataset, each label stays with its own category, and **switching that key to the array index fails
-  exactly two tests**. Because the instance survives, so does its `useCountUp` state
-- **Reduced motion is final state:** final heights and figures with **zero frames requested**
-- Gradient fills with rounded caps, **one gradient per distinct token colour** with ids from `useUid`
-  (two charts carry six distinct ids); gridlines behind, counting labels above, a `filter` hover
-  highlight so the series colour is never swapped, and an **optional `tooltip(index)` renderer**
-  (Hero 1's units + share + revenue) falling back to category + figure. Hover is also keyboard, and
-  US-025's `tooltipAnchor` / `nextHoverIndex` are **imported, not restated**
-- **Category labels are DOM text under the plot**, because SVG text cannot wrap. `niceMax` /
-  `vBarHeight` never yield `NaN`; a zero is a labelled zero; gold is absent from the series map
-- **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler,
-  IDOR, raw SQL, `dangerouslySetInnerHTML`, SSRF, upload, dependency change (**none**), env var,
-  logging, CSRF, storage. **One seam:** nothing mounts a vertical bar chart until US-034
+| US-018 Vertical bar chart tile | 3 | 52 | `charts/v-bars.tsx` — `vBarGeometry` (pure), `VBars`, `VBarTile`, for US-034's kit split. **Criterion 3 is proven by a RE-RANK, not a rerender:** columns keyed by category, so `Home` keeps the *same* `<rect>` while `x` / `y` / `height` transition; identity asserted across a data change *and* a re-ordered dataset, and an index key fails exactly two tests. The surviving instance keeps its `useCountUp` state; reduced motion lands on final heights with zero frames. Gradient caps, gridlines, `filter` hover highlight, optional `tooltip(index)`; category labels are DOM text so a long one wraps; `niceMax` / `vBarHeight` never yield `NaN`. |
 
 ### US-019: Grouped bar chart tile (3 pts)
 **Completed:** 2026-09-09
@@ -211,6 +184,52 @@ period filter that changes the total (3'080 / 1'136 / 430 / 334).
   or route, IDOR, raw SQL, `dangerouslySetInnerHTML`, user-supplied URL / SSRF, upload, dependency
   or lockfile change (**none**), env var or secret, logging, CSRF, storage API. **One seam:** no
   real-Chrome pass; nothing mounts a donut until US-034
+
+### US-022: Department table tile (3 pts)
+**Completed:** 2026-09-09
+**Files Changed:** 1 code (new) + 1 test file (new) + 6 tracking docs
+**Tests Added:** 54 (unit: 54) - 1315/1315 green, **100% on the new file** (stmts / branches / funcs / lines), 99.8% stmts / 98.1% branches of `app/**`
+**Notes:** All 5 acceptance criteria met, both recorded review decisions held, and the revenue/cost
+trap closed structurally rather than by care.
+
+**What Was Done:**
+- `app/components/tiles/department-table.tsx` — `DepartmentTable`, `DepartmentTableTile` and the
+  pure `targetMark` / `targetBarPercent` / `columnAlignClass`. **A real `<table>`** (thead / tbody /
+  tfoot, `scope="col"` headers, a `scope="row"` department name, `sr-only` caption), because six
+  departments read across as well as down. No TanStack Table: six rows and a total row
+- **THE REVENUE / COST TRAP IS CLOSED BY CONSTRUCTION.** The colour comes from `row.judgement` —
+  US-010's `varianceJudgement`, decided once from the department's `type` — handed to US-017's
+  `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** (an up arrow in the negative token)
+  while **Sponsoring's +840 renders UP and FAVOURABLE**; a test asserts the two chips share a
+  `data-direction` and differ in class, and a synthetic cost centre *under* budget flips to
+  FAVOURABLE with a down arrow. A source scan rejects the words `FAVOURABLE` / `ADVERSE`, any
+  `variance <>` comparison and any `DepartmentType` equality, so the judgement cannot migrate back
+  into the component
+- **The flag is `needsAttention`, not a hardcode:** exactly one row is flagged and it is Marketing,
+  whose name never appears in the source — giving another department both conditions moves the flag.
+  It is carried three ways (gold tint, an alert glyph, and the sentence "Over budget and behind
+  target" in the a11y tree)
+- **REVIEW DECISION 1 — CHF millions, never "000":** `formatMillions(chfFromThousands(…))` gives
+  21.00 / 21.84 and a 69.00 / 69.68 total, with the unremovable `MILLIONS_NOTE` subtitle "figures in
+  CHF millions". A test rejects `/000/` anywhere in the rendered tile and pins the currency word to a
+  single occurrence — in that note
+- **REVIEW DECISION 2 — numeric headers right-aligned, "% of target" INCLUDED:** `DEPARTMENT_COLUMNS`
+  declares which columns are numeric and `columnAlignClass` is the ONE rule the header `<th>` *and*
+  its body cells read, so the alignment is proven column by column (and by comparing header-to-cell
+  column position element by element), not asserted from a class on one `<th>`. The cell also ends
+  with its FIGURE, so the percentages land on the header's right edge
+- **The gold near-target band:** 95-99 takes a deep-gold ring, 100+ a filled gold dot, below 95
+  nothing — so **Hospitality (95) is marked and Merchandising (92) is not**, and the two marks differ
+  in shape as well as tone, each with an `sr-only` word. Gold appears nowhere else in the file
+- Background-only row hover on the `fast` token; rows keyed by department NAME (a reversed dataset
+  moves the same element); long names wrap (`break-words`, ellipsis classes rejected) inside a
+  card-bounded `overflow-x-auto`; totals come from `departmentTotals()` on the rows on screen, so the
+  footer cannot disagree with them, and the club variance is deliberately NEUTRAL — a fact, not a
+  verdict. Reduced motion renders every target bar at its final width with **zero frames requested**
+- **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler
+  or route, IDOR, raw SQL, `dangerouslySetInnerHTML`, user-supplied URL / SSRF, upload, dependency
+  or lockfile change (**none**), env var or secret, logging, CSRF, storage API. **One seam:** no
+  real-Chrome pass; nothing mounts the table until US-038
 
 ---
 
