@@ -5,7 +5,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 **Duration:** Day 1-2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 10
-**Status:** Not Started (0/5 completed)
+**Status:** In Progress (1/5 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 
 **Priority:** P0
 **Total Story Points:** 10
-**Status:** Not Started (0/5 completed)
+**Status:** In Progress (1/5 completed)
 **Source:** Build Specification E3.
 
 > **Applies to every story in this epic:**
@@ -39,7 +39,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The four pre-existing tiles that make the dashboard read as a tool already in use.
   - **Acceptance Criteria:**
     - Webshop revenue this month CHF 148,200, +12% vs last month, 6-point sparkline trending up
@@ -48,6 +48,14 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
       Cap "Rotblau" 720; 3rd shirt 26/27 510
     - Active partners: 6 — Bitpanda, Macron, Allianz, Sunrise, Feldschlösschen, Hoffmann Automobile
   - **Dependencies:** US-001
+  - **Notes:** **Delivered set intentionally exceeds the written AC**, per the user's approved
+    decision. The criteria above describe a single period; the Reference Guide (definitive for the
+    experience, `scope.md` §10) drives all four periods, so the shipped dataset carries This month /
+    Last month / Last 3 months / Year to date for both the webshop series and top products, plus the
+    attendance block per period. The two longer periods derive their x-axis labels from the current
+    date. The webshop total and its delta are computed from the series, never stored. Partner brand
+    colours sit deliberately outside the FCB token palette. Partner names follow the Guide, which
+    shortens "Hoffmann Automobile" to "Hoffmann" so the tile does not truncate.
 
 - **US-008**: Hero 1 dataset — shirt sales, badges, printed names
   - **Story Points:** 2
@@ -137,7 +145,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
 
 **By Priority:** P0: 5 stories, 10 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 0 · 🔄 0 · 📋 5 stories, 10 points · ⏸️ 0
+**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 4 stories, 8 points · ⏸️ 0
 
 ---
 

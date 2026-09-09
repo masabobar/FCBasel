@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 6 stories
-**Total Points:** 14 / 116
+**Total Completed:** 7 stories
+**Total Points:** 16 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 14 points/day
+**Average Velocity:** 16 points/day
 **Phases Completed:** Phase 1a (2026-09-09)
 
 ---
@@ -173,6 +173,39 @@ resolved conflict holds: fade-and-rise only, no gold ring on an inserted tile.
   be restored to its final state by the reduced-motion block, which must not sit inside a cascade layer
 - All five gates clean; 181/181 tests; coverage 100% statements / 97.6% branches of `app/**`;
   compiled CSS verified to ship all four keyframes and every final-state rule
+
+### US-007: Persona baseline datasets (2 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 14 (9 code, 5 tracking docs)
+**Tests Added:** 47 (unit: 47)
+**Commit:** see phase-1b progress log
+**Notes:** All 4 acceptance criteria met, and the delivered set **intentionally exceeds them** per
+the user's approved decision: the criteria describe one period, the Reference Guide (definitive for
+the experience, `scope.md` §10) drives all four.
+
+**What Was Done:**
+- Established the data seam the rest of E3 follows and wrote it down in
+  `app/lib/repositories/README.md` as a four-step recipe: enum keys in `enums.ts`, domain types and
+  the repository interface in `types.ts`, derived figures in `derive.ts`, fixtures and the in-memory
+  implementation in `app/lib/mock/<dataset>.ts`, selection in `index.server.ts`
+- Domain types, not storage shapes: the Guide's parallel name/value arrays become rows; every
+  repository method returns a `Promise`; money is a plain number, never a formatted string
+- Four periods of webshop revenue with their comparison series, the attendance block per period, the
+  four-period top-products table and the six partners
+- **Totals and deltas are computed, never stored** — `seriesTotals` sums the same arrays the chart
+  plots, so the headline figure cannot disagree with its own chart
+- "Last 3 months" and "Year to date" derive x-axis labels from the current date through an
+  injectable `Clock`, so the demo never shows stale months and tests never read the wall clock
+- Store-once-reference-everywhere proved by test: last month's revenue series *is* this month's
+  comparison series, and the monthly points for the last three months are the weekly sums
+- Partner brand colours documented and tested as brand colours, not design tokens — Bitpanda teal
+  and Sunrise red sit outside the FCB palette deliberately, and the type is a plain string so they
+  cannot be mistaken for a `ColorToken`
+- The four Specification-pinned figures asserted exactly: CHF 148,200 at +11.9% (+12% rounded),
+  FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners
+- 47 tests added (228/228 green), coverage 100% statements / 98% branches of `app/**`; lint, format,
+  typecheck and build all clean
 
 ---
 

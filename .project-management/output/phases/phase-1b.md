@@ -1,8 +1,8 @@
 # Phase 1b: Dummy Data Model & Seed Datasets
 
 **Duration:** 2026-09-09 to 2026-09-10 (~4.5 AI-hours)
-**Status:** Planning
-**Started:** —
+**Status:** In Progress
+**Started:** 2026-09-09
 **Target Completion:** 2026-09-10
 **Actual Completion:** —
 
@@ -28,11 +28,11 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets (10 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** Todo · **Dependencies:** US-001
+**Priority:** P0 · **Status:** In Progress (1/5) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
-| US-007 | Persona baseline datasets (4 tiles) | 2 | 📋 Todo |
+| US-007 | Persona baseline datasets (4 tiles) | 2 | ✅ Completed |
 | US-008 | Hero 1 dataset — shirt sales, badges, printed names | 2 | 📋 Todo |
 | US-009 | Hero 2 dataset — ticket revenue year on year | 2 | 📋 Todo |
 | US-010 | Hero 3 dataset — departmental performance | 2 | 📋 Todo |
@@ -77,9 +77,9 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 - **Risk Level:** Low (mechanical work — every figure is pinned in the specification)
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 0 / 10 (0%)
-- **Completed Stories:** 0 / 5
-- **Tests Passing:** 0 / 0 · **Coverage:** 0% · **Commits:** 0
+- **Completed Story Points:** 2 / 10 (20%)
+- **Completed Stories:** 1 / 5
+- **Tests Passing:** 228 / 228 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 1
 
 ---
 
@@ -110,11 +110,36 @@ tokens are independent, so 1a and 1b could run in parallel if capacity allowed.
 
 ## Progress Log
 
-_Entries appear here as `/execute-work` completes stories._
+### 2026-09-09 — US-007: Persona baseline datasets (2 pts) ✅
+
+Established the data pattern the rest of E3 follows. Enum keys in
+`app/lib/repositories/enums.ts`, domain types plus the repository interface in `types.ts`, derived
+figures in `derive.ts`, fixtures and the in-memory implementation in `app/lib/mock/baseline.ts`,
+selection in `index.server.ts`. Recorded in `app/lib/repositories/README.md` as a four-step recipe so
+US-008 / US-009 / US-010 are mechanical.
+
+**Scope:** the delivered set intentionally exceeds the written acceptance criteria, per the user's
+approved decision — all four periods of the webshop series, attendance block and top-products table,
+not the single period the criteria describe. The Reference Guide is definitive for the experience
+(`scope.md` §10).
+
+- The four Specification-pinned figures hold and are asserted: CHF 148,200 this month at +11.9%
+  (+12% rounded), FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners.
+- **Totals and deltas are computed, never stored** (`seriesTotals`), so the headline number cannot
+  disagree with the chart under it.
+- "Last 3 months" and "Year to date" derive their x-axis labels from the current date through an
+  injectable `Clock`, so the demo never looks stale and tests never touch the wall clock.
+- A figure used twice is written once: last month's revenue series *is* this month's comparison
+  series, and the monthly points for the last three months are the sums of the weekly series.
+- Partner brand colours are brand colours, not design tokens — Bitpanda teal and Sunrise red sit
+  outside the FCB palette on purpose, and a test fails if a later change "fixes" them.
+- 47 tests added (228/228 green), coverage 100% statements over `app/**`; lint, format, typecheck
+  and build all clean. Security triage: no security-relevant changes (static local data, no
+  endpoint, no dependency, no environment variable, no user input).
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** Planning
+**Phase Status:** In Progress
 **Previous:** [Phase 1a](phase-1a.md) · **Next:** [Phase 2a — Shell](phase-2a.md)

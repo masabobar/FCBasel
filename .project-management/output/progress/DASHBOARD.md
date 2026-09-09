@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 1b - Seed Data *(Phase 1a complete)*
+**Current Phase:** Phase 1b - Seed Data *(1/5 stories complete)*
 
 ---
 
@@ -9,10 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 12% | 100% | 🟢 On Track |
+| **Overall Progress** | 14% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 6/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 14/116 | 116 | 🟢 On Track |
+| **Phase 1b** | 20% — In Progress | 100% | 🟢 On Track |
+| **Stories Completed** | 7/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 16/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -21,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 6
-**Currently Working On:** None — Phase 1a complete
-**Story Points Completed Today:** 14
+**Stories Completed Today:** 7
+**Currently Working On:** US-008 — Hero 1 dataset (2 pts)
+**Story Points Completed Today:** 16
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -44,25 +45,34 @@
   existing `isNew`/`delayMs` hooks. Fade-and-rise only, no gold ring. Reduced motion *collapses*
   animations to a ~1ms final frame rather than removing them, so nothing is stranded at zero.
 
+- ✅ **US-007 — Persona baseline datasets (2 pts)** — the first data story, and the pattern the rest of
+  E3 follows: enums, domain types and the repository interface in `app/lib/repositories/`, fixtures
+  and the in-memory implementation in `app/lib/mock/`, server-only selection in `index.server.ts`.
+  Delivered set intentionally exceeds the written AC (all four periods, per the user's approved
+  decision). Totals and deltas are computed from the series, never stored; the two long periods take
+  their x-axis labels from the current date through an injectable clock; partner brand colours stay
+  outside the token palette on purpose.
+
 ---
 
-## 🏁 Phase 1a complete — next: Phase 1b, Seed Data
+## 🏁 Phase 1b in progress — Seed Data
 
-**Phase 1a goal (met):** stand up the project and build the design token foundation (E2) that every
-later epic references.
-**Duration:** 2026-09-09 to 2026-09-09 (~5.8 AI-hours)
-**Progress:** 100% (6/6 stories · 14/14 points)
+**Phase 1b goal:** the single source of truth for every figure in the prototype, seeded locally and
+grounded in verified FCB facts. **Phase 1a** (setup and design system) closed at 100% on 2026-09-09.
+**Duration:** 2026-09-09 to 2026-09-10
+**Progress:** 20% (1/5 stories · 2/10 points)
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| — none; Phase 1b (Seed Data) is next | ⏸️ Not started | 0% |
+| US-008: Hero 1 dataset — shirt sales, badges, printed names | 📋 Next | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-007: Persona baseline datasets | 2026-09-09 | 2 |
 | US-006: Tile-insertion motion & reduced-motion support | 2026-09-09 | 3 |
 | US-005: Tile card anatomy | 2026-09-09 | 2 |
 | US-004: Self-hosted FCB crest | 2026-09-09 | 1 |
@@ -100,17 +110,19 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 100% stmts / 97.6% branches | 80% | 🟢 Good |
-| Passing Tests | 181/181 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 100% stmts / 98% branches | 80% | 🟢 Good |
+| Passing Tests | 228/228 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
 | Open Bugs | 0 | < 5 | 🟢 Good |
 
-> Coverage is measured over `app/**` only. The surface is still small (46 statements), but the suite
+> Coverage is measured over `app/**` only. The surface is still small (105 statements), but the suite
 > is substantive rather than hollow: it pins every hex, the type scale and the colour discipline,
-> fails the build if `app/app.css` and `app/lib/tokens.ts` ever disagree, and — since US-006 —
-> asserts structurally that no reduced-motion path can leave an element stranded at zero. Since
+> fails the build if `app/app.css` and `app/lib/tokens.ts` ever disagree, asserts structurally that
+> no reduced-motion path can leave an element stranded at zero, and — since US-007 — pins the four
+> Specification baseline figures, proves the webshop total is derived from its chart series, and
+> fails if a partner's brand colour is ever "corrected" into a design token. Since
 > US-002 the gate is three-part: strict `tsc`, ESLint 9 flat config, and Prettier — the last two
 > enforced on every commit by husky + lint-staged.
 
@@ -121,7 +133,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Phase | Status | Stories | Points | Progress |
 |-------|--------|---------|--------|----------|
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
-| Phase 1b: Seed Data | 🔄 Active | 0/5 | 0/10 | 0% |
+| Phase 1b: Seed Data | 🔄 Active | 1/5 | 2/10 | 20% |
 | Phase 2a: Shell & Baseline | ⏸️ Pending | 0/5 | 0/16 | 0% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
@@ -144,4 +156,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-006 completed at 2026-09-09 — Phase 1a closed
+**Last Auto-Update:** US-007 completed at 2026-09-09 — Phase 1b under way

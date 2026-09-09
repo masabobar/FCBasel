@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 6 — **Phase 1a complete**
-**Story Points:** 14
-**Time Worked:** ~4.2 hours
-**Files Changed:** 58
-**Tests Added:** 181
+**Stories Completed:** 7 — **Phase 1a complete, Phase 1b under way**
+**Story Points:** 16
+**Time Worked:** ~4.7 hours
+**Files Changed:** 67
+**Tests Added:** 228
 
 ---
 
@@ -85,6 +85,23 @@
   37 tests added (181/181 green), coverage 100% statements / 97.6% branches of `app/**`, and lint /
   format / typecheck / build all clean.
 
+- **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 / US-009 /
+  US-010 follow: enum keys in `app/lib/repositories/enums.ts`, domain types and the repository
+  interface in `types.ts`, derived figures in `derive.ts`, fixtures plus the in-memory implementation
+  in `app/lib/mock/baseline.ts`, and one line of selection in `index.server.ts` — recorded in the
+  repositories README as a four-step recipe. Per the user's approved decision the delivered set
+  exceeds the written criteria: all four periods of the webshop series, attendance block and
+  top-products table, not the single period the criteria describe. The headline webshop figure and
+  its delta are **computed from the series** rather than stored, so the number cannot disagree with
+  the chart under it; "Last 3 months" and "Year to date" take their x-axis labels from the current
+  date through an injectable clock, so the demo never looks stale and no test depends on the wall
+  clock. A figure used twice is written once — last month's revenue series *is* this month's
+  comparison series, and the monthly points for the last three months are the weekly sums, both
+  asserted. Partner brand colours are brand colours: Bitpanda teal and Sunrise red sit outside the
+  FCB palette on purpose, typed as plain strings and guarded by a test so a later change cannot
+  "fix" them into tokens. 47 tests added (228/228 green), coverage 100% statements / 98% branches of
+  `app/**`, and lint / format / typecheck / build all clean.
+
 ---
 
 ## Stories Completed Today
@@ -103,6 +120,8 @@
 - ✅ US-006 — Tile-insertion motion & reduced-motion support (3 pts) — all 5 acceptance criteria met;
   fade-and-rise only, and reduced motion renders final state rather than switching animation off.
   **Phase 1a closes here: 6/6 stories, 14/14 points.**
+- ✅ US-007 — Persona baseline datasets (2 pts) — all 4 acceptance criteria met and deliberately
+  exceeded (all four periods, per the user's approved scope decision). Phase 1b: 1/5 stories.
 
 ---
 
@@ -123,8 +142,9 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 1b — seed data (10 pts), the swap point for real data later. Phase 1a's foundation is done:
-  tokens, crest, card shell and motion primitives are all in place for it to build on
+- Phase 1b — seed data (8 pts remaining). US-008 (Hero 1: shirt sales, badges, printed names) is
+  next and is mechanical: the repository pattern, enum source of truth and injectable clock from
+  US-007 are already in place
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -139,7 +159,7 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phase 1a is complete; continue with `/holycode-pm:execute-work phase 1b`.
+- Phase 1a is complete and Phase 1b is 1/5; continue with `/holycode-pm:execute-work story US-008`.
 
 ---
 
