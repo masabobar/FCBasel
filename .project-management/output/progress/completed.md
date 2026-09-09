@@ -6,9 +6,9 @@
 
 ## Summary
 
-**Total Completed:** 23 stories
-**Total Points:** 59 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 59 points/day
+**Total Completed:** 24 stories
+**Total Points:** 62 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 62 points/day
 **Phases Completed:** Phase 1a, Phase 1b, Phase 2a (all 2026-09-09)
 
 ---
@@ -91,133 +91,19 @@ filter). Full detail in [`../phases/phase-2a.md`](../phases/phase-2a.md).
 
 ---
 
-## Phase 2b: Component Library — stories in full (7/11)
+## Phase 2b: Component Library — 8/11 complete (the three most recent in full)
 
-### US-027: Motion & animation hooks (3 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 4 code (1 new, 3 modified) + 3 test files + 5 tracking docs · **Tests Added:** 52 - 644/644 green, 100% stmts / 99.4% branches of `app/**`
-**Notes:** All 4 acceptance criteria met. **Built first in Phase 2b on purpose** — the other ten E6
-components consume these hooks, so the API was designed for them and documented in the module header.
+Condensed to keep this log inside its 300-line limit; the **full per-story detail lives in
+[`../phases/phase-2b.md`](../phases/phase-2b.md)** and in the completion notes in
+[`../../input/backlog/phase-2b-components.md`](../../input/backlog/phase-2b-components.md).
 
-**What Was Done:**
-- `app/lib/hooks/use-motion.ts`: `useReducedMotion()`, `useGrow()`, `useCountUp(target, ms?)`,
-  `useUid(prefix?)`
-- **Count-up counts from the CURRENT DISPLAYED VALUE** — mirrored in a ref and read (never depended
-  on) when the target changes, so a filter switched mid-animation carries on from the old number and
-  lands **exactly** on target, upwards and downwards
-- **Reduced motion = final state in the same render**, so `width={grown ? w : 0}` geometry is never
-  stranded at zero — under the preference `useGrow` is `true` on render one with **zero** frames
-- **One reduced-motion source** (US-006's query via `useSyncExternalStore`, reacting to a *change*);
-  a source scan fails if a component ever calls `matchMedia` itself, and every rAF, timer and
-  listener is cancelled on unmount. ~900ms is the `duration.countUp` token; **SSR proven** by
-  `renderToString` plus a real `hydrateRoot` pass
-
-### US-017: KPI tile & variance chip (2 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 3 code (2 new, 1 modified) + 4 test files (3 new, 1 modified) + 5 tracking docs
-**Tests Added:** 78 (unit: 78) - 722/722 green, 100% stmts / 99.5% branches / 100% funcs of `app/**` · **Commit:** see phase-2b progress log
-**Notes:** All 3 acceptance criteria met. **No real-Chrome pass** — nothing in the app mounts these
-components yet; the browser verification belongs to US-013, the first screen that does.
-
-**What Was Done:**
-- `app/components/tiles/delta-chip.tsx` — `DeltaChip`, its own module because US-019, US-022 and
-  US-016 all want the chip without a tile around it. `app/components/tiles/kpi-tile.tsx` —
-  `KpiSparkline`, `KpiFigure` (the number block, no card) and `KpiTile` (`Card` + figure)
-- **Colour is never the sole signal, and the `light` variant proves it:** on navy a test asserts the
-  up and down chips' class strings are **identical** while glyph, explicit sign and an `sr-only`
-  direction word still differ; `text-red` on the chip is rejected by test
-- **Direction is arithmetic; judgement is meaning** — an optional `judgement` prop (US-010's
-  `varianceJudgement`) gives Marketing's overspend an **up arrow in the negative token**; a zero is a
-  **labelled zero**. No variant per hero: extras arrive as `children`, and `KpiFigure onDark` serves
-  the navy band. Motion is US-027's only (a source scan bans local timers and frames)
-- **Closed the US-012 `tailwind-merge` trap at the root:** `app/lib/cn.ts` declares the named type
-  scale as the `font-size` group, **derived** from `tokens.fontSize`, so it cannot drift
-- Extracted `tests/unit/support/motion-harness.ts` — one harness for the nine stories that follow
-
-### US-021: Horizontal bar tile (3 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 1 code (new) + 1 test file (new) + 5 tracking docs
-**Tests Added:** 55 (unit: 55) - 777/777 green, 100% stmts / 99.6% branches / 100% funcs of `app/**` · **Commit:** see phase-2b progress log
-**Notes:** All 4 acceptance criteria met. The most reused chart in the product — five consumers, one
-row. **No real-Chrome pass** for the same reason as US-017: nothing mounted it yet. *(US-013 has
-since given both stories their browser pass — see below.)*
-
-**What Was Done:**
-- `app/components/charts/h-bars.tsx` (the `components/charts/` slot the technical spec reserved) —
-  `HBarRow` (the unit of reuse), `HBars` (the ranked list) and `HBarTile` (`Card` + rows). US-023 is
-  required to compose these; there is nothing left in it to reimplement
-- **Both review decisions are read back off the rendered element, not merely written:** the 150px
-  weight-500 label column with `truncate` / `text-ellipsis` / `line-clamp` *rejected* by test (so
-  `Cap "Rotblau"` cannot regain its reported ellipsis), and the 96px `nowrap` value column asserted
-  through `getComputedStyle` on three lists with `-CHF 150k` a single text node
-- **One rule serves all five consumers: the sign of the DISPLAYED figure** — it sets the anchor side,
-  the token and the text sign, so `negative` mode is only "every row is a decline" (idempotent on a
-  stored magnitude) and mixed signs need nothing extra. Direction is published as `data-direction`
-- **Nothing snaps to zero:** rows keyed by name, so a data change transitions the *same* bar (100% →
-  50%) while `useCountUp` carries on from the figure on screen; `hBarMax` / `hBarPercent` return zero
-  width rather than `NaN`, so an all-zero list still renders **labelled zeros** with their tracks
-- **One deliberate deviation from the reference, flagged for review:** a decline grows *leftwards*
-  here (the reference drew every bar rightwards), so direction survives a washed-out projector
-
-### US-025: Line chart component (3 pts)
-**Completed:** 2026-09-09 · **Phase:** 2b · **Tests:** 73 new (953/953 green)
-
-**Delivered:** `app/components/charts/line-chart.tsx` — the only line chart in the product, built for
-both consumers at once. Four exports: `lineChartGeometry` (pure paths and coordinates),
-`LineChartLegend` (standalone, because the hero band puts its legend in its own header row rather
-than under the chart), `LineChart`, `LineChartTile`.
-
-- **All five acceptance criteria met.** Variable series count with per-series `area` / `dash`; a
-  legend listing every series, dashed swatch for a dashed line; a hover guide plus a tooltip showing
-  **every** series' value at the hovered index; a stroke-draw entrance that replays on a re-key; a
-  `dark` variant for the navy band; `viewBox` + `width="100%"`
-- **The stroke draw survives reduced motion, and that is the load-bearing test.** A solid line
-  normalises its own length (`pathLength="1"`) so the offset transitions 1 → 0 with no measurement
-  and no per-frame JavaScript; under the preference a test reads `stroke-dashoffset="0"` with **zero
-  frames requested**, and again after a re-key — never stranded awaiting a transition that will not
-  run. A dashed line fades instead, at full opacity in that same first render
-- **It replays by being re-keyed and by nothing else** — no `replay` prop, no effect watching the
-  data: a re-key returns the offset to 1 and clears the guide, a data-only change leaves it drawn
-- **Hover is the wrapper's, not the svg's** (the `viewBox` stretches the svg's units): the pure
-  `hoverIndex` maps the pointer to the nearest index and the tooltip lists every series there through
-  US-011. Keyboard came cheap — arrow/Home/End/Escape through the pure `nextHoverIndex`, which
-  returns `null` for every other key, so Tab is not captured (tested)
-- **No hex, and no colour parked where a CSS parser may drop it:** series colours are token names
-  resolved to `var(--color-…)`, taken as presentation attributes and as a `--line-series` custom
-  property on the swatches. Gradient ids come from `useUid`, proven distinct with both charts up
-- **A zero or missing point is a labelled zero** (`valueAt` reads a hole as `0`, so no `NaN` enters
-  a `d`). Legible at 1080p: 12px axis labels, a legend that wraps, a tooltip that flips at an edge
-- **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler,
-  IDOR, raw SQL, `dangerouslySetInnerHTML` (a test rejects it), SSRF, upload, dependency change
-  (**none**), env var, logging, CSRF, storage. **No real-Chrome pass** here
-
-### US-026: Segmented period filter control (2 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 2 code (1 new, 1 modified) + 1 test file + 5 tracking docs
-**Tests Added:** 45 (unit: 45) - 998/998 green, 100% lines / 100% funcs on the new file, 99.7% stmts / 98.5% branches of `app/**` · **Commit:** see phase-2b progress log
-**Notes:** All 3 acceptance criteria met. **Designed for all three consumers, wired into none** —
-mounting it belongs to US-016 and US-034, so US-013's `action` slot stays deliberately empty until
-then. This story **unblocks US-016**, the last deferred Phase 2a story.
-
-**What Was Done:**
-- `app/components/controls/segmented.tsx` — `Segmented`, the pure `nextOptionIndex`, the closed
-  `SEGMENTED_VARIANT_CLASS` table, and `CHIP_SURFACE_CLASS` for US-029's suggestion chips to reuse
-- **11px is a reviewed decision and it is asserted three ways.** `--radius-chip: 11px` already
-  existed, so nothing was redeclared: the group wears `rounded-chip`, each option the new `.fcb-chip`
-  rule, and a test reads the radius back out of the stylesheet while rejecting `rounded-full` /
-  `9999px` / `--radius-pill` in the markup, the source *and* the CSS. The lift is shared with
-  US-029; the tint stays per surface — the only half that has to differ
-- **`PeriodKey` reused, never re-declared:** `SegmentedOption` is structurally the head of the three
-  period types, a `@ts-expect-error` line fails typecheck the moment the key loosens to `string`, and
-  **the label is data on the entry** — what lets Hero 1 say "Current month" for `THIS_MONTH`
-- **Controlled, with no opinion of its own** — a press the caller ignores changes nothing on screen
-  (tested), which lets ONE control drive two tiles on the band or three on Hero 1
-- **Radiogroup semantics, done properly:** ONE tab stop via roving `tabIndex`, wrapping arrows plus
-  Home/End through the pure `nextOptionIndex` (which returns `null` for every other key, so Tab,
-  Enter and Space keep their meaning), and **selection carried four ways, never colour alone**
-- **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler,
-  IDOR, raw SQL, `innerHTML`, SSRF, upload, dependency change (**none**), env var, logging, CSRF,
-  storage. **Scope held:** nothing mounts the control until US-016
+| Story | Pts | Tests | What it left behind |
+|---|---:|---:|---|
+| US-027 Motion & animation hooks | 3 | 52 | `app/lib/hooks/use-motion.ts` — `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`. **Built first on purpose:** the other ten E6 components consume them. **Count-up counts from the CURRENT DISPLAYED VALUE** (ref-mirrored, read not depended on), so a filter switched mid-animation carries on from the old number and lands exactly on target. **Reduced motion = final state in the same render**, so `width={grown ? w : 0}` geometry is never stranded at zero (zero frames requested). One reduced-motion source via `useSyncExternalStore`; a scan fails any component calling `matchMedia`; SSR proven by `renderToString` + `hydrateRoot`. |
+| US-017 KPI tile & variance chip | 2 | 78 | `tiles/delta-chip.tsx` (its own module — US-019/US-022/US-016 want the chip alone) + `tiles/kpi-tile.tsx` (`KpiSparkline`, `KpiFigure`, `KpiTile`). **Colour is never the sole signal, and the `light` variant proves it:** on navy a test asserts the up and down chips' class strings are *identical* while glyph, sign and an `sr-only` word still differ. **Direction is arithmetic, judgement is meaning** — an optional `judgement` prop gives Marketing's overspend an up arrow in the negative token; a zero is a labelled zero. Closed the US-012 `tailwind-merge` trap in `app/lib/cn.ts`. |
+| US-021 Horizontal bar tile | 3 | 55 | `charts/h-bars.tsx` — the most reused chart in the product: `HBarRow` / `HBars` / `HBarTile`, five consumers, one row. **Both review decisions are read back off the rendered element:** the 150px weight-500 label column with `truncate` / `text-ellipsis` / `line-clamp` *rejected*, and the 96px `nowrap` value column proven via `getComputedStyle` with `-CHF 150k` a single text node. **One rule serves every consumer: the sign of the displayed figure** — anchor side, token and text sign, so `negative` mode is idempotent on a stored magnitude. Rows keyed by name; `hBarMax` / `hBarPercent` return zero, never `NaN`. A decline grows **leftwards** (deliberate deviation). |
+| US-025 Line chart component | 3 | 73 | `charts/line-chart.tsx` — the only line chart, built for both consumers at once: `lineChartGeometry` (pure), `LineChartLegend` (standalone, because the band puts its legend in its own header row), `LineChart`, `LineChartTile`. Variable series count, per-series `area` / `dash`, colour by token **name**. **The stroke draw survives reduced motion:** `pathLength="1"` + an offset transitioning 1 → 0, and a test reads `stroke-dashoffset="0"` with zero frames requested. **It replays by being re-keyed and by nothing else.** Hover lists every series at the nearest index; `hoverIndex` / `nextHoverIndex` / `tooltipAnchor` are the pure helpers every later chart imports. |
+| US-026 Segmented period filter control | 2 | 45 | `controls/segmented.tsx` — one control for all three consumers, **wired into none** (mounting belongs to US-016 / US-034), which unblocked US-016. **11px is a reviewed radius, not a pill:** `rounded-chip` + the new `.fcb-chip`, whose `border-radius: var(--radius-chip)` a test reads back out of `app/app.css`, with `rounded-full` / `9999px` / `--radius-pill` rejected in markup, source *and* stylesheet. **`PeriodKey` reused, never re-declared** (a `@ts-expect-error` fails typecheck if the key loosens to `string`); the label is data on the entry. **Controlled with no opinion of its own**, so one control drives two tiles or three. Radiogroup semantics, one tab stop, wrapping arrows + Home/End. |
 
 ### US-018: Vertical bar chart tile (3 pts)
 **Completed:** 2026-09-09
@@ -232,21 +118,17 @@ section-level filter driving three tiles — the reason criterion 3 exists.
   exports, matching the shape US-021 and US-025 set
 - **Criterion 3 is proven by a RE-RANK, not a rerender.** Columns are keyed by category name, so a
   filter press hands `Home` the *same* `<rect>` and the `x` / `y` / `height` CSS transition carries
-  it from the geometry on screen. Element identity is asserted across a data change **and** across a
-  re-ordered dataset, each label is shown to stay with its own category, and **switching that key to
-  the array index fails exactly two tests** — the defect stated as an assertion rather than prose.
-  Because the instance survives, so does its `useCountUp` state: the figure counts on from what is
-  displayed, never back from zero
-- **Reduced motion is final state:** `useGrow` is `true` in the first render, so a test reads the
-  final heights and figures with **zero frames requested** — no bar left at zero height
+  it from the geometry on screen. Identity is asserted across a data change **and** a re-ordered
+  dataset, each label stays with its own category, and **switching that key to the array index fails
+  exactly two tests**. Because the instance survives, so does its `useCountUp` state
+- **Reduced motion is final state:** final heights and figures with **zero frames requested**
 - Gradient fills with rounded caps, **one gradient per distinct token colour** with ids from `useUid`
   (two charts carry six distinct ids); gridlines behind, counting labels above, a `filter` hover
   highlight so the series colour is never swapped, and an **optional `tooltip(index)` renderer**
   (Hero 1's units + share + revenue) falling back to category + figure. Hover is also keyboard, and
   US-025's `tooltipAnchor` / `nextHoverIndex` are **imported, not restated**
-- **Category labels are DOM text under the plot**, because SVG text cannot wrap — a test rejects
-  `truncate` / `line-clamp`. `niceMax` / `vBarHeight` never yield `NaN`; a zero is a labelled zero;
-  gold is absent from the series map by design; no hex or currency string appears in the file
+- **Category labels are DOM text under the plot**, because SVG text cannot wrap. `niceMax` /
+  `vBarHeight` never yield `NaN`; a zero is a labelled zero; gold is absent from the series map
 - **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler,
   IDOR, raw SQL, `dangerouslySetInnerHTML`, SSRF, upload, dependency change (**none**), env var,
   logging, CSRF, storage. **One seam:** nothing mounts a vertical bar chart until US-034
@@ -267,33 +149,68 @@ exists.
   from US-018's `V_BAR_SERIES` tokens, gradient-filled, round-capped), with US-017's `DeltaChip`
   above each pair — arrow, explicit sign and a spoken direction, so colour is never the sole signal
 - **CRITERION 2 IS THE REVIEW DECISION, AND BOTH HALVES ARE MEASURED GEOMETRY.** The scale owns a
-  44-unit **left gutter** (`plotLeft` is its right edge; every bar, chip cell, fixture label and
-  legend row is inset to it), and a 34-unit **chip band** at the top of the plot is reserved for the
-  chips. The band's emptiness is not a hope about round numbers: the axis maximum is **derived from
-  the geometry** (`plotHeight / barZoneHeight`, fed to `niceMax`, which only rounds up), so no bar
-  can enter it whatever the data. Tests compute rather than assume — no chip slot reaches the gutter
-  and none overlaps its neighbour (verified at 8 pairs *and* at 14), the tallest bar's top clears
-  `plotTop` by the full band across seven datasets × three heights, and the rendered strip's own
-  inset and band height are read back off the DOM. **Replacing the derived factor with a fixed 10%
-  fails the headroom test** (`previous: 500, current: 500` is the case that catches it), so the
-  decision cannot be reverted silently. The chips are one flex strip of equal cells, so neighbour
-  overlap is impossible by layout as well as by arithmetic
-- **Criterion 3:** hovering a fixture's whole slot (not its bars, so a short fixture is as reachable
-  as a tall one) shows both seasons *and* the delta, the last as the chip's `light` variant on the
-  navy box; `role="status"`, keyboard-driven through `nextHoverIndex`, pinned by `tooltipAnchor`
+  44-unit **left gutter** (every bar, chip cell, label and legend row is inset to `plotLeft`), and a
+  34-unit **chip band** at the top of the plot is reserved for the chips. The band's emptiness is not
+  a hope about round numbers: the axis maximum is **derived from the geometry** (`plotHeight /
+  barZoneHeight`, fed to `niceMax`, which only rounds up), so no bar can enter it whatever the data.
+  Tests compute rather than assume — no chip slot reaches the gutter or its neighbour (at 8 pairs
+  *and* at 14), the tallest bar clears the band across seven datasets × three heights, and the strip's
+  own inset is read back off the DOM. **A fixed 10% headroom fails the test** (`previous: 500,
+  current: 500` catches it), so the decision cannot be reverted silently
+- **Criterion 3:** hovering a fixture's whole slot shows both seasons *and* the delta (the chip's
+  `light` variant on the navy box); `role="status"`, keyboard-driven through `nextHoverIndex`
 - **No per-bar value labels, by design** — sixteen figures over sixteen bars *was* the reported
-  defect. The gutter carries the magnitudes, the chip the movement, the tooltip the exact readings;
-  the one exception is a bar with no height, which is **labelled at the baseline** so a zero (or a
-  hole) is never an invisible reading
-- Pairs and chip cells are **keyed by fixture**, so a data change transitions the same rects and the
-  same chip: element identity is asserted across a change and a re-rank, and **an index key fails the
-  re-rank test**. Mixed-sign deltas render both directions; `St. Gallen` wraps (a test rejects
-  `truncate` / `line-clamp`); reduced motion lands on final heights with **zero frames requested**
+  defect; the gutter carries the magnitudes, the chip the movement, the tooltip the readings, and a
+  bar with no height is **labelled at the baseline**
+- Pairs and chip cells are **keyed by fixture**, so a data change transitions the same rects:
+  identity is asserted across a change and a re-rank, and **an index key fails the re-rank test**.
+  Mixed-sign deltas render both ways; `St. Gallen` wraps; reduced motion is final state
 - **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler
-  or route, IDOR, raw SQL, `dangerouslySetInnerHTML` (a test rejects it), user-supplied URL / SSRF,
-  upload, dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API. A
-  presentational chart with no IO whose only `style` values are rounded geometry numbers and closed
-  token references. **One seam:** no real-Chrome pass; nothing mounts it until US-036
+  or route, IDOR, raw SQL, `dangerouslySetInnerHTML` (a test rejects it), SSRF, upload, dependency
+  change (**none**), env var, logging, CSRF, storage. **One seam:** nothing mounts it until US-036
+
+### US-020: Donut / ring tile (3 pts)
+**Completed:** 2026-09-09
+**Files Changed:** 1 code (new) + 1 test file (new) + 5 tracking docs
+**Tests Added:** 56 (unit: 56) - 1261/1261 green, 100% stmts / 100% lines / 91.2% branches on the new file, 99.7% stmts / 97.6% branches of `app/**`
+**Notes:** All 4 acceptance criteria met. Built for US-034's "Sponsor badges printed" — 3'080 shirts
+in the middle, Bitpanda 44% / Sunrise 24% / Allianz 20% / IWB 12% around it, under a section-level
+period filter that changes the total (3'080 / 1'136 / 430 / 334).
+
+**What Was Done:**
+- `app/components/charts/donut.tsx` — `donutGeometry` (pure: circumference, per-segment dash length
+  and offset, the gaps), `Donut` (ring + centre + legend) and `DonutTile` (`Card` + ring) — the
+  three-export shape US-018/US-019/US-021/US-025 set
+- **It is deliberately NOT the attendance ring.** US-016's is a single-arc gold gauge against a
+  capacity on the navy band; this is four series arcs plus a legend on a white card. The
+  `stroke-dasharray` technique and the reduced-motion handling are borrowed; the component is
+  separate, because one component doing both would need a mode switch through every line of it
+- **Criterion 1:** four arcs whose painted lengths plus four gaps are exactly one circumference, so
+  the gap is **arc removed from each segment** (half at each end, hence four even gaps), never a
+  stroke painted in the background colour — a test rejects a zero gap *and* the negative dash a
+  narrower-than-gap slot would otherwise produce. The centre counts up through `useCountUp`
+- **CRITERION 2 IS TWO HOVER SURFACES WRITING ONE STATE.** An arc and its legend row both set the
+  single `hovered` index, proven by a **cross-surface** test: hover the LEGEND and the ARC thickens
+  while the centre swaps; then hover a different ARC and the LEGEND row follows. Stubbing out either
+  surface's write fails 4-5 tests. The thickening is a stroke weight, so nothing is re-laid out. The
+  legend rows are real `<button>`s, so focus does exactly what hover does and Tab still leaves
+- **Criterion 3 is a morph, and the proof is a re-rank.** Arcs *and* legend rows are keyed by
+  SPONSOR, so a period press hands `Bitpanda` the same `<circle>` and its `stroke-dasharray` /
+  `stroke-dashoffset` transition in CSS — identity is asserted across a data change and a re-ordered
+  split, and **an index key fails that test**. One `useCountUp` drives the centre, so a hover swap
+  and a period change both count from the figure ON SCREEN (asserted strictly between the two
+  figures mid-flight), never via zero
+- **Criterion 4 reuses `badgeSegments` (US-008)** rather than restating its rounding correction: the
+  segments sum EXACTLY to the centre total on 3'080 / 1'136 / 430 / 334 and ten adversarial totals,
+  asserted on the geometry *and* on the four figures printed on screen (7 → 3 + 2 + 1 + 1). A test
+  rejects a local `Math.round`
+- Reduced motion lands on final arcs and the final total with **zero frames requested**; ids come
+  from `useUid` (8 distinct across two rings); gold is absent and slate is the fourth series; no hex
+  and no formatting appear in the file
+- **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler
+  or route, IDOR, raw SQL, `dangerouslySetInnerHTML`, user-supplied URL / SSRF, upload, dependency
+  or lockfile change (**none**), env var or secret, logging, CSRF, storage API. **One seam:** no
+  real-Chrome pass; nothing mounts a donut until US-034
 
 ---
 

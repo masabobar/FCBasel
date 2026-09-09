@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2b - Chart & Tile Component Library *(7/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
+**Current Phase:** Phase 2b - Chart & Tile Component Library *(8/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
 
 ---
 
@@ -9,13 +9,13 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 51% | 100% | 🟢 On Track |
+| **Overall Progress** | 53% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2a** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 23/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 59/116 | 116 | 🟢 On Track |
-| **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
+| **Stories Completed** | 24/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 62/116 | 116 | 🟢 On Track |
+| **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
 
@@ -23,9 +23,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 23
-**Currently Working On:** US-020 — Donut / ring tile (3 pts)
-**Story Points Completed Today:** 59
+**Stories Completed Today:** 24
+**Currently Working On:** US-022 — Department table tile (3 pts)
+**Story Points Completed Today:** 62
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — React Router 7 SSR scaffold (Railway
   deploy stays a human step) · ESLint 9 + Prettier + husky · one token set published as Tailwind v4
@@ -61,17 +61,17 @@
 
 - ✅ **US-015 — Reset to baseline (2 pts)** — the control that lets the demo be run twice, built as a
   **transition beside the other three**: `withBaselineRestored`, `reset` on `useDashboard`,
-  `scrollToTop`, and US-012's Reset wired through `onReset`. Reset restores `BASELINE_SECTIONS`, the
-  *same* constant that is the hook's initial state. **The timer is the story:** `reset` cancels the
-  pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a
+  `scrollToTop`, US-012's Reset wired through `onReset`, restoring `BASELINE_SECTIONS` — the *same*
+  constant that is the hook's initial state. **The timer is the story:** `reset` cancels the pending
+  beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a
   just-cleared dashboard. Ten presses in one frame still run **one** view transition.
 
 - ✅ **US-027 — Motion & animation hooks (3 pts)** — the four hooks the other ten E6 components are
   built on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`. **Count-up tracks the figure on
-  screen in a ref**, so a filter changed mid-animation carries on from the old number instead of
+  screen in a ref**, so a filter changed mid-animation carries on from the old number rather than
   snapping to zero (US-016 measured exactly that in Chrome). **Reduced motion means final state in
-  the same render**, so `width={grown ? w : 0}` geometry can never be stranded at zero. One
-  reduced-motion source via `useSyncExternalStore`; every frame and listener freed on unmount. 42 new tests.
+  the same render**, so `width={grown ? w : 0}` geometry can never be stranded. One source via
+  `useSyncExternalStore`; every frame and listener freed on unmount. 42 new tests.
 
 - ✅ **US-017 — KPI tile & variance chip (2 pts)** — the first component built ON the motion hooks,
   and the shape the other nine follow: `DeltaChip` in its own module, plus `KpiSparkline` /
@@ -94,19 +94,13 @@
   what is on screen; `hBarMax` / `hBarPercent` return zero width rather than `NaN`. 55 new tests.
 
 - ✅ **US-013 — Baseline dashboard, four pre-existing tiles (3 pts)** — **the canvas stops being
-  empty**, the client's own framing of the mechanic. Nothing was invented:
-  `app/components/dashboard/baseline-row.tsx` composes `KpiTile` ×2, `HBarTile` and a new
-  `PartnersTile` on the `Card` shell, as **direct children of US-012's one canvas grid**. **No figure is re-typed:**
-  `app/lib/dashboard/baseline.ts` reads the US-007 repository in the route's SSR loader, the webshop
-  headline and its `+11.9%` are `seriesTotals` off the same array the sparkline draws, and a **source
-  scan** fails on any displayed figure written as a literal, any pre-formatted `CHF`/`%` string, any
-  product or partner name, or `toLocaleString`/`toFixed`. New `trendEndingAt` makes the six-point
-  window *end on the month the headline covers*, so number and glyph cannot drift apart. Partner
-  plates carry the partner's **own** brand colour from the data. **Reset's baseline seam is closed:**
-  the tiles are static route chrome outside the session list, proven by an insert → Reset `innerHTML`
-  comparison. **First real-Chrome pass for US-017, US-021 and US-027**: no horizontal scroll at
-  1920×1080 (nor 1440/1280/834/390), 54 distinct KPI strings and 43 distinct bar widths per frame,
-  two values only under reduced motion. 103 tests.
+  empty.** `baseline-row.tsx` composes `KpiTile` ×2, `HBarTile` and a new `PartnersTile` as direct
+  children of US-012's one grid. **No figure is re-typed:** figures come from the US-007 repository
+  in the SSR loader, `+11.9%` is `seriesTotals` off the same array the sparkline draws, and a
+  **source scan** fails on any literal figure, pre-formatted `CHF`/`%` string, product or partner
+  name, or `toLocaleString`/`toFixed`. **Reset's baseline seam is closed** (static route chrome,
+  proven by an innerHTML compare). **First real-Chrome pass for US-017/US-021/US-027**: no scroll at
+  1920×1080, 54 distinct KPI strings, 43 distinct bar widths, two values only reduced. 103 tests.
 
 - ✅ **US-026 — Segmented period filter control (2 pts)** — one control in
   `app/components/controls/segmented.tsx` for all three of its consumers: the dark hero band, Top
@@ -121,59 +115,65 @@
   shadow, weight *and* `aria-checked` — never colour alone. 45 new tests.
 
 - ✅ **US-025 — Line chart component (3 pts)** — one chart in
-  `app/components/charts/line-chart.tsx` for both of its consumers: the navy hero band (gold area
-  line over a dashed white one, keyed by period) and Hero 2's twelve-month two-season comparison.
-  Series count is a prop, `area` / `dash` is per series, and colour is a token **name**, so no hex
-  can enter. **The stroke draw survives reduced motion:** `pathLength="1"` plus an offset that
-  transitions 1 → 0, and a test reads `stroke-dashoffset="0"` with **zero frames requested** rather
-  than a line stranded at offset 1. **It replays by being re-keyed and by nothing else.** Hover maps
-  the pointer to the nearest index and the tooltip lists **every** series there through US-011, with
-  arrow/Home/End/Escape doing the same from the keyboard without capturing Tab. Gradient ids from
-  `useUid`; a zero or missing point is a labelled zero, never a `NaN` in a `d`. 73 new tests.
+  `app/components/charts/line-chart.tsx` for both consumers: the navy hero band (gold area line over
+  a dashed white one, keyed by period) and Hero 2's twelve-month two-season comparison. Series count
+  is a prop, `area` / `dash` is per series, colour is a token **name**, so no hex can enter. **The
+  stroke draw survives reduced motion:** `pathLength="1"` plus an offset transitioning 1 → 0, and a
+  test reads `stroke-dashoffset="0"` with **zero frames requested**. **It replays by being re-keyed
+  and by nothing else.** Hover lists **every** series at the nearest index through US-011, with
+  arrow/Home/End/Escape doing the same without capturing Tab. Gradient ids from `useUid`; a missing
+  point is a labelled zero, never a `NaN` in a `d`. 73 new tests.
 
 - ✅ **US-016 — Hero band: webshop trend & attendance ring (5 pts)** — **Phase 2a closes at 5/5 ·
-  16/16 pts.** The navy greeting band sits above the baseline row and **ONE `Segmented` control
-  drives both halves of it** from one `BaselinePeriod` entry: the webshop `LineChart` (gold area over
-  a dashed white previous period, **re-keyed by period so the stroke draw replays**) and the **one
-  genuinely new visual** — a hand-built `AttendanceRing` whose arc sweeps on `stroke-dasharray` and
-  whose centre swaps to "% of capacity" on hover *or focus*. **The total and its delta are computed
-  from the plotted series** on every render; `HeroBandData` has no field to read a stored one from,
-  and the greeting is resolved in the loader from an injectable clock. **US-013's loose end is closed
-  too:** Top Products' `action` slot now holds a light `Segmented`. **Chrome at 1920×1080:** no
-  horizontal scroll (nor 1440/1280/834/390), **54 distinct KPI strings from CHF 148’200 → CHF 132’400
-  (never zero)**, the re-keyed line's offset 1px → 0px across 44 values, 43 distinct arc dash pairs,
-  and **one** KPI and **one** ring value under `prefers-reduced-motion`. First mount of `LineChart`
-  exposed one real defect, fixed in it: end axis labels clipped by the svg's bounds now anchor
-  inwards. 92 new tests, 1090 green.
+  16/16 pts.** The navy greeting band, where **ONE `Segmented` drives both halves** from one
+  `BaselinePeriod` entry: the webshop `LineChart` (gold area over a dashed previous period, re-keyed
+  by period so the stroke draw replays) and the **one genuinely new visual** — a hand-built
+  `AttendanceRing` sweeping on `stroke-dasharray`, its centre swapping to "% of capacity" on hover
+  *or focus*. Total and delta are computed from the plotted series (no field stores them); the
+  greeting comes from an injectable clock. Top Products' `action` slot gained its light `Segmented`.
+  **Chrome at 1920×1080:** no scroll, 54 distinct KPI strings never touching zero, the re-keyed offset
+  1px → 0px over 44 values, 43 distinct dash pairs, one value each under reduced motion. One real
+  defect found and fixed in `LineChart`: clipped end axis labels now anchor inwards. 92 new tests.
 
 - ✅ **US-018 — Vertical bar chart tile (3 pts)** — the kit-split chart in
   `app/components/charts/v-bars.tsx` (`vBarGeometry` / `VBars` / `VBarTile`), built for US-034's
   "Shirt sales by kit". **Bar persistence is the story, and the test is a re-rank:** columns are keyed
-  by category, so a filter press hands `Home` the *same* `<rect>` and the `x` / `y` / `height` CSS
-  transition carries it — an index key fails two tests, one on element identity, one showing every
-  label jumping to a neighbour's figure. Nothing snaps to zero: `useCountUp` continues from the number
-  on screen, and reduced motion lands on final heights with **zero frames requested**. Gradient caps,
-  one gradient per *distinct* token colour, gridlines behind, counting labels above, a `filter` hover
-  highlight and an optional per-bar renderer (Hero 1's units + share + revenue). Category labels are
-  DOM text because SVG text cannot wrap; a zero is a labelled zero. 52 new tests, 1142 green.
+  by category, so a filter press hands `Home` the *same* `<rect>` and its `x`/`y`/`height` CSS
+  transition carries it — an index key fails two tests, one on element identity, one showing labels
+  jumping to a neighbour's figure. Nothing snaps to zero, and reduced motion lands on final heights
+  with **zero frames requested**. Gradient caps, one gradient per *distinct* token colour, gridlines
+  behind, counting labels above, a `filter` hover highlight and an optional per-bar renderer (Hero 1's
+  units + share + revenue). Category labels are DOM text because SVG text cannot wrap. 52 new tests.
 
 - ✅ **US-019 — Grouped bar chart tile (3 pts)** — the ticket-revenue chart in
   `app/components/charts/grouped-bars.tsx` (`groupedBarGeometry` / `GroupedBars` / `GroupedBarTile`),
   built for US-036's eight fixtures: **sixteen bars (navy 25/26, red 26/27) and eight delta chips in
   one tile.** That density is the whole story, and **the overlap fix the review asked for is now
-  arithmetic rather than padding.** The y-axis owns a 44-unit **left gutter** and every bar, chip,
-  label and legend row is inset to the plot's left edge; a 34-unit **chip band** above the bars is
-  guaranteed empty because the axis maximum is *derived from the geometry* (`plotHeight /
-  barZoneHeight` fed to US-018's `niceMax`, which only rounds up). Both halves are **measured, not
-  asserted in prose**: tests compute that no chip slot reaches the gutter and none overlaps its
-  neighbour (at 8 pairs and at 14), that the tallest bar's top clears `plotTop` by the full band
-  across seven datasets × three heights, and that swapping the derived factor for a fixed 10% fails.
-  Chips are US-017's `DeltaChip` (arrow + explicit sign + spoken word) in one flex strip, so overlap
-  is impossible by layout too; the hover box gives both seasons and the delta. **There are no per-bar
-  value labels by design** — sixteen figures over sixteen bars *was* the defect — so the gutter
-  carries magnitudes, the chip the movement and the tooltip the readings, with a labelled zero for a
-  bar that has no height. Pairs keyed by fixture (an index key fails the re-rank test); mixed signs
-  render both ways; reduced motion is final state. 63 new tests, 1205 green, 100% on the new file.
+  arithmetic rather than padding:** the y-axis owns a 44-unit left gutter every bar, chip, label and
+  legend row is inset to, and a 34-unit chip band above the bars stays empty because the axis maximum
+  is *derived from the geometry* (fed to US-018's `niceMax`, which only rounds up). Both halves are
+  **measured**: no chip slot reaches the gutter or its neighbour (at 8 pairs and at 14), the tallest
+  bar clears the band across seven datasets × three heights, and a fixed 10% headroom fails that
+  test. Chips are US-017's `DeltaChip` in one flex strip, so overlap is impossible by layout too.
+  **No per-bar value labels by design** — sixteen figures over sixteen bars *was* the defect — so the
+  gutter carries magnitudes, the chip the movement and the tooltip the readings, with a labelled zero
+  for a bar with no height. Pairs keyed by fixture (an index key fails the re-rank test); mixed signs
+  render both ways. 63 new tests, 1205 green, 100% on the new file.
+
+- ✅ **US-020 — Donut / ring tile (3 pts)** — the sponsor-badge ring in
+  `app/components/charts/donut.tsx` (`donutGeometry` / `Donut` / `DonutTile`), built for US-034's
+  "Sponsor badges printed": four segments with even gaps, a counting centre total and a legend. **It
+  is deliberately not US-016's attendance ring** — that is a single-arc gold gauge on navy; this is
+  four series arcs on a white card, sharing only the dasharray technique. **Two hover surfaces, ONE
+  state:** an arc and its legend row both write the same hovered index, and a cross-surface test
+  hovers the *legend* to assert the *arc* thickens and the centre swaps, then hovers a different arc
+  to assert the legend follows — stubbing out either write fails 4-5 tests. Rows are real buttons, so
+  focus does what hover does. **The segments morph rather than re-enter:** arcs and rows are keyed by
+  sponsor, so a period press transitions the *same* `<circle>`'s dasharray/dashoffset (an index key
+  fails the re-rank test) while one `useCountUp` moves the centre between the total and a segment
+  figure, never via zero. **The arithmetic is `badgeSegments`'** (US-008), imported not restated, so
+  the four printed figures add up exactly to the middle at 3'080 / 1'136 / 430 / 334 and ten
+  adversarial totals. 56 new tests, 1261 green.
 ---
 
 ## 🏁 Phase 2a complete — Dashboard Shell & Persona Baseline
@@ -187,13 +187,14 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-020: Donut / ring tile | ⏳ Ready | Next up; segments morph via dasharray/dashoffset, parts sum exactly |
+| US-022: Department table tile | ⏳ Ready | Next up; right-aligned numeric headers incl. "% of target" is a review decision |
 | US-023: Driver / breakdown tile | ⏳ Ready | Composes US-021's row; no new row to write |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-020: Donut / ring tile | 2026-09-09 | 3 |
 | US-019: Grouped bar chart tile | 2026-09-09 | 3 |
 | US-018: Vertical bar chart tile | 2026-09-09 | 3 |
 | US-016: Hero band — webshop trend & attendance ring | 2026-09-09 | 5 |
@@ -245,8 +246,8 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 99.79% stmts / 98.43% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1205/1205 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 99.71% stmts / 97.61% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
+| Passing Tests | 1261/1261 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -256,14 +257,13 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 > every hex, the type scale and the colour discipline, fails the build if `app/app.css` and
 > `app/lib/tokens.ts` disagree, and asserts structurally that no reduced-motion path leaves an
 > element stranded at zero. The data suites pin the Specification figures, prove every total is
-> *derived*, force the badge segments to sum exactly at every total from 0 to 2,000, show that a
-> naive "variance > 0 is good" rule misreads exactly one department, and (US-011) sweep every number
-> in all six narratives against the data. The component suites test the same way: variance stays
-> distinguishable with the colour *removed* (US-017); US-021's and US-019's review decisions are read
-> back off the rendered element or computed from the geometry; US-013 scans its own sources for a
-> literal figure; US-025 proves no chart path is left undrawn; US-016 proves ONE control moves two
-> widgets, counting from the figure on screen. The gate is three-part: strict `tsc`, ESLint 9 and
-> Prettier, via husky.
+> *derived*, force the badge segments to sum exactly at every total from 0 to 2,000 (US-020 re-proves
+> it on screen), show that a naive "variance > 0 is good" rule misreads exactly one department, and
+> (US-011) sweep every number in all six narratives. The component suites test the same way: variance
+> stays distinguishable with the colour *removed* (US-017); US-021's and US-019's review decisions
+> are read back off the rendered element; US-013 scans its own sources for a literal figure; US-025
+> proves no chart path is left undrawn; US-016 and US-020 prove ONE control (or one state) moves two
+> things at once. The gate is three-part: strict `tsc`, ESLint 9 and Prettier, via husky.
 
 ---
 
@@ -274,7 +274,7 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
-| Phase 2b: Component Library | 🔄 In Progress | 7/11 | 19/29 | 66% |
+| Phase 2b: Component Library | 🔄 In Progress | 8/11 | 22/29 | 76% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
@@ -297,4 +297,4 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
 
-**Last Auto-Update:** US-019 completed at 2026-09-09 — Phase 2b is at 7/11 · 19/29 pts. The grouped bar chart (`GroupedBars` / `GroupedBarTile`) is US-036's fixture tile: eight fixtures, sixteen bars (navy 25/26, red 26/27), a `DeltaChip` above each pair and a per-fixture tooltip carrying both seasons plus the delta. **The review's overlap fix is now structural and measured** — the scale owns a dedicated left gutter, the chips own a reserved band above the bars whose emptiness is guaranteed by deriving the axis maximum from the geometry, and tests compute that no chip reaches the gutter or its neighbour at 8 and 14 pairs (a fixed 10% headroom fails them). Pairs keyed by fixture, so a re-rank transitions the same rects; reduced motion is final state. **Next is US-020** — donut / ring tile (3 pts)
+**Last Auto-Update:** US-020 completed at 2026-09-09 — Phase 2b is at 8/11 · 22/29 pts. The segmented donut (`Donut` / `DonutTile`) is US-034's sponsor-badge ring: four arcs with even gaps, a counting centre total and a legend. **Criterion 2 is two hover surfaces sharing one state** — an arc and its legend row both write the hovered index, proven by a cross-surface test, and the rows are real buttons so focus does what hover does. **Criterion 3 is a morph, not a remount** — arcs keyed by sponsor, so a period press transitions the same circle's dasharray/dashoffset and the centre counts from the figure on screen. **Criterion 4 reuses `badgeSegments`**, so the four figures add up exactly to the centre total at every period total and ten adversarial ones. **Next is US-022** — department table tile (3 pts)

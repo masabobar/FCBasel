@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (7/11 completed)
+**Status:** In Progress (8/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (7/11 completed)
+**Status:** In Progress (8/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -113,7 +113,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Segmented ring with a centre total, used for sponsor-badge share.
   - **Acceptance Criteria:**
     - Segments with small gaps; centre shows the total and counts up
@@ -123,6 +123,27 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - Segment values derive from the fixed percentage split with rounding corrected so parts sum
       exactly to the total
   - **Dependencies:** US-005, US-027
+  - **Completion note (2026-09-09):** All four criteria met, in
+    `app/components/charts/donut.tsx` — `donutGeometry` (pure), `Donut` and `DonutTile`.
+    **It is deliberately NOT the attendance ring:** US-016's is a single-arc gold gauge on the navy
+    band, this is four series arcs plus a legend on a white card; the dasharray sweep is borrowed,
+    the component is separate. **Criterion 2 is two hover surfaces writing ONE state:** an arc and
+    its legend row both set the single `hovered` index, proven by a cross-surface test (hover the
+    legend → the arc thickens and the centre swaps; hover a different arc → the legend row follows),
+    and stubbing out either write fails 4-5 tests. Legend rows are real `<button>`s, so focus does
+    what hover does and Tab still leaves. **Criterion 3 is a morph, proven by a re-rank:** arcs and
+    legend rows are keyed by SPONSOR, so a period press hands `Bitpanda` the same `<circle>` and its
+    `stroke-dasharray` / `stroke-dashoffset` transition in CSS — element identity is asserted across
+    a data change *and* a re-ordered split, and an index key fails that test. One `useCountUp` drives
+    the centre, so a hover swap and a period change both count from the figure on screen (asserted
+    strictly between the two figures mid-flight), never via zero. **Criterion 4 reuses
+    `badgeSegments` (US-008)** instead of restating its rounding correction: the segments sum exactly
+    to the centre total on 3'080 / 1'136 / 430 / 334 and ten adversarial totals, asserted on the
+    geometry *and* on the four figures printed on screen. Gaps are arc REMOVED from each segment
+    (half at each end), never a stroke in the background colour — a test rejects a zero gap and a
+    negative dash. Ids from `useUid` (8 distinct across two rings); gold is absent and slate is the
+    fourth series; reduced motion lands on final arcs with zero frames requested. 56 tests added
+    (1261/1261, gates clean).
 
 - **US-021**: Horizontal bar tile
   - **Story Points:** 3
@@ -267,7 +288,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 6 stories, 16 points · 🔄 0 · 📋 5 stories, 13 points · ⏸️ 0
+**By Status:** ✅ 8 stories, 22 points · 🔄 0 · 📋 3 stories, 7 points · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)
