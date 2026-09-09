@@ -175,6 +175,39 @@
 }
 
 /**
+ * CHIP SURFACE — the 11px corner and the lift-and-tint hover, written once.
+ *
+ * ELEVEN PIXELS IS A REVIEWED DECISION, NOT A ROUNDING. The reference notes
+ * record "not fully rounded" as feedback: the segmented period filter (US-026)
+ * and the suggestion chips (US-029) both use `--radius-chip`, deliberately NOT
+ * a full pill. `rounded-full` / `--radius-pill` must never appear on either —
+ * the value lives here and in the token set, so neither component restates it.
+ *
+ * The class carries the radius, the LIFT and the transition that runs both.
+ * The TINT stays with the component's light/dark variant classes, because it is
+ * the one half that has to differ per surface: muted grey on a white card,
+ * translucent white on the navy band.
+ *
+ * The reduced-motion block at the foot of this file collapses the transition to
+ * ~1ms, so a hover lands on its target state with no movement — the state is
+ * never lost, only the travel.
+ */
+@layer components {
+  .fcb-chip {
+    border-radius: var(--radius-chip);
+    transition-property: color, background-color, box-shadow, transform;
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  /* The lift. One pixel: enough to read as a response, not enough to shift the
+     row it sits in. A disabled chip does not answer a hover. */
+  .fcb-chip:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+/**
  * MOTION PRIMITIVES — defined exactly once, here.
  *
  * The dashboard's "wow" is an orchestrated reveal: the thinking panel appears

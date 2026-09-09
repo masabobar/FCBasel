@@ -1,7 +1,7 @@
 # Phase 2b: Chart & Tile Component Library
 
 **Duration:** 2026-09-11 to 2026-09-12 (~12.0 AI-hours)
-**Status:** In Progress (4/11 stories · 11/29 points)
+**Status:** In Progress (5/11 stories · 13/29 points)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-12
 **Actual Completion:** —
@@ -29,7 +29,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 
 ### Epic 5: E6 — Chart & Tile Component Library (29 story points)
 
-**Priority:** P0 (US-026 is P1) · **Status:** In Progress (4/11) · **Dependencies:** US-003, US-005
+**Priority:** P0 (US-026 is P1) · **Status:** In Progress (5/11) · **Dependencies:** US-003, US-005
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
@@ -42,15 +42,14 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 | US-023 | Driver / breakdown tile | 2 | P0 | 📋 Todo |
 | US-024 | Recommendation panel & narrative caption strip | 2 | P0 | 📋 Todo |
 | US-025 | Line chart component | 3 | P0 | ✅ Done |
-| US-026 | Segmented period filter control | 2 | **P1** | 📋 Todo |
+| US-026 | Segmented period filter control | 2 | **P1** | ✅ Done |
 | US-027 | Motion & animation hooks | 3 | P0 | ✅ Done |
 
 **Technical Notes:**
 
-- **Charts are hand-built SVG, ported from the reference build** (decided 2026-09-09). No charting
+- **Charts are hand-built SVG, ported from the reference build** (decided 2026-09-09) — no charting
   library, no TanStack Table. The deciding factor was animation: bars persisting across data changes,
-  donut segments morphing via `stroke-dasharray`, line stroke-draw on re-key, and count-up from the
-  **current displayed value** — "most of the wow", and awkward to guarantee in a library.
+  donut segments morphing, line stroke-draw on re-key, count-up from the **current displayed value**.
 - **Build US-027 first.** Every other component in this phase depends on the motion hooks.
 - **Colour is never the sole signal.** A projector can shift green/red, so variance always carries an
   explicit sign and arrow alongside the token.
@@ -81,13 +80,13 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 - **Estimated Effort:** ~40 team-hours → ~12.0 AI-core hours
 - **Risk Level:** Low-Medium — the largest phase by volume, but the most mechanical
 
-> The **single largest block** in the build (23% of effort) and the most repetitive — the best place
-> to find the estimate's SPEED_FACTOR too cautious.
+> The **single largest block** in the build (23% of effort) and the most repetitive — the best place to
+> find the estimate's SPEED_FACTOR too cautious.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 11 / 29 (38%)
-- **Completed Stories:** 4 / 11
-- **Tests Passing:** 953 / 953 · **Coverage:** 99.9% stmts / 98.6% branches · **Commits:** 3
+- **Completed Story Points:** 13 / 29 (45%)
+- **Completed Stories:** 5 / 11
+- **Tests Passing:** 998 / 998 · **Coverage:** 99.7% stmts / 98.5% branches · **Commits:** 4
 
 ---
 
@@ -98,7 +97,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 **Blocks:**
 - Every hero in Phase 3b composes these components
 - US-013 (baseline Top Products) needs US-021
-- US-016 (hero band) needs US-025, US-026, US-027
+- US-016 (hero band) needs US-025, US-026, US-027 — ✅ all three exist, US-016 is unblocked
 
 **Internal ordering:** US-027 → everything else. US-021 → US-023 (the driver tile reuses the bar row).
 
@@ -121,38 +120,25 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 
 ### 2026-09-09 — US-027 Motion & animation hooks ✅ (3 pts)
 
-**Delivered:** the four hooks every animated component in this epic keys off, in
-`app/lib/hooks/use-motion.ts` (technical spec §4.1's reserved slot). The consumer API in full:
+**Delivered:** `app/lib/hooks/use-motion.ts` (spec §4.1's slot) — `useReducedMotion()`, `useGrow()`,
+`useCountUp(target, animationMs?)`, `useUid(prefix?)`, `COUNT_UP_DURATION_MS` (900, from the token
+set). Every animated component in this epic keys off these four.
 
-```ts
-useReducedMotion(): boolean                                  // tracks the preference
-useGrow(): boolean                                           // false → true after two frames
-useCountUp(target: number, animationMs?: number): number     // from the CURRENT displayed value
-useUid(prefix?: string): string                              // "bars-r3" — one id per instance
-COUNT_UP_DURATION_MS                                         // 900, from the token set
-```
+**Count-up runs from the figure on screen**, mirrored in a ref as each frame commits it and read
+(never depended on) when the target changes, so a retargeted animation opens mid-flight and lands
+*exactly* on target. **Reduced motion is final state in the SAME render**, not one effect later:
+`useGrow` returns `grown || reduced` with **zero** frames requested and `useCountUp` returns the
+target. One reduced-motion source of truth — `reducedMotionQuery()` in `app/lib/motion.ts` (the
+string `app/app.css` matches on) behind `useSyncExternalStore`; a test fails if the hook file calls
+`matchMedia` itself, and SSR is proven by `renderToString` plus a `hydrateRoot` pass.
 
-**Count-up from the current displayed value.** The figure on screen is mirrored in a ref as each
-frame commits it, and the effect reads that ref (never depends on it) when the target changes — so a
-retargeted animation opens on the mid-flight figure and lands *exactly* on the target, both ways.
-
-**Reduced motion means final state in the SAME RENDER, not one effect later.** `useGrow` returns
-`grown || reduced`, `useCountUp` returns `reduced ? target : displayed`; under the preference
-`useGrow` is `true` on the first render with **zero** frames requested, and a preference flipped
-mid-animation abandons the frame — US-006's CSS rule restated in JavaScript, holding even without
-`requestAnimationFrame`. **One reduced-motion source of truth:** `reducedMotionQuery()` in
-`app/lib/motion.ts` (the string `app/app.css` matches on) behind `useSyncExternalStore` — a test
-fails if the hook file calls `matchMedia` itself, and SSR is proven by `renderToString` plus a
-`hydrateRoot` pass that fails on `console.error`.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 644/644 tests ✅ (52 new) · build ✅ · coverage 100%
-stmts / 99.4% branches. **Security triage:** no security-relevant changes detected — the one value
-reaching the DOM is `useUid`'s id, sanitised to `[A-Za-z0-9_-]`. **One seam:** no browser pass.
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 644/644 (52 new) · build ✅ · coverage 100% stmts /
+99.4% branches. **Security triage:** none — the one value reaching the DOM is `useUid`'s sanitised id.
 
 ### 2026-09-09 — US-017 KPI tile & variance chip ✅ (2 pts)
 
-**Delivered:** three exports, so nothing has to be forked later — `delta-chip.tsx` (`DeltaChip`,
-wanted alone by US-019/US-022/US-016) and `kpi-tile.tsx` (`KpiSparkline`, `KpiFigure`, `KpiTile`).
+**Delivered:** `delta-chip.tsx` (`DeltaChip`, wanted alone by US-019/US-022/US-016) and `kpi-tile.tsx`
+(`KpiSparkline`, `KpiFigure`, `KpiTile`) — so nothing has to be forked later.
 
 ```tsx
 <KpiTile title="Webshop revenue" period="This month" value={148_200} format={formatMoney}
@@ -161,42 +147,27 @@ wanted alone by US-019/US-022/US-016) and `kpi-tile.tsx` (`KpiSparkline`, `KpiFi
 ```
 
 **Colour is never the sole signal, and it is TESTED that way.** The chip carries direction four
-independent times — glyph, explicit `+`/`-` from `formatSignedPercent`, an `sr-only` word, and the
-token colour. The proof is the `light` variant: on navy both directions share one white treatment
-(the negative token falls to ~2:1 there), and a test asserts the two chips' class strings are
-**identical** while sign, glyph and spoken word still differ. Red never means "bad" — only
-`variancePositive` / `varianceNegative`, and a test rejects `text-red` on the chip.
+independent times — glyph, explicit `+`/`-`, an `sr-only` word, and the token. The proof is the
+`light` variant: on navy both directions share one white treatment (the negative token falls to ~2:1
+there) and a test asserts the two class strings are **identical** while sign, glyph and spoken word
+still differ. Red never means "bad" — a test rejects `text-red`. **Direction is not judgement:**
+Marketing's overspend (UP *and* ADVERSE) arrives through an optional `judgement` prop fed from
+`varianceJudgement` (US-010), never re-derived from a sign. A zero is a **labelled zero**. `onDark`
+on `KpiFigure` forces the chip's `light` variant, so no red figure can be left on the navy band.
 
-**Direction is not judgement.** The arrow follows the arithmetic; the colour follows the meaning, so
-Marketing's overspend (UP *and* ADVERSE) comes through an optional `judgement` prop fed from
-`varianceJudgement` (US-010) — the chip never re-derives good/bad from a sign. A zero is a **labelled
-zero**: dash glyph, `+0%`, the neutral treatment rather than either variance token, "unchanged" spoken.
+**The US-012 trap is closed at the root:** `app/lib/cn.ts` declares our named type scale as
+`tailwind-merge`'s `font-size` group, **derived from `tokens.fontSize` through the same
+`cssVariableName` mapping Tailwind generates the utility from**, so a size beside a colour is no
+longer silently dropped. Motion is US-027's with nothing added (a test greps for `useState`, timers,
+`requestAnimationFrame`); the sparkline paints with `currentColor`, so no prop can smuggle a hex in.
 
-**One tile carries all three consumers without a variant per hero.** Extra hero content arrives as
-`children`; `onDark` on `KpiFigure` is what US-016's navy band composes, forcing the chip's `light`
-variant so nobody can leave a red figure on navy.
-
-**The US-012 trap is closed at the root.** `tailwind-merge` reads our named type scale as colours, so
-a size beside a colour was silently lost. `app/lib/cn.ts` now declares the scale as the `font-size`
-group, **derived from `tokens.fontSize` through the same `cssVariableName` mapping Tailwind generates
-the utility from**, so a new token cannot drift. Asserted in `tests/unit/cn.test.ts`.
-
-**Motion is US-027's, with nothing added** — a test greps this file and fails on `useState`,
-`setTimeout`, `setInterval` or `requestAnimationFrame`. The sparkline draws with `pathLength="1"` + a
-dash offset and paints with `currentColor`, so no colour prop can smuggle a hex through. The frame
-and preference stubs moved to `tests/unit/support/motion-harness.ts` — one harness for all nine.
-
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 722/722 tests ✅ (78 new) · build ✅ · coverage 100%
-stmts / 99.5% branches. `.kpi-number` was checked to sit *before* the utilities layer so `onDark`'s
-white wins. **Security triage:** no security-relevant changes detected.
-
-**One seam, stated plainly:** no real-Chrome pass here — nothing in the app mounted these components
-yet. *(Closed 2026-09-09: US-013's baseline row gave US-017, US-021 and US-027 their browser pass —
-54 distinct KPI strings and 43 distinct bar widths per frame, two values only under reduced motion.)*
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 722/722 (78 new) · build ✅ · coverage 100% stmts /
+99.5% branches. **Security triage:** none. *(The "no browser pass" seam closed 2026-09-09 with
+US-013's baseline row, which gave US-017/US-021/US-027 their Chrome pass.)*
 
 ### 2026-09-09 — US-021 Horizontal bar tile ✅ (3 pts)
 
-**Delivered:** `app/components/charts/h-bars.tsx` — the most reused chart in the product. Three
+**Delivered:** `app/components/charts/h-bars.tsx` — the most reused chart in the product, three
 exports, one per seam:
 
 ```tsx
@@ -206,40 +177,35 @@ exports, one per seam:
 ```
 
 **Both review decisions are asserted, not just implemented.** The label column is 150px at weight 500
-with **no truncation** — a test reads `150px` back off every rendered label, rejects `truncate` /
-`text-ellipsis` / `line-clamp`, and pins `Cap "Rotblau"` and `Home shirt 26/27` as full strings (a
-long label wraps). The value column is 96px `nowrap`, read back through `getComputedStyle` on every
-row of three lists, with `-CHF 150k` proven to be a single text node. Both widths are inline geometry
-from one exported constant, so each decision has one home.
+with **no truncation** — a test reads `150px` back off every label, rejects `truncate` /
+`text-ellipsis` / `line-clamp`, and pins `Cap "Rotblau"` as a full string (long labels wrap). The
+value column is 96px `nowrap`, read back through `getComputedStyle` on every row of three lists, with
+`-CHF 150k` proven a single text node. Both are inline geometry from one exported constant.
 
 **One rule carries all five consumers: the sign of the displayed figure.** A negative row grows
 leftwards from the far edge in the variance-negative token and its text carries the `-`; everything
 else grows rightwards in its series colour. `negative` mode is then just "every row is a decline" —
 it negates the stored magnitude (Hero 2 stores `drop: 150`) so `formatMoneyCompact` produces
-`-CHF 150k` with the minus **before** the unit, idempotently. The same rule handles the badge trend's
-mixed signs (+38%, +6%, -3%) from one dataset. Colour is never the sole signal: direction is the
-anchor side, the token *and* the sign, published as `data-direction` so nothing reads a pixel.
-
-**Nothing snaps to zero.** Rows are keyed by name, so a filter change transitions the *same* bar's
-width (a test holds element identity across a rerender: 100% → 50%) while `useCountUp` carries the
-figure on from what is on screen. The exported pure `hBarMax` / `hBarPercent` return zero width
-rather than `NaN`, so a zero is a **labelled zero** with its track, in the neutral treatment.
+`-CHF 150k` idempotently, and the same rule handles the badge trend's mixed signs from one dataset.
+Colour is never the sole signal: direction is the anchor side, the token *and* the sign, published as
+`data-direction` so nothing reads a pixel. **Nothing snaps to zero** — rows are keyed by name, so a
+filter change transitions the *same* bar's width (element identity held across a rerender: 100% →
+50%) while `useCountUp` carries the figure on; `hBarMax` / `hBarPercent` return zero, never `NaN`.
 
 **Reuse seam for US-023:** the driver tile is `HBarTile` with `format={formatMoneyCompact}` and its
 `-CHF 400k total` chip in the card's `action` slot, which passes straight through `Card` (asserted).
 
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 777/777 tests ✅ (55 new) · build ✅ · coverage 100%
-stmts / 99.6% branches; every new utility confirmed in the compiled stylesheet.
-**Security triage:** no security-relevant changes detected.
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 777/777 (55 new) · build ✅ · coverage 100% stmts /
+99.6% branches; every new utility confirmed in the compiled stylesheet. **Security triage:** none.
 
-**One deliberate deviation from the reference, flagged for review:** the reference draws
-negative-mode bars rightwards; here a decline grows **leftwards**, so direction survives a projector
-that washes the red out. Reverting it is one line; the 150px and 96px decisions must not be.
+**One deliberate deviation, flagged for review:** the reference draws negative-mode bars rightwards;
+here a decline grows **leftwards**, so direction survives a washed-out projector. Reverting it is one
+line; the 150px and 96px decisions must not be.
 
 ### 2026-09-09 — US-025 Line chart component ✅ (3 pts)
 
 **Delivered:** `app/components/charts/line-chart.tsx` — the only line chart in the product, built for
-both consumers at once. Four exports, one per seam:
+both consumers at once, four exports, one per seam:
 
 ```tsx
 <LineChart key={period} dark legend={false} xs={p.labels} format={formatMoney}   // US-016 band
@@ -256,45 +222,79 @@ normalises its own length (`pathLength="1"`), so one dash of 1 covers it and the
 1 → 0 — no measurement, no per-frame JavaScript. Under the preference `useGrow` is `true` in the
 **first** render, so a test reads `stroke-dashoffset="0"` with **zero frames requested**, and again
 after a re-key: the line is never stranded at offset 1 awaiting a transition that will not run. A
-dashed line cannot draw that way (its dasharray *is* the pattern) so it fades, at full opacity in
-that same first render. Flipping the preference mid-entrance resolves the offset immediately.
-
-**It replays by being re-keyed, and there is no second mechanism.** No `replay` prop, no effect
-watching the data: `<LineChart key={period}>` remounts and `useGrow` starts at `false` again. Tests
-hold both halves — a re-key returns the offset to 1 and clears the hover guide, while a data change
-*without* a key change leaves it drawn (no flash).
+dashed line cannot draw that way (its dasharray *is* the pattern) so it fades in instead, at full
+opacity in that same first render. **It replays by being re-keyed, with no second mechanism** — no
+`replay` prop, no effect watching the data; a re-key returns the offset to 1 and clears the hover
+guide, while a data change *without* a key change leaves it drawn (no flash).
 
 **Hover shows EVERY series at the hovered x.** The pointer is mapped over the wrapper (the svg's
 units are stretched by the `viewBox`) to the nearest index by the exported pure `hoverIndex`; a guide
-plus one dot per series is drawn there and the tooltip lists every series' reading — tested by
-hovering an exact x and reading the whole tooltip back through US-011's formatters. Keyboard access
-came cheap: `tabIndex=0` plus arrow/Home/End/Escape through the pure `nextHoverIndex`, which returns
-`null` for every other key, so Tab is not captured (tested).
-
-**Two charts on screen cannot collide.** Gradient ids come from `useUid`; a test renders the band and
-Hero 2 together and asserts two distinct ids **and** that each area fill points at its own (the
-reference's module-global counter is not used; a test rejects a literal `id="…"`).
+plus one dot per series is drawn and the tooltip lists every series' reading, tested by hovering an
+exact x and reading it back through US-011's formatters. Keyboard access came cheap: `tabIndex=0`
+plus arrow/Home/End/Escape through the pure `nextHoverIndex`, which returns `null` for every other
+key so Tab is not captured. **Two charts cannot collide:** gradient ids come from `useUid`, and a
+test renders the band and Hero 2 together asserting distinct ids *and* that each fill points at its own.
 
 **No hex, and no colour parked where a CSS parser may drop it.** Series colours are token names
-(`red`/`blue`/`navy`/`gold`/`white`) resolved through `cssVariable` to `var(--color-…)`: the svg takes
-them as presentation attributes, the two DOM swatches as a `--line-series` custom property read back
-by `bg-[var(--line-series)]`. Gold is a legitimate *series* colour here — navy band only, per the
-Guide — and the light default cycle never reaches for it. A zero is a **labelled zero**: `valueAt`
-reads a missing, short or non-finite point as `0`, so no `NaN` enters a `d` and the twelve-month axis
-still runs full length. Axis labels use the 12px `--text-chart-axis` token rather than the
-reference's 10px (E8); the legend wraps, and the tooltip flips inside the plot near either edge.
+resolved through `cssVariable` to `var(--color-…)`: the svg takes them as presentation attributes,
+the two DOM swatches as a `--line-series` custom property read back by `bg-[var(--line-series)]`.
+Gold is a legitimate *series* colour here — navy band only, per the Guide. A zero is a **labelled
+zero**: `valueAt` reads a missing or non-finite point as `0`, so no `NaN` enters a `d`. Axis labels
+use the 12px `--text-chart-axis` token, not the reference's 10px (E8); the legend wraps and the
+tooltip flips inside the plot near either edge.
 
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 953/953 tests ✅ (73 new) · build ✅ · coverage 100%
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 953/953 (73 new) · build ✅ · coverage 100%
 lines / 100% funcs / 99.3% stmts on the new file (99.9% / 98.6% overall); every new utility confirmed
 in the compiled stylesheet. **Security triage:** no security-relevant changes detected — names and
 labels are React-escaped and the only values reaching `style` are data numbers plus a token
 reference. **One seam:** no real-Chrome pass — nothing mounts a line chart until US-016.
 
+### 2026-09-09 — US-026 Segmented period filter control ✅ (2 pts)
+
+**Delivered:** `app/components/controls/segmented.tsx` — the one period control, designed for all
+three consumers and **wired into none of them**: mounting it is US-016's and US-034's work, so
+US-013's `action` slot stays deliberately empty until then.
+
+```tsx
+<Segmented options={periods} value={period} onChange={setPeriod} />            // US-013 card action
+<Segmented options={periods} value={period} onChange={setPeriod} variant="dark" />  // US-016 band
+<Segmented options={h1} value={pk} onChange={setPk} label="Period for merchandise" />  // US-034
+export function nextOptionIndex(key, current, count): number | null            // pure, arrow keys
+```
+**11px is a REVIEWED decision and it is asserted, not just implemented.** `--radius-chip: 11px`
+already existed, so nothing was redeclared: the group wears `rounded-chip` and every option the new
+`.fcb-chip` class, whose `border-radius: var(--radius-chip)` a test reads back out of `app/app.css`.
+`rounded-full` / `rounded-pill` / `9999px` / `--radius-pill` are rejected in the markup, the source
+*and* the stylesheet, and `radius.chip` is pinned unequal to `tile` and `pill`. The lift-and-tint
+hover is split on purpose: `.fcb-chip` carries the 1px lift and the transition (shared with US-029's
+chips, hence the exported `CHIP_SURFACE_CLASS`); the tint stays in the variant table, the one half
+that has to differ per surface.
+**`PeriodKey` reused, never re-declared.** `SegmentedOption` is `{ key: PeriodKey; label: string }`,
+structurally the head of `BaselinePeriod` / `TopProductsPeriod` / `Hero1Period`, so a consumer hands
+its period array straight over. A `@ts-expect-error` line fails `pnpm typecheck` the moment the key
+loosens to `string`, and a test proves no period literal appears in the file at all. The label is
+data on the ENTRY, which lets Hero 1 say "Current month" for the same `THIS_MONTH` key.
+**Controlled, with no opinion of its own** — a press the caller ignores changes nothing on screen
+(tested), which is what lets ONE control drive two tiles on the band, or three on Hero 1, without
+them ever disagreeing. **Accessibility done properly:** `role="radiogroup"` with an accessible name,
+`role="radio"` + `aria-checked` per option, ONE tab stop via roving `tabIndex` (the group stays
+reachable when the value matches nothing), arrows wrapping on both axes plus Home/End through the
+pure `nextOptionIndex`, which returns `null` for every other key so Tab, Enter and Space keep their
+meaning. Selection is carried four ways, never by colour: the filled shape, `shadow-raised`,
+`font-bold` and `aria-checked`.
+
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 998/998 tests ✅ (45 new) · build ✅ · coverage 100%
+lines / 100% funcs / 97.4% stmts on the new file (99.7% / 98.5% overall). **Security triage:** no
+security-relevant changes detected — a presentational control with no IO, no dependency change, and
+labels rendered as React-escaped text. **One seam:** no real-Chrome pass; nothing mounts it until
+US-016 — which this story **unblocks** (US-025 + US-026 + US-027 all exist now).
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress — US-027, US-017, US-021, US-025 done (4/11 · 11/29). Phase 2a's
-deferred US-013 was completed inside this run (Phase 2a now 4/5 · 11/16), giving US-017/US-021/US-027
-their first Chrome pass. **Next: US-026** — the last piece US-016's hero band is waiting on.
+**Phase Status:** In Progress — US-027, US-017, US-021, US-025, US-026 done (5/11 · 13/29). Phase
+2a's deferred US-013 was completed inside this run (Phase 2a now 4/5 · 11/16), giving
+US-017/US-021/US-027 their first Chrome pass. **Next: US-016** — now unblocked, the hero band was
+waiting on US-025 + US-026 + US-027 and has all three.
 **Previous:** [Phase 2a](phase-2a.md) · **Next:** [Phase 3a — Conversation](phase-3a.md)

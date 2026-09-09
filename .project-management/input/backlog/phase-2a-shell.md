@@ -6,7 +6,7 @@ grow when a question is asked.
 **Duration:** Day 2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 16
-**Status:** In Progress (4/5 completed — US-016 still deferred; its US-025/US-026 dependencies are unbuilt)
+**Status:** In Progress (4/5 completed — US-016 deferred but UNBLOCKED; US-025/US-026/US-027 all exist)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -16,7 +16,7 @@ grow when a question is asked.
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (4/5 completed — US-016 still deferred; its US-025/US-026 dependencies are unbuilt)
+**Status:** In Progress (4/5 completed — US-016 deferred but UNBLOCKED; US-025/US-026/US-027 all exist)
 **Source:** Build Specification E4; Reference Implementation Guide §8.
 
 > The dashboard **never clears to show a hero — it grows.** That single behaviour is what makes the
@@ -196,7 +196,8 @@ grow when a question is asked.
     - Webshop total and its delta are **computed** from the series, never stored separately
   - **Dependencies:** US-007, US-025, US-026, US-027
   - **Status note (2026-09-09):** ⏸️ **Deferred to the Phase 2b run** — US-025 (line chart),
-    US-026 (segmented filter) and US-027 (motion hooks) all live in Phase 2b.
+    US-026 (segmented filter) and US-027 (motion hooks) all live in Phase 2b — **all three landed
+    2026-09-09, so US-016 is now unblocked**.
   - **Notes:** A Reference Guide addition beyond the Build Specification, added at the lead owner's
     direction. P1 because the three heroes are the demo's core; this is the frame around them.
 
@@ -208,7 +209,7 @@ grow when a question is asked.
 
 **By Priority:** P0: 4 stories, 11 points · P1: 1 story, 5 points · P2: 0
 
-**By Status:** ✅ 4 stories, 11 points · 🔄 0 · 📋 0 · ⏸️ 1 story, 5 points (US-016 — US-025/US-026 unbuilt)
+**By Status:** ✅ 4 stories, 11 points · 🔄 0 · 📋 0 · ⏸️ 1 story, 5 points (US-016 — now unblocked)
 
 ---
 

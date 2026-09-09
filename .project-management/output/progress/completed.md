@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 19 stories
-**Total Points:** 46 / 116
+**Total Completed:** 20 stories
+**Total Points:** 48 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 46 points/day
+**Average Velocity:** 48 points/day
 **Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
 
 ---
@@ -48,65 +48,21 @@ Condensed to keep this log inside its 300-line limit; the **full per-story detai
 
 ---
 
-## Completed Stories *(Phase 2a onward)*
+## Phase 2a: Shell & Baseline — 4/5 stories (US-016 deferred, now unblocked)
 
-### US-012: Branded application shell (3 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 7 code (4 new, 3 modified) + 5 test files + 6 tracking docs
-**Tests Added:** 57 net (unit: 57) - 475/475 green, 100% stmts / 98.9% branches of `app/**` · **Commit:** see phase-2a progress log
-**Notes:** Scope held to the frame. Baseline tiles (US-013), insertion (US-014), reset (US-015) and
-the hero band (US-016) deliberately not built - the canvas is left empty for them.
+US-012 / US-014 / US-015 condensed to keep this log inside its 300-line limit; the **full per-story
+detail lives in [`../phases/phase-2a.md`](../phases/phase-2a.md)**, the authoritative record.
+US-013's entry stays in full below, with the Phase 2b components it was the first to mount.
 
-**What Was Done:**
-- `chrome/{sidebar,top-bar,app-shell}.tsx` + `lib/persona.ts`: navy sidebar (hidden below `lg`), app
-  bar with the self-hosted crest, "Sales & Marketing", decorative status and Reset, and a 12/8/4
-  canvas grid. No literal colour anywhere - tests pin that
-- **Persona is a role:** the label and the "SM" monogram live in one module, and a test asserts the
-  app bar's entire text is exactly those labels. No photo - the crest is the only `<img>`
-- **Placeholders inert structurally, not by handler:** `<span aria-disabled="true">`, no href, no
-  handler, no focus, `pointer-events-none`. Real Chrome: `tabIndex` -1, a synthesised click leaves
-  the router at `/`. **Status is decorative:** static text, `data-decorative`, no live region, no
-  `fetch` / `useEffect` / timer in the file; at 1920x1080 `scrollWidth === clientWidth`
+| Story | Pts | Tests | What it left behind |
+|---|---:|---:|---|
+| US-012 Branded application shell | 3 | 57 | `chrome/{sidebar,top-bar,app-shell}.tsx` + `lib/persona.ts` — navy sidebar (hidden below `lg`), app bar with the self-hosted crest, and a 12/8/4 canvas grid left **empty** for US-013/014/015/016. No literal colour anywhere. **Persona is a role:** one module holds the label and the "SM" monogram, and a test asserts the app bar's entire text is exactly those labels. **Placeholders are inert structurally, not by handler** (`aria-disabled`, no href, no focus, `pointer-events-none`); status is decorative — no live region, no `fetch`, no timer. Chrome: `scrollWidth === clientWidth` at 1920x1080. |
+| US-014 Dynamic tile insertion & grid reflow | 3 | 77 | `lib/dashboard/sections.ts` (pure) + `use-dashboard.ts` (state, owned by `root.tsx`): the session as a memory-only `{heroId, phase, revision}` list. The dashboard **grows, it never clears**. **Dedupe by hero id** — re-asking keeps ONE section in place and bumps `revision` so it re-inserts rather than doing nothing, and a follow-up *flips* its parent's phase (what US-033 needs). **One grid, not two:** sections re-use US-012's tracks via `grid-cols-subgrid`. **Reflow, never jump** — every mutation runs through `animateReflow` with `flushSync` inside the callback; reduced motion gives zero transitions with an identical layout. A source scan bans every storage API. |
+| US-015 Reset to baseline | 2 | 40 | Reset built as a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS`, `reset` + `schedule` + `generation`, `scrollToTop`, `<AppShell onReset>`. It restores the same named constant that is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free. **The timer, proven by breaking it:** `reset` cancels the pending beat *first*; deleting that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard. **Abuse-proof by construction** — the same reference comes back when there is nothing to clear, so 10 presses in one frame run **one** transition. 3 of 5 criteria met; the chips (US-029) and half the thinking beat (US-031) are a stated SEAM, not a claim. |
 
-### US-014: Dynamic tile insertion & grid reflow (3 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 8 code (4 new, 4 modified) + 5 test files + 7 tracking docs
-**Tests Added:** 77 (unit: 77) - 552/552 green, 100% stmts / 99.1% branches of `app/**` · **Commit:** see phase-2a progress log
-**Notes:** The mechanic the demo turns on: the dashboard **grows, it never clears**. Hero content is
-a marked placeholder - tiles are Phase 2b, narratives Phase 3b.
+---
 
-**What Was Done:**
-- `lib/dashboard/sections.ts` (pure) + `use-dashboard.ts` (state, owned by `root.tsx`): the session
-  as a memory-only `{heroId, phase, revision}` list - append, refresh-in-place, flip-phase
-- **Dedupe by hero id:** re-asking keeps ONE section in place and bumps `revision` (changing the
-  React key, so it re-inserts rather than doing nothing); a section already showing its follow-up
-  never regresses. A follow-up **flips** its parent's phase - what US-033 needs
-- **One grid, not two:** sections re-use the US-012 canvas grid's tracks via `grid-cols-subgrid`.
-  Chrome at 1920x1080: tracks 122.656px, tiles 816px at x=256/1088
-- **Reflow, never jump:** every mutation runs through US-006's `animateReflow` with `flushSync`
-  inside the transition callback; Chrome shows the view-transition group animating, and reduced
-  motion gives zero transitions with an identical layout. `scrollY` 0 -> 154 at 1280x620
-- **No persistence:** a source scan over `app/**` bans `localStorage`, `sessionStorage`, `indexedDB`
-  and `document.cookie`; a remount test shows the session starting empty, as a reload does
-
-### US-015: Reset to baseline (2 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 6 code (all modified) + 4 test files + 8 tracking docs
-**Tests Added:** 40 (unit: 40) - 592/592 green, 100% stmts / 99.2% branches / 100% funcs of `app/**` · **Commit:** see phase-2a progress log
-**Notes:** 3 of 5 criteria fully met; **criterion 2 (chips, US-029) and half of criterion 4 (the
-thinking beat, US-031) are a SEAM, not a claim**; criterion 1's four tiles are US-013. Nothing was
-invented to make an unbuilt criterion look done.
-
-**What Was Done:**
-- Reset is a **transition beside the other three**: `withBaselineRestored` / `BASELINE_SECTIONS` in
-  `sections.ts` (pure), `reset` + `schedule` + `generation` on `use-dashboard.ts`, `scrollToTop` in
-  `motion.ts`, `<AppShell onReset={reset}>` in `root.tsx`. It restores the same named constant that
-  is the hook's initial state, so **nothing says "empty"** and US-013 gets reset for free
-- **The timer, proven by breaking it:** `reset` cancels the single pending beat *first*; deleting
-  that line makes two tests fail with a `HERO_2` section landing in a just-cleared dashboard
-- **Abuse-proof by construction:** `withBaselineRestored` returns the *same reference* when there is
-  nothing to clear, so 10 presses in one frame run **one** transition. Chrome: `scrollY` 900 -> 0
-  over three rapid presses, zero `startViewTransition` calls under reduced motion
+## Phase 2b: Component Library — stories in full (5/11)
 
 ### US-027: Motion & animation hooks (3 pts)
 **Completed:** 2026-09-09
@@ -289,6 +245,49 @@ than under the chart), `LineChart`, `LineChartTile`.
   upload, dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API.
   Series names and axis labels are React-escaped text; the only values reaching `style` are numbers
   derived from the data plus a token reference
+
+### US-026: Segmented period filter control (2 pts)
+**Completed:** 2026-09-09
+**Files Changed:** 2 code (1 new, 1 modified) + 1 test file + 5 tracking docs
+**Tests Added:** 45 (unit: 45) - 998/998 green, 100% lines / 100% funcs on the new file, 99.7% stmts / 98.5% branches of `app/**` · **Commit:** see phase-2b progress log
+**Notes:** All 3 acceptance criteria met. **Designed for all three consumers, wired into none** —
+mounting it belongs to US-016 and US-034, so US-013's `action` slot stays deliberately empty until
+then. This story **unblocks US-016**, the last deferred Phase 2a story.
+
+**What Was Done:**
+- `app/components/controls/segmented.tsx` — `Segmented`, the pure `nextOptionIndex`, the closed
+  `SEGMENTED_VARIANT_CLASS` table, and `CHIP_SURFACE_CLASS` for US-029's suggestion chips to reuse
+- **11px is a reviewed decision and it is asserted three ways.** `--radius-chip: 11px` already
+  existed, so nothing was redeclared: the group wears `rounded-chip`, each option the new `.fcb-chip`
+  rule in `app/app.css`, and a test reads `border-radius: var(--radius-chip)` back out of the
+  stylesheet while rejecting `rounded-full` / `rounded-pill` / `9999px` / `--radius-pill` in the
+  markup, the source *and* the CSS, and pins `radius.chip` unequal to both `tile` and `pill`
+- **The lift-and-tint hover is split on purpose:** `.fcb-chip` carries the 1px lift and the
+  transition (shared with US-029), the tint stays in the light/dark table — the only half that has to
+  differ per surface. `light` is a white card or section header, `dark` the navy band (navy fill vs
+  the club's gold accent); a test asserts the two variants' class strings actually differ
+- **`PeriodKey` reused, never re-declared** (`.claude/rules/enums-and-constants.md` §8):
+  `SegmentedOption` is `{ key: PeriodKey; label: string }`, structurally the head of
+  `BaselinePeriod` / `TopProductsPeriod` / `Hero1Period`, so a consumer passes its period array
+  straight in. A `@ts-expect-error` line fails `pnpm typecheck` the moment the key loosens to
+  `string`, and a test proves no period literal appears in the file at all. **The label is data on
+  the entry**, which is what lets Hero 1 say "Current month" for the same `THIS_MONTH` key
+- **Controlled, with no opinion of its own** — no internal selection, no defaulting to the first
+  option; a press the caller ignores changes nothing on screen (tested). That is what lets ONE
+  control drive two tiles on the band, or three on Hero 1, without them ever disagreeing
+- **Radiogroup semantics, done properly:** `role="radiogroup"` with an accessible name, `role="radio"`
+  + `aria-checked` per option, ONE tab stop via roving `tabIndex` (and the group stays reachable when
+  the value matches no option), arrows wrapping on both axes plus Home/End through the pure
+  `nextOptionIndex`, which returns `null` for every other key so Tab, Enter and Space keep their
+  meaning. **Selection is carried four ways, never colour alone** — the filled shape,
+  `shadow-raised`, `font-bold` and `aria-checked`, so the projector-shift rule holds here too
+- **Scope held:** no hero band (US-016), no Hero 1 section (US-034), no Top Products wiring, no
+  suggestion chips (US-029). **No real-Chrome pass** — nothing mounts the control until US-016
+- **Security triage: no security-relevant changes detected.** Considered and cleared: HTTP handler or
+  route, IDOR, raw SQL, `dangerouslySetInnerHTML` / `innerHTML`, user-supplied URL / SSRF, upload,
+  dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API. A
+  presentational control with no IO: labels render as React-escaped text and the only DOM query uses
+  a constant selector
 
 ---
 

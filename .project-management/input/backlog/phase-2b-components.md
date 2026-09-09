@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (4/11 completed)
+**Status:** In Progress (5/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (4/11 completed)
+**Status:** In Progress (5/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -201,13 +201,23 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 2
   - **Priority:** P1
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** The pill filter control used by the hero band, Top Products and Hero 1.
   - **Acceptance Criteria:**
     - Renders in a card's `action` slot or a section header
     - `light` and `dark` variants
     - 11px corner radius (not a full pill), with a lift-and-tint hover
   - **Dependencies:** US-003
+  - **Completion note (2026-09-09):** All three criteria met, in
+    `app/components/controls/segmented.tsx` — `Segmented`, plus the pure `nextOptionIndex` and the
+    exported `CHIP_SURFACE_CLASS` US-029's suggestion chips will reuse. Controlled
+    (`options` / `value` / `onChange`), keys typed to the shared `PeriodKey` with the label as data
+    on each entry, so Hero 1 can say "Current month" for `THIS_MONTH`. `light` / `dark` variants from
+    a closed class table; 11px comes from the existing `--radius-chip` via `rounded-chip` plus the
+    new `.fcb-chip` rule (radius + 1px lift + transition) — `rounded-full` is rejected by test.
+    Radiogroup semantics: one tab stop (roving `tabIndex`), wrapping arrows on both axes, Home/End,
+    and selection carried by shape, shadow, weight *and* `aria-checked`, never colour alone.
+    **Not wired into any consumer** — US-013's `action` slot stays empty until US-016's pass.
 
 - **US-027**: Motion & animation hooks
   - **Story Points:** 3
@@ -237,7 +247,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 2 stories, 5 points · 🔄 0 · 📋 9 stories, 24 points · ⏸️ 0
+**By Status:** ✅ 5 stories, 13 points · 🔄 0 · 📋 6 stories, 16 points · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)

@@ -79,9 +79,9 @@ is asked.
 ### Progress Tracking *(auto-updated by `/execute-work`)*
 - **Completed Story Points:** 11 / 16 (69%)
 - **Completed Stories:** 4 / 5 — **the phase is NOT complete**
-- **Deferred:** US-016 (5 pts) → still open; its dependencies US-025 (line chart) and US-026
-  (segmented filter) are not built yet. US-013 was completed in the Phase 2b run on 2026-09-09,
-  once US-017 and US-021 existed
+- **Deferred:** US-016 (5 pts) → still open but **UNBLOCKED as of 2026-09-09**: US-025 (line chart),
+  US-026 (segmented filter) and US-027 (motion hooks) all now exist. US-013 was completed in the
+  Phase 2b run on 2026-09-09, once US-017 and US-021 existed
 - **Tests Passing:** 880 / 880 · **Coverage:** 100% stmts / 99.6% branches / 100% funcs (`app/**`) · **Commits:** 4
 
 ---
@@ -93,7 +93,7 @@ is asked.
 - US-007 baseline datasets (Phase 1b)
 - US-017 KPI tile + US-021 horizontal bar tile — **needed by US-013**; both landed 2026-09-09 and
   US-013 shipped immediately after
-- US-025, US-026, US-027 — **needed by US-016** for the hero band (US-027 landed; US-025/US-026 open)
+- US-025, US-026, US-027 — **needed by US-016** for the hero band; **all three landed 2026-09-09**
 
 **Blocks:** US-033 (follow-up gating) needs US-014's insertion mechanic.
 
@@ -109,7 +109,7 @@ is asked.
 |------|--------|-------|------------|-------|--------|
 | Grid jumps instead of reflowing when tiles insert | High | Medium | Existing tiles animate to new positions; verified in US-043 polish | AI | Mitigated — US-014 wraps every insertion in a view transition; `::view-transition-group(fcb-tile-HERO_1)` observed animating in real Chrome while a second section inserted |
 | Reset mid-flow leaves an orphaned timeout or animation | Medium | Medium | Reset clears the pending timeout ref; verified in US-042 and US-045 | AI | Mitigated — US-015 owns the single pending timer (`schedule`) and cancels it **first**, before touching state. Proven by deleting the cancel: the beat then inserted `HERO_2` into the reset dashboard and two tests failed. Repeated presses run one transition, not several |
-| Cross-phase dependency stalls US-013 / US-016 | Medium | High | See sequencing note above — reorder within the phase rather than blocking | AI | Half closed — US-013 shipped in the Phase 2b run the day US-017 and US-021 landed, with no rework to either. US-016 stays open until US-025/US-026 exist |
+| Cross-phase dependency stalls US-013 / US-016 | Medium | High | See sequencing note above — reorder within the phase rather than blocking | AI | ✅ Closed — US-013 shipped in the Phase 2b run the day US-017 and US-021 landed, with no rework to either, and US-026 (2026-09-09) was the last piece US-016 waited on: reordering within the run cost nothing |
 | Horizontal scroll appears at 1080p | High | Low | Responsive 12-column grid; verified in US-040 | AI | Mitigated — US-012 shell measured in Chrome at 1920×1080, `scrollWidth === clientWidth` |
 
 ---
@@ -288,8 +288,8 @@ API (none — the `app/**` scan still passes). The one value-driven style in the
 through the CSSOM (which rejects anything that is not a colour), and a test asserts every partner's
 `brandColor` matches `/^#[0-9A-Fa-f]{6}$/`.
 
-**Next:** US-025 — line chart component (3 pts), which with US-026 unblocks US-016 and closes
-Phase 2a.
+**Next:** US-016 — hero band: webshop trend & attendance ring (5 pts). Now unblocked (US-025 +
+US-026 + US-027 all exist) and the last story in this phase; build it inside the Phase 2b run.
 
 ---
 
