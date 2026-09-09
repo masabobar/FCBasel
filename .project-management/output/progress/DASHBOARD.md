@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 1b - Seed Data *(4/5 stories complete)*
+**Current Phase:** Phase 2a - Shell & Baseline *(0/5 stories started)* · Phase 1b complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 19% | 100% | 🟢 On Track |
+| **Overall Progress** | 21% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
-| **Phase 1b** | 80% — In Progress | 100% | 🟢 On Track |
-| **Stories Completed** | 10/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 22/116 | 116 | 🟢 On Track |
+| **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
+| **Stories Completed** | 11/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 24/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 10
-**Currently Working On:** US-011 — Formatters & cross-hero reconciliation (2 pts)
-**Story Points Completed Today:** 22
+**Stories Completed Today:** 11
+**Currently Working On:** None — Phase 1b complete
+**Story Points Completed Today:** 24
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -82,25 +82,39 @@
   derived 410 overspend. Ticketing's 24,360 legitimately exceeds Hero 2's 7,830 because it includes
   the season-ticket base, and the `scopeLabel` says so on the tile.
 
+- ✅ **US-011 — Formatters & cross-hero reconciliation (2 pts)** — the shared display layer
+  (`app/lib/format.ts`, pure and stateless) plus the drift alarm that closes Phase 1b
+  (`tests/unit/reconciliation.test.ts`, 39 tests). Money always carries `CHF`, and the sign goes
+  *before* the unit (`-CHF 400k`); millions render bare under the "figures in CHF millions" subtitle
+  with no "000" note anywhere. `Intl.NumberFormat("en-CH")` per the Reference Guide, so thousands
+  group with the Swiss U+2019 mark — pinned as a constant and made runtime-independent of ICU, proved
+  by tests that stub `Intl` to `en-US` and `de-DE`. `oneDecimal` is *imported* from `derive.ts`, so
+  there is exactly one rounding rule, and variance carries its meaning through sign plus a new
+  `VarianceDirection` enum rather than colour. The reconciliation suite asserts relationships and not
+  constants — every hero's stored key set, every split against its total, the intended cross-hero
+  inequality (Ticketing 24,360 > 7,830, both scope-labelled), and every number in all six narratives
+  swept against the figures the data can actually produce. **No drift found.**
+
 ---
 
-## 🏁 Phase 1b in progress — Seed Data
+## 🏁 Phase 1b complete — Seed Data
 
 **Phase 1b goal:** the single source of truth for every figure in the prototype, seeded locally and
-grounded in verified FCB facts. **Phase 1a** (setup and design system) closed at 100% on 2026-09-09.
-**Duration:** 2026-09-09 to 2026-09-10
-**Progress:** 80% (4/5 stories · 8/10 points)
+grounded in verified FCB facts. Closed at 100% on 2026-09-09, as did **Phase 1a**.
+**Duration:** 2026-09-09 (one day, ahead of the 2026-09-10 target)
+**Progress:** 100% (5/5 stories · 10/10 points)
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-011: Formatters & cross-hero reconciliation | 📋 Next | 0% |
+| Phase 2a: US-012 — Branded application shell | 📋 Next | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-011: Formatters & cross-hero reconciliation | 2026-09-09 | 2 |
 | US-010: Hero 3 dataset — departmental performance | 2026-09-09 | 2 |
 | US-009: Hero 2 dataset — ticket revenue year on year | 2026-09-09 | 2 |
 | US-008: Hero 1 dataset — shirt sales, badges, printed names | 2026-09-09 | 2 |
@@ -142,8 +156,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 100% stmts / 98% branches | 80% | 🟢 Good |
-| Passing Tests | 348/348 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 100% stmts / 98.9% branches | 80% | 🟢 Good |
+| Passing Tests | 418/418 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -159,7 +173,11 @@ run `railway login && railway init && railway up`, then record the shareable URL
 > from 0 to 2,000 and at a set of adversarial primes, and US-009 pins both of Hero 2's deliberately
 > different scope labels so the fixture total and the larger monthly total cannot read as a bug.
 > US-010 goes further and tests the *meaning* of a number: a naive "variance > 0 is good" rule is
-> shown to misread exactly one department, so the Revenue/Cost tag cannot be dropped unnoticed. Since
+> shown to misread exactly one department, so the Revenue/Cost tag cannot be dropped unnoticed.
+> US-011 closes the phase with a cross-dataset reconciliation suite that fails if any figure drifts
+> from any other, sweeps every number in all six hero narratives against the data, and pins the
+> formatter output glyph by glyph — including a stubbed-ICU test proving the output does not move
+> between Node builds. Since
 > US-002 the gate is three-part: strict `tsc`, ESLint 9 flat config, and Prettier — the last two
 > enforced on every commit by husky + lint-staged.
 
@@ -170,8 +188,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Phase | Status | Stories | Points | Progress |
 |-------|--------|---------|--------|----------|
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
-| Phase 1b: Seed Data | 🔄 Active | 4/5 | 8/10 | 80% |
-| Phase 2a: Shell & Baseline | ⏸️ Pending | 0/5 | 0/16 | 0% |
+| Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
+| Phase 2a: Shell & Baseline | 🔄 Active | 0/5 | 0/16 | 0% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
@@ -181,7 +199,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 ## 🔗 Quick Links
 
-- **[Next Phase Plan](../phases/phase-1b.md)** - Phase 1b, Seed Data
+- **[Next Phase Plan](../phases/phase-2a.md)** - Phase 2a, Shell & Baseline
+- **[Phase 1b Plan](../phases/phase-1b.md)** - Completed 2026-09-09
 - **[Phase 1a Plan](../phases/phase-1a.md)** - Completed 2026-09-09
 - **[Backlog](../../input/backlog/)** - All project backlogs
 - **[Detailed Status](current-status.md)** - Full status report
@@ -193,4 +212,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-010 completed at 2026-09-09 — Phase 1b under way
+**Last Auto-Update:** US-011 completed at 2026-09-09 — Phase 1b complete, Phase 2a active

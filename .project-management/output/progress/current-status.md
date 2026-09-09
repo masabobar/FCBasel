@@ -8,9 +8,9 @@
 ## Overall Status
 
 **Project:** FC Basel — Intelligence Platform Prototype
-**Current Phase:** Phase 1b - Dummy Data Model & Seed Datasets
-**Overall Progress:** 19% (10/45 items completed)
-**Story Points Completed:** 22/116
+**Current Phase:** Phase 2a - Dashboard Shell & Persona Baseline
+**Overall Progress:** 21% (11/45 items completed)
+**Story Points Completed:** 24/116
 
 ---
 
@@ -23,13 +23,14 @@
 - **Epics:** Epic 1 (Setup & Deployment), Epic 2 (E2 Brand Theming)
 - **Open human step:** the Railway deploy acceptance criterion of US-001
 
-### Phase 1b: Dummy Data Model & Seed Datasets (Current)
-- **Status:** 🔄 In Progress
-- **Progress:** 4/5 stories · **Points:** 8/10
+### Phase 1b: Dummy Data Model & Seed Datasets
+- **Status:** ✅ Completed 2026-09-09
+- **Progress:** 5/5 stories · **Points:** 10/10
+- **Target:** 2026-09-10 (~4.5 AI-hours) — met a day early
 - **Epics:** Epic 3 (E3 Seed Datasets)
 
-### Phase 2a: Dashboard Shell & Persona Baseline
-- **Status:** ⏳ Upcoming
+### Phase 2a: Dashboard Shell & Persona Baseline (Current)
+- **Status:** 🔄 Active
 - **Progress:** 0/5 stories · **Points:** 0/16
 - **Epics:** Epic 4 (E4 Shell & Baseline)
 
@@ -67,7 +68,7 @@
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets
 - **Phase:** 1b · **Stories:** 5 (US-007 to US-011) · **Points:** 10
-- **Completed:** 4/5 · **Status:** In Progress
+- **Completed:** 5/5 · **Status:** ✅ Done
 
 ### Epic 4: E4 — Dashboard Shell & Persona Baseline
 - **Phase:** 2a · **Stories:** 5 (US-012 to US-016) · **Points:** 16
@@ -93,9 +94,9 @@
 
 ## Active Work
 
-**Currently In Progress:** None — Phase 1b at 4/5
+**Currently In Progress:** None — Phase 1b complete (5/5)
 **Blocked Stories:** None
-**Next Up:** US-011 — Formatters & cross-hero reconciliation (US-007 to US-010 are complete)
+**Next Up:** US-012 — Branded application shell, opening Phase 2a
 
 ---
 
@@ -115,7 +116,7 @@ Full breakdown: [`../reports/ai-hours-estimate-2026-09-09.md`](../reports/ai-hou
 
 - [View DASHBOARD](DASHBOARD.md) - Live auto-updating status
 - [View Backlog](../../input/backlog/README.md) - Master backlog index
-- [View Phase 1b](../phases/phase-1b.md) - Current phase plan · [Phase 1a](../phases/phase-1a.md) - Completed
+- [View Phase 2a](../phases/phase-2a.md) - Current phase plan · [Phase 1b](../phases/phase-1b.md) · [Phase 1a](../phases/phase-1a.md) - Completed
 - [PRD](../docs/prd.md) · [Technical Spec](../docs/technical-spec.md) · [Architecture](../docs/architecture.md)
 
 ---

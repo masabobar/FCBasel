@@ -1,10 +1,10 @@
 # Phase 1b: Dummy Data Model & Seed Datasets
 
 **Duration:** 2026-09-09 to 2026-09-10 (~4.5 AI-hours)
-**Status:** In Progress
+**Status:** Completed
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-10
-**Actual Completion:** —
+**Actual Completion:** 2026-09-09
 
 > **Acceptance criteria live in** [`../../input/backlog/phase-1b-seed-data.md`](../../input/backlog/phase-1b-seed-data.md).
 > This file tracks execution.
@@ -28,7 +28,7 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 
 ### Epic 3: E3 — Dummy Data Model & Seed Datasets (10 story points) *(foundation)*
 
-**Priority:** P0 · **Status:** In Progress (4/5) · **Dependencies:** US-001
+**Priority:** P0 · **Status:** ✅ Completed (5/5) · **Dependencies:** US-001
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
@@ -36,7 +36,7 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 | US-008 | Hero 1 dataset — shirt sales, badges, printed names | 2 | ✅ Completed |
 | US-009 | Hero 2 dataset — ticket revenue year on year | 2 | ✅ Completed |
 | US-010 | Hero 3 dataset — departmental performance | 2 | ✅ Completed |
-| US-011 | Formatters & cross-hero reconciliation | 2 | 📋 Todo |
+| US-011 | Formatters & cross-hero reconciliation | 2 | ✅ Completed |
 
 **Technical Notes:**
 
@@ -50,7 +50,6 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
   over budget *and* behind target — that is the case the causal follow-up interrogates.
 - Derived values (webshop total and delta, kit revenue at CHF 99, badge segments from the percentage
   split) are **computed**, not stored, so a number can never disagree with its own chart.
-- `badgeSegs` must correct rounding so the four sponsor segments sum exactly to the total.
 - **Guardrail:** no salary and no named-individual performance data in any dataset. Squad names
   (Shaqiri, Sow, Metinho, Daniliuc) appear only as shirt-print counts — merchandising data about
   public figures, not performance data.
@@ -59,10 +58,10 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 
 ## Definition of Done *(applies to every story in this phase)*
 
-- [ ] Code implemented and reviewed against `.claude/rules/code-quality.md`
-- [ ] Unit tests cover reconciliation and formatter behaviour; coverage ≥ 80%
-- [ ] Security triage run per `.claude/rules/security-review.md`
-- [ ] Linter clean · Git commit created · Progress tracking updated
+- [x] Code implemented and reviewed against `.claude/rules/code-quality.md`
+- [x] Unit tests cover reconciliation and formatter behaviour; coverage ≥ 80%
+- [x] Security triage run per `.claude/rules/security-review.md`
+- [x] Linter clean · Git commit created · Progress tracking updated
 
 *Not applicable:* API status-code matrix (no endpoints) · i18n (English only) · database migrations
 (no database — see `.claude/rules/database.md` for the expansion path only).
@@ -77,9 +76,9 @@ verified FCB facts, and internally reconciled so nothing jars to someone who kno
 - **Risk Level:** Low (mechanical work — every figure is pinned in the specification)
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 8 / 10 (80%)
-- **Completed Stories:** 4 / 5
-- **Tests Passing:** 348 / 348 · **Coverage:** 100% stmts (`app/**`) · **Commits:** 4
+- **Completed Story Points:** 10 / 10 (100%)
+- **Completed Stories:** 5 / 5
+- **Tests Passing:** 418 / 418 · **Coverage:** 100% stmts / 98.9% branches (`app/**`) · **Commits:** 5
 
 ---
 
@@ -101,10 +100,10 @@ tokens are independent, so 1a and 1b could run in parallel if capacity allowed.
 
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
-| Figures re-typed in a component instead of referenced | High | Medium | US-011 enforces store-once-reference-everywhere; a figure in two tiles must come from one constant | AI | Open |
-| Cross-hero totals appear contradictory in the room | High | Medium | Scope labels on every affected tile (see Technical Notes) | AI | Open |
+| Figures re-typed in a component instead of referenced | High | Medium | US-011 enforces store-once-reference-everywhere; `reconciliation.test.ts` asserts the stored key set of every hero, so a re-typed total fails the suite | AI | ✅ Closed |
+| Cross-hero totals appear contradictory in the room | High | Medium | Scope labels on every affected tile (see Technical Notes), asserted together with the intended inequality in US-011 | AI | ✅ Closed |
 | Rounding makes segments not sum to the total | Medium | Medium | `badgeSegments` corrects the remainder explicitly; proved exhaustively for totals 0-2,000 (US-008) | AI | ✅ Closed |
-| Narrative copy edited and figures no longer match | High | Low | Narratives are verbatim and live beside the figures in the same hero object | AI | Open |
+| Narrative copy edited and figures no longer match | High | Low | Narratives are verbatim and live beside the figures; US-011 sweeps every number in all six narratives against the reachable data | AI | ✅ Closed |
 
 ---
 
@@ -118,10 +117,9 @@ figures in `derive.ts`, fixtures and the in-memory implementation in `app/lib/mo
 selection in `index.server.ts`. Recorded in `app/lib/repositories/README.md` as a four-step recipe so
 US-008 / US-009 / US-010 are mechanical.
 
-**Scope:** the delivered set intentionally exceeds the written acceptance criteria, per the user's
-approved decision — all four periods of the webshop series, attendance block and top-products table,
-not the single period the criteria describe. The Reference Guide is definitive for the experience
-(`scope.md` §10).
+**Scope:** intentionally exceeds the written acceptance criteria, per the user's approved decision —
+all four periods of the webshop series, attendance block and top-products table, not the single
+period the criteria describe. The Reference Guide is definitive (`scope.md` §10).
 
 - The four Specification-pinned figures hold and are asserted: CHF 148,200 this month at +11.9%
   (+12% rounded), FCB 2-1 Sion at 28,900 of ~38,000, this month's five product lines, 6 partners.
@@ -181,9 +179,8 @@ arithmetic. New `SeasonKey` and `MonthKey` enums with their label maps in `enums
 plus `Hero2Repository` in `types.ts`, derived figures in `derive.ts`, fixtures and the implementation
 in `app/lib/mock/hero2.ts`, one line of selection in `index.server.ts`.
 
-**Scope:** the delivered set intentionally exceeds the written acceptance criteria, per the user's
-approved decision — the month-by-month series (twelve points per season) is a Reference Guide
-addition the Build Specification never mentions, and the tile draws it.
+**Scope:** intentionally exceeds the written criteria, per the user's approved decision — the
+month-by-month series (twelve points per season) is a Reference Guide addition the tile draws.
 
 - **The two charts are at DIFFERENT scopes on purpose, and the data says so.** `scopeLabel` sits on
   each series: the fixture chart is "Eight highest-grossing home fixtures, matchday ticket revenue
@@ -254,9 +251,50 @@ implementation in `app/lib/mock/hero3.ts`, one line of selection in `index.serve
   format, typecheck and build all clean. Security triage: no security-relevant changes (static local
   data, no endpoint, no dependency, no environment variable, no user input, no network call).
 
+### 2026-09-09 — US-011: Formatters & cross-hero reconciliation (2 pts) ✅
+
+Phase 1b closes with the two things that keep the other four stories honest: one display layer
+(`app/lib/format.ts`, pure and stateless) and one drift alarm (`tests/unit/reconciliation.test.ts`).
+
+- **Money always carries its unit.** `formatMoney` → `CHF 3’811’500`; `formatMoneyCompact` →
+  `CHF 150k` and `-CHF 150k` with **the sign before the unit**, as the declining-fixtures badge reads
+  — and no bare-amount variant exists to reach for by mistake ("currency shown without unit" is a
+  Specification edge case). Millions render bare (`69.68`) under the "figures in CHF millions"
+  subtitle; no "000" note anywhere.
+- **One rounding rule, not two.** `oneDecimal` was made public in `derive.ts` and *imported* by the
+  formatters, never restated. `chfFromThousands` is the only factor of 1000 in the app.
+- **Locale decided deliberately.** `Intl.NumberFormat("en-CH")` per the Reference Guide, which groups
+  with U+2019 (`3’811’500`) — the Swiss mark, kept because the approved prototype renders it, pinned
+  as a constant, and made **runtime-independent** (whatever separator ICU produced is rewritten to the
+  pinned one; two tests stub `Intl` to `en-US` and `de-DE` to prove it).
+- **Variance never rides on colour.** Sign plus a new `VarianceDirection` enum (UP / DOWN / FLAT with
+  an accessible label map) — a direction key, never a glyph or a hex, so the component owns the
+  colour. Tabular numerals stay in the token layer; a test reads that declaration back out of
+  `app/app.css` so `TABULAR_NUMERALS_CLASS` cannot become a second source of truth.
+- **The reconciliation suite asserts relationships, not constants.** 39 tests: 22,400 + 10,300 +
+  5,800 = 38,500, Home share 58.18% → 58%, badge *exactly* 8.00%, badge segments summing to their
+  period total in all four periods, 38,500 × CHF 99 = CHF 3,811,500 split 2.218 / 1.020 / 0.574M;
+  7,880 → 7,830 = -50 → -0.6% with declines 150+110+70+70 = 400 and monthly totals larger than
+  fixture totals *on purpose*; 69,000 → 69,680 = +680 → +1.0%, Merchandising -7.65% → "7.7% under",
+  Marketing +12.06% → "12% over" and the one department both over budget *and* behind target, its
+  drivers 240+150+20 = 410 = its variance. **No drift found.**
+- **The intended cross-hero inequality is asserted as such:** Hero 3 Ticketing 24,360 (season tickets
+  included) legitimately exceeds Hero 2's 7,830 matchday fixtures, with both scope labels checked;
+  Hero 1's shirt revenue is likewise asserted to sit *inside* Hero 3's Fanshop actual.
+- **Store-once is asserted structurally:** each hero's stored key set is pinned, so a re-typed total,
+  variance, share or decline list fails the suite, and labels are checked against the shared enum
+  maps. Every number in all six narratives is swept against the figures the data can produce, with
+  two documented narrative-only exceptions (Hero 2's "3,200 fewer seats", Hero 3's "18%").
+  `blendedTargetPercent: 96` re-verified as a stored measurement (mean 97.0, budget-weighted 99.7,
+  actual-weighted 99.8 — none of them 96) and pinned against being "fixed".
+- 70 tests added (418/418 green), coverage 100% statements / 98.9% branches over `app/**`; lint,
+  format, typecheck and build all clean. Security triage: no security-relevant changes (pure string
+  formatting of static local data — no endpoint, no dependency, no env var, no user input, no network
+  call, no `innerHTML`).
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress
+**Phase Status:** ✅ Completed
 **Previous:** [Phase 1a](phase-1a.md) · **Next:** [Phase 2a — Shell](phase-2a.md)

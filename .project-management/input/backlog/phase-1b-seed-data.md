@@ -5,7 +5,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 **Duration:** Day 1-2 (of a one-week build)
 **Total Stories:** 5
 **Total Points:** 10
-**Status:** In Progress (3/5 completed)
+**Status:** ✅ Completed (5/5 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ in verified FCB facts so nothing jars to someone who knows the club.
 
 **Priority:** P0
 **Total Story Points:** 10
-**Status:** In Progress (3/5 completed)
+**Status:** ✅ Completed (5/5 completed)
 **Source:** Build Specification E3.
 
 > **Applies to every story in this epic:**
@@ -133,7 +133,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** Shared number formatting plus a check that figures reconcile across heroes.
   - **Acceptance Criteria:**
     - `CHF` prefix with thousands separators for money; `%` for shares; explicit `+`/`-` for variances
@@ -144,6 +144,12 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
       always matches the chart
     - All splits and variances verified to reconcile; percentages and absolutes agree
   - **Dependencies:** US-007, US-008, US-009, US-010
+  - **Notes:** Delivered as `app/lib/format.ts` (pure, stateless) plus
+    `tests/unit/reconciliation.test.ts`. Locale is `Intl.NumberFormat("en-CH")` per the Reference
+    Guide, so thousands group with the Swiss U+2019 mark; the separator is pinned as a constant and
+    the output is runtime-independent of ICU. `oneDecimal` is imported from `derive.ts`, not
+    restated, so there is exactly one rounding rule. Reconciliation asserts relationships across all
+    four datasets and found **no drift**.
 
 ---
 
@@ -153,7 +159,7 @@ real prices (CHF 99 adult, CHF 79 kids, +CHF 25 a name, +CHF 5 a sponsor badge);
 
 **By Priority:** P0: 5 stories, 10 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 4 stories, 8 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 0
+**By Status:** ✅ 5 stories, 10 points · 🔄 0 · 📋 0 · ⏸️ 0
 
 ---
 

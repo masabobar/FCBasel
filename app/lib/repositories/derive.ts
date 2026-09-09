@@ -30,8 +30,14 @@ import {
 /** How the club is written in a scoreline. */
 export const CLUB_SHORT_NAME = "FCB";
 
-/** The app's ONE rounding rule for a displayed percentage: one decimal. */
-function oneDecimal(value: number): number {
+/**
+ * The app's ONE rounding rule for a displayed percentage: one decimal.
+ *
+ * Exported so `app/lib/format.ts` can apply the SAME rule on the way to the
+ * screen instead of restating it. A percentage that is rounded one way here and
+ * another way in a formatter is the drift this whole module exists to prevent.
+ */
+export function oneDecimal(value: number): number {
   return Number(value.toFixed(1));
 }
 

@@ -59,6 +59,30 @@ capacity, a scoreline — are **computed in `derive.ts`, never stored**. The Ref
 the headline number to always agree with the chart under it, and the only way to guarantee that is
 for there to be nothing to disagree with.
 
+## Display: `app/lib/format.ts` (US-011)
+
+The data layer stops at plain numbers. Turning one into a string is
+[`app/lib/format.ts`](../format.ts) — the ONE place `CHF`, the thousands separator, the `%`, the
+`+`/`-` sign and the millions scale are spelled. Every tile and hero renders through it, so no
+component assembles `"CHF 148'200"` by hand.
+
+Three things to know before using it:
+
+1. **Money always carries its unit.** There is no bare-amount money formatter to reach for by
+   mistake — "currency shown without unit" is a named edge case in the Build Specification.
+2. **Every money formatter takes plain CHF.** Hero 2 and Hero 3 store CHF _thousands_, so they go
+   through `chfFromThousands()` — the only factor of 1000 in the app.
+3. **One rounding rule.** `oneDecimal` lives in [`derive.ts`](derive.ts) and is _imported_ by the
+   formatters, never restated, so a percentage cannot round one way in the domain and another way on
+   screen. Tabular numerals stay in the token layer (`.kpi-number` in `app/app.css`, or the
+   `tabular-nums` utility named by `TABULAR_NUMERALS_CLASS`).
+
+`tests/unit/reconciliation.test.ts` sits on top of all four datasets and fails if any figure drifts:
+totals against their rows, badges against their segments, narratives against the figures they quote,
+and the one _intended_ cross-hero inequality (Hero 3 Ticketing includes the season-ticket base, so it
+exceeds Hero 2's matchday fixtures). A failure there is a finding about the data, not a test to
+loosen.
+
 ## Swapping in Prisma later
 
 1. Add the Prisma schema and run `prisma migrate` (per `.claude/rules/database.md` — never

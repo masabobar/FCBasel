@@ -190,6 +190,37 @@ export const VARIANCE_JUDGEMENT_LABEL: Record<VarianceJudgement, string> = {
   [VarianceJudgement.NEUTRAL]: "On budget",
 };
 
+/* --------------------------------------------------- VARIANCE DIRECTION -- */
+
+/**
+ * Which way a movement went - the ARROW half of a variance.
+ *
+ * Separate from {@link VarianceJudgement} because they answer different
+ * questions: direction is arithmetic (did the number go up or down), judgement
+ * is meaning (is that good news). Marketing's overspend is UP and ADVERSE at the
+ * same time, and a tile needs both.
+ *
+ * It exists so that variance is never carried by colour alone: a projector can
+ * shift green and red, so the sign, the arrow and the colour token must all say
+ * the same thing. `varianceDirection` in `../format.ts` produces it.
+ */
+export const VarianceDirection = {
+  UP: "UP",
+  DOWN: "DOWN",
+  /** Exactly unchanged - no arrow. */
+  FLAT: "FLAT",
+} as const;
+
+export type VarianceDirection =
+  (typeof VarianceDirection)[keyof typeof VarianceDirection];
+
+/** Accessible wording for the arrow, so the direction is not visual only. */
+export const VARIANCE_DIRECTION_LABEL: Record<VarianceDirection, string> = {
+  [VarianceDirection.UP]: "up",
+  [VarianceDirection.DOWN]: "down",
+  [VarianceDirection.FLAT]: "unchanged",
+};
+
 /* ------------------------------------------------------- PARTNER ROLES -- */
 
 /** What a commercial partner is to the club. */

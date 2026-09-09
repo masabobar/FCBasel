@@ -7,11 +7,11 @@
 
 ## Today's Summary
 
-**Stories Completed:** 10 — **Phase 1a complete, Phase 1b under way**
-**Story Points:** 22
-**Time Worked:** ~6.3 hours
-**Files Changed:** 88
-**Tests Added:** 348
+**Stories Completed:** 11 — **Phase 1a and Phase 1b both complete**
+**Story Points:** 24
+**Time Worked:** ~7.0 hours
+**Files Changed:** 96
+**Tests Added:** 418
 
 ---
 
@@ -159,6 +159,33 @@
   people. 44 tests added (348/348 green), coverage 100% statements / 98.7% branches of `app/**`, and
   lint / format / typecheck / build all clean.
 
+- **US-011 — Formatters & cross-hero reconciliation.** Phase 1b closes with the two things that keep
+  the other four data stories honest. `app/lib/format.ts` is the one place a number becomes a string:
+  money always carries `CHF` (there is deliberately no bare-amount variant to reach for), the sign
+  goes *before* the unit as the declining-fixtures badge reads (`-CHF 400k`), and millions render bare
+  (`69.68`) under the "figures in CHF millions" subtitle with no "000" note anywhere. The locale
+  decision was made deliberately and documented: `Intl.NumberFormat("en-CH")` per the Reference
+  Guide, which groups thousands with the Swiss U+2019 mark rather than a comma — kept because the
+  approved prototype renders it, pinned as a constant, and made independent of the runtime's ICU by
+  rewriting whatever separator ICU actually produced, which two tests prove by stubbing `Intl` to
+  `en-US` and `de-DE`. `oneDecimal` was made public in `derive.ts` and imported rather than restated,
+  so there is exactly one rounding rule in the app, and `chfFromThousands` is the only factor of
+  1000. Variance carries its meaning through the sign plus a new `VarianceDirection` enum (with an
+  accessible label map) rather than through colour, and tabular numerals stay in the token layer —
+  a test reads that declaration back out of `app/app.css` so the exported class name cannot become a
+  second source of truth. The reconciliation suite then asserts relationships rather than restating
+  constants: kit units summing to 38,500 with the Home share at 58.18% -> 58% and the badge at
+  exactly 8.00%, badge segments summing to their period total in all four periods, 38,500 x CHF 99
+  split 2.218 / 1.020 / 0.574M, the fixture fall of 50 becoming -0.6% with declines of
+  150+110+70+70 = 400, monthly totals larger than fixture totals *on purpose*, and 69,000 -> 69,680
+  = +680 -> +1.0% with Merchandising at "7.7% under", Marketing at "12% over" and its three drivers
+  summing to exactly its 410 variance. The one intended cross-hero inequality is asserted as such
+  (Ticketing 24,360 exceeds Hero 2's 7,830, both scope-labelled), store-once is asserted
+  structurally by pinning each hero's stored key set, and every number in all six narratives is swept
+  against the figures the data can produce — with only two documented narrative-only exceptions.
+  **No drift was found in any dataset.** 70 tests added (418/418 green), coverage 100% statements /
+  98.9% branches of `app/**`, and lint / format / typecheck / build all clean.
+
 ---
 
 ## Stories Completed Today
@@ -187,6 +214,9 @@
 - ✅ US-010 — Hero 3 dataset: departmental performance (2 pts) — all 5 acceptance criteria met,
   including the derived Revenue/Cost judgement and the derived over-budget-and-behind-target flag.
   Phase 1b: 4/5 stories.
+- ✅ US-011 — Formatters & cross-hero reconciliation (2 pts) — all 6 acceptance criteria met; one
+  shared display layer, one rounding rule, and a reconciliation suite that found **no drift**.
+  **Phase 1b closes here: 5/5 stories, 10/10 points.**
 
 ---
 
@@ -207,10 +237,9 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- Phase 1b — seed data (2 pts remaining). US-011 (formatters & cross-hero reconciliation) closes
-  the phase: the `CHF` / `%` / signed-variance formatters, a millions helper for the department
-  table, tabular numerals, and a reconciliation pass over the four datasets now seeded — every
-  figure appearing in two tiles must come from one constant
+- Phase 2a — shell and baseline (16 pts). US-012 (branded application shell) starts it: the app
+  chrome around the crest that US-004 already ships, then the baseline dashboard that reads the
+  US-007 datasets through the repository seam and renders them with the US-011 formatters
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -225,7 +254,8 @@
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phase 1a is complete and Phase 1b is 4/5; continue with `/holycode-pm:execute-work story US-011`.
+- Phases 1a and 1b are both complete (24/116 points); continue with
+  `/holycode-pm:execute-work story US-012`.
 
 ---
 

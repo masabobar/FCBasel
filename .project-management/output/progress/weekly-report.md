@@ -7,10 +7,10 @@
 
 ## Week Summary
 
-**Stories Completed:** 6
-**Story Points:** 14/116 (12%)
-**Current Phase:** Phase 1b - Seed Data *(Phase 1a completed 2026-09-09)*
-**Team Velocity:** 14 pts/day (one day of data — not yet a trend)
+**Stories Completed:** 11
+**Story Points:** 24/116 (21%)
+**Current Phase:** Phase 2a - Shell & Baseline *(Phases 1a and 1b both completed 2026-09-09)*
+**Team Velocity:** 24 pts/day (one day of data — not yet a trend)
 
 ---
 
@@ -28,6 +28,22 @@
 - **US-006** — the motion foundation: four keyframes, the tile entrance wired to the card's existing
   hooks, smooth grid reflow, and a reduced-motion path that renders final state rather than
   switching animation off. Fade-and-rise only — the Specification's gold ring stays removed.
+
+**✅ Phase 1b — Dummy Data Model & Seed Datasets, complete (5/5 stories, 10/10 points):**
+- **US-007** — the data seam every later dataset follows: enums, domain types and repository
+  interfaces in `app/lib/repositories/`, fixtures in `app/lib/mock/`, server-only selection in
+  `index.server.ts`. Totals and deltas computed from the series, never stored.
+- **US-008 / US-009 / US-010** — the three hero datasets, each one object with `primary` and
+  `followUp` so a hero and its escalation cannot drift. Kit revenue, the badge segments, the fixture
+  declines, every departmental variance and the flagged department are all *derived*; the Reference
+  Guide's stored `homeShare`, `totalPrev`/`totalCurr`/`deltaPct`, `declines` list and Marketing
+  `flag` deliberately did not survive the port. Scope labels are data, because Hero 2 and Hero 3 are
+  at deliberately different scopes.
+- **US-011** — one shared display layer (`app/lib/format.ts`: `CHF` always attached, sign before the
+  unit, a millions helper for the department table, one imported rounding rule, and output pinned
+  independent of the runtime's ICU) plus a cross-dataset reconciliation suite that asserts
+  relationships rather than constants, sweeps every figure quoted in all six narratives, and
+  **found no drift**.
 
 **Non-story work completed 2026-09-09:**
 - HolyCode PM framework bootstrapped into the project
@@ -50,6 +66,7 @@
 ### Wednesday, 2026-09-09
 - Requirements extraction and project initialization
 - **Phase 1a delivered end to end:** US-001, US-002, US-003, US-004, US-005, US-006 (14 pts)
+- **Phase 1b delivered end to end:** US-007, US-008, US-009, US-010, US-011 (10 pts)
 
 ### Thursday, 2026-09-10
 - (To be logged)
@@ -61,15 +78,15 @@
 
 ## Velocity Trend
 
-**This Week:** 14 pts
+**This Week:** 24 pts
 **Last Week:** N/A
-**Average:** 14 pts/day (1 day)
+**Average:** 24 pts/day (1 day)
 **Trend:** N/A (insufficient data)
 
-> Velocity becomes meaningful after Phase 1a and 1b complete. Phase 1a landed 14 points in ~4.2 AI
-> hours against a ~5.8 AI-core-hour estimate. At the end of 1b, recalculate
-> `actual_factor = actual_ai_hours / (planned_team_hours × 1.20)` and re-run the estimate if it
-> differs from 0.25 by more than ±0.05.
+> Phase 1a landed 14 points in ~4.2 AI hours against a ~5.8 AI-core-hour estimate; Phase 1b landed
+> 10 points in ~2.8 AI hours against ~4.5. Both phases together: 24 points in ~7.0 AI hours against
+> a ~10.3 AI-core-hour estimate, so `actual_factor ≈ 0.17` against the planned 0.25 — running ahead.
+> Re-run the estimate if Phase 2a (the first non-foundation phase) does not hold that factor.
 
 ---
 
@@ -78,7 +95,7 @@
 **Target:** the prototype is **demo-ready** — not feature-complete, but robust.
 
 **Planned Stories:**
-1. Phase 1b — seed datasets (10 pts); Phase 1a's foundations are already complete
+1. Phases 1a + 1b — foundations and seed data (24 pts): **complete**
 2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts)
 3. Phases 3a + 3b — conversation engine and the three hero flows (33 pts)
 4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts)
