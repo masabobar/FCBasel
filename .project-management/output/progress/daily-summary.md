@@ -7,10 +7,10 @@
 
 ## Today's Summary
 
-**Stories Completed:** 1
-**Story Points:** 3
-**Time Worked:** ~1 hour
-**Files Changed:** 21
+**Stories Completed:** 2
+**Story Points:** 5
+**Time Worked:** ~1.5 hours
+**Files Changed:** 34
 **Tests Added:** 8
 
 ---
@@ -25,6 +25,13 @@
   verified by execution, serving HTTP 200 with server-rendered markup, with no environment variable
   and no database. 8 unit tests green, `tsc --noEmit` clean, `pnpm audit` clean after overriding a
   vulnerable transitive `qs`.
+- **US-002 — Developer tooling & local DX.** ESLint 9 flat config (TypeScript + React hooks) with
+  `eslint-config-prettier` applied last, Prettier with `prettier-plugin-tailwindcss` for Tailwind v4
+  class sorting, and husky v9 + lint-staged running `eslint --fix` and `prettier --write` on staged
+  files. Every acceptance-criteria script was executed rather than assumed, and the pre-commit hook
+  was proven with throwaway commits that were then reset away: a lint error blocked the commit, and
+  a badly formatted file landed already formatted and class-sorted. `pnpm lint` clean, `pnpm
+  typecheck` clean, 8/8 tests green, `pnpm audit` clean with the US-001 `qs` override retained.
 
 ---
 
@@ -32,6 +39,8 @@
 
 - ✅ US-001 — Environment & deployment setup (3 pts) — 4/5 acceptance criteria met; the Railway
   deploy AC is deferred to the human.
+- ✅ US-002 — Developer tooling & local DX (2 pts) — all 4 acceptance criteria met and verified by
+  execution, including the pre-commit hook.
 
 ---
 
@@ -52,8 +61,8 @@
 ## Next Day Plan
 
 **Immediate Focus:**
-- US-002 — Developer tooling & local DX (2 pts, AI) — ESLint 9 flat config, Prettier, husky
 - US-003 — Design token set (3 pts) — blocks all visual work
+- US-004 — Self-hosted FCB crest (1 pt) — trademarked asset, commit it, never hotlink
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from

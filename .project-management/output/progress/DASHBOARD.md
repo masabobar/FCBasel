@@ -9,10 +9,10 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 3% | 100% | 🟢 On Track |
-| **Current Phase** | 21% | 100% | 🟢 On Track |
-| **Stories Completed** | 1/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 3/116 | 116 | 🟢 On Track |
+| **Overall Progress** | 4% | 100% | 🟢 On Track |
+| **Current Phase** | 36% | 100% | 🟢 On Track |
+| **Stories Completed** | 2/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 5/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -21,12 +21,14 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 1
-**Currently Working On:** US-002 — Developer tooling & local DX (2 pts)
-**Story Points Completed Today:** 3
+**Stories Completed Today:** 2
+**Currently Working On:** US-003 — Design token set (3 pts)
+**Story Points Completed Today:** 5
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
+- ✅ **US-002 — Developer tooling & local DX (2 pts)** — ESLint 9 flat config, Prettier with Tailwind
+  class sorting, husky + lint-staged. Pre-commit hook proven with real throwaway commits.
 
 ---
 
@@ -35,18 +37,19 @@
 **Goal:** Stand up the project and its Railway deployment, then build the design token foundation
 (E2) that every later epic references.
 **Duration:** 2026-09-09 to 2026-09-09 (~5.8 AI-hours)
-**Progress:** 17% (1/6 stories · 3/14 points)
+**Progress:** 33% (2/6 stories · 5/14 points)
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-002: Developer tooling & local DX | 📋 Todo | 0% |
+| US-003: Design token set | 📋 Todo | 0% |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-002: Developer tooling & local DX | 2026-09-09 | 2 |
 | US-001: Environment & deployment setup | 2026-09-09 | 3 |
 
 ---
@@ -82,11 +85,13 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Test Coverage (`app/**`) | 100% | 80% | 🟢 Good |
 | Passing Tests | 8/8 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
+| ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
 | Open Bugs | 0 | < 5 | 🟢 Good |
 
 > Coverage is measured over `app/**` only. The number is honest but thin — the application surface
-> is still four small modules. ESLint arrives with US-002; strict `tsc` is the current lint gate.
+> is still four small modules. Since US-002 the gate is three-part: strict `tsc`, ESLint 9 flat
+> config, and Prettier — the last two enforced on every commit by husky + lint-staged.
 
 ---
 
@@ -94,7 +99,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Phase | Status | Stories | Points | Progress |
 |-------|--------|---------|--------|----------|
-| Phase 1a: Setup & Design System | 🔄 Active | 1/6 | 3/14 | 21% |
+| Phase 1a: Setup & Design System | 🔄 Active | 2/6 | 5/14 | 36% |
 | Phase 1b: Seed Data | ⏸️ Pending | 0/5 | 0/10 | 0% |
 | Phase 2a: Shell & Baseline | ⏸️ Pending | 0/5 | 0/16 | 0% |
 | Phase 2b: Component Library | ⏸️ Pending | 0/11 | 0/29 | 0% |
@@ -117,4 +122,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-001 completed at 2026-09-09
+**Last Auto-Update:** US-002 completed at 2026-09-09

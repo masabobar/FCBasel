@@ -1,0 +1,14 @@
+node_modules/
+build/
+.react-router/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+
+# Documentation owned by the project-management framework and its templates.
+# These files have their own line-count limits (.claude/rules/documentation.md
+# §2.1); reflowing them here would fight those rules for no benefit.
+.project-management/
+.claude/
+CLAUDE.md

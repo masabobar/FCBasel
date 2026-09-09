@@ -30,12 +30,12 @@ every later epic references rather than restates.
 
 ### Epic 1: Project Setup & Deployment (5 story points)
 
-**Priority:** P0 · **Status:** In Progress (1/2) · **Dependencies:** none
+**Priority:** P0 · **Status:** Done (2/2) · **Dependencies:** none
 
 | Story | Title | Pts | Owner | Status |
 |---|---|---:|---|---|
 | US-001 | Environment & deployment setup | 3 | Human+AI | ✅ Done (1 AC deferred) |
-| US-002 | Developer tooling & local DX | 2 | AI | 📋 Todo |
+| US-002 | Developer tooling & local DX | 2 | AI | ✅ Done |
 
 **Technical Notes:**
 - React Router 7 framework mode with SSR; `@react-router/serve` in production
@@ -90,11 +90,12 @@ every later epic references rather than restates.
 - **Risk Level:** Low
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 3 / 14 (21%)
-- **Completed Stories:** 1 / 6
+- **Completed Story Points:** 5 / 14 (36%)
+- **Completed Stories:** 2 / 6
 - **Tests Passing:** 8 / 8
 - **Code Coverage:** 100% of `app/**` (small surface — 4 statements, 4 functions)
-- **Commits:** 1
+- **Linter:** ESLint 9 flat config — clean (0 errors, 0 warnings across 11 files)
+- **Commits:** 2
 
 ---
 
@@ -149,6 +150,37 @@ the platform supplies it, defaulting to 3000); no database is provisioned.
   `build`/`start` scripts, `@react-router/serve` as the production server). Run
   `railway login && railway init && railway up`, then record the shareable URL in this file and in
   the backlog entry.
+
+### 2026-09-09 — US-002 Developer tooling & local DX (2 pts) ✅
+
+ESLint 9 flat config (`eslint.config.js`) covering TypeScript and React hooks: `@eslint/js`
+recommended, `typescript-eslint` recommended (syntax-only, not type-aware — fast enough to run on
+every commit), `eslint-plugin-react-hooks` flat recommended, and `eslint-config-prettier` **last**
+so ESLint never argues with Prettier over formatting. Prettier is configured in `.prettierrc.json`
+with `prettier-plugin-tailwindcss` and `tailwindStylesheet: ./app/app.css` for Tailwind v4 class
+sorting. Build artefacts (`build/`, `.react-router/`, `coverage/`, `node_modules/`) are ignored by
+both tools; Prettier additionally skips `.project-management/`, `.claude/` and `CLAUDE.md`, whose
+line-count limits are governed by `.claude/rules/documentation.md`.
+
+Scripts added: `lint`, `lint:fix`, `format`, `format:check`, `prepare`. All six acceptance-criteria
+scripts were **run, not assumed** — `dev` and `start` were each booted and answered HTTP 200.
+
+husky v9 + lint-staged run `eslint --fix` then `prettier --write` on staged `*.{ts,tsx}`, and
+`prettier --write` on staged config/markdown. **Hook verified with real throwaway commits** (both
+since removed with `git reset --soft`, history left tidy): a probe file with an unfixable
+`no-explicit-any` error was rejected and `HEAD` did not move; a probe with only formatting problems
+committed successfully with Prettier's reflow *and* Tailwind class re-ordering already applied in
+the committed blob.
+
+- **Tests:** unchanged at 8 unit tests, all passing; no hollow tests added for config. Coverage of
+  `app/**` still 100%.
+- **Typecheck:** `pnpm typecheck` clean under TypeScript strict.
+- **Linter:** `pnpm lint` clean over all 11 source files — no rule was weakened and no file was
+  disabled to get there.
+- **Security triage:** dependency trigger fired (A06 — `package.json` + lockfile changed for
+  7 new devDependencies). **`pnpm audit`: no known vulnerabilities**; the `qs: ">=6.16.0"` override
+  from US-001 is retained. All additions are dev-only tooling that never ships in the server bundle.
+  No secrets, env vars, HTTP handlers, database, user input or uploads — no other trigger applies.
 
 ---
 

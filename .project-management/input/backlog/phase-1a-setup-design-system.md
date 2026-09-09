@@ -5,7 +5,7 @@
 **Duration:** Day 1 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (1/6 completed)
+**Status:** In Progress (2/6 completed)
 
 > **Global guardrails apply to every story here** — see [`../constraints.md`](../constraints.md) §2.
 > No integration, no runtime model, no auth, no persistence, no salary/named-individual data.
@@ -16,7 +16,7 @@
 
 **Priority:** P0
 **Total Story Points:** 5
-**Status:** In Progress (1/2 completed)
+**Status:** Completed (2/2 completed)
 **Source:** Developer-owned; deliberately outside the Build Specification.
 
 ### Stories:
@@ -46,15 +46,17 @@
   - **Priority:** P0
   - **Component:** [DevOps]
   - **Owner:** AI
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** Scripts and quality tooling so the one-week build stays fast and clean.
   - **Acceptance Criteria:**
-    - `dev`, `build`, `start`, `lint`, `format`, `test` scripts all work
-    - ESLint 9 flat config + Prettier with `prettier-plugin-tailwindcss`
-    - husky + lint-staged run lint/format on commit
-    - TypeScript strict mode passes with no errors
+    - ✅ `dev`, `build`, `start`, `lint`, `format`, `test` scripts all work
+    - ✅ ESLint 9 flat config + Prettier with `prettier-plugin-tailwindcss`
+    - ✅ husky + lint-staged run lint/format on commit
+    - ✅ TypeScript strict mode passes with no errors
   - **Dependencies:** US-001
-  - **Notes:** ~1-2 h.
+  - **Notes:** ~1-2 h. `eslint-config-prettier` is applied last so ESLint never argues with Prettier
+    over formatting. Prettier skips `.project-management/`, `.claude/` and `CLAUDE.md` — those docs
+    carry their own line-count limits.
 
 ---
 
@@ -148,7 +150,7 @@
 
 **By Priority:** P0: 6 stories, 14 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 5 stories, 11 points · ⏸️ 0
+**By Status:** ✅ 2 stories, 5 points · 🔄 0 · 📋 4 stories, 9 points · ⏸️ 0
 
 ---
 

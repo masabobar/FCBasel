@@ -24,7 +24,7 @@ Postgres, and nothing outside this directory changes.
 
    ```ts
    // app/lib/repositories/index.server.ts
-   import { mockMatchRepository } from '../mock/matches';
+   import { mockMatchRepository } from "../mock/matches";
    export const matchRepository: MatchRepository = mockMatchRepository;
    ```
 

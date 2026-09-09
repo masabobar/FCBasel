@@ -1,9 +1,5 @@
 {
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".react-router/types/**/*"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", ".react-router/types/**/*"],
   "exclude": ["node_modules", "build", "coverage"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],

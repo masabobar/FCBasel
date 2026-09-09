@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 1 story
-**Total Points:** 3 / 116
+**Total Completed:** 2 stories
+**Total Points:** 5 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 3 points/day
+**Average Velocity:** 5 points/day
 
 ---
 
@@ -34,6 +34,28 @@
 - Verified from a **clean checkout**: install, build, and a production server returning HTTP 200
   with server-rendered markup — no environment variable, no database
 - Cleared 2 moderate transitive `qs` advisories with a pnpm override; `pnpm audit` is now clean
+
+### US-002: Developer tooling & local DX (2 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 13 (8 code/config, 5 tracking docs)
+**Tests Added:** 0 (tooling config carries no behaviour worth a hollow test; the existing 8 stay green)
+**Commit:** see phase-1a progress log
+**Notes:** All 4 acceptance criteria met and verified by execution, including the pre-commit hook.
+
+**What Was Done:**
+- Added ESLint 9 flat config (`eslint.config.js`): `@eslint/js` + `typescript-eslint` +
+  `eslint-plugin-react-hooks`, with `eslint-config-prettier` last so the two tools never conflict
+- Added `.prettierrc.json` with `prettier-plugin-tailwindcss` and `tailwindStylesheet` pointing at
+  `app/app.css`, so Tailwind v4 utility classes are sorted on save and on commit
+- Ignored `build/`, `.react-router/`, `coverage/`, `node_modules/` in both tools
+- Added `lint`, `lint:fix`, `format`, `format:check` and `prepare` scripts; ran every AC script
+  (`dev` and `start` both booted and answered HTTP 200)
+- Wired husky v9 + lint-staged: `eslint --fix` then `prettier --write` on staged `*.{ts,tsx}`
+- **Proved the hook fires** with two throwaway commits, then removed them with `git reset --soft`:
+  a lint error blocked the commit outright; a badly formatted file was auto-formatted and
+  class-sorted *inside* the committed blob
+- `pnpm lint` clean, `pnpm typecheck` clean, 8/8 tests green, `pnpm audit` clean
 
 ---
 
