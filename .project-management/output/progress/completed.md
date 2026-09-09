@@ -6,11 +6,11 @@
 
 ## Summary
 
-**Total Completed:** 15 stories
-**Total Points:** 35 / 116
+**Total Completed:** 16 stories
+**Total Points:** 37 / 116
 **Start Date:** 2026-09-09
 **Days Active:** 1
-**Average Velocity:** 35 points/day
+**Average Velocity:** 37 points/day
 **Phases Completed:** Phase 1a, Phase 1b (both 2026-09-09)
 
 ---
@@ -251,6 +251,46 @@ header (the precedent US-007 set with `app/lib/repositories/README.md`).
   shared with `useUid`, so an SVG gradient id is always legal in `url(#…)` and in a selector
 - **SSR proven, not asserted:** a `renderToString` with `window` and the frame APIs stubbed away,
   plus a real `hydrateRoot` pass that fails on any `console.error` — including under reduced motion
+
+### US-017: KPI tile & variance chip (2 pts)
+**Completed:** 2026-09-09
+**By:** AI
+**Files Changed:** 3 code (2 new, 1 modified) + 4 test files (3 new, 1 modified) + 5 tracking docs
+**Tests Added:** 78 (unit: 78) - 722/722 green, 100% stmts / 99.5% branches / 100% funcs of `app/**`
+**Commit:** see phase-2b progress log
+**Notes:** All 3 acceptance criteria met. **No real-Chrome pass** — nothing in the app mounts these
+components yet; the browser verification belongs to US-013, the first screen that does.
+
+**What Was Done:**
+- `app/components/tiles/delta-chip.tsx` — `DeltaChip`, its own module because US-019, US-022 and
+  US-016 all want the chip without a tile around it. `app/components/tiles/kpi-tile.tsx` —
+  `KpiSparkline`, `KpiFigure` (the number block, no card) and `KpiTile` (`Card` + figure)
+- **Colour is never the sole signal, and the `light` variant is where that is proved.** On navy the
+  negative token sits near 2:1, so the light variant drops colour coding entirely — a test asserts
+  the up and down chips' class strings are **identical** there while the glyph, the explicit sign
+  from `formatSignedPercent` and an `sr-only` direction word all still differ. `text-red` on the chip
+  is rejected by test: red never means "bad"
+- **Direction is arithmetic; judgement is meaning.** An optional `judgement` prop (US-010's
+  `varianceJudgement`) gives Marketing's overspend an **up arrow in the negative token**; the chip
+  never re-derives good/bad from the sign. A zero is a **labelled zero** — dash glyph, `+0%` in house
+  style, neutral treatment, "unchanged" spoken — never a variance token
+- **One API, three consumers, no variant per hero:** hero extras (Hero 2's compare bars, Hero 3's
+  two-up footer) arrive as `children`; US-016's navy band composes `KpiFigure onDark`, which forces
+  the chip's light variant so an illegible red figure cannot be left on navy. All three verified
+- The 30px/700/tight/tabular number is the existing `.kpi-number` role class, not four utilities
+  restated. Motion is US-027's only — a test greps the comment-stripped source and fails on
+  `useState`, `setTimeout`, `setInterval` or `requestAnimationFrame`, and the retarget test proves a
+  new value continues from the figure on screen at the *component* level
+- The sparkline draws itself via `pathLength="1"` + a dash offset (no path measurement, no per-frame
+  JS), paints with `currentColor` so no colour prop exists, and handles the degenerate series rather
+  than emitting `NaN` into a `d`: empty renders nothing, flat draws through the middle, one point
+  reads as a flat line. Two on screen carry different gradient ids (`useUid`)
+- **Closed the US-012 `tailwind-merge` trap at the root:** `app/lib/cn.ts` declares the named type
+  scale as the `font-size` group, **derived** from `tokens.fontSize` via the same `cssVariableName`
+  mapping Tailwind builds the utility from, so it cannot drift. Two sizes still collapse, two colours
+  still collapse, a caller can still override a base size
+- Extracted `tests/unit/support/motion-harness.ts` (the frame and preference stubs) — the nine
+  remaining component stories all need them, so there is one harness rather than nine copies
 
 ---
 

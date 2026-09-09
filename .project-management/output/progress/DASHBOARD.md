@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2b - Chart & Tile Component Library *(1/11 stories complete)* · Phase 2a partial (3/5, US-013 + US-016 folded into the 2b run) · Phases 1a + 1b complete
+**Current Phase:** Phase 2b - Chart & Tile Component Library *(2/11 stories complete)* · Phase 2a partial (3/5, US-013 + US-016 folded into the 2b run) · Phases 1a + 1b complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 30% | 100% | 🟢 On Track |
+| **Overall Progress** | 32% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 15/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 35/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 16/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 37/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,9 +22,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 15
-**Currently Working On:** US-017 — KPI tile & variance chip (2 pts)
-**Story Points Completed Today:** 35
+**Stories Completed Today:** 16
+**Currently Working On:** US-021 — Horizontal bar tile (3 pts)
+**Story Points Completed Today:** 37
 
 - ✅ **US-001 — Environment & deployment setup (3 pts)** — React Router 7 SSR scaffold; clean-checkout
   `install` / `build` / `start` all verified. One AC deferred: the Railway deploy is a human step.
@@ -152,6 +152,24 @@
   twice. 42 new tests, including a real `renderToString` + `hydrateRoot` pass that fails on any
   hydration mismatch.
 
+- ✅ **US-017 — KPI tile & variance chip (2 pts)** — the first component built ON the motion hooks, and
+  the shape the other nine follow. Three exports so nothing is forked later: `DeltaChip` in its own
+  module (US-019, US-022 and US-016 want the chip without a tile), plus `KpiSparkline` / `KpiFigure` /
+  `KpiTile`. **Colour is never the sole signal, and the `light` variant is the proof** — on the navy
+  band both directions share one white treatment, because the negative token sits at roughly 2:1
+  there, and a test asserts the two chips' class strings are *identical* while the glyph, the explicit
+  sign and an `sr-only` word still differ. Red never means "bad": only the variance tokens, and a zero
+  renders as a **labelled zero** in the neutral treatment rather than either of them. **Direction is
+  arithmetic, judgement is meaning** — an optional `judgement` prop (from US-010's
+  `varianceJudgement`) draws Marketing's overspend as an up arrow in the *negative* token. One API
+  carries all three consumers with **no variant per hero**: hero extras arrive as `children`, and
+  US-016's navy band composes `KpiFigure onDark`, which forces the light chip so nobody can leave an
+  illegible red figure on navy. The 30px/700/tight/tabular treatment is the existing `.kpi-number`
+  role class, and a test greps the file to prove it holds no state or timer of its own; the sparkline
+  draws itself with `pathLength="1"` and a dash offset and paints with `currentColor`, so no hex can
+  be passed in. **The US-012 `tailwind-merge` trap is closed at the root:** `app/lib/cn.ts` declares
+  the named type scale as a font-size group, derived from the token set, so a size and a colour can
+  share an element everywhere from here on. 78 new tests.
 ---
 
 ## 🏁 Phase 1b complete — Seed Data
@@ -165,13 +183,14 @@ grounded in verified FCB facts. Closed at 100% on 2026-09-09, as did **Phase 1a*
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-017: KPI tile & variance chip | 🔄 Next | Unblocked by US-027 |
+| US-021: Horizontal bar tile | 🔄 Next | Unblocked; US-023 waits on it |
 | US-013 + US-016 (Phase 2a) | ⏸️ Deferred | Await US-021 / US-025 + US-026 |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-017: KPI tile & variance chip | 2026-09-09 | 2 |
 | US-027: Motion & animation hooks | 2026-09-09 | 3 |
 | US-015: Reset to baseline | 2026-09-09 | 2 |
 | US-014: Dynamic tile insertion & grid reflow | 2026-09-09 | 3 |
@@ -218,8 +237,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 100% stmts / 99.4% branches / 100% funcs | 80% | 🟢 Good |
-| Passing Tests | 644/644 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 100% stmts / 99.5% branches / 100% funcs | 80% | 🟢 Good |
+| Passing Tests | 722/722 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -236,6 +255,8 @@ run `railway login && railway init && railway up`, then record the shareable URL
 > different scope labels so the fixture total and the larger monthly total cannot read as a bug.
 > US-010 goes further and tests the *meaning* of a number: a naive "variance > 0 is good" rule is
 > shown to misread exactly one department, so the Revenue/Cost tag cannot be dropped unnoticed.
+> US-017 adds the component-level version: the two variance directions must stay distinguishable with
+> the colour *removed*, and a named size token must survive beside a colour token.
 > US-011 closes the phase with a cross-dataset reconciliation suite that fails if any figure drifts
 > from any other, sweeps every number in all six hero narratives against the data, and pins the
 > formatter output glyph by glyph — including a stubbed-ICU test proving the output does not move
@@ -252,7 +273,7 @@ run `railway login && railway init && railway up`, then record the shareable URL
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | 🔄 Partial | 3/5 | 8/16 | 50% |
-| Phase 2b: Component Library | 🔄 In Progress | 1/11 | 3/29 | 10% |
+| Phase 2b: Component Library | 🔄 In Progress | 2/11 | 5/29 | 17% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
@@ -275,4 +296,4 @@ run `railway login && railway init && railway up`, then record the shareable URL
 
 **💡 Tip:** This file updates automatically during `/execute-work`. Just refresh to see latest progress!
 
-**Last Auto-Update:** US-027 completed at 2026-09-09 — Phase 2b open (1/11 · 3/29 pts). The motion hooks land first because every remaining E6 component consumes them; next is US-017
+**Last Auto-Update:** US-017 completed at 2026-09-09 — Phase 2b at 2/11 · 5/29 pts. The KPI tile is the first consumer of the motion hooks and closed the `tailwind-merge` size-token trap for every component after it; next is US-021

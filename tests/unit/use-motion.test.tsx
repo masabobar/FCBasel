@@ -14,6 +14,11 @@ import {
 } from "../../app/lib/hooks/use-motion";
 import { REDUCED_MOTION_QUERY } from "../../app/lib/motion";
 import { duration, durationMs } from "../../app/lib/tokens";
+import {
+  restoreMotionStubs,
+  stubFrames,
+  stubMatchMedia,
+} from "./support/motion-harness";
 
 /**
  * The hooks' own source, comments stripped — a few checks are about what the
@@ -29,114 +34,18 @@ const HOOKS_CODE = readFileSync(
 
 /* ------------------------------------------------------------- HARNESS -- */
 
-const originalMatchMedia = window.matchMedia;
-
-interface MediaStub {
-  /** Flip the preference and notify every subscriber, as a browser does. */
-  set: (matches: boolean) => void;
-  /** How many listeners are attached right now — 0 after a clean unmount. */
-  listenerCount: () => number;
-}
-
 /**
- * A `matchMedia` whose result can be changed and which reports its own
- * listeners, so "reacts to a change" and "detaches on unmount" are both
- * observable. `legacy` exercises the pre-`EventTarget` MediaQueryList API.
+ * The frame and preference stubs live in `./support/motion-harness` — every
+ * animated component's test file needs the same two, so there is one harness
+ * rather than a copy per file.
  */
-function stubMatchMedia(
-  matches: boolean,
-  { legacy = false }: { legacy?: boolean } = {},
-): MediaStub {
-  const listeners = new Set<() => void>();
-  const query = {
-    media: REDUCED_MOTION_QUERY,
-    matches,
-    addEventListener: legacy
-      ? undefined
-      : (type: string, listener: () => void) => {
-          if (type === "change") listeners.add(listener);
-        },
-    removeEventListener: legacy
-      ? undefined
-      : (type: string, listener: () => void) => {
-          if (type === "change") listeners.delete(listener);
-        },
-    addListener: legacy
-      ? (listener: () => void) => listeners.add(listener)
-      : undefined,
-    removeListener: legacy
-      ? (listener: () => void) => listeners.delete(listener)
-      : undefined,
-  };
-
-  window.matchMedia = vi.fn(() => query as unknown as MediaQueryList);
-
-  return {
-    set(next: boolean) {
-      query.matches = next;
-      act(() => {
-        for (const listener of [...listeners]) listener();
-      });
-    },
-    listenerCount: () => listeners.size,
-  };
-}
-
-interface FrameStub {
-  /** Run every frame currently pending, `ms` later on the clock. */
-  advance: (ms?: number) => void;
-  /** Frames requested and not yet run or cancelled. */
-  pending: () => number;
-  /** Ids passed to `cancelAnimationFrame`. */
-  cancelled: number[];
-  /** How many frames have been requested in total. */
-  requested: () => number;
-}
-
-/** A hand-driven `requestAnimationFrame`, so every frame is deterministic. */
-function stubFrames(): FrameStub {
-  const pending = new Map<number, FrameRequestCallback>();
-  const cancelled: number[] = [];
-  let now = 0;
-  let nextId = 1;
-  let requested = 0;
-
-  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-    const id = nextId;
-    nextId += 1;
-    requested += 1;
-    pending.set(id, callback);
-    return id;
-  });
-  vi.stubGlobal("cancelAnimationFrame", (id: number) => {
-    cancelled.push(id);
-    pending.delete(id);
-  });
-
-  return {
-    advance(ms = 16) {
-      now += ms;
-      const due = [...pending.values()];
-      pending.clear();
-      act(() => {
-        for (const callback of due) callback(now);
-      });
-    },
-    pending: () => pending.size,
-    cancelled,
-    requested: () => requested,
-  };
-}
 
 beforeEach(() => {
   stubMatchMedia(false);
 });
 
 afterEach(() => {
-  // Globals first: a test may have stubbed `window` itself away.
-  vi.unstubAllGlobals();
-  window.matchMedia = originalMatchMedia;
-  vi.restoreAllMocks();
+  restoreMotionStubs();
 });
 
 /* ------------------------------------------------------ REDUCED MOTION -- */

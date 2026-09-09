@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (1/11 completed)
+**Status:** In Progress (2/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (1/11 completed)
+**Status:** In Progress (2/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -34,7 +34,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** A labelled big number with a delta chip, optional sparkline and subtitle.
   - **Acceptance Criteria:**
     - Large number (30px/700, tight tracking, tabular numerals) with count-up
@@ -42,6 +42,21 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       dark backgrounds
     - Optional sparkline and optional supporting subtitle
   - **Dependencies:** US-005, US-027
+  - **Completion note (2026-09-09):** All three criteria met. `DeltaChip` lives in
+    `app/components/tiles/delta-chip.tsx` on its own, because US-019, US-022 and US-016 want the chip
+    without a tile around it; `KpiSparkline`, `KpiFigure` and `KpiTile` are in
+    `app/components/tiles/kpi-tile.tsx`. The 30px/700/tight/tabular treatment is the existing
+    `.kpi-number` role class, not four utilities restated. **Colour is never the sole signal, and the
+    `light` variant proves it:** on navy both directions share one white treatment (the negative
+    token is ~2:1 there), and a test asserts the two chips' class strings are identical while the
+    glyph, the explicit sign and an `sr-only` word still differ. Direction is arithmetic and
+    judgement is meaning, so an optional `judgement` prop (from US-010's `varianceJudgement`) draws
+    Marketing's overspend as an **up arrow in the negative token**; a zero renders as a labelled zero
+    in the neutral treatment, never a variance token. Hero 2 and Hero 3's extra content arrives as
+    `children` and the navy band composes `KpiFigure onDark` — **no variant per hero**. Motion is
+    US-027's only (a test fails on any local `useState` / timer / rAF here) and every string comes
+    from US-011. Also closed the US-012 `tailwind-merge` trap at the root: `app/lib/cn.ts` declares
+    the named type scale, derived from the token set. 78 tests added (722/722, gates clean).
 
 - **US-018**: Vertical bar chart tile
   - **Story Points:** 3
@@ -197,7 +212,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 10 stories, 26 points · ⏸️ 0
+**By Status:** ✅ 2 stories, 5 points · 🔄 0 · 📋 9 stories, 24 points · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)

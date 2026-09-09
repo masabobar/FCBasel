@@ -7,12 +7,12 @@
 
 ## Today's Summary
 
-**Stories Completed:** 15 — **Phase 1a and Phase 1b complete; Phase 2a at 3/5 (partial); Phase 2b
-open at 1/11**
-**Story Points:** 35
-**Time Worked:** ~9.4 hours
-**Files Changed:** 150
-**Tests Added:** 644
+**Stories Completed:** 16 — **Phase 1a and Phase 1b complete; Phase 2a at 3/5 (partial); Phase 2b
+at 2/11**
+**Story Points:** 37
+**Time Worked:** ~10.0 hours
+**Files Changed:** 162
+**Tests Added:** 722
 
 ---
 
@@ -32,42 +32,34 @@ open at 1/11**
   reveal keyframes plus `app/lib/motion.ts`, where **reduced motion renders final state rather than
   switching animation off** — the principle US-027 later restated in JavaScript (US-006).
 - **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 / US-009 /
-  US-010 follow: enum keys in `app/lib/repositories/enums.ts`, domain types and the repository
-  interface in `types.ts`, derived figures in `derive.ts`, fixtures plus the in-memory implementation
-  in `app/lib/mock/baseline.ts`, and one line of selection in `index.server.ts` — recorded in the
-  README as a four-step recipe. Per the user's approved decision the delivered set
-  exceeds the written criteria: all four periods, not the single period the criteria describe. The
-  headline webshop figure and its delta are **computed from the series** rather than stored, so the
-  number cannot disagree with the chart under it; the two long periods take their x-axis labels from
-  an injectable clock, so no test depends on the wall clock. A figure used twice is written once —
-  last month's revenue series *is* this month's comparison series. Partner brand colours are brand
-  colours: Bitpanda teal and Sunrise red sit outside the FCB palette on purpose, typed as plain
-  strings and guarded by a test. 47 tests added (228/228), all gates clean.
+  US-010 follow: enums, domain types and the repository interface in `app/lib/repositories/`,
+  fixtures and the in-memory implementation in `app/lib/mock/`, one line of selection in
+  `index.server.ts` — recorded in the README as a four-step recipe. Per the user's approved decision
+  the delivered set exceeds the written criteria (all four periods). The headline webshop figure and
+  its delta are **computed from the series**, so a number cannot disagree with the chart under it; a
+  figure used twice is written once (last month's series *is* this month's comparison series); the
+  long periods label their x-axis from an injectable clock. Partner brand colours stay outside the
+  FCB palette on purpose, guarded by a test. 47 tests added (228/228), all gates clean.
 
 - **US-008 — Hero 1 dataset: shirt sales, badges, printed names.** Mechanical, exactly as US-007
-  predicted: `SEASON_TO_DATE` extends the shared `PeriodKey` (a new `KitVariant` enum joins it),
-  domain types and `Hero1Repository`, derived figures, fixtures, one line of selection. Per the
-  user's approved decision the delivered set
-  exceeds the written criteria — all four periods, because the tile has a period switch. One hero
-  object with `primary` and `followUp` so the tile and its escalation cannot drift, and a
-  `scopeLabel` so the tile states what it covers, which matters when Hero 2 and Hero 3 quote
-  different scopes in the same room. **Nothing derivable is stored:** kit revenue is units x CHF 99,
-  the Home share is 22,400/38,500 = 58.18% shown as 58%, the badge share exactly 8% — the Guide's
-  `homeShare: 58` deliberately did not survive the port. `badgeSegments` corrects its rounding
-  remainder into Bitpanda's segment, proved exhaustively: the four parts sum *exactly* to the total
-  for every total from 0 to 2,000, the four real period totals and adversarial primes. Both
-  narratives are verbatim, checked by SHA-256. The guardrail is tested: squad names exist only as
-  print counts, and no salary, goals, assists, minutes or rating appears anywhere (273/273).
+  predicted, and again exceeding the written criteria by the user's approved decision. One hero
+  object with `primary` and `followUp` so a tile and its escalation cannot drift, plus a `scopeLabel`
+  per series. **Nothing derivable is stored:** kit revenue is units x CHF 99, the Home share 58% and
+  the badge share exactly 8% — the Guide's `homeShare: 58` did not survive the port. `badgeSegments`
+  corrects its rounding remainder so the four parts sum *exactly* to the total, proved for every
+  total from 0 to 2,000 and adversarial primes. Narratives verbatim by SHA-256, and the guardrail is
+  tested: squad names exist only as shirt-print counts (273/273). Full detail in
+  [`completed.md`](completed.md).
+
 - **US-009 — Hero 2 dataset: ticket revenue year on year.** Eight home fixtures in CHF thousands
-  (7,880 -> 7,830) plus the twelve-month series the Reference Guide adds beyond the Specification,
-  as one `Hero2` object with `primary` and `followUp`. The story's real risk was labelling, not
-  arithmetic: the two charts sit at deliberately different scopes — eight highest-grossing fixtures
-  against all home fixtures per month (9,880 -> 9,770) — so `scopeLabel` is a field on each series
-  and tests assert the labels exist, differ, and that the monthly total is the larger one. Nothing
-  derivable is stored: the Guide's `totalPrev`, `totalCurr`, `deltaPct` and second `declines` list
-  did not survive the port, so the headline -0.6% comes from the same `seriesTotals` the baseline
-  band uses, and FCZ -150 / Lugano -110 / Luzern -70 / Sion -70 and the -CHF 400k badge are
-  recovered from the fixture pairs. Both narratives verbatim, pinned by text and length (304/304).
+  (7,880 -> 7,830) plus the twelve-month series the Reference Guide adds beyond the Specification.
+  The real risk was labelling, not arithmetic: the two charts sit at deliberately different scopes
+  (eight highest-grossing fixtures against all home fixtures per month, 9,880 -> 9,770), so
+  `scopeLabel` is a field on each series and tests assert the labels exist, differ, and that the
+  monthly total is the larger. Nothing derivable is stored — the Guide's `totalPrev`, `totalCurr`,
+  `deltaPct` and second `declines` list did not survive the port, so the headline -0.6%, the four
+  declines and the -CHF 400k badge all come off the fixture pairs. Narratives verbatim (304/304).
+
 - **US-010 — Hero 3 dataset: departmental performance.** Six departments in CHF thousands
   (69,000 -> 69,680, +680 / +1.0% derived) as one `Hero3` object with `primary` and `followUp`. The
   new idea here is that a TAG carries the meaning of a number: above budget is money earned for the
@@ -90,25 +82,20 @@ open at 1/11**
   the other four data stories honest. `app/lib/format.ts` is the one place a number becomes a
   string: money always carries `CHF` (no bare-amount variant to reach for), the sign goes *before*
   the unit as the declining-fixtures badge reads (`-CHF 400k`), and millions render bare under the
-  "figures in CHF millions" subtitle. The locale
-  decision was made deliberately and documented: `Intl.NumberFormat("en-CH")` per the Reference
-  Guide, which groups thousands with the Swiss U+2019 mark rather than a comma — pinned as a
-  constant and made independent of the runtime's ICU by rewriting whatever separator ICU actually
-  produced, which two tests prove by stubbing `Intl` to `en-US` and `de-DE`. `oneDecimal` was made
-  public in `derive.ts` and imported rather than restated, so there is exactly one rounding rule,
-  and `chfFromThousands` is the only factor of 1000. Variance carries its meaning through the sign
-  plus a `VarianceDirection` enum rather than through colour, and tabular numerals stay in the token
-  layer. The reconciliation suite then asserts relationships rather than restating
-  constants: kit units summing to 38,500 with the Home share at 58.18% -> 58% and the badge at
-  exactly 8.00%, badge segments summing to their period total in all four periods, the fixture fall
-  of 50 becoming -0.6% with declines of 150+110+70+70 = 400, monthly totals larger than fixture
-  totals *on purpose*, and 69,000 -> 69,680 = +680 -> +1.0% with Marketing's three drivers summing
-  to exactly its 410 variance. The one intended cross-hero inequality is asserted as such
-  (Ticketing 24,360 exceeds Hero 2's 7,830, both scope-labelled), store-once is asserted
-  structurally by pinning each hero's stored key set, and every number in all six narratives is swept
-  against the figures the data can produce — with only two documented narrative-only exceptions.
-  **No drift was found in any dataset.** 70 tests added (418/418 green), coverage 100% statements /
-  98.9% branches of `app/**`, and lint / format / typecheck / build all clean.
+  "figures in CHF millions" subtitle. The locale decision was made deliberately and documented:
+  `Intl.NumberFormat("en-CH")` per the Reference Guide, which groups thousands with the Swiss U+2019
+  mark — pinned as a constant and made independent of the runtime's ICU by rewriting whatever
+  separator ICU actually produced, which two tests prove by stubbing `Intl` to `en-US` and `de-DE`.
+  `oneDecimal` is imported from `derive.ts` rather than restated, so there is exactly one rounding
+  rule, and `chfFromThousands` is the only factor of 1000. Variance carries its meaning through the
+  sign plus a `VarianceDirection` enum rather than through colour. The reconciliation suite then
+  asserts relationships rather than restating constants — kit units to 38,500 with the Home share at
+  58.18% -> 58% and the badge at exactly 8.00%, the fixture fall of 50 becoming -0.6% with declines
+  of 150+110+70+70 = 400, 69,000 -> 69,680 = +680 -> +1.0% with Marketing's three drivers summing to
+  exactly its 410 variance, the intended cross-hero inequality asserted *as* intended (Ticketing
+  24,360 exceeds Hero 2's 7,830, both scope-labelled), store-once pinned per hero, and every number
+  in all six narratives swept against what the data can produce, with two documented exceptions.
+  **No drift was found in any dataset.** 70 tests added (418/418), all gates clean.
 
 - **US-012 — Branded application shell.** `app/components/chrome/{sidebar,top-bar,app-shell}.tsx`
   plus `app/lib/persona.ts`: the navy sidebar (hidden below `lg`), the app bar carrying the
@@ -168,29 +155,41 @@ open at 1/11**
   `schedule`). 40 tests added, 592/592 green. **Phase 2a now 3/5 stories, 8/16 points — and it
   stays open: US-013 and US-016 are deferred to the Phase 2b run.**
 - **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
-  depends on: `useReducedMotion`, `useGrow`, `useCountUp` and `useUid` in
-  `app/lib/hooks/use-motion.ts`, with the consumer API documented in the module header so the next
-  ten stories are composition rather than invention. **Count-up counts from the figure on screen,
-  not from zero** — the displayed value is mirrored in a ref as each frame commits it, and a test
-  proves a target changed mid-flight makes the new animation *open on that very figure*, climb
-  monotonically, never dip, and land **exactly** on the target (both upwards and downwards, because
-  a period filter moves numbers both ways). Without that ref, every filter press in all ten
-  consuming components would flash back to zero and re-count. **Reduced motion means final state in
-  the same render, not one effect later:** `useGrow` returns `grown || reduced` and `useCountUp`
-  returns `reduced ? target : displayed`, so `width={grown ? w : 0}` geometry is never stranded at
-  zero by a transition that will not run — under the preference `useGrow` is `true` on the first
-  render with **zero** frames requested. One reduced-motion source of truth: the hooks subscribe to
-  US-006's `REDUCED_MOTION_QUERY` through `useSyncExternalStore` (an explicit server snapshot, so
-  SSR-safety is structural and React owns the unsubscribe), and a test greps the comment-stripped
-  hook source to prove it never calls `matchMedia` itself. Every rAF, fallback timer and listener is
-  cancelled on unmount, asserted per hook and once with ten tiles unmounted mid-count. The ~900ms
-  count-up became the `duration.countUp` token read through a new `tokens.durationMs()`, and
-  `cssIdentifier` was extracted from `viewTransitionName` so `useUid`'s SVG gradient ids are always
-  legal in `url(#…)`. SSR is *proven*: a `renderToString` with `window` and the frame APIs stubbed
-  away, plus a real `hydrateRoot` pass that fails on any hydration `console.error`. **No browser
-  pass, stated plainly — hooks have no UI of their own; US-017 is the first consumer and owns that
-  verification.** 52 tests added, 644/644 green.
-
+  depends on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid` in
+  `app/lib/hooks/use-motion.ts`, the consumer API documented in the module header so the next ten
+  stories are composition rather than invention. **Count-up counts from the figure on screen, not
+  from zero** — the displayed value is mirrored in a ref, and a test proves a target changed
+  mid-flight opens the new animation *on that very figure*, climbs monotonically, never dips and
+  lands exactly on target, both directions. **Reduced motion means final state in the same render:**
+  `useGrow` is `true` on the first render with **zero** frames requested, so `width={grown ? w : 0}`
+  geometry is never stranded. One reduced-motion source (US-006's `REDUCED_MOTION_QUERY` via
+  `useSyncExternalStore`), every rAF/timer/listener cancelled on unmount, ~900ms promoted to the
+  `duration.countUp` token, SSR *proven* by `renderToString` plus a real `hydrateRoot` pass. Full
+  account in [`completed.md`](completed.md). 52 tests added, 644/644 green.
+- **US-017 — KPI tile & variance chip.** The first component built on those hooks, and the shape the
+  other nine follow. Three exports so nothing is forked later: `DeltaChip` in its own module
+  (US-019, US-022 and US-016 want the chip without a tile), plus `KpiSparkline`, `KpiFigure` and
+  `KpiTile`. **The chip is where "colour is never the sole signal" stops being a slogan.** Direction
+  is carried four independent times — the glyph, the explicit `+`/`-` from `formatSignedPercent`, an
+  `sr-only` word, and only then the token colour — and the `light` variant is the proof: on the navy
+  band the negative token sits near 2:1 and is illegible at 13px, so that variant drops colour
+  coding altogether and a test asserts the up and down chips' class strings are **identical** while
+  glyph, sign and spoken word still differ. Red never means "bad" (a test rejects `text-red` on the
+  chip) and a zero is a **labelled zero** in the neutral treatment, not a variance token.
+  **Direction is arithmetic, judgement is meaning:** an optional `judgement` prop from US-010's
+  `varianceJudgement` draws Marketing's overspend as an up arrow in the *negative* token, so the
+  chip never re-derives good/bad from a sign. One API carries all three consumers with **no variant
+  per hero** — hero extras arrive as `children`, and US-016's navy band composes `KpiFigure onDark`,
+  which forces the light chip so nobody can leave an illegible red figure on navy. Nothing was
+  reinvented: the number is the existing `.kpi-number` role class and the motion is US-027's, with a
+  test grepping the source to fail on any local `useState`, timer or rAF. The sparkline draws itself
+  with `pathLength="1"` and a dash offset and paints with `currentColor`, so no hex can be passed in;
+  empty, flat and single-point series are handled rather than left to emit `NaN`. **The US-012
+  `tailwind-merge` trap is closed at the root** — `app/lib/cn.ts` declares the named type scale as a
+  font-size group, derived from the token set — and the frame/preference stubs moved to
+  `tests/unit/support/motion-harness.ts` for the nine stories still to come. **No browser pass,
+  stated plainly:** nothing mounts these components yet, so US-013 owns that. 78 tests added,
+  722/722 green.
 ---
 
 ## Stories Completed Today
@@ -235,6 +234,9 @@ open at 1/11**
 - ✅ US-027 — Motion & animation hooks (3 pts) — all 4 acceptance criteria met, including the two
   subtle ones: count-up continues from the current displayed value, and nothing is stranded at zero
   under reduced motion. **Phase 2b opens here: 1/11 stories, 3/29 points.**
+- ✅ US-017 — KPI tile & variance chip (2 pts) — all 3 acceptance criteria met; the delta chip's
+  meaning survives with the colour removed, and the named-size/colour `tailwind-merge` trap is closed
+  for every component after it. **Phase 2b now 2/11 stories, 5/29 points.**
 
 ---
 
@@ -257,10 +259,11 @@ open at 1/11**
 **Immediate Focus:**
 - **Phase 2a is done for now at 3/5 stories, 8/16 points** — US-012, US-014, US-015 built. It is
   deliberately left open, not closed.
-- **Phase 2b — the component library** is under way: US-027 (the motion hooks) is done, so the ten
-  remaining components are unblocked. Next is **US-017 — KPI tile & variance chip (2 pts)**, then
-  US-021, US-013, US-025, US-026, US-016, and the rest of the charts. Every one of them should
-  import from `app/lib/hooks/use-motion.ts` rather than animate by hand.
+- **Phase 2b — the component library** is under way: the motion hooks (US-027) and the KPI tile
+  (US-017) are done. Next is **US-021 — Horizontal bar tile (3 pts)**, then US-013, US-025, US-026,
+  US-016 and the rest of the charts. Every one of them should import from
+  `app/lib/hooks/use-motion.ts` rather than animate by hand, and compose `Card` and `DeltaChip`
+  rather than restate them — US-023 in particular must reuse US-021's bar row.
 
 **Priority Stories for This Week:**
 1. Phase 1a + 1b — foundations (24 pts): tokens and seed data, which everything else reads from
@@ -275,11 +278,15 @@ open at 1/11**
 - Estimated ~52 AI-core hours / ~68 AI-realistic hours for the full 116 points.
 - If the week gets tight, extend daily runtime before cutting scope — the entire P1 cut set is worth
   only ~0.82 days at 8h/day.
-- Phases 1a and 1b are complete, Phase 2a is at 3/5 and Phase 2b at 1/11 (35/116 points); continue
+- Phases 1a and 1b are complete, Phase 2a is at 3/5 and Phase 2b at 2/11 (37/116 points); continue
   with `/holycode-pm:execute-work phase 2b`, finishing US-013 and US-016 inside that run.
 - **The motion hooks are the shared contract for Phase 2b:** `useCountUp` from the current value and
   `useGrow`'s reduced-motion short-circuit are what keep ten charts consistent. A component that
   reimplements either is a review finding, not a style choice.
+- **Two shared pieces US-017 left for the rest of the phase:** `DeltaChip` is the *only* variance
+  chip (US-019's per-pair chips and US-022's variance column import it, judgement passed in), and
+  `app/lib/cn.ts` now protects named size tokens — but only through `cn`, so a component that hand
+  writes `class="text-caption text-muted"` outside it is still on its own.
 - **Reset's seams are recorded in code, not just here:** US-029's chips should be *derived* from
   `useDashboard`'s `sections` and US-031's thinking beat *scheduled* through its `schedule`, so
   neither story needs reset logic of its own.

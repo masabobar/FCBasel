@@ -1,7 +1,7 @@
 # Phase 2b: Chart & Tile Component Library
 
 **Duration:** 2026-09-11 to 2026-09-12 (~12.0 AI-hours)
-**Status:** In Progress (1/11 stories · 3/29 points)
+**Status:** In Progress (2/11 stories · 5/29 points)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-12
 **Actual Completion:** —
@@ -29,11 +29,11 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 
 ### Epic 5: E6 — Chart & Tile Component Library (29 story points)
 
-**Priority:** P0 (US-026 is P1) · **Status:** In Progress (1/11) · **Dependencies:** US-003, US-005
+**Priority:** P0 (US-026 is P1) · **Status:** In Progress (2/11) · **Dependencies:** US-003, US-005
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
-| US-017 | KPI tile & variance chip | 2 | P0 | 📋 Todo |
+| US-017 | KPI tile & variance chip | 2 | P0 | ✅ Done |
 | US-018 | Vertical bar chart tile | 3 | P0 | 📋 Todo |
 | US-019 | Grouped bar chart tile | 3 | P0 | 📋 Todo |
 | US-020 | Donut / ring tile | 3 | P0 | 📋 Todo |
@@ -88,9 +88,9 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 > too cautious — a good place to calibrate.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 3 / 29 (10%)
-- **Completed Stories:** 1 / 11
-- **Tests Passing:** 644 / 644 · **Coverage:** 100% stmts / 99.4% branches · **Commits:** 1
+- **Completed Story Points:** 5 / 29 (17%)
+- **Completed Stories:** 2 / 11
+- **Tests Passing:** 722 / 722 · **Coverage:** 100% stmts / 99.5% branches · **Commits:** 2
 
 ---
 
@@ -112,10 +112,11 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
 | A per-hero copy of a chart type is created under time pressure | Medium | Medium | Genuinely shared components is an explicit acceptance criterion on every story | AI | Open |
-| Filter change snaps values to zero instead of transitioning | High | Medium | Count-up tracks the last displayed value in a ref; bars keyed by category | AI | 🔄 Half closed — `useCountUp` proven to continue from the displayed figure (US-027); per-component keying still on each chart story |
-| SVG gradient ids collide across simultaneous charts | Medium | Medium | Stable unique-id hook per component instance (US-027) | AI | ✅ Closed by US-027 (`useUid`, tested for distinctness across three live instances) |
+| Filter change snaps values to zero instead of transitioning | High | Medium | Count-up tracks the last displayed value in a ref; bars keyed by category | AI | 🔄 Half closed — proven again at COMPONENT level in US-017 (a retargeted tile's opening frame is the figure on screen); per-component geometry keying still on each chart story |
+| SVG gradient ids collide across simultaneous charts | Medium | Medium | Stable unique-id hook per component instance (US-027) | AI | ✅ Closed — `useUid` (US-027) and now proven on a real component: two KPI sparklines on one screen carry different gradient ids (US-017) |
 | Hand-built SVG takes longer than a library would | Medium | Medium | Port from the reference rather than writing fresh; the components already exist and work | AI | Open |
 | Long labels overflow their tile | Low | Medium | Wrap or truncate-with-tooltip; never overflow | AI | Open |
+| A named type-size token is silently dropped beside a colour token | Medium | **High** | `tailwind-merge` reads `text-caption` as a colour; the type scale is now declared in `app/lib/cn.ts`, derived from the token set | AI | ✅ Closed by US-017 for every component that follows |
 
 ---
 
@@ -185,9 +186,77 @@ user-supplied URL, no upload, no env var, no dependency or lockfile change, no l
 API. The one value that reaches the DOM is `useUid`'s id, and it is sanitised to `[A-Za-z0-9_-]`
 before it can appear in an attribute or a selector.
 
+### 2026-09-09 — US-017 KPI tile & variance chip ✅ (2 pts)
+
+**Delivered:** three exports, so nothing has to be forked later —
+`app/components/tiles/delta-chip.tsx` (`DeltaChip`, wanted on its own by US-019, US-022 and US-016)
+and `app/components/tiles/kpi-tile.tsx` (`KpiSparkline`, `KpiFigure`, `KpiTile`, `sparklineGeometry`).
+
+```tsx
+<KpiTile title="Webshop revenue" period="This month"
+         value={148_200} format={formatMoney}      // counts up; strings from US-011
+         delta={{ value: 12 }}                      // + arrow + pos token, or judgement={...}
+         subtitle="vs last month" sparkline={sixPoints} />
+
+<KpiFigure value={7_830_000} format={formatMoneyMillions} delta={{ value: -0.6 }} onDark />
+```
+
+**Colour is never the sole signal, and it is TESTED that way.** The chip carries direction four
+independent times — the glyph, the explicit `+`/`-` from `formatSignedPercent`, a `sr-only` word,
+and the token colour. The proof is the `light` variant: on the navy band both directions share one
+white treatment (the negative token falls to ~2:1 on navy and is illegible at 13px), and a test
+asserts the two chips' `className` strings are **identical** while sign, glyph and spoken word still
+differ. Red never means "bad" anywhere — only `variancePositive` / `varianceNegative`, and a test
+rejects `text-red` on the chip.
+
+**Direction is not judgement.** The arrow follows the arithmetic; the colour follows the meaning.
+Marketing's overspend is UP *and* ADVERSE, so `judgement` is an optional prop the caller passes from
+`varianceJudgement` (US-010) and the chip never re-derives good/bad from a sign. A zero renders as a
+**labelled zero**: dash glyph, `+0%` in house style, the neutral (muted) treatment rather than either
+variance token, and "unchanged" in the accessibility tree.
+
+**One tile carries all three consumers without a variant per hero.** Extra hero content (Hero 2's
+compare bars, Hero 3's two-up footer) arrives as `children` under the number; `onDark` on `KpiFigure`
+is what US-016's navy band composes, and it forces the chip's `light` variant so a caller cannot
+leave an illegible red figure on navy. Verified against all three: the baseline webshop tile, Hero 2's
+`-0.6%` total and Hero 3's `+1%` overall.
+
+**The US-012 trap is closed at the root, not worked around.** `tailwind-merge` reads our named type
+scale (`text-caption`, `text-kpi`) as colours, so a size and a colour on one element silently lost the
+size. `app/lib/cn.ts` now declares the scale as the `font-size` group, **derived from
+`tokens.fontSize` through the same `cssVariableName` mapping Tailwind generates the utility from**, so
+a new token is understood immediately and cannot drift. Two sizes still collapse, two colours still
+collapse, and a caller can still override a base size. Asserted in `tests/unit/cn.test.ts` and again
+on the rendered subtitle and chip.
+
+**Motion is US-027's, with nothing added.** `useCountUp` for the number, `useGrow` for the sparkline's
+stroke draw, `useUid` for its gradient id; a test greps this file and fails on `useState`,
+`setTimeout`, `setInterval` or `requestAnimationFrame`. The sparkline draws itself with
+`pathLength="1"` + a dash offset — no path measurement, no per-frame JavaScript — and it paints with
+`currentColor`, so there is no colour prop to smuggle a hex through. Degenerate series are handled
+rather than left to emit `NaN` into a `d` attribute: empty renders nothing, a flat series draws
+through the middle, a single point reads as a flat line.
+
+**Also:** the frame and preference stubs moved to `tests/unit/support/motion-harness.ts` — every one
+of the nine remaining component stories needs them, so there is one harness rather than nine copies
+(`use-motion.test.tsx` now imports it, still 42/42).
+
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 722/722 tests ✅ (78 new: 45 tile, 25 chip, 8 `cn`)
+· build ✅ · coverage 100% stmts / 99.5% branches / 100% funcs. Every utility used was confirmed
+present in the compiled stylesheet (`bg-variance-positive/10`, `duration-(--duration-grow)`,
+`text-bg/70`…), and `.kpi-number` was checked to sit *before* the utilities layer so `onDark`'s white
+actually wins. **Security triage:** no security-relevant changes detected — no endpoint, no raw SQL,
+no `dangerouslySetInnerHTML` (asserted), no user-supplied URL, no upload, no env var, no dependency
+or lockfile change, no logging, no storage API. All rendered text is React-escaped; `format` is a
+caller-supplied pure function, not input.
+
+**One seam, stated plainly:** still no real-Chrome pass. Nothing in the app mounts these components
+yet — the first screen that does is **US-013**, and the browser verification of count-up, the stroke
+draw and two sparklines side by side belongs there.
+
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
-**Phase Status:** In Progress — US-027 done; US-017 next
+**Phase Status:** In Progress — US-027 and US-017 done; US-021 next
 **Previous:** [Phase 2a](phase-2a.md) · **Next:** [Phase 3a — Conversation](phase-3a.md)
