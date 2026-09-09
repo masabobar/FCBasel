@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (3/11 completed)
+**Status:** In Progress (4/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (3/11 completed)
+**Status:** In Progress (4/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -171,7 +171,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Multi-series line chart for the hero band and the month-by-month comparison.
   - **Acceptance Criteria:**
     - One or more series, each optionally an area fill or a dashed line; legend
@@ -180,6 +180,22 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - `dark` variant for the navy hero band
     - Scales to its container via `viewBox` and `width: 100%`
   - **Dependencies:** US-005, US-027
+  - **Completion note (2026-09-09):** All five criteria met, in
+    `app/components/charts/line-chart.tsx` — `lineChartGeometry` (the pure paths and coordinates),
+    `LineChartLegend` (on its own, because the hero band puts its legend in its own header row rather
+    than under the chart), `LineChart` and `LineChartTile`. Built for BOTH consumers at once: series
+    count is a prop, per-series style is `area` / `dash`, and colour is a token NAME
+    (`gold` + `white` on the navy band, `navy` + `red` on white) so no hex can enter. **The stroke
+    draw survives reduced motion** — a solid line normalises `pathLength="1"` and transitions its
+    offset 1 → 0, and under the preference `useGrow` is `true` in the first render, so a test reads
+    `stroke-dashoffset="0"` with zero frames requested rather than a line stranded at offset 1; a
+    dashed line fades instead, because its dasharray is already its pattern. **It replays by being
+    re-keyed** and by nothing else: a re-key returns the offset to 1 and clears the guide, while a
+    data-only change leaves it drawn. Hover maps the pointer over the wrapper to the nearest index
+    and the tooltip lists EVERY series there, through US-011; arrow/Home/End/Escape do the same from
+    the keyboard without capturing Tab. Gradient ids come from `useUid`, proven distinct with the
+    band and Hero 2 on screen together. A zero or missing point is a labelled zero, never a `NaN` in
+    a `d`. 73 tests added (953/953, gates clean, 100% lines / 100% funcs on the new file).
 
 - **US-026**: Segmented period filter control
   - **Story Points:** 2
