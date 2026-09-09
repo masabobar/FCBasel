@@ -5,7 +5,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 **Duration:** Days 2-3 (of a one-week build)
 **Total Stories:** 11
 **Total Points:** 29
-**Status:** In Progress (5/11 completed)
+**Status:** In Progress (6/11 completed)
 
 > **Global guardrails apply** — see [`../constraints.md`](../constraints.md) §2.
 
@@ -15,7 +15,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Priority:** P0
 **Total Story Points:** 29
-**Status:** In Progress (5/11 completed)
+**Status:** In Progress (6/11 completed)
 **Source:** Build Specification E6; Reference Implementation Guide §8.
 
 > **Applies to every story in this epic:**
@@ -42,23 +42,21 @@ screen. Styled from the E2 tokens, fed from the E3 data.
       dark backgrounds
     - Optional sparkline and optional supporting subtitle
   - **Dependencies:** US-005, US-027
-  - **Completion note (2026-09-09):** All three criteria met. `DeltaChip` lives in
-    `app/components/tiles/delta-chip.tsx` on its own, because US-019, US-022 and US-016 want the chip
-    without a tile around it; `KpiSparkline`, `KpiFigure` and `KpiTile` are in
-    `app/components/tiles/kpi-tile.tsx`. **Colour is never the sole signal, and the `light` variant
-    proves it:** on navy both directions share one white treatment, and a test asserts the two chips'
-    class strings are identical while the glyph, the explicit sign and an `sr-only` word still differ.
-    Direction is arithmetic and judgement is meaning, so an optional `judgement` prop draws
-    Marketing's overspend as an up arrow in the negative token; a zero is a labelled zero. Hero extras
-    arrive as `children` and the navy band composes `KpiFigure onDark` — **no variant per hero**.
-    Motion is US-027's only and every string comes from US-011. Also closed the US-012
-    `tailwind-merge` trap at the root in `app/lib/cn.ts`. 78 tests added (722/722, gates clean).
+  - **Completion note (2026-09-09):** All three criteria met. `DeltaChip` is in
+    `app/components/tiles/delta-chip.tsx` on its own (US-019/US-022/US-016 want the chip without a
+    tile); `KpiSparkline` / `KpiFigure` / `KpiTile` are in `kpi-tile.tsx`. **Colour is never the sole
+    signal, and the `light` variant proves it:** on navy both directions share one white treatment
+    and a test asserts the two class strings are identical while glyph, sign and an `sr-only` word
+    still differ. Direction is arithmetic, judgement is meaning — an optional `judgement` prop draws
+    Marketing's overspend as an up arrow in the negative token; a zero is a labelled zero. Hero
+    extras arrive as `children` (**no variant per hero**), motion is US-027's and strings are
+    US-011's. Also closed the US-012 `tailwind-merge` trap in `app/lib/cn.ts`. 78 tests (722/722).
 
 - **US-018**: Vertical bar chart tile
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-09)
   - **Description:** Gradient vertical bars with rounded caps, used for the kit split.
   - **Acceptance Criteria:**
     - Gridlines, count-up value labels, hover highlight
@@ -66,6 +64,19 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - Bars persist across data changes (keyed by category) so a filter change transitions height and
       position via CSS while the label counts up — never a snap to zero
   - **Dependencies:** US-005, US-027
+  - **Completion note (2026-09-09):** All three criteria met, in
+    `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure), `VBars` and `VBarTile`. **Criterion
+    3 is proven by a RE-RANK, not a rerender:** columns are keyed by category, so `Home` keeps the
+    *same* `<rect>` and its `x` / `y` / `height` CSS transition — element identity is asserted across
+    a data change and a re-ordered dataset, each label stays with its own category, and switching
+    that key to the array index fails exactly two tests. The surviving instance keeps its
+    `useCountUp` state, so the label counts on from the figure on screen; reduced motion lands on
+    final heights with **zero frames requested**. Gradient fills with rounded caps, one gradient per
+    distinct token colour (ids from `useUid`, distinct with two charts on screen), gridlines behind,
+    labels above, a `filter` hover highlight, and an optional `tooltip(index)` renderer for Hero 1's
+    units + share + revenue (falling back to category + figure). Category labels are DOM text so a
+    long one wraps; `niceMax` / `vBarHeight` never yield `NaN`; a zero is a labelled zero; US-025's
+    `tooltipAnchor` / `nextHoverIndex` reused. 52 tests added (1142/1142, gates clean).
 
 - **US-019**: Grouped bar chart tile
   - **Story Points:** 3
@@ -114,16 +125,14 @@ screen. Styled from the E2 tokens, fed from the E3 data.
   - **Completion note (2026-09-09):** All four criteria met, in
     `app/components/charts/h-bars.tsx` — `HBarRow` (the unit of reuse), `HBars` (the ranked list) and
     `HBarTile` (`Card` + rows, `action` slot passing through for Hero 2's `-CHF 400k total` badge).
-    **Both review decisions are read back off the rendered element by tests**, not merely written:
-    150px label at weight 500 with `truncate` / `text-ellipsis` / `line-clamp` rejected (long labels
-    wrap), and a 96px `nowrap` value column proven on three different lists with `-CHF 150k` a single
-    text node. One rule serves all five consumers — the sign of the displayed figure sets the anchor
-    side, the token and the text sign — so `negative` mode is just "every row is a decline" (it
-    negates the stored magnitude, idempotently) and the badge trend's mixed signs work unchanged.
-    Rows keyed by name, so a data change transitions the same bar (100% → 50%) while `useCountUp`
-    continues from the figure on screen; `hBarMax` / `hBarPercent` are pure and return zero width,
-    never `NaN`, so a zero is a labelled zero. US-023 composes this, with nothing to reimplement.
-    55 tests added (777/777, gates clean, coverage 100% stmts).
+    **Both review decisions are read back off the rendered element by tests:** 150px label at weight
+    500 with `truncate` / `text-ellipsis` / `line-clamp` rejected (long labels wrap), and a 96px
+    `nowrap` value column proven on three lists with `-CHF 150k` a single text node. One rule serves
+    all five consumers — the sign of the displayed figure sets the anchor side, the token and the
+    text sign — so `negative` mode is just "every row is a decline" (idempotent on a stored
+    magnitude) and mixed signs work unchanged. Rows keyed by name, so a data change transitions the
+    same bar (100% → 50%) while `useCountUp` continues from the figure on screen; `hBarMax` /
+    `hBarPercent` return zero width, never `NaN`. US-023 composes this. 55 tests (777/777, clean).
 
 - **US-022**: Department table tile
   - **Story Points:** 3
@@ -181,21 +190,17 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - Scales to its container via `viewBox` and `width: 100%`
   - **Dependencies:** US-005, US-027
   - **Completion note (2026-09-09):** All five criteria met, in
-    `app/components/charts/line-chart.tsx` — `lineChartGeometry` (the pure paths and coordinates),
-    `LineChartLegend` (on its own, because the hero band puts its legend in its own header row rather
-    than under the chart), `LineChart` and `LineChartTile`. Built for BOTH consumers at once: series
-    count is a prop, per-series style is `area` / `dash`, and colour is a token NAME
-    (`gold` + `white` on the navy band, `navy` + `red` on white) so no hex can enter. **The stroke
-    draw survives reduced motion** — a solid line normalises `pathLength="1"` and transitions its
-    offset 1 → 0, and under the preference `useGrow` is `true` in the first render, so a test reads
-    `stroke-dashoffset="0"` with zero frames requested rather than a line stranded at offset 1; a
-    dashed line fades instead, because its dasharray is already its pattern. **It replays by being
-    re-keyed** and by nothing else: a re-key returns the offset to 1 and clears the guide, while a
-    data-only change leaves it drawn. Hover maps the pointer over the wrapper to the nearest index
-    and the tooltip lists EVERY series there, through US-011; arrow/Home/End/Escape do the same from
-    the keyboard without capturing Tab. Gradient ids come from `useUid`, proven distinct with the
-    band and Hero 2 on screen together. A zero or missing point is a labelled zero, never a `NaN` in
-    a `d`. 73 tests added (953/953, gates clean, 100% lines / 100% funcs on the new file).
+    `app/components/charts/line-chart.tsx` — `lineChartGeometry` (pure), `LineChartLegend` (on its
+    own, because the band places its legend in its own header row), `LineChart` and `LineChartTile`.
+    Built for BOTH consumers at once: series count is a prop, style is per-series `area` / `dash`,
+    colour is a token NAME so no hex can enter. **The stroke draw survives reduced motion** — a
+    solid line normalises `pathLength="1"` and transitions its offset 1 → 0, and under the
+    preference `useGrow` is `true` in the first render (`stroke-dashoffset="0"`, zero frames
+    requested); a dashed line fades instead, its dasharray being its pattern. **It replays by being
+    re-keyed** and by nothing else. Hover maps the pointer over the wrapper to the nearest index and
+    the tooltip lists EVERY series there through US-011; arrow/Home/End/Escape do the same without
+    capturing Tab. Gradient ids from `useUid`, distinct with both charts on screen. A zero or
+    missing point is a labelled zero, never a `NaN` in a `d`. 73 tests (953/953, clean).
 
 - **US-026**: Segmented period filter control
   - **Story Points:** 2
@@ -209,15 +214,13 @@ screen. Styled from the E2 tokens, fed from the E3 data.
     - 11px corner radius (not a full pill), with a lift-and-tint hover
   - **Dependencies:** US-003
   - **Completion note (2026-09-09):** All three criteria met, in
-    `app/components/controls/segmented.tsx` — `Segmented`, plus the pure `nextOptionIndex` and the
-    exported `CHIP_SURFACE_CLASS` US-029's suggestion chips will reuse. Controlled
-    (`options` / `value` / `onChange`), keys typed to the shared `PeriodKey` with the label as data
-    on each entry, so Hero 1 can say "Current month" for `THIS_MONTH`. `light` / `dark` variants from
-    a closed class table; 11px comes from the existing `--radius-chip` via `rounded-chip` plus the
-    new `.fcb-chip` rule (radius + 1px lift + transition) — `rounded-full` is rejected by test.
-    Radiogroup semantics: one tab stop (roving `tabIndex`), wrapping arrows on both axes, Home/End,
-    and selection carried by shape, shadow, weight *and* `aria-checked`, never colour alone.
-    **Not wired into any consumer** — US-013's `action` slot stays empty until US-016's pass.
+    `app/components/controls/segmented.tsx` — `Segmented`, the pure `nextOptionIndex` and the
+    exported `CHIP_SURFACE_CLASS` US-029's chips reuse. Controlled, keys typed to the shared
+    `PeriodKey` with the label as data on each entry (Hero 1 says "Current month" for `THIS_MONTH`).
+    `light` / `dark` from a closed class table; 11px comes from the existing `--radius-chip` plus
+    the new `.fcb-chip` rule (radius + 1px lift + transition) — `rounded-full` rejected by test.
+    Radiogroup semantics: one tab stop (roving `tabIndex`), wrapping arrows, Home/End, and selection
+    carried by shape, shadow, weight *and* `aria-checked`, never colour alone. Wired in by US-016.
 
 - **US-027**: Motion & animation hooks
   - **Story Points:** 3
@@ -247,7 +250,7 @@ screen. Styled from the E2 tokens, fed from the E3 data.
 
 **Total Epics:** 1 | **Total Stories:** 11 | **Total Points:** 29
 **By Priority:** P0: 10 stories, 27 points · P1: 1 story, 2 points · P2: 0
-**By Status:** ✅ 5 stories, 13 points · 🔄 0 · 📋 6 stories, 16 points · ⏸️ 0
+**By Status:** ✅ 6 stories, 16 points · 🔄 0 · 📋 5 stories, 13 points · ⏸️ 0
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-2a-shell.md) · [Next Phase →](phase-3a-conversation.md) · [Dashboard](../../output/progress/DASHBOARD.md)

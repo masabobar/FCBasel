@@ -6,10 +6,10 @@
 
 ## Today's Summary
 
-**Stories Completed:** 21 — **Phases 1a, 1b and 2a all complete (2a closed by US-016); Phase 2b at
-5/11**
-**Story Points:** 53
-**Time Worked:** ~14.5 hours · **Files Changed:** 198 · **Tests Added:** 1090
+**Stories Completed:** 22 — **Phases 1a, 1b and 2a all complete (2a closed by US-016); Phase 2b at
+6/11**
+**Story Points:** 56
+**Time Worked:** ~15.0 hours · **Files Changed:** 200 · **Tests Added:** 1142
 
 ---
 
@@ -114,21 +114,29 @@
   are keyed by name, so a filter change transitions the *same* bar while the figure counts on from
   what is on screen. One deviation flagged: a decline grows *leftwards*. 55 tests.
 - **US-016 — Hero band. Phase 2a is closed (5/5 · 16/16).** The navy band above the baseline row,
-  and the first thing to mount `LineChart` and `Segmented` in the app.
-  **ONE `Segmented` drives both halves** from a single `BaselinePeriod` entry — one `useState` and
-  one `<Segmented>` in the file, both counts pinned by tests — so the gold-area-over-dashed-white
-  chart (re-keyed by period, which is what replays the stroke draw) and the new hand-built
-  `AttendanceRing` (arc sweeping on `stroke-dasharray`, centre swapping to "% of capacity" on hover
-  *or focus*, with a gold glow that is an accent on a 12px arc and never a fill) cannot disagree
-  about the month. **The total and its delta are `seriesTotals` off the plotted array on every
-  render**, and `HeroBandData` deliberately has no field to read a stored one from. The greeting is
-  resolved in the loader from an injectable clock, so server and browser cannot differ on the hour.
-  **US-013's loose end closed:** Top Products' `action` slot now holds a light `Segmented`, its own
-  period, independent of the band's by design. Chrome at 1920×1080: **54 distinct KPI strings from
-  `CHF 148’200` → `CHF 132’400`, still the old figure in the frame after the click**, 44 stroke
-  offsets on the re-keyed line, 43 arc dash pairs on the same element, and one KPI / one ring value
-  under reduced motion. One defect exposed by first mount, fixed in `LineChart`: clipped end axis
-  labels. 92 tests, 1090/1090.
+  and the first thing to mount `LineChart` and `Segmented` in the app. **ONE `Segmented` drives both
+  halves** from a single `BaselinePeriod` entry (one `useState`, one `<Segmented>`, both counts
+  pinned by tests), so the gold-area-over-dashed-white chart (re-keyed by period, which replays the
+  stroke draw) and the new hand-built `AttendanceRing` (arc sweeping on `stroke-dasharray`, centre
+  swapping to "% of capacity" on hover *or focus*) cannot disagree about the month. **The total and
+  its delta are `seriesTotals` off the plotted array**, and `HeroBandData` has no field to read a
+  stored one from; the greeting is resolved in the loader from an injectable clock. **US-013's loose
+  end closed:** Top Products' `action` slot now holds its own light `Segmented`. Chrome at 1920×1080:
+  **54 distinct KPI strings from `CHF 148’200` → `CHF 132’400`, still the old figure in the frame
+  after the click**, 44 stroke offsets, 43 arc dash pairs on the same element, one KPI / one ring
+  value under reduced motion. One defect fixed in `LineChart`: clipped end axis labels. 92 tests.
+- **US-018 — Vertical bar chart tile.** `app/components/charts/v-bars.tsx` — the kit-split chart
+  US-034 composes: `vBarGeometry` / `VBars` / `VBarTile`. **Bar persistence is the story and the
+  test is a re-rank:** columns are keyed by category, so a filter press hands `Home` the *same*
+  `<rect>` and the `x` / `y` / `height` CSS transition carries it — element identity holds across a
+  data change *and* a re-ordered dataset, each label stays with its own category, and switching that
+  key to the array index **fails exactly two tests**. The surviving instance keeps its `useCountUp`
+  state, so the label counts on from what is displayed; reduced motion lands on final heights with
+  zero frames requested. Gradient fills with rounded caps, one gradient per distinct token colour
+  (`useUid`), gridlines behind, labels above, a `filter` hover highlight, and an **optional
+  `tooltip(index)` renderer** for Hero 1's units + share + revenue. Category labels are DOM text so
+  a long one wraps; `niceMax` / `vBarHeight` never yield `NaN`; US-025's `tooltipAnchor` /
+  `nextHoverIndex` reused rather than restated. 52 tests, 1142/1142.
 ---
 
 ## Stories Completed Today
@@ -178,53 +186,19 @@
   keys typed to the shared `PeriodKey`, radiogroup semantics with one tab stop. Not wired into a
   consumer — that is US-016's and US-034's work.
   **Phase 2b now 5/11 stories, 13/29 points — and US-016 is unblocked.**
-
-- **US-013 — Baseline dashboard: four pre-existing tiles.** The story that makes the prototype look
-  real, and the deferred Phase 2a one US-017 + US-021 had just unblocked. **The canvas stops being
-  empty:** four tiles in order — Webshop revenue, Last home match, Top products, Active partners — as
-  direct children of US-012's one canvas grid, composing `KpiTile`, `HBarTile` and the `Card` shell;
-  the only new component is the partner strip. **No figure is re-typed:** the route gained an SSR
-  `loader` reading the US-007 repository through `app/lib/dashboard/baseline.ts`, the webshop headline
-  and its `+11.9%` are `seriesTotals` off the same array the sparkline draws, and a source scan fails
-  on any dataset figure written as a literal. **Reset's baseline seam is closed as US-015 described**
-  — the tiles are static route chrome outside the session list, and a test drives insert → Reset and
-  compares the canvas to its load state. **Also the first real-Chrome pass for US-017, US-021 and
-  US-027:** no horizontal scroll at 1920×1080 (nor 1440/1280/834/390), 54 distinct KPI strings and 43
-  distinct bar widths per frame, two values only under reduced motion. 880/880, gates clean.
-
-- **US-025 — Line chart component.** One chart in `app/components/charts/line-chart.tsx` for both of
-  its consumers: the navy hero band (a gold area line over a dashed white previous period, keyed by
-  period) and Hero 2's twelve-month two-season comparison. Series count is a prop, `area` / `dash` is
-  per series, and colour is a token **name**, so no hex can enter — gold is a legitimate series
-  colour on the band only, per the Guide. **The stroke draw survives reduced motion, and that is the
-  load-bearing test:** `pathLength="1"` plus an offset that transitions 1 → 0, and because `useGrow`
-  is `true` in the first render under the preference, a test reads `stroke-dashoffset="0"` with
-  **zero frames requested** rather than a line stranded at offset 1. **It replays by being re-keyed
-  and by nothing else** — a re-key returns the offset to 1 and clears the guide, a data-only change
-  leaves it drawn, so a filter press never flashes. Hover maps the pointer over the wrapper to the
-  nearest index and the tooltip lists **every** series there through US-011; arrow/Home/End/Escape do
-  the same from the keyboard without capturing Tab. Gradient ids come from `useUid`, proven distinct
-  with both charts on screen. A zero or missing point is a labelled zero, never a `NaN` in a `d`.
-  73 tests, 953/953 green.
-- **US-026 — Segmented period filter control.** One control for all three of its consumers — the dark
-  hero band, Top Products' `action` slot and Hero 1's section header — and **wired into none of them
-  on purpose**: mounting it belongs to US-016 and US-034. **It is controlled and has no opinion of
-  its own** — no internal selection, no defaulting to the first option, so a press the caller ignores
-  changes nothing on screen (tested), which is exactly what lets one control drive two tiles on the
-  band or three on Hero 1 without them ever disagreeing. Keys are the shared `PeriodKey` rather than
-  a local union — a `@ts-expect-error` line fails `pnpm typecheck` the moment they loosen to `string`
-  — while the label travels as data on the *entry*, which lets Hero 1 say "Current month" for the
-  same `THIS_MONTH` key. **11px, deliberately not a pill:** the reviewed radius already existed as
-  `--radius-chip`, so the group wears `rounded-chip` and each option the new `.fcb-chip` rule (radius
-  + 1px lift + transition, shared ahead with US-029's chips), with `rounded-full` rejected in the
-  markup, the source *and* the stylesheet. Radiogroup semantics with one tab stop, wrapping arrows on
-  both axes plus Home/End, and selection carried by shape, shadow, weight *and* `aria-checked` —
-  never colour alone. 45 tests, 998/998 green.
 - ✅ **US-016 — Hero band: webshop trend & attendance ring (5 pts). All 6 criteria met, and Phase 2a
   is CLOSED at 5/5 · 16/16.** One control drives the chart and the ring; hover gives a guide plus
   both series' values; the ring swaps its centre and glows; a filter change counts from the figure on
   screen, redraws the line and sweeps the arc; the total and delta are computed from the series.
   Top Products' filter is wired too. 92 tests, 1090/1090 green.
+- ✅ US-018 — Vertical bar chart tile (3 pts) — all 3 acceptance criteria met: gridlines, count-up
+  labels and a hover highlight; an optional per-bar tooltip renderer taking the index; and bars
+  keyed by category, proven by a re-rank test where the same `<rect>` survives and transitions while
+  each label stays with its own figure. **Phase 2b now 6/11 stories, 16/29 points.**
+
+*(US-013, US-025 and US-026's long-form accounts were condensed to keep this log inside its 300-line
+limit — they stay bulleted above, and the full detail is in [`completed.md`](completed.md) and
+[`../phases/phase-2b.md`](../phases/phase-2b.md).)*
 
 ---
 
@@ -247,11 +221,11 @@
 - **Phases 1a, 1b and 2a are all closed** (14 + 10 + 16 = 40 points). Nothing in Phase 2a is
   outstanding: US-013 and US-016 were both finished inside the Phase 2b run on the day their
   dependencies landed.
-- **Phase 2b — the component library** is at 5/11 · 13/29. Next is **US-018 — vertical bar chart
-  tile (3 pts)**. Every remaining component should import from `app/lib/hooks/use-motion.ts` rather
-  than animate by hand, and compose `Card`, `DeltaChip`, `HBars`, `LineChart` and `Segmented` rather
-  than restate them — US-023 in particular must reuse US-021's bar row. `LineChart` and `Segmented`
-  are now proven in the app (US-016's Chrome pass), so US-036 and US-034 can mount them as they are.
+- **Phase 2b — the component library** is at 6/11 · 16/29. Next is **US-019 — grouped bar chart
+  tile (3 pts)**, whose y-axis gutter with headroom is a review decision. Every remaining component
+  should import from `app/lib/hooks/use-motion.ts` rather than animate by hand, and compose `Card`,
+  `DeltaChip`, `HBars`, `VBars`, `LineChart` and `Segmented` rather than restate them — US-023 in
+  particular must reuse US-021's bar row, and US-019 should take US-018's keyed-column pattern.
 
 **Priority Stories for This Week:** Phase 1a + 1b foundations (24 pts, done) → Phase 2a + 2b shell
 and component library (45 pts, the largest block) → Phase 3a + 3b conversation and the three heroes
@@ -264,8 +238,8 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
 - **The deadline is this week.** Sponsor showing first, owner audience the following week.
   Estimated ~52 AI-core / ~68 AI-realistic hours for the full 116 points; if the week gets tight,
   extend daily runtime before cutting scope — the P1 cut set is worth only ~0.82 days at 8h/day.
-- Phases 1a, 1b and 2a are complete and Phase 2b is at 5/11 (53/116 points); continue with
-  `/holycode-pm:execute-work phase 2b`, starting at US-018.
+- Phases 1a, 1b and 2a are complete and Phase 2b is at 6/11 (56/116 points); continue with
+  `/holycode-pm:execute-work phase 2b`, starting at US-019.
 - **US-021 is the reuse test for the whole epic:** `HBars` / `HBarRow` must be the only horizontal
   bar row in the codebase. Its 150px no-truncate label and 96px `nowrap` value column are review
   decisions, and a second implementation would silently drop both.
@@ -284,6 +258,10 @@ and component library (45 pts, the largest block) → Phase 3a + 3b conversation
 - **US-025's chart is the only line chart** and both heroes must key it, not fork it: `key={period}`
   is the replay mechanism, `legend={false}` plus `LineChartLegend` is how the band places its own
   legend, and a second `smoothPath` anywhere is a review finding.
+- **US-018 keyed its columns by category, and that is now the epic's pattern for geometry:** US-019
+  and US-020 must key by fixture and by segment, never by index — the proof is a re-rank test, since
+  an index key is invisible while the order holds. Its `V_BAR_SERIES` map has no gold entry, and the
+  optional `tooltip(index)` renderer is how a hero passes several figures into one hover box.
 - **US-026's `Segmented` is the only period control**, and the period stays the CALLER's state —
   US-016 proved the pattern: one value in the band drives both the chart's `key` and the ring, while
   Top Products holds its own. Its 11px radius is a reviewed decision: `rounded-full` on it or on

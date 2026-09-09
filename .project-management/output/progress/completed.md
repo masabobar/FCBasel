@@ -6,11 +6,9 @@
 
 ## Summary
 
-**Total Completed:** 21 stories
-**Total Points:** 53 / 116
-**Start Date:** 2026-09-09
-**Days Active:** 1
-**Average Velocity:** 53 points/day
+**Total Completed:** 22 stories
+**Total Points:** 56 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 56 points/day
 **Phases Completed:** Phase 1a, Phase 1b, Phase 2a (all 2026-09-09)
 
 ---
@@ -64,54 +62,38 @@ entry stays in full below the table — it is the story that closed the phase.
 ---
 
 ### US-016: Hero band — webshop trend & attendance ring (5 pts)
-**Completed:** 2026-09-09 (Phase 2a story, executed in the Phase 2b run once US-025, US-026 and US-027 existed) — **it closes Phase 2a at 5/5 · 16/16 pts**
-**Files Changed:** 13 (2 new code, 5 modified code, 2 new test files, 4 modified test files) + 7 tracking docs
-**Tests Added:** 92 (unit) — 1090/1090 green, 99.75% stmts / 98.61% branches / 100% funcs / 100% lines of `app/**`
+**Completed:** 2026-09-09 (Phase 2a story, executed in the Phase 2b run once US-025/026/027 existed) — **it closes Phase 2a at 5/5 · 16/16 pts**
+**Files Changed:** 13 code/test + 7 tracking docs · **Tests Added:** 92 — 1090/1090 green, 99.75% stmts / 100% lines of `app/**`
 **Notes:** All 6 acceptance criteria met, **plus** the loose end US-013 left (Top Products' period
-filter). A Reference Guide refinement beyond the Build Specification, and first in the documented cut
-order — so it shipped deliberately self-contained.
+filter). Full detail in [`../phases/phase-2a.md`](../phases/phase-2a.md).
 
 **What Was Done:**
-- `app/components/dashboard/hero-band.tsx` — the band: greeting, ONE period filter, the webshop chart
-  in the wider left column, the ring and its stats in the narrower right one. One full-width grid
-  item on US-012's canvas; it **composes** `Segmented`, `LineChart` + `LineChartLegend`,
-  `KpiFigure onDark`, `DeltaChip` and the US-027 hooks, and invents only layout, copy and one piece
-  of state. A test asserts it contains no `<svg>`, no timer and no `requestAnimationFrame`
-- `app/components/charts/attendance-ring.tsx` — **the one genuinely new visual.** Hand-built SVG, no
-  library: pure `ringGeometry` (clamped to 0–1, because an arc longer than its circumference wraps
-  back and reads as a shorter one; a non-finite share draws nothing rather than `NaN`), the sweep as
-  a `stroke-dasharray` transition off `useGrow`, the centre counting through `useCountUp`, and a
-  hover that swaps average attendance for "% of capacity" **and answers focus identically**
-- `app/lib/persona.ts` — `personaGreeting(now)`. It takes the DATE and does not read the clock: the
-  greeting is resolved in the loader, so the server and the browser cannot disagree about the hour
-- `app/lib/dashboard/baseline.ts` — extended rather than duplicated: one `periods()` read now feeds
-  both the band and the webshop tile, `topProducts` carries every period, and `HeroBandData` holds
-  the greeting and the periods — **and no total and no delta**, so there is nothing to read instead
-  of computing. `app/app.css` gained three token-only rules (`.fcb-band`, `.fcb-band-wash`,
-  `.fcb-ring-glow`); the reference's plum gradient stop is not in the token set, so the ramp is
-  navy → navy-light → navy with a red wash at 32%
-- **① One control, two widgets, proven twice:** structurally (exactly one `useState` and one
-  `<Segmented>` in the file, both counts pinned) and behaviourally (one click moves the line's `d`,
-  the KPI, the arc and the stats together). Top Products keeps its own filter by design — a test
-  proves the band's press leaves it untouched
-- **⑤ / ⑥ measured in real Chrome at 1920×1080:** no horizontal scroll (nor at 1440/1280/834/390),
-  chart column 1056px against the ring column's 520px, the KPI settled at `CHF 148’200` and **still
-  `CHF 148’200` in the frame after the click**, then 54 distinct strings to `CHF 132’400`; the
-  re-keyed line's offset 1px → 0px over 44 values; the ring transitioning on the SAME element over 43
-  dash pairs; Top Products showing 48 width frames and 54 value frames on the same rows. Under
-  `prefers-reduced-motion`: one KPI string, one ring value, arc at its share, line drawn, bars final
+- `dashboard/hero-band.tsx` — greeting, ONE period filter, the webshop chart in the wider left
+  column, the ring and its stats in the narrower right one. It **composes** `Segmented`,
+  `LineChart` + `LineChartLegend`, `KpiFigure onDark`, `DeltaChip` and the US-027 hooks, inventing
+  only layout, copy and one piece of state (a test asserts no `<svg>`, no timer, no rAF in the file)
+- `charts/attendance-ring.tsx` — **the one genuinely new visual.** Hand-built SVG: pure
+  `ringGeometry` (clamped to 0–1; a non-finite share draws nothing rather than `NaN`), the sweep a
+  `stroke-dasharray` transition off `useGrow`, the centre counting through `useCountUp`, and a hover
+  that swaps average attendance for "% of capacity" **and answers focus identically**
+- `lib/persona.ts` gained `personaGreeting(now)` — it takes the DATE, so server and browser cannot
+  disagree about the hour; `HeroBandData` holds **no total and no delta**, so nothing can be read
+  instead of computed
+- **① One control, two widgets, proven twice** — structurally (exactly one `useState`, one
+  `<Segmented>`) and behaviourally (one click moves the line, the KPI, the arc and the stats)
+- **⑤ / ⑥ measured in real Chrome at 1920×1080:** no horizontal scroll (nor 1440/1280/834/390), the
+  KPI **still `CHF 148’200` in the frame after the click** then 54 distinct strings to `CHF 132’400`,
+  the re-keyed line's offset 1px → 0px, 43 arc dash pairs on the SAME element; under reduced motion
+  one KPI string and one ring value, nothing left at zero
 - **One real defect found and fixed in `LineChart`:** its end axis labels were clipped by the svg's
-  own bounds (`W1`/`W4`), so `axisLabelAnchor` anchors the first and last inwards
-- **Security triage: no security-relevant changes detected.** Considered and cleared: HTTP handler or
-  route (none — the loader's shape is unchanged and it is an SSR data hop), IDOR, raw SQL,
-  `dangerouslySetInnerHTML` / `innerHTML`, user-supplied URL / SSRF (zero network calls), upload,
-  dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API. Every
-  rendered string is an escaped text node; the only dynamic style values are `var(--…)` token
-  references and numeric geometry
+  own bounds, so `axisLabelAnchor` anchors the first and last inwards
+- **Security triage: no security-relevant changes detected** — no handler/route change, no SQL, no
+  `innerHTML`, no network call, no upload, no dependency or env change, no logging; every rendered
+  string is an escaped text node and the only dynamic style values are token references and geometry
 
 ---
 
-## Phase 2b: Component Library — stories in full (5/11)
+## Phase 2b: Component Library — stories in full (6/11)
 
 ### US-027: Motion & animation hooks (3 pts)
 **Completed:** 2026-09-09
@@ -224,18 +206,15 @@ than under the chart), `LineChart`, `LineChartTile`.
   back. Keyboard came cheap — `tabIndex=0` plus arrow/Home/End/Escape through the pure
   `nextHoverIndex`, which returns `null` for every other key, so Tab is not captured (tested)
 - **No hex, and no colour parked where a CSS parser may drop it.** Series colours are token names
-  (`red`/`blue`/`navy`/`gold`/`white`) resolved through `cssVariable` to `var(--color-…)`: the svg
-  takes them as presentation attributes, the two DOM swatches as a `--line-series` custom property
-  read back by `bg-[var(--line-series)]`. Gold is a legitimate *series* colour here — navy band only,
-  per the Guide — and the light default cycle never reaches for it
+  resolved through `cssVariable` to `var(--color-…)`: the svg takes them as presentation attributes,
+  the two DOM swatches as a `--line-series` custom property read back by `bg-[var(--line-series)]`.
+  Gold is a legitimate *series* colour here — navy band only, per the Guide
 - **Two charts on screen cannot collide:** gradient ids come from `useUid`, and a test renders the
   band and Hero 2 together to assert two distinct ids **and** that each area fill points at its own
 - **A zero or missing point is a labelled zero** — `valueAt` reads a missing, short or non-finite
-  reading as `0`, so no `NaN` enters a `d` and the twelve-month axis still runs full length. Legible
-  at 1080p (E8): 12px `--text-chart-axis` labels rather than the reference's 10px, a legend that
-  wraps rather than clipping, and a tooltip that flips to sit inside the plot near either edge
-- **Scope held:** no hero band (US-016), no period filter (US-026), no sparkline (US-017 owns the
-  small inline one). **No real-Chrome pass** — nothing mounts a line chart until US-016
+  reading as `0`, so no `NaN` enters a `d`. Legible at 1080p (E8): 12px `--text-chart-axis` labels
+  rather than the reference's 10px, a legend that wraps, and a tooltip that flips near either edge
+- **Scope held:** no hero band, no period filter, no sparkline. **No real-Chrome pass** here
 - **Security triage: no security-relevant changes detected.** Considered and cleared: HTTP handler or
   route, IDOR, raw SQL, `dangerouslySetInnerHTML` (a test rejects it), user-supplied URL / SSRF,
   upload, dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API.
@@ -256,34 +235,64 @@ then. This story **unblocks US-016**, the last deferred Phase 2a story.
 - **11px is a reviewed decision and it is asserted three ways.** `--radius-chip: 11px` already
   existed, so nothing was redeclared: the group wears `rounded-chip`, each option the new `.fcb-chip`
   rule in `app/app.css`, and a test reads `border-radius: var(--radius-chip)` back out of the
-  stylesheet while rejecting `rounded-full` / `rounded-pill` / `9999px` / `--radius-pill` in the
-  markup, the source *and* the CSS, and pins `radius.chip` unequal to both `tile` and `pill`
-- **The lift-and-tint hover is split on purpose:** `.fcb-chip` carries the 1px lift and the
-  transition (shared with US-029), the tint stays in the light/dark table — the only half that has to
-  differ per surface. `light` is a white card or section header, `dark` the navy band (navy fill vs
-  the club's gold accent); a test asserts the two variants' class strings actually differ
+  stylesheet while rejecting `rounded-full` / `9999px` / `--radius-pill` in the markup, the source
+  *and* the CSS, and pins `radius.chip` unequal to both `tile` and `pill`. The lift-and-tint hover is
+  split on purpose: `.fcb-chip` carries the 1px lift and the transition (shared with US-029), the
+  tint stays in the light/dark table — the only half that has to differ per surface
 - **`PeriodKey` reused, never re-declared** (`.claude/rules/enums-and-constants.md` §8):
-  `SegmentedOption` is `{ key: PeriodKey; label: string }`, structurally the head of
-  `BaselinePeriod` / `TopProductsPeriod` / `Hero1Period`, so a consumer passes its period array
-  straight in. A `@ts-expect-error` line fails `pnpm typecheck` the moment the key loosens to
-  `string`, and a test proves no period literal appears in the file at all. **The label is data on
-  the entry**, which is what lets Hero 1 say "Current month" for the same `THIS_MONTH` key
-- **Controlled, with no opinion of its own** — no internal selection, no defaulting to the first
-  option; a press the caller ignores changes nothing on screen (tested). That is what lets ONE
-  control drive two tiles on the band, or three on Hero 1, without them ever disagreeing
-- **Radiogroup semantics, done properly:** `role="radiogroup"` with an accessible name, `role="radio"`
-  + `aria-checked` per option, ONE tab stop via roving `tabIndex` (and the group stays reachable when
-  the value matches no option), arrows wrapping on both axes plus Home/End through the pure
-  `nextOptionIndex`, which returns `null` for every other key so Tab, Enter and Space keep their
-  meaning. **Selection is carried four ways, never colour alone** — the filled shape,
-  `shadow-raised`, `font-bold` and `aria-checked`, so the projector-shift rule holds here too
-- **Scope held:** no hero band (US-016), no Hero 1 section (US-034), no Top Products wiring, no
-  suggestion chips (US-029). **No real-Chrome pass** — nothing mounts the control until US-016
+  `SegmentedOption` is structurally the head of `BaselinePeriod` / `TopProductsPeriod` /
+  `Hero1Period`, so a consumer passes its period array straight in. A `@ts-expect-error` line fails
+  typecheck the moment the key loosens to `string`, and no period literal appears in the file. **The
+  label is data on the entry** — what lets Hero 1 say "Current month" for the same `THIS_MONTH` key
+- **Controlled, with no opinion of its own** — a press the caller ignores changes nothing on screen
+  (tested), which lets ONE control drive two tiles on the band or three on Hero 1
+- **Radiogroup semantics, done properly:** `role="radiogroup"` + `radio` with `aria-checked`, ONE tab
+  stop via roving `tabIndex` (the group stays reachable when the value matches no option), wrapping
+  arrows plus Home/End through the pure `nextOptionIndex`, which returns `null` for every other key
+  so Tab, Enter and Space keep their meaning. **Selection is carried four ways, never colour alone**
+- **Scope held:** nothing mounts the control until US-016 — no real-Chrome pass in this story
 - **Security triage: no security-relevant changes detected.** Considered and cleared: HTTP handler or
   route, IDOR, raw SQL, `dangerouslySetInnerHTML` / `innerHTML`, user-supplied URL / SSRF, upload,
   dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API. A
   presentational control with no IO: labels render as React-escaped text and the only DOM query uses
   a constant selector
+
+### US-018: Vertical bar chart tile (3 pts)
+**Completed:** 2026-09-09
+**Files Changed:** 1 code (new) + 1 test file (new) + 5 tracking docs
+**Tests Added:** 52 (unit: 52) - 1142/1142 green, 100% lines / funcs / stmts on the new file (94.9% branches — both misses unreachable `?? "red"` fallbacks), 99.8% stmts / 98.3% branches of `app/**`
+**Notes:** All 3 acceptance criteria met. Built for US-034's "Shirt sales by kit", which sits under a
+section-level filter driving three tiles — the reason criterion 3 exists.
+
+**What Was Done:**
+- `app/components/charts/v-bars.tsx` — `vBarGeometry` (pure: slots, bar widths, gridlines, the
+  `niceMax` axis top), `VBars` and `VBarTile` (`Card` + chart, card slots passing through) — three
+  exports, matching the shape US-021 and US-025 set
+- **Criterion 3 is proven by a RE-RANK, not a rerender.** Columns are keyed by category name, so a
+  filter press hands `Home` the *same* `<rect>` and the `x` / `y` / `height` CSS transition carries
+  it from the geometry on screen. Element identity is asserted across a data change **and** across a
+  re-ordered dataset, each label is shown to stay with its own category, and **switching that key to
+  the array index fails exactly two tests** — the defect stated as an assertion rather than prose.
+  Because the instance survives, so does its `useCountUp` state: the figure counts on from what is
+  displayed, never back from zero
+- **Reduced motion is final state:** `useGrow` is `true` in the first render, so a test reads the
+  final heights and figures with **zero frames requested** — no bar left at zero height
+- Gradient fills with rounded caps (`rx`), **one gradient per distinct token colour** with ids from
+  `useUid` (two charts on screen carry six distinct ids, each bar pointing at its own); gridlines
+  behind and counting labels above; a hover highlight that is a `filter`, so the series colour is
+  never swapped; and an **optional `tooltip(index)` renderer** — Hero 1's units + share + revenue
+  box — falling back to category + figure so a hover is never silent. Hover is also keyboard
+  (arrows/Home/End/Escape), and US-025's `tooltipAnchor` / `nextHoverIndex` are **imported, not
+  restated**, so the edge flip and the "do not capture Tab" rule are not fixed twice
+- **Category labels are DOM text under the plot**, because SVG text cannot wrap — a test rejects
+  `truncate` / `line-clamp` on them. `niceMax` / `vBarHeight` return a usable scale rather than
+  `NaN` for a zero, a negative, a hole or an all-zero list, and a zero is a labelled zero. Gold is
+  absent from the series map by design; no hex or currency string appears in the file
+- **Security triage: no security-relevant changes detected.** Considered and cleared: HTTP handler or
+  route, IDOR, raw SQL, `dangerouslySetInnerHTML` / `innerHTML`, user-supplied URL / SSRF, upload,
+  dependency or lockfile change (**none**), env var or secret, logging, CSRF, storage API — a
+  presentational chart with no IO, whose only `style` values are rounded geometry numbers and a token
+  reference. **One seam:** no real-Chrome pass; nothing mounts a vertical bar chart until US-034
 
 ---
 

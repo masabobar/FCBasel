@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2b - Chart & Tile Component Library *(5/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
+**Current Phase:** Phase 2b - Chart & Tile Component Library *(6/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
 
 ---
 
@@ -9,12 +9,12 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 46% | 100% | 🟢 On Track |
+| **Overall Progress** | 48% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2a** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 21/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 53/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 22/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 56/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -23,44 +23,27 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 21
-**Currently Working On:** US-018 — Vertical bar chart tile (3 pts)
-**Story Points Completed Today:** 53
+**Stories Completed Today:** 22
+**Currently Working On:** US-019 — Grouped bar chart tile (3 pts)
+**Story Points Completed Today:** 56
 
-- ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — **US-001** React Router 7 SSR scaffold
-  (the Railway deploy stays a human step) · **US-002** ESLint 9 + Prettier + husky, proven with
-  throwaway commits · **US-003** one token set published as Tailwind v4 `@theme static` properties
-  *and* a typed TS object, held in lockstep by a parity test, colour discipline encoded in the names ·
-  **US-004** the crest self-hosted (194 KB → 17.9 KB, zero `fcb.ch` references in the build) ·
-  **US-005** one `Card` shell every tile composes — slots, not variants · **US-006** four reveal
-  keyframes timed from motion tokens, with reduced motion *collapsing* animations to a ~1ms final
-  frame rather than removing them (nothing is ever stranded at zero).
+- ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — React Router 7 SSR scaffold (Railway
+  deploy stays a human step) · ESLint 9 + Prettier + husky · one token set published as Tailwind v4
+  `@theme static` properties *and* a typed TS object, held in lockstep by a parity test · the crest
+  self-hosted (194 KB → 17.9 KB) · one `Card` shell every tile composes — slots, not variants · four
+  reveal keyframes timed from motion tokens, reduced motion *collapsing* them to a ~1ms final frame.
 
-- ✅ **US-007 — Persona baseline datasets (2 pts)** — the first data story and the pattern the rest of
-  E3 follows: enums, domain types and the repository interface in `app/lib/repositories/`, fixtures in
-  `app/lib/mock/`, server-only selection in `index.server.ts`. All four periods. Totals and deltas are
-  computed from the series, never stored; the two long periods label their x-axis from an injectable
-  clock; partner brand colours stay outside the token palette on purpose.
-
-- ✅ **US-008 / US-009 / US-010 — the three hero datasets (6 pts)** — Hero 1 season-to-date
-  merchandising (kit revenue = units × CHF 99, the 58% Home share and the exactly-8% badge share all
-  *derived*; `badgeSegments` corrects its rounding remainder so the donut adds up to the number
-  printed inside it) · Hero 2 matchday ticket revenue year on year (eight fixtures 7,880 → 7,830 CHF
-  thousands plus the twelve-month series, at *different scopes on purpose*, each carrying its own
-  `scopeLabel`; the -0.6% and the -CHF 400k badge derived from the pairs) · Hero 3 full-year
-  departmental performance (69,000 → 69,680, +680 / +1.0%, derived) where the **Revenue / Cost tag is
-  load-bearing**: above budget is earned money for five departments and an **overspend** for the
-  Marketing cost centre, so each row carries a derived `VarianceJudgement` and a test shows a naive
-  "variance > 0 is good" rule misreads exactly one. The three follow-up drivers (240 + 150 + 20)
-  reconcile *exactly* with Marketing's 410 overspend.
-
-- ✅ **US-011 — Formatters & cross-hero reconciliation (2 pts)** — the shared display layer
-  (`app/lib/format.ts`, pure and stateless) plus the drift alarm that closes Phase 1b. Money always
-  carries `CHF` with the sign *before* the unit (`-CHF 400k`); `en-CH` groups thousands with the Swiss
-  U+2019 mark, pinned as a constant and made ICU-independent by stubbing `Intl`; `oneDecimal` is
-  *imported* from `derive.ts`, so there is one rounding rule. The reconciliation suite asserts
-  relationships, not constants — every split against its total and every number in all six
-  narratives. **No drift found.**
+- ✅ **Phase 1b — Seed data & formatters (5 stories, 10 pts)** — **US-007** the pattern the rest of E3
+  follows (enums + types + repository interface, fixtures in `app/lib/mock/`, server-only selection),
+  all four periods, totals and deltas *derived* · **US-008/009/010** the three hero datasets: kit
+  revenue = units × CHF 99 with the 58% and exactly-8% shares derived and `badgeSegments` correcting
+  its rounding remainder; eight fixtures 7,880 → 7,830 plus a twelve-month series at a *different
+  scope on purpose*; the departmental table where the **Revenue / Cost tag is load-bearing** — a
+  naive "variance > 0 is good" rule misreads exactly one row, and the three drivers (240 + 150 + 20)
+  reconcile *exactly* with Marketing's 410 overspend · **US-011** one display layer
+  (`app/lib/format.ts`, pure), `CHF` always carried with the sign *before* the unit, the Swiss U+2019
+  group mark pinned ICU-independently, one rounding rule imported from `derive.ts`, plus a
+  reconciliation suite sweeping every number in all six narratives. **No drift found.**
 
 - ✅ **US-012 — Branded application shell (3 pts)** — the frame Phase 2a builds on: navy sidebar, top
   app bar, and an empty 12-column canvas for US-013/US-014. The persona is a *role* —
@@ -175,6 +158,22 @@
   and **one** ring value under `prefers-reduced-motion`. First mount of `LineChart` also exposed one
   real defect, fixed in it: end axis labels were clipped by the svg's bounds, so they now anchor
   inwards. 92 new tests, 1090 green.
+
+- ✅ **US-018 — Vertical bar chart tile (3 pts)** — the kit-split chart in
+  `app/components/charts/v-bars.tsx` (`vBarGeometry` / `VBars` / `VBarTile`), built for US-034's
+  "Shirt sales by kit" under a section filter that moves three tiles at once. **Bar persistence is
+  the story, and the test is a re-rank:** columns are keyed by category, so a filter press hands
+  `Home` the *same* `<rect>` and the `x` / `y` / `height` CSS transition carries it — switching the
+  key to the array index fails two tests, one on element identity, one showing every label jumping to
+  a neighbour's figure. Nothing snaps to zero: `useCountUp` continues from the number on screen and
+  `useGrow` is already `true` under reduced motion (final heights, **zero frames requested**).
+  Gradient fills with rounded caps and one gradient per *distinct* token colour (`useUid`, proven
+  distinct with two charts on screen); gridlines behind, counting labels above, hover highlight plus
+  an **optional per-bar renderer** taking the index — that is Hero 1's units + share + revenue box —
+  falling back to category + figure so a hover is never silent. Category labels are DOM text under
+  the plot, because SVG text cannot wrap; a zero is a labelled zero; `niceMax` / `vBarHeight` return
+  a usable scale rather than `NaN`. US-025's `tooltipAnchor` and `nextHoverIndex` are reused, not
+  restated. 52 new tests, 1142 green.
 ---
 
 ## 🏁 Phase 2a complete — Dashboard Shell & Persona Baseline
@@ -188,13 +187,14 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-018: Vertical bar chart tile | ⏳ Ready | Next up; the last chart primitive the heroes need |
+| US-019: Grouped bar chart tile | ⏳ Ready | Next up; the y-axis gutter decision must not be reverted |
 | US-023: Driver / breakdown tile | ⏳ Ready | Composes US-021's row; no new row to write |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-018: Vertical bar chart tile | 2026-09-09 | 3 |
 | US-016: Hero band — webshop trend & attendance ring | 2026-09-09 | 5 |
 | US-026: Segmented period filter control | 2026-09-09 | 2 |
 | US-025: Line chart component | 2026-09-09 | 3 |
@@ -244,8 +244,8 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 99.75% stmts / 98.61% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1090/1090 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 99.77% stmts / 98.30% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
+| Passing Tests | 1142/1142 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -274,7 +274,7 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
-| Phase 2b: Component Library | 🔄 In Progress | 5/11 | 13/29 | 45% |
+| Phase 2b: Component Library | 🔄 In Progress | 6/11 | 16/29 | 55% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
@@ -297,4 +297,4 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
 
-**Last Auto-Update:** US-016 completed at 2026-09-09 — **Phase 2a is CLOSED at 5/5 · 16/16 pts**. The navy hero band now sits above the baseline row: ONE `Segmented` control drives both the webshop line chart (gold area over dashed white, re-keyed so the stroke draw replays) and the new hand-built attendance ring (arc sweeps on `stroke-dasharray`, centre swaps to "% of capacity" on hover with a gold glow), with the total and its delta computed from the plotted series. Top Products' filter is wired too — the loose end US-013 left. Chrome at 1920×1080: 54 distinct KPI strings counting **from CHF 148’200, not zero**, 43 arc values, and one value each under reduced motion. **Next is US-018** — vertical bar chart tile (3 pts)
+**Last Auto-Update:** US-018 completed at 2026-09-09 — Phase 2b is at 6/11 · 16/29 pts. The vertical bar chart (`VBars` / `VBarTile`) is the kit-split tile US-034 composes: gradient bars with rounded caps, gridlines behind, counting labels above, hover highlight and an **optional per-bar tooltip renderer** taking the index (Hero 1's units + share + revenue). **Bars are keyed by category, and a re-rank test proves it** — the same `<rect>` survives a data change and transitions its height *and* position, while the label counts on from the figure on screen; an index key fails two tests. Reduced motion lands on final heights with zero frames requested. **Next is US-019** — grouped bar chart tile (3 pts)
