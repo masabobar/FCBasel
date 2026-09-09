@@ -31,6 +31,11 @@ import { Card, type CardProps } from "../tiles/card";
  *   `HBars`     the ranked list, scaled to its own largest magnitude
  *   `HBarTile`  `Card` + `HBars` — what a dashboard tile actually is
  *
+ * US-023 needed two things this file did not yet publish, and they were added
+ * HERE rather than reimplemented there: {@link hBarDisplayedValue}, so a summary
+ * badge sums the figures the rows show, and `HBarTile`'s `children` slot, so a
+ * tile can put a footnote under the bars without forking the card.
+ *
  * TWO REVIEW DECISIONS THAT MUST NOT BE REVERTED (Reference Guide; a reported
  * defect in each case):
  *
@@ -168,8 +173,13 @@ export function hBarPercent(value: number, max: number): number {
  * to the number instead of being pasted in front of the string. Applying it to
  * the magnitude also makes it idempotent: a caller that already stores `-150`
  * gets `-CHF 150k` too, never `+CHF 150k` back.
+ *
+ * EXPORTED for US-023's driver tile, which sums the rows for its
+ * `-CHF 400k total` badge: that badge has to add up the figures the rows
+ * actually SHOW, so it reads them through this function rather than restating
+ * the rule and risking a total that disagrees with the bars above it.
  */
-function displayedValue(value: number, negative: boolean): number {
+export function hBarDisplayedValue(value: number, negative: boolean): number {
   return negative ? -Math.abs(value) : value;
 }
 
@@ -232,7 +242,7 @@ export function HBarRow({
 
   // Read off the TARGET, not the counted value, so the tone and the anchor do
   // not flip mid-count while the figure crosses zero.
-  const direction = varianceDirection(displayedValue(value, negative));
+  const direction = varianceDirection(hBarDisplayedValue(value, negative));
   const declining = direction === VarianceDirection.DOWN;
   const percent = hBarPercent(value, max);
 
@@ -290,7 +300,7 @@ export function HBarRow({
           declining ? "text-variance-negative" : "text-text",
         )}
       >
-        {format(displayedValue(counted, negative))}
+        {format(hBarDisplayedValue(counted, negative))}
       </div>
     </div>
   );
@@ -365,6 +375,17 @@ export interface HBarTileProps
   extends HBarCardProps, Omit<HBarsProps, "className"> {
   /** The scope line in the card header: `Units sold`, `8 fixtures shown`. */
   period?: ReactNode;
+  /**
+   * Anything the tile shows UNDER the bars, inside the card body — US-023's
+   * driver tile puts Hero 2's one-line attendance note here.
+   *
+   * A slot rather than a `note` prop, because this shell has no business
+   * knowing what the extra line says; and a slot HERE rather than a second
+   * card in the driver tile, because forking the chrome to gain one line is
+   * exactly what the `Card` notes forbid. The card's own `caption` remains the
+   * narrative strip behind the AI glyph — a different thing from a footnote.
+   */
+  children?: ReactNode;
 }
 
 /**
@@ -385,6 +406,7 @@ export function HBarTile({
   isNew,
   delayMs,
   className,
+  children,
   ...bars
 }: HBarTileProps) {
   return (
@@ -401,6 +423,7 @@ export function HBarTile({
       className={className}
     >
       <HBars {...bars} />
+      {children}
     </Card>
   );
 }

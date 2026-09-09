@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 2b - Chart & Tile Component Library *(9/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
+**Current Phase:** Phase 2b - Chart & Tile Component Library *(10/11 stories complete)* · **Phases 1a + 1b + 2a all complete**
 
 ---
 
@@ -9,12 +9,12 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 56% | 100% | 🟢 On Track |
+| **Overall Progress** | 58% | 100% | 🟢 On Track |
 | **Phase 1a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 1b** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2a** | 100% — Completed | 100% | 🟢 Done |
-| **Stories Completed** | 25/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 65/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 26/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 67/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -23,9 +23,9 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 25
-**Currently Working On:** US-023 — Driver / breakdown tile (2 pts)
-**Story Points Completed Today:** 65
+**Stories Completed Today:** 26
+**Currently Working On:** US-024 — Recommendation panel & narrative caption strip (2 pts)
+**Story Points Completed Today:** 67
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — React Router 7 SSR scaffold (Railway
   deploy stays a human step) · ESLint 9 + Prettier + husky · one token set published as Tailwind v4
@@ -90,20 +90,19 @@
   empty.** `baseline-row.tsx` composes `KpiTile` ×2, `HBarTile` and a new `PartnersTile` as direct
   children of US-012's one grid. **No figure is re-typed:** figures come from the US-007 repository
   in the SSR loader, `+11.9%` is `seriesTotals` off the same array the sparkline draws, and a
-  **source scan** fails on any literal figure, pre-formatted `CHF`/`%` string, product or partner
-  name, or `toLocaleString`/`toFixed`. **Reset's baseline seam is closed** (static route chrome,
-  proven by an innerHTML compare). **First real-Chrome pass for US-017/US-021/US-027**: no scroll at
-  1920×1080, 54 distinct KPI strings, 43 distinct bar widths, two values only reduced. 103 tests.
+  **source scan** fails on any literal figure, pre-formatted `CHF`/`%` string, name, or
+  `toLocaleString`/`toFixed`. **Reset's baseline seam is closed.** **First real-Chrome pass for
+  US-017/US-021/US-027**: no scroll at 1920×1080, 54 distinct KPI strings. 103 tests.
 
 - ✅ **US-026 — Segmented period filter control (2 pts)** — one control in
   `app/components/controls/segmented.tsx` for all three of its consumers: the dark hero band, Top
   Products' `action` slot, and Hero 1's section header. **Controlled, with no opinion of its own** —
   a press the caller ignores changes nothing on screen, which is what lets one control drive two
   tiles (the band) or three (Hero 1) without them ever disagreeing. Keys are the shared `PeriodKey`,
-  never a local union, and the label is data on the *entry*. **11px, deliberately not a pill:** the
-  reviewed radius already existed as `--radius-chip`, and tests reject `rounded-full` in the markup,
-  the source *and* the stylesheet. Radiogroup semantics: one tab stop, wrapping arrows plus Home/End,
-  selection carried by shape, shadow, weight *and* `aria-checked` — never colour alone. 45 tests.
+  never a local union. **11px, deliberately not a pill:** the reviewed radius already existed as
+  `--radius-chip`, and tests reject `rounded-full` in the markup, the source *and* the stylesheet.
+  Radiogroup semantics: one tab stop, wrapping arrows plus Home/End, selection carried by shape,
+  shadow, weight *and* `aria-checked` — never colour alone. 45 tests.
 
 - ✅ **US-025 — Line chart component (3 pts)** — one chart in
   `app/components/charts/line-chart.tsx` for both consumers: the navy hero band (gold area line over
@@ -111,19 +110,18 @@
   is a prop, `area` / `dash` is per series, colour is a token **name**, so no hex can enter. **The
   stroke draw survives reduced motion:** `pathLength="1"` plus an offset transitioning 1 → 0, read
   back as `stroke-dashoffset="0"` with **zero frames requested**; it replays by being re-keyed and by
-  nothing else. Hover lists **every** series at the nearest index, keyboard included without
-  capturing Tab. Gradient ids from `useUid`; a missing point is a labelled zero. 73 new tests.
+  nothing else. Hover lists **every** series at the nearest index, keyboard included. Gradient ids
+  from `useUid`; a missing point is a labelled zero. 73 new tests.
 
 - ✅ **US-016 — Hero band: webshop trend & attendance ring (5 pts)** — **Phase 2a closes at 5/5 ·
   16/16 pts.** The navy greeting band, where **ONE `Segmented` drives both halves** from one
   `BaselinePeriod` entry: the webshop `LineChart` (gold area over a dashed previous period, re-keyed
-  by period so the stroke draw replays) and the **one genuinely new visual** — a hand-built
-  `AttendanceRing` sweeping on `stroke-dasharray`, its centre swapping to "% of capacity" on hover
-  *or focus*. Total and delta are computed from the plotted series (no field stores them); the
-  greeting comes from an injectable clock. Top Products' `action` slot gained its light `Segmented`.
-  **Chrome at 1920×1080:** no scroll, 54 distinct KPI strings never touching zero, the re-keyed offset
-  1px → 0px over 44 values, 43 distinct dash pairs, one value each under reduced motion. One real
-  defect found and fixed in `LineChart`: clipped end axis labels now anchor inwards. 92 new tests.
+  so the stroke draw replays) and the **one genuinely new visual** — a hand-built `AttendanceRing`
+  sweeping on `stroke-dasharray`, its centre swapping to "% of capacity" on hover *or focus*. Total
+  and delta are computed from the plotted series; the greeting comes from an injectable clock.
+  **Chrome at 1920×1080:** no scroll, 54 distinct KPI strings never touching zero, 43 distinct dash
+  pairs, one value each under reduced motion. One real defect found and fixed in `LineChart`:
+  clipped end axis labels now anchor inwards. 92 new tests.
 
 - ✅ **US-018 — Vertical bar chart tile (3 pts)** — the kit-split chart in
   `app/components/charts/v-bars.tsx` (`vBarGeometry` / `VBars` / `VBarTile`), built for US-034's
@@ -132,8 +130,8 @@
   transition carries it — an index key fails two tests, one on element identity, one showing labels
   jumping to a neighbour's figure. Nothing snaps to zero, and reduced motion lands on final heights
   with **zero frames requested**. Gradient caps, one gradient per *distinct* token colour, gridlines
-  behind, counting labels above, a `filter` hover highlight and an optional per-bar renderer (Hero 1's
-  units + share + revenue). Category labels are DOM text because SVG text cannot wrap. 52 new tests.
+  behind, counting labels above, a hover highlight and an optional per-bar renderer. Category labels
+  are DOM text because SVG text cannot wrap. 52 new tests.
 
 - ✅ **US-019 — Grouped bar chart tile (3 pts)** — the ticket-revenue chart in
   `app/components/charts/grouped-bars.tsx` (`groupedBarGeometry` / `GroupedBars` / `GroupedBarTile`),
@@ -141,37 +139,39 @@
   is the story, and **the overlap fix is arithmetic rather than padding:** the y-axis owns a 44-unit
   gutter everything is inset to, and a 34-unit chip band stays empty because the axis maximum is
   *derived from the geometry*. Both halves are **measured** — no chip slot reaches the gutter or its
-  neighbour (8 pairs and 14), the tallest bar clears the band across seven datasets × three heights,
-  and a fixed 10% headroom fails that test. **No per-bar value labels by design** (sixteen figures
-  over sixteen bars *was* the defect), except a labelled zero. Pairs keyed by fixture; an index key
-  fails the re-rank test. 63 new tests, 1205 green, 100% on the new file.
+  neighbour (8 pairs and 14), the tallest bar clears the band across seven datasets, and a fixed 10%
+  headroom fails that test. **No per-bar value labels by design**, except a labelled zero. Pairs
+  keyed by fixture; an index key fails the re-rank test. 63 new tests, 1205 green.
 
 - ✅ **US-020 — Donut / ring tile (3 pts)** — the sponsor-badge ring in
   `app/components/charts/donut.tsx` (`donutGeometry` / `Donut` / `DonutTile`), built for US-034's
   "Sponsor badges printed": four segments with even gaps, a counting centre total and a legend. **Not
   US-016's attendance ring** — that is a single-arc gold gauge on navy; this is four series arcs on a
   white card, sharing only the dasharray technique. **Two hover surfaces, ONE state:** an arc and its
-  legend row write the same index, proven by a cross-surface test (stub either write and 4-5 tests
-  fail); rows are real buttons, so focus does what hover does. **The segments morph rather than
-  re-enter:** arcs keyed by sponsor, so a period press transitions the *same* circle's
-  dasharray/dashoffset while one `useCountUp` moves the centre, never via zero. **The arithmetic is
-  `badgeSegments`'** (US-008), so the four figures add up exactly to the middle. 56 new tests, 1261
-  green.
+  legend row write the same index, proven by a cross-surface test; rows are real buttons, so focus
+  does what hover does. **The segments morph rather than re-enter:** arcs keyed by sponsor, so a
+  period press transitions the *same* circle's dasharray while one `useCountUp` moves the centre.
+  **The arithmetic is `badgeSegments`'** (US-008), so the figures add up exactly. 56 tests, 1261.
 - ✅ **US-022 — Department table tile (3 pts)** — Hero 3's primary tile in
-  `app/components/tiles/department-table.tsx`: a real `<table>` (`scope="col"` / `scope="row"`
-  headers, `sr-only` caption), six departments and a total row. **The revenue/cost trap is closed by
-  construction, not by care:** the colour comes from `row.judgement` — US-010's `varianceJudgement`,
-  decided once from the department's type — handed to US-017's `DeltaChip`, so **Marketing's +410
-  renders as an UP arrow in the NEGATIVE token (ADVERSE)** while Sponsoring's +840 renders
-  FAVOURABLE. The two chips share a `data-direction` and differ in class, and a source scan rejects
-  the words `FAVOURABLE` / `ADVERSE`, any `variance <>` test and any `DepartmentType` equality, so
-  the judgement cannot migrate back into the component. The flag is `needsAttention` (exactly one
-  row, Marketing — whose name never appears in the source, so the flag follows the figures).
-  **Both review decisions are asserted:** CHF **millions** with the unremovable "figures in CHF
-  millions" subtitle (a test rejects `/000/` anywhere in the rendered tile), and numeric headers
-  right-aligned **including "% of target"** through one `columnAlignClass` rule the header *and* its
-  cells read — proven column by column, not by a class on one `<th>`. Near-target gold: Hospitality
-  (95) a ring, Merchandising (92) nothing, 100+ a filled dot. 54 new tests, 1315 green.
+  `app/components/tiles/department-table.tsx`: a real `<table>`, six departments and a total row.
+  **The revenue/cost trap is closed by construction, not by care:** the colour comes from
+  `row.judgement` (US-010's `varianceJudgement`, decided once from the department's type) through
+  US-017's `DeltaChip`, so **Marketing's +410 renders as an UP arrow in the NEGATIVE token** while
+  Sponsoring's +840 renders FAVOURABLE — and a source scan rejects `FAVOURABLE` / `ADVERSE`, any
+  `variance <>` test and any `DepartmentType` equality, so the judgement cannot migrate back in.
+  **Both review decisions are asserted:** CHF **millions** with an unremovable subtitle saying so
+  (no `/000/` anywhere), and numeric headers right-aligned **including "% of target"** through one
+  rule the header *and* its cells read. 54 new tests, 1315 green.
+- ✅ **US-023 — Driver / breakdown tile (2 pts)** — the contribution list for all three causal
+  follow-ups, in `app/components/tiles/driver-tile.tsx`. **It draws no bars, and that is the
+  point:**
+  every row is US-021's `HBarRow` through `HBarTile`, the tests read the 150px label and 96px
+  `nowrap` value columns back off the rows this tile produced, and a source scan rejects bar
+  geometry, count-up, gradients and local state. **What it adds is three things:** stable ranking
+  (equal to US-009's `fixtureDeclines`, so Luzern stays ahead of the tied Sion), a total **derived
+  from the rows on screen** so the `-CHF 400k total` badge cannot disagree with the bars (it matches
+  `declineTotal` and Marketing's +410 variance), and a muted note line. Two seams were widened
+  rather than forked: `HBarTile` gained a `children` slot, `DeltaChip` a `suffix`. 43 tests, 1358.
 
 ---
 
@@ -186,13 +186,13 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-023: Driver / breakdown tile | ⏳ Ready | Next up; composes US-021's `HBarRow` — no second bar row |
-| US-024: Recommendation panel & caption strip | ⏳ Ready | Must read as advice, not as a data tile |
+| US-024: Recommendation panel & caption strip | ⏳ Ready | Next up, and the last of Phase 2b; must read as advice, not as a data tile, and must reuse `Card`'s existing caption strip |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-023: Driver / breakdown tile | 2026-09-09 | 2 |
 | US-022: Department table tile | 2026-09-09 | 3 |
 | US-020: Donut / ring tile | 2026-09-09 | 3 |
 | US-019: Grouped bar chart tile | 2026-09-09 | 3 |
@@ -247,7 +247,7 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 99.81% stmts / 98.08% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1315/1315 | TBD | 🟢 Good |
+| Passing Tests | 1358/1358 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -255,15 +255,15 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 > Coverage is measured over `app/**` only, and the suite is substantive rather than hollow: it pins
 > every hex, the type scale and the colour discipline, fails the build if `app/app.css` and
-> `app/lib/tokens.ts` disagree, and asserts that no reduced-motion path strands an element at zero. The data suites pin the Specification figures, prove every total is
-> *derived*, force the badge segments to sum exactly at every total from 0 to 2,000 (US-020 re-proves
-> it on screen), show that a naive "variance > 0 is good" rule misreads exactly one department, and
+> `app/lib/tokens.ts` disagree, and asserts that no reduced-motion path strands an element at zero.
+> The data suites pin the Specification figures, prove every total is *derived*, force the badge
+> segments to sum exactly at every total from 0 to 2,000 (US-020 re-proves it on screen), show that a
+> naive "variance > 0 is good" rule misreads exactly one department, and
 > (US-011) sweep every number in all six narratives. The component suites test the same way: variance
-> stays distinguishable with the colour *removed* (US-017); US-021's and US-019's review decisions
-> are read back off the rendered element, and US-022's source is scanned so it cannot even NAME a
-> good/bad verdict; US-013 scans its own sources for a literal figure; US-025
-> proves no chart path is left undrawn; US-016 and US-020 prove ONE control (or one state) moves two
-> things at once. The gate is three-part: strict `tsc`, ESLint 9 and Prettier, via husky.
+> stays distinguishable with the colour *removed* (US-017); US-021's and US-019's review decisions are
+> read back off the rendered element, US-022's source cannot even NAME a good/bad verdict and
+> US-023's cannot contain bar geometry; US-013 scans for a literal figure; US-016 and US-020 prove
+> ONE control moves two things. The gate is three-part: `tsc`, ESLint 9 and Prettier, via husky.
 
 ---
 
@@ -274,7 +274,7 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 | Phase 1a: Setup & Design System | ✅ Completed | 6/6 | 14/14 | 100% |
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
-| Phase 2b: Component Library | 🔄 In Progress | 9/11 | 25/29 | 86% |
+| Phase 2b: Component Library | 🔄 In Progress | 10/11 | 27/29 | 93% |
 | Phase 3a: Conversation | ⏸️ Pending | 0/6 | 0/17 | 0% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
@@ -297,4 +297,4 @@ lived-in, and the insertion mechanic. Closed at 100% on 2026-09-09, as did **Pha
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
 
-**Last Auto-Update:** US-022 completed at 2026-09-09 — Phase 2b is at 9/11 · 25/29 pts. The department table (`DepartmentTable` / `DepartmentTableTile`) is Hero 3's primary tile: a real `<table>`, six departments and a total row. **The revenue/cost trap is closed by construction** — the colour comes from US-010's `varianceJudgement` via `DeltaChip`, so Marketing's +410 reads UP and ADVERSE while Sponsoring's +840 reads FAVOURABLE, and a source scan stops the judgement ever moving back into the component. **Both review decisions hold:** CHF millions with an unremovable "figures in CHF millions" subtitle (no "000" anywhere), and numeric headers right-aligned including "% of target" from one rule the header and its cells share. Gold near-target band: Hospitality (95) marked, Merchandising (92) not. **Next is US-023** — driver / breakdown tile (2 pts), which must compose US-021's bar row
+**Last Auto-Update:** US-023 completed at 2026-09-09 — Phase 2b is at 10/11 · 27/29 pts. The driver tile (`DriverTile`, `DriverTotalBadge`, plus the pure `rankDrivers` / `driverTotal`) is the contribution list under all three causal follow-ups, and it is deliberately THIN: **every row is US-021's `HBarRow` through `HBarTile`** — the tests read the 150px label and 96px `nowrap` value columns back off the rows this tile produced, and a source scan rejects bar geometry, count-up, gradients and local state, so the shared row cannot be copied a sixth time. It adds exactly three things: **stable magnitude ranking** (equal to US-009's `fixtureDeclines`, so Luzern stays ahead of the tied Sion), a **total derived from the rows on screen** so the `-CHF 400k total` badge can never disagree with the bars (it matches `declineTotal`, and Marketing's drivers match the +410 variance), and a muted note line for US-037's attendance sentence. `HBarTile` gained a `children` slot and `DeltaChip` a `suffix` node — seams widened, not forked. **Next is US-024** — recommendation panel & narrative caption strip (2 pts), the last story in Phase 2b

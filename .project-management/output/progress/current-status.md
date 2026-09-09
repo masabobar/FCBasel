@@ -11,8 +11,8 @@ stale after US-018; US-019, US-020 and US-022 are now all reflected)
 
 **Project:** FC Basel — Intelligence Platform Prototype
 **Current Phase:** Phase 2b - Chart & Tile Component Library (**Phase 2a closed at 5/5**)
-**Overall Progress:** 56% (25/45 items completed)
-**Story Points Completed:** 65/116
+**Overall Progress:** 58% (26/45 items completed)
+**Story Points Completed:** 67/116
 
 ---
 
@@ -40,8 +40,8 @@ stale after US-018; US-019, US-020 and US-022 are now all reflected)
 
 ### Phase 2b: Chart & Tile Component Library (Current)
 - **Status:** 🔄 In Progress — US-027, US-017, US-021, US-025, US-026, US-018, US-019, US-020,
-  US-022 built; US-023 and US-024 remain
-- **Progress:** 9/11 stories · **Points:** 25/29
+  US-022, US-023 built; only US-024 remains
+- **Progress:** 10/11 stories · **Points:** 27/29
 - **Epics:** Epic 5 (E6 Component Library)
 
 ### Phase 3a: Conversational Interface
@@ -81,8 +81,8 @@ stale after US-018; US-019, US-020 and US-022 are now all reflected)
 
 ### Epic 5: E6 — Chart & Tile Component Library
 - **Phase:** 2b · **Stories:** 11 (US-017 to US-027) · **Points:** 29
-- **Completed:** 9/11 · **Status:** 🔄 In Progress (US-027, US-017, US-021, US-025, US-026,
-  US-018, US-019, US-020, US-022)
+- **Completed:** 10/11 · **Status:** 🔄 In Progress (US-027, US-017, US-021, US-025, US-026,
+  US-018, US-019, US-020, US-022, US-023)
 
 ### Epic 6: E5 — Conversational Interface & Interaction Model
 - **Phase:** 3a · **Stories:** 6 (US-028 to US-033) · **Points:** 17
@@ -100,23 +100,25 @@ stale after US-018; US-019, US-020 and US-022 are now all reflected)
 
 ## Active Work
 
-**Currently In Progress:** None — Phase 2b at 9/11; **Phases 1a, 1b and 2a are all closed**
+**Currently In Progress:** None — Phase 2b at 10/11; **Phases 1a, 1b and 2a are all closed**
 **Blocked Stories:** none
-**Next Up:** US-023 — driver / breakdown tile (2 pts). It must **compose US-021's `HBarRow`** rather
-than write a second bar row, take a custom value formatter, and hang its `-CHF 400k total` summary
-chip in `Card`'s `action` slot. Then US-024 (recommendation panel + narrative caption strip), which
-must read as advice rather than as a data tile. US-022 leaves two patterns to copy: a good/bad
-reading is taken from `derive.ts` as data and never re-derived in a component (its source is scanned
-so it cannot even name a verdict), and a recorded review decision is expressed structurally — one
-alignment rule read by both the header and its cells — so it cannot be reverted by accident
+**Next Up:** US-024 — recommendation panel & narrative caption strip (2 pts), the last story in
+Phase 2b. The panel must read as **advice rather than as a data tile** (gold accent, visibly not a
+metric), and the caption strip already exists as `CardCaption` on US-005's `Card` — it must be
+reused and made carryable by any tile, not rebuilt. US-022 and US-023 leave three patterns to copy:
+a good/bad reading is taken from `derive.ts` as data and never re-derived in a component; a recorded
+review decision is expressed structurally so it cannot be reverted by accident; and when a tile
+needs slightly more than a shared component offers, the shared seam is widened (`HBarTile`'s
+`children`, `DeltaChip`'s `suffix`) while a source scan proves the new file holds no copy of what it
+reused
 
 ---
 
-## Quality Snapshot (2026-09-09, after US-022)
+## Quality Snapshot (2026-09-09, after US-023)
 
 | Metric | Value |
 |---|---|
-| Passing tests | 1315 / 1315 |
+| Passing tests | 1358 / 1358 |
 | Coverage (`app/**`) | 99.81% stmts · 98.08% branches · 100% funcs · 100% lines |
 | TypeScript (strict) | 0 errors |
 | ESLint / Prettier | 0 problems · formatted |

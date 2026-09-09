@@ -1,7 +1,7 @@
 # Phase 2b: Chart & Tile Component Library
 
 **Duration:** 2026-09-11 to 2026-09-12 (~12.0 AI-hours)
-**Status:** In Progress (9/11 stories · 25/29 points)
+**Status:** In Progress (10/11 stories · 27/29 points)
 **Started:** 2026-09-09
 **Target Completion:** 2026-09-12
 **Actual Completion:** —
@@ -29,7 +29,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 
 ### Epic 5: E6 — Chart & Tile Component Library (29 story points)
 
-**Priority:** P0 (US-026 is P1) · **Status:** In Progress (9/11) · **Dependencies:** US-003, US-005
+**Priority:** P0 (US-026 is P1) · **Status:** In Progress (10/11) · **Dependencies:** US-003, US-005
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
@@ -39,7 +39,7 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 | US-020 | Donut / ring tile | 3 | P0 | ✅ Done |
 | US-021 | Horizontal bar tile | 3 | P0 | ✅ Done |
 | US-022 | Department table tile | 3 | P0 | ✅ Done |
-| US-023 | Driver / breakdown tile | 2 | P0 | 📋 Todo |
+| US-023 | Driver / breakdown tile | 2 | P0 | ✅ Done |
 | US-024 | Recommendation panel & narrative caption strip | 2 | P0 | 📋 Todo |
 | US-025 | Line chart component | 3 | P0 | ✅ Done |
 | US-026 | Segmented period filter control | 2 | **P1** | ✅ Done |
@@ -87,9 +87,9 @@ bespoke work per screen. Every component is styled from the E2 tokens and fed fr
 > find the estimate's SPEED_FACTOR too cautious.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 25 / 29 (86%)
-- **Completed Stories:** 9 / 11
-- **Tests Passing:** 1315 / 1315 · **Coverage:** 99.8% stmts / 98.1% branches · **Commits:** 8
+- **Completed Story Points:** 27 / 29 (93%)
+- **Completed Stories:** 10 / 11
+- **Tests Passing:** 1358 / 1358 · **Coverage:** 99.8% stmts / 98.1% branches · **Commits:** 9
 
 ---
 
@@ -211,72 +211,61 @@ zero frames.
 
 ### 2026-09-09 — US-020 Donut / ring tile ✅ (3 pts)
 
-**Delivered:** `app/components/charts/donut.tsx` — the multi-segment sponsor ring for US-034, three
-exports (`donutGeometry` pure, `Donut`, `DonutTile`). **It is NOT the attendance ring:** US-016's is a
-single-arc gold gauge on the navy band; this is four series arcs and a legend on a white card. The
-dasharray sweep is borrowed, the component is separate.
-**Criterion 2 is TWO SURFACES, ONE STATE, and that is the cross-surface test.** Hovering an arc and
-hovering its legend row both write the single `hovered` index, so a test hovers the LEGEND and asserts
-the ARC is thickened and the centre swapped, then hovers a different ARC and asserts the LEGEND row
-follows; stubbing out either surface's write fails 4-5 tests. The rows are real `<button>`s, so focus
-does what hover does and Tab still leaves.
-**Criterion 3 is a morph, and the proof is a RE-RANK.** Arcs *and* legend rows are keyed by sponsor,
-so a period press hands `Bitpanda` the same `<circle>` and its `stroke-dasharray` /
-`stroke-dashoffset` transition in CSS; element identity is asserted across a data change and a
-re-ordered split, and an index key fails that test. The centre is one `useCountUp`, so a hover swap
-and a period change both count from the figure on screen (asserted strictly between the two figures
-mid-flight) — never via zero.
-**Criterion 4 reuses `badgeSegments` (US-008)** rather than restating its rounding correction: the
-segments sum EXACTLY to the centre total on all four period totals (3'080 / 1'136 / 430 / 334) and on
-ten adversarial ones, asserted on the geometry *and* on the four figures printed on screen. The gaps
-are **arc removed from each segment** (half at each end, so all four read evenly), never a stroke in
-the background colour — a test rejects both a zero gap and a negative dash. Gradient ids from
-`useUid` (8 distinct across two rings); gold is absent, slate is the fourth series.
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1261/1261 (56 new) · build ✅ · coverage 100% stmts /
-100% lines / 91.2% branches on the new file (the misses are unreachable `?? "red"` fallbacks);
-99.7% / 97.6% overall. **Security triage:** no security-relevant changes detected — a presentational
-chart with no IO, no dependency change, no raw SQL / `dangerouslySetInnerHTML` / user-supplied URL;
-the only values reaching `style` are rounded geometry numbers and closed token references.
-**One seam:** no real-Chrome pass — nothing mounts a donut until US-034.
+**Delivered:** `app/components/charts/donut.tsx` — the multi-segment sponsor ring for US-034
+(`donutGeometry` pure, `Donut`, `DonutTile`); NOT US-016's single-arc gold gauge. Arc hover and legend
+hover write ONE `hovered` index (cross-surface test both ways; rows are real `<button>`s). Arcs and
+rows keyed by sponsor, so a period press morphs the same `<circle>`'s dasharray while the centre
+counts from the figure on screen; an index key fails the re-rank test. `badgeSegments` (US-008) is
+reused, so segments sum exactly to the centre total on all four periods and ten adversarial ones; gaps
+are arc removed from each segment, never a background-coloured stroke. Ids from `useUid`.
+**Gates:** 1261/1261 (56 new) · clean · 100% stmts on the new file. **Security:** none.
 
 ### 2026-09-09 — US-022 Department table tile ✅ (3 pts)
 
-**Delivered:** `app/components/tiles/department-table.tsx` — a real `<table>` (thead / tbody / tfoot,
-`scope="col"` headers, a `scope="row"` department name, `sr-only` caption) with `DepartmentTable`,
-`DepartmentTableTile` and the pure `targetMark` / `targetBarPercent` / `columnAlignClass` helpers. No
-TanStack Table: six rows and a total.
-**THE REVENUE / COST TRAP IS CLOSED BY CONSTRUCTION, not by care.** The colour comes from
-`row.judgement` (US-010's `varianceJudgement`) handed to US-017's `DeltaChip`, so Marketing's **+410
-renders UP and ADVERSE** — an up arrow in the negative token — while Sponsoring's +840 renders UP and
-FAVOURABLE; a test asserts the two chips share a `data-direction` and differ in class. The words
-`FAVOURABLE` and `ADVERSE` do not appear in the component at all, and a source scan rejects them
-along with any `variance <>` comparison or `DepartmentType` equality — the judgement cannot migrate
-back in. The flag is `needsAttention` (exactly one row, and it is Marketing); the department name is
-absent from the source, so giving another row both conditions moves the flag.
-**Both review decisions are asserted:** figures are **CHF millions** via `formatMillions` with the
-unremovable `MILLIONS_NOTE` subtitle ("figures in CHF millions") — a test rejects `/000/` anywhere in
-the rendered tile and pins the currency word to a single occurrence in that note; and the numeric
-headers are right-aligned **including "% of target"** through `columnAlignClass`, one rule read by
-the header AND its cells, with header-to-cell column position compared element by element.
-**Gold band:** Hospitality (95) takes a near-target ring in the deep gold, Merchandising (92) takes
-no mark at all, and 100+ takes a filled gold dot — shape as well as tone, each with an `sr-only`
-word. Row hover is a background-only highlight on the `fast` token; rows keyed by name (a re-order
-moves the row); long names wrap (`break-words`, no ellipsis) and the table scrolls inside the card.
-Totals come from `departmentTotals()` on the rows on screen, so the footer cannot disagree with them,
-and the club variance is deliberately NEUTRAL — a fact, not a verdict.
-**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1315/1315 (54 new) · build ✅ · coverage 100% on the
-new file; 99.8% stmts / 98.1% branches overall. **Security triage:** no security-relevant changes
-detected — a presentational component with no IO, no dependency change, no raw SQL /
-`dangerouslySetInnerHTML` / user-supplied URL; the only values reaching `style` are a clamped
-percentage and a stagger. **One seam:** no real-Chrome pass until US-038 mounts it.
+**Delivered:** `app/components/tiles/department-table.tsx` — a real `<table>` with `DepartmentTable`,
+`DepartmentTableTile` and the pure `targetMark` / `targetBarPercent` / `columnAlignClass`.
+**THE REVENUE / COST TRAP IS CLOSED BY CONSTRUCTION:** colour comes from `row.judgement` (US-010)
+through US-017's `DeltaChip`, so Marketing's **+410 renders UP and ADVERSE** while Sponsoring's +840
+renders UP and FAVOURABLE; a source scan rejects `FAVOURABLE` / `ADVERSE`, any `variance <>` test and
+any `DepartmentType` equality, and the flag is `needsAttention`, never a named row. **Both review
+decisions are asserted:** CHF **millions** with the unremovable "figures in CHF millions" subtitle
+(`/000/` rejected in the rendered tile), and numeric headers right-aligned **including "% of target"**
+by one `columnAlignClass` rule the header *and* its cells read. Near-target gold is shape plus an
+`sr-only` word; totals come from `departmentTotals()` on the rows on screen, club variance NEUTRAL.
+**Gates:** 1315/1315 (54 new) · clean · 100% on the new file. **Security:** none.
+
+### 2026-09-09 — US-023 Driver / breakdown tile ✅ (2 pts)
+
+**Delivered:** `app/components/tiles/driver-tile.tsx` — `DriverTile`, `DriverTotalBadge` and the pure
+`rankDrivers` / `driverTotal`. **IT DRAWS NO BARS, AND THAT IS THE STORY.** Every row is US-021's
+`HBarRow` through `HBarTile`; a source scan rejects `h-bar-*`, the two column widths, `H_BAR_SERIES`,
+`width` / `toFixed`, `useCountUp` / `useGrow` / `transition`, any `useState` / timer and any gradient
+class, while the render tests read the 150px label and 96px `nowrap` value columns back off the rows
+this tile produced — so a sixth copy of the row cannot appear without failing tests.
+**Three additions, honestly scoped:** (1) `rankDrivers`, magnitude-descending and **stable for ties**,
+asserted equal to US-009's `fixtureDeclines` order so Luzern precedes Sion; `rank="none"` keeps an
+authored order (US-035 leads with Bitpanda because it leads badge selection). (2) `driverTotal`,
+**derived from the rows on screen** through the newly exported `hBarDisplayedValue`, so the badge sums
+exactly what the bars show — asserted equal to `declineTotal` (-CHF 400k) and to
+`departmentVariance(Marketing)` (CHF 410k), and re-derived when the rows change. (3) A muted `note`
+line under the bars for US-037's attendance note — distinct from the card's AI caption strip.
+**Two seams added to shared modules rather than forked:** `HBarTile` now has a `children` slot under
+the bars, and `DeltaChip` a `suffix` node, so the badge is `-CHF 400k total` in ONE chip with the
+arrow, the sign and the `sr-only` direction it already had. Everything else — card chrome, `action`,
+formatter, `negative`, series, scaling, stagger, reduced motion — is delegated.
+**Gates:** lint ✅ · format ✅ · typecheck ✅ · 1358/1358 (43 new) · build ✅ · coverage 100% on the
+new file; 99.8% stmts / 98.1% branches overall. **Security triage:** no trigger fires — no endpoint,
+no IO, no dependency change, no raw SQL, no user-supplied URL; `note` / `totalLabel` are React nodes
+React escapes, and a scan rejects `dangerouslySetInnerHTML`. **One seam:** no real-Chrome pass until
+US-035 / US-037 / US-039 mount it.
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-09
 **Phase Status:** In Progress — US-027, US-017, US-021, US-025, US-026, US-018, US-019, US-020,
-US-022 done (9/11 · 25/29). Phase 2a is CLOSED (5/5) after US-016, which gave US-025/US-026/US-027
-their Chrome pass.
-**Next: US-023** — driver / breakdown tile; it must COMPOSE US-021's `HBarRow`, not write a second
-bar row.
+US-022, US-023 done (10/11 · 27/29). Phase 2a is CLOSED (5/5) after US-016, which gave
+US-025/US-026/US-027 their Chrome pass.
+**Next: US-024** — recommendation panel & narrative caption strip (2 pts), the last story in the
+phase; the caption strip already exists on `Card` (US-005) and must be reused, not rebuilt.
 **Previous:** [Phase 2a](phase-2a.md) · **Next:** [Phase 3a — Conversation](phase-3a.md)

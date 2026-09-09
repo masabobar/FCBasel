@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { cn } from "../../lib/cn";
 import {
@@ -131,6 +132,14 @@ export interface DeltaChipProps {
   judgement?: VarianceJudgement;
   /** `light` for a dark surface (the navy hero band). */
   variant?: DeltaVariant;
+  /**
+   * A word after the figure, INSIDE the chip — US-023's driver tile reads
+   * `-CHF 400k total`, one chip rather than a chip beside a stray label.
+   *
+   * A node, not a formatted string: the figure still comes from `format`, so
+   * this cannot become a second place a number is assembled.
+   */
+  suffix?: ReactNode;
   className?: string;
 }
 
@@ -139,6 +148,7 @@ export function DeltaChip({
   format = formatSignedPercent,
   judgement = judgementFromSign(value),
   variant = "default",
+  suffix,
   className,
 }: DeltaChipProps) {
   const direction = varianceDirection(value);
@@ -167,6 +177,7 @@ export function DeltaChip({
       {/* The figure animates nowhere, but it sits in a column of chips in the
           department table — tabular digits keep those aligned. */}
       <span className={TABULAR_NUMERALS_CLASS}>{format(value)}</span>
+      {suffix && <span data-slot="delta-suffix">{suffix}</span>}
       {/* The arrow is decorative, so the direction is stated in words here.
           Colour reaches no screen reader at all; this is the one carrier that
           is never lost. */}

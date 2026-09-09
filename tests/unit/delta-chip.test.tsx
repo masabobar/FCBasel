@@ -247,6 +247,29 @@ describe("DeltaChip — typography and merging", () => {
   });
 });
 
+describe("DeltaChip — the suffix slot (US-023's total badge)", () => {
+  it("puts the caller's word after the figure, inside the one chip", () => {
+    const chip = renderChip({ value: -12, suffix: "total" });
+    const suffix = chip.querySelector('[data-slot="delta-suffix"]')!;
+
+    expect(suffix).toHaveTextContent("total");
+    // After the figure, and still inside the chip — one chip reading
+    // `-12% total`, not a chip beside a stray label.
+    expect(
+      chip.querySelector(".tabular-nums")!.compareDocumentPosition(suffix) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(glyph(chip)).not.toBe("");
+    expect(spokenDirection(chip)).toBe("down");
+  });
+
+  it("renders no extra element when no suffix is given", () => {
+    expect(
+      renderChip({ value: 12 }).querySelector('[data-slot="delta-suffix"]'),
+    ).toBeNull();
+  });
+});
+
 describe("DeltaChip — values come from tokens and formatters, never literals", () => {
   it("uses no hardcoded colour", () => {
     expect(CHIP_CODE).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);

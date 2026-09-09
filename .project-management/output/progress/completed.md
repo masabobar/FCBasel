@@ -6,9 +6,9 @@
 
 ## Summary
 
-**Total Completed:** 25 stories
-**Total Points:** 65 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 65 points/day
+**Total Completed:** 26 stories
+**Total Points:** 67 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 67 points/day
 **Phases Completed:** Phase 1a, Phase 1b, Phase 2a (all 2026-09-09)
 
 ---
@@ -230,6 +230,49 @@ trap closed structurally rather than by care.
   or route, IDOR, raw SQL, `dangerouslySetInnerHTML`, user-supplied URL / SSRF, upload, dependency
   or lockfile change (**none**), env var or secret, logging, CSRF, storage API. **One seam:** no
   real-Chrome pass; nothing mounts the table until US-038
+
+### US-023: Driver / breakdown tile (2 pts)
+**Completed:** 2026-09-09
+**Files Changed:** 1 code (new) + 2 code (shared seams widened) + 3 test files + 5 tracking docs
+**Tests Added:** 43 (unit: 39 new file + 2 on `HBarTile`'s new slot + 2 on `DeltaChip`'s suffix) - 1358/1358 green, **100% on the new file**, 99.8% stmts / 98.1% branches of `app/**`
+**Notes:** All 3 acceptance criteria met. The story was deliberately small — a REUSE story — and the
+honest outcome is a thin tile plus the tests that keep it thin.
+
+**What Was Done:**
+- `app/components/tiles/driver-tile.tsx` — `DriverTile`, `DriverTotalBadge` and the pure
+  `rankDrivers` / `driverTotal`, designed at once for all three consumers: US-035's mixed-sign
+  percentages, US-037's negative money with the total badge, US-039's positive money
+- **CRITERION 3 IS ENFORCED TWO WAYS, not asserted.** Every row is US-021's `HBarRow` reached
+  through `HBarTile`: the render tests read the 150px label column, the 96px `nowrap` value column
+  and the `aria-hidden` track back off the rows THIS tile produced, and the scaling is `HBars`'
+  (FCZ 100% / Lugano 73.33% / Sion 46.67%). A source scan then rejects `h-bar-*`, both width
+  constants, `H_BAR_SERIES`, `width` / `toFixed` / `Math.min`, `useCountUp` / `useGrow` /
+  `transition` / `animation`, every `useState` / `useEffect` / timer, every gradient class and even
+  a second `Card` — so a sixth copy of the shared row cannot appear without failing tests
+- **RANKING is the tile's own, and it is STABLE:** `rankDrivers` sorts by magnitude descending on a
+  COPY (the caller's dataset is never sorted in place) and equal values keep their arrival order, so
+  Luzern precedes the tied Sion — asserted equal to US-009's `fixtureDeclines` order rather than to
+  a hand-written list. `rank="none"` keeps an authored order for US-035, whose list leads with
+  Bitpanda because Bitpanda leads badge selection, not because +2 is the largest figure
+- **THE TOTAL IS DERIVED, so the badge cannot disagree with the bars:** `driverTotal` sums the
+  figures the rows DISPLAY through `hBarDisplayedValue` (newly exported from `h-bars.tsx` rather
+  than restated), giving `-CHF 400k` — asserted equal to `declineTotal(fixtures)` — and `CHF 410k`
+  for the Marketing drivers, asserted equal to `departmentVariance(Marketing)`. It is re-derived on
+  a rerender (dropping two rows moves the badge to `-CHF 220k`) and is unaffected by the ranking
+- **TWO SEAMS WIDENED IN THE SHARED MODULES RATHER THAN FORKED:** `HBarTile` gained a `children`
+  slot rendered under the bars (US-037's one-line attendance `note` lives there, wrapping rather
+  than truncating, and distinct from the card's AI caption strip), and `DeltaChip` gained an
+  optional `suffix` node so `-CHF 400k total` is ONE chip that keeps the arrow, the explicit sign
+  and the `sr-only` direction. An explicit `action` still wins over the derived badge
+- The custom formatter is used verbatim in all three shapes (`+38%`, `-CHF 150k`, `CHF 240k`), a
+  mixed-sign list renders both directions (`data-direction` UP and DOWN off one dataset), an
+  overspend total renders UP and ADVERSE, and reduced motion lands on final widths, final figures
+  *and* the final badge with **zero frames requested**
+- **Security triage: no trigger fires** — considered and cleared: HTTP handler or route, IDOR, raw
+  SQL, `dangerouslySetInnerHTML` (scan-rejected), user-supplied URL / SSRF, upload, dependency or
+  lockfile change (**none**), env var or secret, logging, CSRF, storage API. `note` / `totalLabel`
+  are React nodes React escapes. **One seam:** no real-Chrome pass until US-035 / US-037 / US-039
+  mount it
 
 ---
 

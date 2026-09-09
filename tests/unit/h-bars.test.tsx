@@ -11,6 +11,7 @@ import {
   HBarRow,
   HBars,
   HBarTile,
+  hBarDisplayedValue,
   hBarMax,
   hBarPercent,
   type HBarDatum,
@@ -734,6 +735,40 @@ describe("HBarRow / HBars — the reuse seam US-023 composes", () => {
     const { container } = render(<HBars rows={[]} />);
 
     expect(container.firstChild).toBeNull();
+  });
+
+  it("gives the tile a slot UNDER the bars, so a footnote needs no new card", () => {
+    renderSettled(
+      <HBarTile title="Fixtures driving the decline" rows={DECLINES} negative>
+        <p data-slot="test-note">Lower attendance, not pricing.</p>
+      </HBarTile>,
+    );
+
+    const note = slot("test-note")!;
+    expect(slot("card")!.contains(note)).toBe(true);
+    // Under the bars, and inside the same body — not after the card.
+    expect(note.parentElement).toBe(slot("h-bars")!.parentElement);
+    expect(
+      slot("h-bars")!.compareDocumentPosition(note) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("exposes the displayed figure, so a summary can add up the rows", () => {
+    // US-023's `-CHF 400k total` badge sums the figures the rows SHOW.
+    expect(hBarDisplayedValue(150, true)).toBe(-150);
+    expect(hBarDisplayedValue(-150, true)).toBe(-150);
+    expect(hBarDisplayedValue(-150, false)).toBe(-150);
+    expect(hBarDisplayedValue(150, false)).toBe(150);
+    // Zero negates to `-0`, which is still zero to every formatter and to
+    // `varianceDirection` — a zero row reads FLAT, never as a decline.
+    expect(hBarDisplayedValue(0, true) === 0).toBe(true);
+    expect(
+      DECLINES.reduce(
+        (total, row) => total + hBarDisplayedValue(row.value, true),
+        0,
+      ),
+    ).toBe(chfFromThousands(-400));
   });
 });
 
