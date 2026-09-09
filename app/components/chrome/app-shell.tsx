@@ -16,7 +16,9 @@ import { TopBar } from "./top-bar";
  * US-013 (the four baseline tiles) and US-014 (hero sections inserted into
  * this same grid — the dashboard grows, it never clears). Tiles are passed in
  * as `children` and become grid items, so insertion is a change of children
- * and never a change of frame.
+ * and never a change of frame. The prompt bar (US-028) arrives the same way,
+ * through `promptBar`: the shell places it below the canvas and reserves the
+ * strip it covers, and knows nothing else about it.
  *
  * NO HORIZONTAL SCROLL AT 1920×1080 (`constraints.md` §3) is a structural
  * property here rather than a media query: the sidebar is the only fixed-width
@@ -37,6 +39,19 @@ import { TopBar } from "./top-bar";
 export const CANVAS_GRID_CLASS =
   "grid grid-cols-4 gap-grid-gap sm:grid-cols-8 lg:grid-cols-12";
 
+/**
+ * The strip the canvas leaves free at its foot for the pinned prompt bar
+ * (US-028), applied ONLY when a bar is supplied.
+ *
+ * The bar is `fixed` — see `PROMPT_BAR_POSITION_CLASS` for why sticky cannot
+ * work inside a shell that clips overflow — so it takes no space in the flow
+ * and the canvas has to reserve it, or the last row of tiles would sit under
+ * the bar with no way to scroll clear of it. It is comfortably taller than the
+ * bar itself (field plus US-029's chip row); if the bar ever grows past this,
+ * this number grows with it.
+ */
+export const PROMPT_BAR_CLEARANCE_CLASS = "pb-32";
+
 export interface AppShellProps {
   /**
    * Reset handler, forwarded to the app-bar control. The shell renders the
@@ -44,12 +59,26 @@ export interface AppShellProps {
    * `reset` (US-015), which is the only implementation there should ever be.
    */
   onReset?: () => void;
+  /**
+   * The persistent prompt bar (US-028), rendered after the canvas so it comes
+   * last in the tab order and is the final thing on the page. It positions
+   * itself; the shell's only job is to place it in the tree and to reserve the
+   * strip it covers (see {@link PROMPT_BAR_CLEARANCE_CLASS}). Absent, the
+   * canvas keeps its plain padding — nothing about the shell depends on there
+   * being a bar.
+   */
+  promptBar?: ReactNode;
   /** Grid items for the main canvas — baseline tiles and hero sections. */
   children?: ReactNode;
   className?: string;
 }
 
-export function AppShell({ onReset, children, className }: AppShellProps) {
+export function AppShell({
+  onReset,
+  promptBar,
+  children,
+  className,
+}: AppShellProps) {
   return (
     <div
       data-slot="app-shell"
@@ -65,12 +94,17 @@ export function AppShell({ onReset, children, className }: AppShellProps) {
 
         <main
           data-slot="canvas"
-          className="min-w-0 flex-1 overflow-x-hidden p-grid-gap"
+          className={cn(
+            "min-w-0 flex-1 overflow-x-hidden p-grid-gap",
+            promptBar && PROMPT_BAR_CLEARANCE_CLASS,
+          )}
         >
           <div data-slot="canvas-grid" className={CANVAS_GRID_CLASS}>
             {children}
           </div>
         </main>
+
+        {promptBar}
       </div>
     </div>
   );

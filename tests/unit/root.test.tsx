@@ -6,6 +6,8 @@ import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { PROMPT_BAR_CLEARANCE_CLASS } from "../../app/components/chrome/app-shell";
+import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
 import App, { Layout } from "../../app/root";
 
 const ROOT_SOURCE = readFileSync(
@@ -121,7 +123,7 @@ describe("App", () => {
     // One implementation, one wiring point: the control is US-012's, the
     // behaviour is `useDashboard`'s, and this is where they meet (US-015).
     expect(ROOT_SOURCE).toMatch(/const \{[^}]*reset[^}]*\} = useDashboard\(\)/);
-    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}>/);
+    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}/);
   });
 
   it("presses Reset on a baseline dashboard without breaking the screen", async () => {
@@ -139,6 +141,44 @@ describe("App", () => {
     ).toHaveLength(0);
     expect(screen.getByText("child route")).toBeInTheDocument();
     expect(scrollTo).toHaveBeenCalledTimes(1);
+  });
+
+  it("mounts the persistent prompt bar below the canvas", () => {
+    // US-028: the bar is part of the frame, and it is the LAST thing on the
+    // page so the canvas keeps the tab order it had.
+    renderApp();
+
+    const bar = document.querySelector('[data-slot="prompt-bar"]')!;
+    expect(bar).toBeInTheDocument();
+    expect(
+      screen.getByRole("main").compareDocumentPosition(bar) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("reserves the strip the pinned bar covers, so no tile hides under it", () => {
+    renderApp();
+
+    expect(screen.getByRole("main")).toHaveClass(PROMPT_BAR_CLEARANCE_CLASS);
+  });
+
+  it("clears a half-typed question when Reset is pressed", async () => {
+    // `generation` is `useDashboard`'s extension point for state it cannot
+    // derive, and a half-typed prompt is exactly that: the bar is keyed on it,
+    // so Reset takes the typing with it (US-015 × US-028).
+    Object.assign(window, { scrollTo: vi.fn() });
+    const user = userEvent.setup();
+    renderApp();
+
+    const input = screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL });
+    await user.type(input, "kit sales");
+    expect(input).toHaveValue("kit sales");
+
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+
+    expect(
+      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+    ).toHaveValue("");
   });
 
   it("renders the crest as the first item of the app bar", () => {

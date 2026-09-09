@@ -6,10 +6,10 @@
 
 ## Summary
 
-**Total Completed:** 27 stories
-**Total Points:** 69 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 69 points/day
-**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09)
+**Total Completed:** 28 stories
+**Total Points:** 71 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 1 · **Average Velocity:** 71 points/day
+**Phases Completed:** Phase 1a, Phase 1b, Phase 2a, **Phase 2b** (all 2026-09-09) · **Phase 3a open (1/6)**
 
 ---
 
@@ -236,6 +236,60 @@ the demo: the panel that recommends, and the line that interprets.
   lockfile change (**none**), env var or secret, logging, CSRF, storage API. Panel text and captions
   are React nodes React escapes, proven with an `<img onerror>` string. **One seam:** no real-Chrome
   pass until US-035 / US-037 / US-039 mount it
+
+---
+
+## Phase 3a: Conversational Interface — in progress (1/6 stories · 2/17 pts)
+
+### US-028: Persistent prompt bar (2 pts)
+**Completed:** 2026-09-09 — **it opens Phase 3a**
+**Files Changed:** 4 code (1 new) + 3 test files (1 new) + 6 tracking docs
+**Tests Added:** 48 (unit: 48) - 1441/1441 green, 99.82% stmts / 98.20% branches / 100% lines
+**Notes:** All 4 acceptance criteria met. The product's first and only user input.
+
+**What Was Done:**
+- `chrome/prompt-bar.tsx` — `PromptBar`, mounted by `app/root.tsx` through a new `promptBar` slot on
+  the US-012 shell (`AppShell` also gained `PROMPT_BAR_CLEARANCE_CLASS`, applied to the canvas only
+  when a bar is supplied)
+- **ONE field, and the field IS the typing area.** The search icon and the send button are siblings
+  of the `<input>` inside the single bordered element; the `:focus-within` ring sits on that same
+  element and the input's own outline is suppressed, so focus reads as one ring around one field
+  rather than a box inside a box. **The reported defect is rejected structurally:** a test walks the
+  field's subtree and fails on any descendant carrying a border or a ring, and asserts the input and
+  the button are DIRECT children. The field wears `rounded-pill`, deliberately not `.fcb-chip` /
+  `--radius-chip` — those stay with US-026 and US-029, or "11px, not a pill" stops meaning anything
+- **A real HTML `<form>` was chosen, and the choice is recorded.** The reference build avoided one
+  only because its sandbox swallowed submissions; here the browser's implicit submission makes Enter
+  and the embedded button ONE code path instead of two hand-rolled ones, with `preventDefault`
+  because there is nowhere to navigate. A press on the field's padding (or on the decorative icon)
+  focuses the input through `mousedown` + `preventDefault`, leaving the keyboard path untouched
+- **Criterion 4 without a second clock, because US-015 already owns the only one.** A submit
+  CONSUMES the question: the cleared value is written to a mirrored ref *before* `onSubmit` runs —
+  the same committed-ref trick `useDashboard` uses so two presses in one frame see each other — so a
+  re-entrant submit reads an empty draft and takes the no-op branch. `busy` additionally disables
+  both controls for US-031's beat. Proven three ways: three rapid Enters, a triple-click on send,
+  and a latching harness where the parent never releases `busy`, each yielding exactly ONE call. A
+  scan rejects `setTimeout` / `setInterval` in the file
+- **Empty and whitespace-only input are no-ops** — not an error, not a fallback, nothing cleared and
+  nothing removed; a chip rendered in the bar's `children` slot is still there afterwards
+- **`fixed`, not `sticky`, and that is a structural finding worth keeping:** the shell clips sideways
+  overflow, which per the CSS overflow spec makes it a scroll container on the other axis as tall as
+  the dashboard, so a sticky bar would settle at the bottom of the CONTENT. Fixed also leaves the
+  PAGE scrolling, which US-015's `scrollToTop` and US-014's auto-scroll both depend on. The canvas
+  reserves the strip so no tile can hide under the bar, and `lg:left-60` is checked against the
+  sidebar's own exported `SIDEBAR_WIDTH_CLASS`
+- Accessibility: a real visually hidden `<label>` (the placeholder is guidance, never the name), an
+  `aria-label` on the send button, `aria-hidden` on both glyphs, the form as a named `search` region
+  with `aria-busy`
+- **Security triage — the user-input trigger FIRES here (A03), and it is closed:** the typed value is
+  rendered only as an input `value`, never as markup; there is no `dangerouslySetInnerHTML`,
+  `innerHTML`, `eval` or template-built URL, request, storage key or selector (the single selector
+  is the fixed `INTERACTIVE_SELECTOR` constant); an `<img onerror>` payload reaches the callback
+  verbatim and creates no element, with `onerror=` absent from the document. US-030 will match it
+  against a fixed intent list and discard it. Considered and cleared: HTTP handler or route, IDOR,
+  raw SQL, SSRF, upload, dependency or lockfile change (**none**), env var or secret, logging, CSRF,
+  storage API. **One seam:** no real-Chrome pass yet — the bar is verified in Chrome once US-029 to
+  US-032 give it something to answer with
 
 ---
 

@@ -1,8 +1,8 @@
 # Screen Map — FC Basel Intelligence Platform Prototype
 
-**Version:** 1.6.0
+**Version:** 1.7.0
 **Last Updated:** 2026-09-09
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-024 — Phase 2b is closed, so every tile kind an insight section will hold now exists, the recommendation panel included; chips and thinking beat still pending)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-09 after US-028 — the Prompt bar region is now half Built: the unified field with its embedded send is real and always on screen; the suggestion chips inside it are US-029)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -44,7 +44,7 @@ The three inert items are deliberate: they imply a fuller product without preten
 | **Path** | `/` (single route) |
 | **Auth** | Public — no authentication model exists in the prototype |
 | **Stories** | US-012, US-013, US-014, US-015, US-016, US-028 to US-039 |
-| **Status** | *(generated)* In Progress (5/17 completed — US-012 shell, US-013 baseline row, US-014 insertion machinery, US-015 reset, US-016 hero band; hero content pending) |
+| **Status** | *(generated)* In Progress (6/17 completed — US-012 shell, US-013 baseline row, US-014 insertion machinery, US-015 reset, US-016 hero band, US-028 prompt bar; matcher and hero content pending) |
 
 **Description:** The persona's dashboard. On arrival it already looks lived-in — four baseline tiles,
 not an empty canvas. The user types a business question or taps a suggestion chip; after a staged
@@ -90,7 +90,7 @@ does not.
 | Baseline row | Webshop revenue KPI, Last home match KPI, Top Products, Active Partners | US-013, US-016 | ✅ Built — `app/components/dashboard/baseline-row.tsx` (+ `app/components/tiles/partner-tile.tsx`, `app/lib/dashboard/baseline.ts`), mounted by `app/routes/_index.tsx`. Four tiles as **direct children of the canvas grid** (3 + 3 + 6 columns, then a full-width partner strip at `lg`), composing `KpiTile`, `HBarTile` and the `Card` shell — no new tile kind and no second grid. No figure is re-typed in a component: a source scan enforces it. **Top Products' period filter is now wired (US-016):** its `action` slot holds a light `Segmented` driving its own period, independent of the band's, so the five figures recalculate and the same bar elements transition |
 | Insight sections | One per answered question — section head, narrative, cards, optional follow-up (recommendation panel) | US-014, US-024, US-034 to US-039 | 🔄 Built (US-014, US-024) — `app/components/heroes/{hero-section,insight-sections}.tsx`; one section per hero id, in the order asked, spanning the canvas grid via `grid-cols-subgrid`. **US-024 finished the section's two insight elements:** the prominent narrative line under the section header is US-005's caption strip in its `section` variant (AI glyph, wraps, never truncated), and the follow-up's advice is `app/components/tiles/recommendation-panel.tsx` — a gold-accented `aside`, structurally not a tile. Per-hero content is a placeholder until US-034 to US-039 |
 | Transient panels | Thinking, Fallback, empty state | US-031, US-032 | 📋 Not started |
-| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 📋 Not started — the chip row's reset behaviour is already provided for: **derive** it from `useDashboard`'s `sections` (initial chips at the baseline, follow-up chips from the sections on screen) and Reset restores it with no logic of its own; `generation` covers anything US-028's input holds that cannot be derived |
+| Prompt bar | Suggestion chips, unified input field, embedded send | US-028, US-029 | 🔄 Built (US-028) — `app/components/chrome/prompt-bar.tsx`, mounted by `app/root.tsx` through a new `promptBar` slot on the shell and **pinned to the foot of the screen** (`fixed`, because the shell clips overflow and a sticky bar would settle at the bottom of the dashboard instead; the canvas reserves the strip so no tile hides under it). **ONE bordered field** with the search icon and send button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, a press on the padding focusing the input, a real `<form>` so Enter and the button share one submit path, empty input a no-op, and rapid submits collapsing to one without a second timer. **Still to come:** the three suggestion chips render into the bar's `children` slot (US-029) — **derive** them from `useDashboard`'s `sections` so Reset restores them for free; the typed question reaches the matcher through `onSubmit` (US-030) and the field closes on `busy` during the thinking beat (US-031) |
 
 > The **canvas grid** row is new in 1.1.0. It was implicit before — US-012 made it a real region
 > with its own component, and US-013/US-014 both insert into it rather than owning a grid each.
@@ -122,6 +122,17 @@ does not.
 > mistaken for one more metric. Both render pre-authored strings verbatim — Phase 3b supplies the
 > copy.
 >
+> 1.7.0 records US-028: the **Prompt bar region exists on screen** and Phase 3a is open. No region
+> and no route was added — the bar is a second slot on the US-012 shell, beside the canvas rather
+> than inside its grid, so it is not a grid item and cannot be reflowed by an insertion. Two
+> structural facts a later story must not undo: it is **`fixed`** (the shell clips sideways overflow,
+> which makes it a scroll container as tall as the content, so `sticky` would strand the bar at the
+> bottom of the dashboard) and the **page** still scrolls rather than the canvas, which US-015's
+> Reset and US-014's auto-scroll both depend on. The field is ONE bordered element with the icon and
+> the send button inside it; the nested box reported in review is rejected by a test that walks the
+> field's subtree. This is also the app's **only user input**: it is rendered solely as an input
+> `value`, never as markup, and builds no URL, request, storage key or selector.
+>
 > 1.4.0 records US-013: the **Baseline row region and the Baseline state are Built**. No region and
 > no route was added — the four tiles are grid items on the canvas that already existed. The region's
 > contents line is corrected: it listed only Top Products and Active Partners, but US-013's
@@ -137,9 +148,13 @@ does not.
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-09, after US-024)
+## 4. Drift Report (hand-checked 2026-09-09, after US-028)
 
 - **Stories referencing screens not in this map:** *(none)*
+- **Routes added by US-028:** *(none)*. The prompt bar is a component in the existing shell:
+  `app/routes.ts` is untouched, the form's default submission is prevented because there is nowhere
+  to navigate, and nothing is requested, stored or logged. The typed question is passed to an
+  `onSubmit` callback and dropped.
 - **Routes added by US-024:** *(none)*. Two components, no route, no loader, no request: the panel
   and the caption strip take their text as a prop.
 - **Screen entries with no backing story (orphans):** *(none)*

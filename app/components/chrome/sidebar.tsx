@@ -60,8 +60,15 @@ export const INERT_NAV_ITEMS: readonly NavItem[] = [
  */
 const NAV_ROW_CLASS = "flex items-center gap-2.5 rounded-badge px-3 py-2";
 
-/** Sidebar width. Fixed, so the canvas beside it owns all remaining space. */
-const SIDEBAR_WIDTH_CLASS = "w-60";
+/**
+ * Sidebar width. Fixed, so the canvas beside it owns all remaining space.
+ *
+ * Exported because US-028's prompt bar is pinned to the viewport and therefore
+ * has to offset itself past this column by hand (`PROMPT_BAR_POSITION_CLASS`
+ * in `./prompt-bar.tsx`). A test asserts the two agree, which is the closest a
+ * statically extracted utility can get to sharing one value.
+ */
+export const SIDEBAR_WIDTH_CLASS = "w-60";
 
 const ICON_SIZE = 16;
 

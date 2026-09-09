@@ -6,10 +6,10 @@
 
 ## Today's Summary
 
-**Stories Completed:** 27 — **Phases 1a, 1b, 2a and 2b ALL complete (2b closed by US-024, 11/11 ·
-29/29)**
-**Story Points:** 69
-**Time Worked:** ~18.0 hours · **Files Changed:** 222 · **Tests Added:** 1393
+**Stories Completed:** 28 — **Phases 1a, 1b, 2a and 2b ALL complete (2b closed by US-024, 11/11 ·
+29/29); Phase 3a opened by US-028 (1/6 · 2/17)**
+**Story Points:** 71
+**Time Worked:** ~18.7 hours · **Files Changed:** 229 · **Tests Added:** 1441
 
 ---
 
@@ -23,51 +23,29 @@
   bytes were PNG (US-004); one `Card` shell of collapsing slots (US-005); and the four reveal
   keyframes plus `app/lib/motion.ts`, where **reduced motion renders final state rather than
   switching animation off** (US-006).
-- **US-007 — Persona baseline datasets.** The first data story, so it sets the shape US-008 to
-  US-010 follow: enums, domain types and the repository interface in `app/lib/repositories/`,
-  fixtures in `app/lib/mock/`, one line of selection in `index.server.ts`. All four periods. The
-  headline webshop figure and its delta are **computed from the series**, so a number cannot
-  disagree with the chart under it. Partner brand colours stay outside the palette. 228/228.
-- **US-008 — Hero 1 dataset: shirt sales, badges, printed names.** One hero object with `primary`
-  and `followUp` so a tile and its escalation cannot drift. **Nothing derivable is stored:** kit
-  revenue is units × CHF 99, the Home share 58%, the badge share exactly 8%. `badgeSegments`
-  corrects its rounding remainder so the parts sum *exactly*, proved 0-2,000 (273/273).
-- **US-009 — Hero 2 dataset: ticket revenue year on year.** Eight home fixtures (7,880 → 7,830) plus
-  the twelve-month series. The real risk was labelling, not arithmetic: the two charts sit at
-  deliberately different scopes, so `scopeLabel` is a field and tests assert the labels differ.
-  The -0.6%, the four declines and the -CHF 400k badge all come off the fixture pairs (304/304).
-- **US-010 — Hero 3 dataset: departmental performance.** Six departments (69,000 → 69,680, +1.0%
-  derived). The new idea is that a TAG carries a number's meaning: above budget is money earned for
-  five departments and an **overspend** for the Marketing cost centre, so `varianceJudgement`
-  decides good-or-bad once from `DepartmentType`, and one test proves a naive "variance > 0" rule
-  misreads exactly one department. The follow-up reconciles: 240 + 150 + 20 = 410 (348/348).
-- **US-011 — Formatters & cross-hero reconciliation.** `app/lib/format.ts` is the one place a number
-  becomes a string: money always carries `CHF`, the sign goes *before* the unit (`-CHF 400k`), and
-  `en-CH` groups with the Swiss U+2019 mark, pinned independent of the runtime's ICU (proved by
-  stubbing `Intl`). One rounding rule, imported from `derive.ts`. The reconciliation suite asserts
-  relationships rather than constants and sweeps every narrative number. **No drift found.** 418.
-- **US-012 — Branded application shell.** `app/components/chrome/{sidebar,top-bar,app-shell}.tsx`
-  plus `app/lib/persona.ts`: the navy sidebar (hidden below `lg`), the app bar carrying the US-004
-  crest, the workspace label, a decorative connection status and Reset, and a canvas grid stepping
-  12 → 8 → 4 columns. `root.tsx` mounts the shell around `<Outlet />`, so a hero inserted later joins
-  the same grid; the canvas is deliberately **empty** (tiles are US-013, insertion US-014). Three
-  things were made structural rather than trusted: **the persona is a role** (one module, and a test
-  asserts the app bar renders no text beyond those labels), **the placeholders are inert by
-  construction** (`aria-disabled`, no href, no focus), and **the status is decorative** (no live
-  region, no `fetch`, no timer). No horizontal scroll at 1920×1080. 475/475 green.
-- **US-014 — Dynamic tile insertion & grid reflow.** The mechanic the demo turns on: the dashboard
-  **grows, it never clears**. A memory-only list of `{heroId, phase, revision}` — pure transitions in
-  `sections.ts`, state in `use-dashboard.ts`, owned by `root.tsx`; sections are **direct children of
-  the US-012 canvas grid** via `grid-cols-subgrid`. Re-asking a hero **refreshes in place** and a
-  follow-up **flips** its parent's phase rather than appending (US-033 inherits that). Reflow runs
-  through US-006's `animateReflow`; reduced motion recorded zero view transitions and an identical
-  layout. A source scan bans every storage API. 552/552. **Phase 2a then 2/5 · 6/16 points.**
-- **US-015 — Reset to baseline.** The control that lets the demo be run twice, built as a
-  **transition beside the other three** rather than a mode. **Reset restores a named baseline, never
-  a literal empty list**, and that constant is *also* the hook's initial state. **The pending timer
-  is the story:** `reset` cancels it first, and deleting that line makes two tests fail with the beat
-  dropping an answer into a just-cleared dashboard. The *same list reference* comes back when there
-  is nothing to clear, so ten presses in one frame run **one** view transition. 592/592.
+- **Phase 1b — US-007 to US-011 (10 pts), closed.** Condensed; the full account is in
+  [`../phases/phase-1b.md`](../phases/phase-1b.md). US-007 set the shape the rest follow (enums,
+  types and the repository interface, fixtures in `app/lib/mock/`, server-only selection, all four
+  periods, every headline **computed from the series**). US-008 to US-010 built the three hero
+  datasets with **nothing derivable stored** — kit revenue as units × CHF 99, `badgeSegments`
+  correcting its rounding remainder so the parts sum exactly, the two Hero 2 charts kept at
+  deliberately different scopes with `scopeLabel` as a field, and `varianceJudgement` deciding
+  good-or-bad once from `DepartmentType` so a naive "variance > 0" rule is proven to misread exactly
+  one department. US-011 made `app/lib/format.ts` the one place a number becomes a string (sign
+  before the unit, Swiss U+2019 pinned independent of ICU, one rounding rule) and swept every
+  narrative number: **no drift found.** 418/418.
+- **US-012 / US-014 / US-015 — shell, insertion, reset (8 pts), Phase 2a's first three.** Condensed;
+  the full account is in [`../phases/phase-2a.md`](../phases/phase-2a.md). The navy sidebar, app bar
+  and a canvas grid stepping 12 → 8 → 4, with three things made structural rather than trusted: the
+  **persona is a role** (a test accounts for the app bar's whole text), the placeholder nav is
+  **inert by construction**, and the connection status is **decorative** (no live region, no
+  `fetch`, no timer). Then the mechanic the demo turns on: the dashboard **grows, it never clears** —
+  a memory-only list of `{heroId, phase, revision}`, pure transitions in `sections.ts`, sections as
+  direct children of the SAME canvas grid via `grid-cols-subgrid`, re-asking refreshing in place and
+  a follow-up flipping its parent's phase. And Reset as a **fourth transition, not a mode**,
+  restoring the named baseline that is also the hook's initial state, cancelling the pending beat
+  first (delete that line and two tests fail), and handing back the same list reference when there
+  is nothing to clear, so ten presses in one frame run ONE view transition. 592/592 green.
 - **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
   depends on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`. **Count-up counts from the
   figure on screen, not from zero** — a test proves a target changed mid-flight opens the new
@@ -153,6 +131,17 @@
   hyphens, `CHF 150k`, `2.2%` vs `2.6%`), with no clamp and no casing, because Phase 3b's copy is
   signed off. **Criterion 3 is order**, so the tests assert the narrative precedes every chart in a
   section. Gold stayed sanctioned; no new-tile ring appeared. 35 tests, 1393/1393.
+- **US-028 — Persistent prompt bar. Phase 3a opens (1/6 · 2/17).**
+  `app/components/chrome/prompt-bar.tsx`, mounted by `root.tsx` through a new `promptBar` slot on the
+  shell: the product's only user input. **ONE bordered field IS the typing area** — icon and send
+  button inside it as siblings of the `<input>`, the `:focus-within` ring on that same element, the
+  input's own outline suppressed, and a test that walks the subtree and rejects any descendant
+  border or ring, because the nested box was the reported defect. **A real `<form>`** (the reference
+  build avoided one only for its sandbox), so Enter and the button share the browser's implicit
+  submission. **Debounce with no second clock:** a submit consumes the question by clearing a
+  mirrored ref *before* `onSubmit`, so three rapid Enters yield one call, and `busy` closes the field
+  for US-031. Empty and whitespace-only do nothing. `fixed`, not `sticky` — the shell clips overflow,
+  and the page must keep scrolling for Reset. XSS pass-through proven. 48 tests, 1441/1441.
 
 ---
 
@@ -166,10 +155,10 @@
   to US-009 deliberately exceeded theirs (all four periods, the twelve-month series). US-010 derives
   the Revenue/Cost judgement and the attention flag rather than storing either; US-011 adds one
   shared display layer, one rounding rule, and a reconciliation suite that found **no drift**.
-- ✅ US-012 — Branded application shell (3 pts) — all 5 criteria met, the two easy ones to fake measured in a real browser. **Phase 2a opens here: 1/5 · 3/16.**
-- ✅ US-014 — Dynamic tile insertion & grid reflow (3 pts) — all 7 criteria met: dedupe by hero id proven in unit tests and in Chrome, a follow-up flips its parent's phase, no storage API anywhere.
-- ✅ US-015 — Reset to baseline (2 pts) — 3 of 5 criteria fully met; the chips (US-029) and the
-  thinking beat (US-031) are recorded as seams rather than claimed. **Phase 2a then 3/5 · 8/16.**
+- ✅ US-012 / US-014 / US-015 (8 pts) — the shell (all 5 criteria, the two easy ones to fake measured
+  in a real browser), insertion (all 7, dedupe by hero id proven in Chrome, no storage API) and
+  Reset (3 of 5 fully met; the chips and the thinking beat recorded as seams rather than claimed).
+  **Phase 2a then 3/5 · 8/16.**
 - ✅ US-027 — Motion & animation hooks (3 pts) — all 4 acceptance criteria met, including the two
   subtle ones: count-up continues from the current displayed value, and nothing is stranded at zero
   under reduced motion. **Phase 2b opens here: 1/11 stories, 3/29 points.**
@@ -219,6 +208,13 @@
   byte-identical, which is the guarantee Phase 3b's verbatim narratives depend on.
   **Phase 2b is CLOSED: 11/11 stories, 29/29 points.**
 
+- ✅ US-028 — Persistent prompt bar (2 pts) — all 4 criteria met: one field with the icon and send
+  button embedded and **no inner bordered box** (asserted structurally, not by class), a press on
+  the padding focusing the input, Enter *and* the embedded button submitting through one real form
+  while empty input is a no-op that leaves the chips alone, and rapid repeated submits collapsing to
+  exactly one call — proven by three rapid Enters, a triple-click and a latching `busy` harness.
+  **Phase 3a opens here: 1/6 stories, 2/17 points.**
+
 *(Long-form accounts are condensed to keep this log inside its 300-line limit — the full detail is
 in [`completed.md`](completed.md) and [`../phases/phase-2b.md`](../phases/phase-2b.md).)*
 
@@ -239,17 +235,18 @@ in [`completed.md`](completed.md) and [`../phases/phase-2b.md`](../phases/phase-
 ## Next Day Plan
 
 **Immediate Focus:**
-- **Phases 1a, 1b, 2a and 2b are all closed** (14 + 10 + 16 + 29 = 69 points). The component
-  library is complete: seven tile kinds, four chart geometries, the segmented control, the motion
-  hooks and the two insight elements, with no per-hero copy anywhere.
-- **Next is Phase 3a — Conversation (US-028 to US-033, 17 pts):** the prompt bar, the suggestion
-  chips (derive them from `useDashboard`'s sections, as US-015 provided for), keyword intent
-  matching, the staged thinking beat, the fallback panel and the follow-up chip logic. Then Phase 3b
-  is composition only — every hero beat assembles the existing components and supplies the
-  pre-authored strings, which US-024 proved render verbatim.
+- **Phases 1a, 1b, 2a and 2b are all closed** (69 points): seven tile kinds, four chart geometries,
+  the segmented control, the motion hooks and the two insight elements, no per-hero copy anywhere.
+- **Phase 3a is open and US-028 is done:** next is **US-029, the three suggestion chips**, which go
+  into the bar's `children` slot wearing `CHIP_SURFACE_CLASS` and should be **derived** from
+  `useDashboard`'s `sections` so Reset restores them for free. Then US-030's matcher wires to the
+  bar's `onSubmit`, US-031 latches `busy` and schedules the beat through `schedule`, US-032 catches
+  everything below threshold, US-033 gates the follow-ups. Then Phase 3b is composition only —
+  every hero beat assembles existing components and supplies the pre-authored strings, which US-024
+  proved render verbatim.
 
-**Priority Stories for This Week:** Phase 1a + 1b foundations (24 pts, done) → Phase 2a + 2b shell
-and component library (45 pts, the largest block) → Phase 3a + 3b, the demo itself (33 pts).
+**Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
+3a + 3b, the demo itself (33 pts, 2 done).
 
 ---
 
@@ -258,8 +255,12 @@ and component library (45 pts, the largest block) → Phase 3a + 3b, the demo it
 - **The deadline is this week.** Sponsor showing first, owner audience the following week. ~52
   AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope — the
   P1 cut set is worth only ~0.82 days at 8h/day.
-- Phases 1a, 1b, 2a and 2b are all complete (69/116 points); continue with
-  `/holycode-pm:execute-work phase 3a`, starting at US-028.
+- Phases 1a, 1b, 2a and 2b are all complete and Phase 3a is open (71/116 points); continue with
+  `/holycode-pm:execute-work story US-029`.
+- **US-028 named three seams and they are the whole wiring of Phase 3a:** `onSubmit` (US-030's
+  matcher), `busy` (US-031's beat) and `children` (US-029's chips) — plus `key={generation}` in
+  `root.tsx`, which is how a half-typed question clears with Reset. A story that grows its own
+  submit path, its own timer or its own chip styling is a review finding.
 - **US-021 is the reuse test for the whole epic, and US-023 and US-024 both passed it:** widen the
   shared seam when a consumer needs a little more (`HBarTile`'s `children`, `DeltaChip`'s `suffix`,
   `CardCaption`'s `section` placement) and let a source scan prove the new file holds no copy of
@@ -272,10 +273,9 @@ and component library (45 pts, the largest block) → Phase 3a + 3b, the demo it
   `useGrow`'s reduced-motion short-circuit are what keep ten charts consistent. A component that
   reimplements either is a review finding, not a style choice.
 - **Two shared pieces US-017 left for the rest of the phase:** `DeltaChip` is the *only* variance
-  chip, and `app/lib/cn.ts` protects named size tokens — but only through `cn`.
-- **Reset's seams are recorded in code:** US-029's chips should be *derived* from `useDashboard`'s
-  `sections` and US-031's thinking beat *scheduled* through its `schedule`. US-013 closed the third
-  (the baseline tiles) as static route chrome — do not move them into the session list.
+  chip, and `app/lib/cn.ts` protects named size tokens — but only through `cn`. **Reset's seams are
+  recorded in code:** US-029's chips *derived* from `sections`, US-031's beat *scheduled* through
+  `schedule`; US-013 closed the third (baseline tiles as static route chrome).
 - **US-013 set the no-hardcoded-figure pattern for every hero:** figures reach a component only
   through a loader-provided view model, and a test scans component sources for a literal figure.
 - **US-025's chart is the only line chart** and both heroes must key it, not fork it: `key={period}`
@@ -289,11 +289,11 @@ and component library (45 pts, the largest block) → Phase 3a + 3b, the demo it
   one value in the band drives both the chart's `key` and the ring, while Top Products holds its own.
   Its 11px radius is reviewed: `rounded-full` on it or on US-029's chips is a review finding.
 - **US-016's band is first in the cut order and was built to stay cuttable:** one grid item, no
-  shared state, no import from the baseline row. Its `AttendanceRing` (single-arc gauge) and
-  `Donut` (segmented ring) are two components on purpose; neither should grow a mode to become the
-  other.
-- The shell keeps two guardrails as *tests*: the app bar's whole text must equal the known role
-  labels, and the status file must hold no `fetch`, `useEffect` or timer.
+  shared state, no import from the baseline row. Its `AttendanceRing` (single-arc gauge) and `Donut`
+  (segmented ring) are two components on purpose; neither grows a mode to become the other.
+- Three shell guardrails are *tests*: the app bar's whole text equals the known role labels, the
+  status file holds no `fetch`/`useEffect`/timer, and (US-028) the prompt field's subtree may carry
+  no border and no ring.
 
 ---
 

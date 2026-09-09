@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   AppShell,
   CANVAS_GRID_CLASS,
+  PROMPT_BAR_CLEARANCE_CLASS,
 } from "../../app/components/chrome/app-shell";
 import { INERT_NAV_ITEMS } from "../../app/components/chrome/sidebar";
 import { CONNECTION_STATUS_TEXT } from "../../app/components/chrome/top-bar";
@@ -127,6 +128,40 @@ describe("AppShell — the canvas grid", () => {
     renderShell();
 
     expect(slot("canvas-grid").childElementCount).toBe(0);
+  });
+});
+
+describe("AppShell — the prompt bar slot", () => {
+  it("renders the supplied bar after the canvas, inside the canvas column", () => {
+    // Last in the tree, so the canvas keeps the tab order it had and the bar
+    // is the final stop (US-028).
+    renderShell({ promptBar: <div data-testid="bar">bar</div> });
+
+    const bar = screen.getByTestId("bar");
+    expect(slot("top-bar").parentElement).toContainElement(bar);
+    expect(
+      slot("canvas").compareDocumentPosition(bar) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(slot("canvas-grid")).not.toContainElement(bar);
+  });
+
+  it("reserves the strip the pinned bar covers when one is supplied", () => {
+    renderShell({ promptBar: <div data-testid="bar">bar</div> });
+
+    expect(slot("canvas")).toHaveClass(
+      PROMPT_BAR_CLEARANCE_CLASS,
+      "p-grid-gap",
+    );
+  });
+
+  it("keeps the canvas padding untouched when there is no bar", () => {
+    // The shell does not depend on there being a prompt bar; US-012's frame
+    // stands on its own.
+    renderShell();
+
+    expect(slot("canvas")).not.toHaveClass(PROMPT_BAR_CLEARANCE_CLASS);
+    expect(slot("canvas")).toHaveClass("p-grid-gap");
   });
 });
 

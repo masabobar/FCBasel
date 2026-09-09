@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-09
-**Current Phase:** Phase 3a - Conversation *(0/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
+**Current Phase:** Phase 3a - Conversation *(1/6 stories)* · **Phases 1a + 1b + 2a + 2b all complete**
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 60% | 100% | 🟢 On Track |
+| **Overall Progress** | 61% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
-| **Stories Completed** | 27/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 69/116 | 116 | 🟢 On Track |
+| **Stories Completed** | 28/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 71/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -22,41 +22,27 @@
 
 ## 📅 Today's Progress (2026-09-09)
 
-**Stories Completed Today:** 27
-**Currently Working On:** None — Phase 2b complete
-**Story Points Completed Today:** 69
+**Stories Completed Today:** 28
+**Currently Working On:** US-029 — Suggestion chips & chip lifecycle (3 pts)
+**Story Points Completed Today:** 71
 
-- ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — React Router 7 SSR scaffold (Railway
-  deploy stays a human step) · ESLint 9 + Prettier + husky · one token set published as Tailwind v4
-  `@theme static` properties *and* a typed TS object, held in lockstep by a parity test · the crest
-  self-hosted (194 KB → 17.9 KB) · one `Card` shell every tile composes — slots, not variants · four
-  reveal keyframes timed from motion tokens, reduced motion *collapsing* them to a ~1ms final frame.
+- ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
+  human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
+  typed TS object, kept in lockstep by a parity test · crest self-hosted (194 KB → 17.9 KB) · one
+  `Card` shell (slots, not variants) · four keyframes, reduced motion *collapsing* to a final frame.
 
-- ✅ **Phase 1b — Seed data & formatters (5 stories, 10 pts)** — **US-007** the pattern the rest of E3
-  follows (enums + types + repository interface, fixtures in `app/lib/mock/`, server-only selection),
-  all four periods, totals and deltas *derived* · **US-008/009/010** the three hero datasets: kit
-  revenue = units × CHF 99 with the 58% and exactly-8% shares derived and `badgeSegments` correcting
-  its rounding remainder; eight fixtures 7,880 → 7,830 plus a twelve-month series at a *different
-  scope on purpose*; the departmental table where the **Revenue / Cost tag is load-bearing** — a
-  naive "variance > 0 is good" rule misreads exactly one row, and the three drivers (240 + 150 + 20)
-  reconcile *exactly* with Marketing's 410 overspend · **US-011** one display layer
-  (`app/lib/format.ts`, pure), `CHF` always carried with the sign *before* the unit, the Swiss U+2019
-  group mark pinned ICU-independently, one rounding rule imported from `derive.ts`, plus a
-  reconciliation suite sweeping every number in all six narratives. **No drift found.**
+- ✅ **Phase 1b — Seed data & formatters (5 stories, 10 pts)** — **US-007** set the E3 pattern (enums
+  + types + repository interface, fixtures in `app/lib/mock/`, server-only selection, every total
+  *derived*) · **US-008/009/010** the three hero datasets, including the departmental table where the
+  **Revenue / Cost tag is load-bearing** (a naive "variance > 0 is good" rule misreads exactly one
+  row) and drivers reconciling *exactly* with Marketing's 410 overspend · **US-011** one pure display
+  layer, Swiss U+2019 pinned ICU-independently, plus a reconciliation sweep of every number in all
+  six narratives. **No drift found.**
 
-- ✅ **US-012 — Branded application shell (3 pts)** — navy sidebar, top app bar, an empty 12-column
-  canvas. The persona is a *role* (`app/lib/persona.ts`); a test accounts for the app bar's entire
-  text, so a personal name cannot be added by accident. Placeholder nav is inert structurally.
-
-- ✅ **US-014 — Dynamic tile insertion & grid reflow (3 pts)** — the mechanic the demo turns on: the
-  dashboard **grows, it never clears**. Memory-only session state in `root.tsx`; re-asking refreshes
-  in place and a follow-up flips a section's phase instead of appending. Sections reuse the canvas
-  tracks (`grid-cols-subgrid`), so there is still **one grid**; a scan asserts no storage API.
-
-- ✅ **US-015 — Reset to baseline (2 pts)** — the control that lets the demo be run twice, built as a
-  transition beside the other three and restoring the *same* `BASELINE_SECTIONS` the hook starts
-  from. **The timer is the story:** `reset` cancels the pending beat *first* — delete that line and
-  two tests fail with a `HERO_2` section landing in a just-cleared dashboard.
+- ✅ **US-012 / US-014 / US-015 — shell, insertion, reset (8 pts)** — navy sidebar + app bar + one
+  12-column canvas, the persona a *role*; the dashboard **grows, it never clears** (memory-only state
+  in `root.tsx`, sections reusing the canvas tracks so there is still ONE grid); and Reset as a
+  fourth transition restoring the same `BASELINE_SECTIONS`, cancelling the pending beat *first*.
 
 - ✅ **US-027 — Motion & animation hooks (3 pts)** — the four hooks the other ten E6 components are
   built on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`. **Count-up tracks the figure on
@@ -170,26 +156,37 @@
   metric chrome), because advice must never read as one more metric. **Verbatim is tested byte for
   byte** on US-039's string, and **criterion 3 is order**, so the tests assert the narrative precedes
   every chart in the section. 35 tests, 1393.
+- ✅ **US-028 — Persistent prompt bar (2 pts)** — **Phase 3a opens**, and with it the only user input
+  in the product. **ONE field, and the field itself is the typing area:** the search icon and the
+  send button are siblings of the `<input>` inside the single bordered element, the focus ring is
+  `:focus-within` on that same element, and a test walks the field's subtree and fails on any
+  descendant carrying a border or a ring — the nested box was the reported defect. A real HTML
+  `<form>` was used (the reference build avoided one only because its sandbox swallowed submits), so
+  Enter and the embedded button are **one** code path. **Debounce without a second clock:** a submit
+  consumes the question, clearing a mirrored ref *before* the callback, so three rapid Enters yield
+  exactly one call, and `busy` closes the field for US-031's beat. Empty and whitespace-only are
+  no-ops, chips untouched. `fixed`, not `sticky`, because the shell clips overflow; the canvas
+  reserves the strip. XSS pass-through proven with an `<img onerror>` payload. 48 tests, 1441.
 
 ---
 
-## 🏁 Phase 2b complete — Chart & Tile Component Library
+## 🏁 Phase 3a open — Conversational Interface
 
-**Phase 2b goal:** the reusable visual kit the heroes are assembled from. Closed at 100% on
-2026-09-09 (11/11 · 29/29 pts), ahead of its 2026-09-12 target — as did **Phases 1a, 1b and 2a**.
-Every tile kind, chart geometry, control and hook a hero needs now exists and is shared, with no
-per-hero copy anywhere.
+**Phase 2b** closed at 100% on 2026-09-09 (11/11 · 29/29 pts), as did **Phases 1a, 1b and 2a**: every
+tile kind, chart geometry, control and hook a hero needs exists and is shared. **Phase 3a** now
+builds the choreography that stands in for the AI, and its first story put a question box on screen.
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| None | — | Phase 2b complete; **Phase 3a (US-028, prompt bar) is next** |
+| US-029: Suggestion chips & chip lifecycle | 📋 Next | The bar's `children` slot and `CHIP_SURFACE_CLASS` are waiting for it |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-028: Persistent prompt bar | 2026-09-09 | 2 |
 | US-024: Recommendation panel & narrative caption strip | 2026-09-09 | 2 |
 | US-023: Driver / breakdown tile | 2026-09-09 | 2 |
 | US-022: Department table tile | 2026-09-09 | 3 |
@@ -245,8 +242,8 @@ per-hero copy anywhere.
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 99.82% stmts / 98.17% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1393/1393 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 99.82% stmts / 98.20% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
+| Passing Tests | 1441/1441 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -274,7 +271,7 @@ per-hero copy anywhere.
 | Phase 1b: Seed Data | ✅ Completed | 5/5 | 10/10 | 100% |
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
-| Phase 3a: Conversation | 🔄 Active | 0/6 | 0/17 | 0% |
+| Phase 3a: Conversation | 🔄 Active | 1/6 | 2/17 | 12% |
 | Phase 3b: Heroes | ⏸️ Pending | 0/6 | 0/16 | 0% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
@@ -297,4 +294,4 @@ per-hero copy anywhere.
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
 
-**Last Auto-Update:** US-024 completed at 2026-09-09 — **Phase 2b is CLOSED at 11/11 · 29/29 pts**, and with it the whole component library. The story built the two elements the client's framing calls the peak of the demo. **The caption strip was reused, not rebuilt:** US-005's `CardCaption` gained a second placement (`section`) rather than a second component, so a tile's truncated foot line and the section narrative that wraps share one implementation, one AI glyph and one decorative `aria-hidden`; `SectionHead` renders that element now, and source scans reject a second glyph in either consumer. **The recommendation panel is structurally not a data tile** — an `aside` region named by its "Recommendation" eyebrow, `rounded-panel` on a tinted surface, a 3px gold bar down the SIDE where a tile's runs across the top, and none of the card's metric chrome — because advice that reads as another metric is a product failure, not a styling nit. **Verbatim fidelity is the load-bearing test:** US-039's recommendation renders byte-identical, straight quotes, ASCII hyphens, `CHF 150k` and `2.2% vs 2.6%` intact, with no clamp and no casing. **Criterion 3 is order,** so DOM order is asserted: the narrative precedes every chart in a section. Gold stayed sanctioned; no new-tile ring appeared. **Next is Phase 3a** — US-028 to US-033: the prompt bar, suggestion chips, intent matching, the staged thinking beat and the fallback panel
+**Last Auto-Update:** US-028 completed at 2026-09-09 — **Phase 3a is open at 1/6 · 2/17 pts**, and the product now has a question box. **The field IS the typing area:** one rounded element carries the border, the search icon and the send button sit inside it as siblings of the `<input>`, and the focus ring is `:focus-within` on that same element with the input's own outline suppressed — the inner bordered box that review reported cannot come back, because a test walks the field's subtree and fails on any descendant carrying a border or a ring. **A real HTML `<form>` was chosen**: the reference build avoided one only because its sandbox swallowed submissions, and in this stack the browser's implicit submission makes Enter and the embedded button ONE path instead of two hand-rolled ones. **Criterion 4 was met without inventing a second clock** — US-015 owns the only pending timer. A submit CONSUMES the question: the cleared value is written to a mirrored ref *before* `onSubmit` runs, so a second submit in the same tick reads an empty draft and takes the no-op branch, and `busy` genuinely disables both controls for US-031's beat. Three rapid Enters, a triple-click on send and a latching harness all yield exactly ONE call. Empty and whitespace-only input do nothing at all, chips untouched. `fixed` rather than `sticky`, because the shell clips overflow and would strand a sticky bar at the bottom of the CONTENT; the canvas reserves the strip so no tile hides under it, and the page keeps scrolling as US-015's Reset expects. **The security trigger fired and passed:** this is the app's only user input, and it is proved to travel as a string — rendered only as an input `value`, no `dangerouslySetInnerHTML`, no URL, request or locator built from it, an `<img onerror>` payload reaching the callback verbatim and creating no element. **Next is US-029** — the three suggestion chips, into the bar's `children` slot

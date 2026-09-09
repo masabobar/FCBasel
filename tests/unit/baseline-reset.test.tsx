@@ -254,7 +254,7 @@ describe("the seam is closed the way US-015 described it", () => {
     // The harness above is only evidence if it is the real tree: the routed
     // page (which renders the baseline row) inside the shell, with the
     // sections after it, and Reset wired to the hook.
-    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}>/);
+    expect(ROOT_SOURCE).toMatch(/<AppShell onReset=\{reset\}/);
     expect(ROOT_SOURCE.indexOf("<Outlet />")).toBeLessThan(
       ROOT_SOURCE.indexOf("<InsightSections"),
     );

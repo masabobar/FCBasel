@@ -6,7 +6,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 **Duration:** Day 3 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 17
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 
 > **The golden rule:** no model is called, no SQL generated, no answer computed live. The
 > "intelligence" is choreography. See [`../constraints.md`](../constraints.md) §2 — *do not "upgrade"
@@ -18,7 +18,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **Priority:** P0
 **Total Story Points:** 17
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 **Source:** Build Specification E5 and decision model §5.2; Reference Implementation Guide §6.
 
 ### Stories:
@@ -27,7 +27,7 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed (2026-09-09)
   - **Description:** A single unified input field at the bottom of the screen, always visible.
   - **Acceptance Criteria:**
     - One rounded field with the search icon and send button **embedded inside it**; no inner
@@ -39,6 +39,16 @@ off-script question never breaks the demo. This choreography is what stands in f
   - **Dependencies:** US-003
   - **Notes:** The reference build deliberately uses no HTML `<form>` (submission failed silently in
     its sandbox). In this stack a form is fine — the behaviour above is what must be preserved.
+  - **Implementation:** `app/components/chrome/prompt-bar.tsx`, mounted by `app/root.tsx` through a
+    new `promptBar` slot on the US-012 shell. **A real `<form>` was used**, so Enter and the embedded
+    button share the browser's implicit submission instead of two hand-rolled paths. One bordered
+    element is the field; the icon and the send button sit inside it as siblings of the `<input>`,
+    and the `:focus-within` ring lives on that same element with the input's own outline suppressed
+    — a test walks the subtree and rejects any descendant border or ring. **Debounce needs no second
+    timer:** a submit consumes the question, clearing a mirrored ref before `onSubmit`, so a
+    re-entrant submit reads an empty draft, and `busy` disables the field for US-031's beat.
+    `fixed`, not `sticky` (the shell clips overflow), with the canvas reserving the strip. Seams for
+    the next stories: `onSubmit` (US-030), `busy` (US-031), `children` (US-029).
 
 - **US-029**: Suggestion chips & chip lifecycle
   - **Story Points:** 3
@@ -134,7 +144,7 @@ off-script question never breaks the demo. This choreography is what stands in f
 
 **By Priority:** P0: 6 stories, 17 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 0 · 🔄 0 · 📋 6 stories, 17 points · ⏸️ 0
+**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 5 stories, 15 points · ⏸️ 0
 
 ---
 
