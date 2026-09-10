@@ -82,6 +82,8 @@ import {
 /* ----------------------------------------------------------------- DATA -- */
 
 const PRIMARY = HEROES.hero1.primary;
+/** The follow-up travels with the primary; US-035's own suite exercises it. */
+const FOLLOW_UP = HEROES.hero1.followUp;
 
 function periodFor(key: PeriodKey): Hero1Period {
   const period = PRIMARY.periods.find((one) => one.key === key);
@@ -498,8 +500,10 @@ describe("Hero 1 — three tiles, in the defined order (criterion 3)", () => {
       "data-phase",
       InsightPhase.WITH_FOLLOW_UP,
     );
+    // Three primary tiles plus the beat's one driver tile. The divider and the
+    // recommendation panel are NOT cards; US-035's suite asserts them.
     expect(cards()).toHaveLength(4);
-    expect(cards()[3]!.style.animationDelay).toBe("270ms");
+    expect(cards()[3]!.style.animationDelay).toBe("360ms");
   });
 });
 
@@ -915,6 +919,7 @@ describe("Hero 1 — a dataset that cannot answer degrades rather than lying", (
     render(
       <Hero1Body
         primary={{ ...PRIMARY, periods: narrowed }}
+        followUp={FOLLOW_UP}
         phase={InsightPhase.PRIMARY}
       />,
     );
@@ -933,6 +938,7 @@ describe("Hero 1 — a dataset that cannot answer degrades rather than lying", (
     const { container } = render(
       <Hero1Body
         primary={{ ...PRIMARY, periods: [] }}
+        followUp={FOLLOW_UP}
         phase={InsightPhase.PRIMARY}
       />,
     );

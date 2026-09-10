@@ -7,7 +7,12 @@ import {
 } from "../../lib/dashboard/sections";
 import { scrollRevealedIntoView, viewTransitionName } from "../../lib/motion";
 import { type HeroId } from "../../lib/repositories/enums";
-import { Card, CardCaption } from "../tiles/card";
+import {
+  Card,
+  CARD_ACCENTS,
+  CardCaption,
+  TILE_ENTER_CLASS,
+} from "../tiles/card";
 
 /**
  * One answered question, as a self-contained insight section on the canvas.
@@ -80,6 +85,87 @@ export function tileDelayMs(index: number): number {
  */
 export function sectionLabelId(heroId: HeroId): string {
   return `insight-${heroId}-label`;
+}
+
+/* -------------------------------------------------- FOLLOW-UP DIVIDER -- */
+
+/**
+ * The word on the divider that opens a follow-up beat. An affordance — "a
+ * second question was asked and this is its answer" — not narrative copy, so
+ * it belongs to the frame rather than to any hero's dataset.
+ */
+export const FOLLOW_UP_DIVIDER_LABEL = "Follow-up";
+
+/**
+ * The rule's thickness. The tile accent is 3px across the top of a card and the
+ * recommendation panel's is 3px down its side; this one is a hairline BELOW
+ * both, because it is a seam in the page rather than an edge of a component.
+ */
+const DIVIDER_RULE_CLASS = "h-[2px]";
+
+/**
+ * The gold "Follow-up" divider — the seam between a section's primary answer
+ * and the beat that interprets it.
+ *
+ * IT LIVES HERE, IN THE FRAME, AND NOT IN A HERO. All three follow-ups open the
+ * same way (US-035 Hero 1, US-037 Hero 2, US-039 Hero 3), so the divider is one
+ * component the heroes import — the alternative is three near-identical gold
+ * rules that drift in thickness, wording and spacing across the three peak
+ * moments of the prototype.
+ *
+ * GOLD IS SPENT ONCE PER BEAT. Colour discipline rule 4 (`app/lib/tokens.ts`)
+ * allows gold in exactly two places, and the follow-up treatment is one of
+ * them. This divider and the beat's `RecommendationPanel` are that treatment
+ * together: the divider says WHERE the beat starts and the panel says WHICH
+ * part of it is advice. A hero must therefore NOT also accent its follow-up
+ * tiles gold — a chart inside the beat is still a chart, and a third gold mark
+ * in one section spends the accent until it means nothing.
+ *
+ * It is a full-width grid item, so it separates rows of the canvas grid rather
+ * than sitting inside a card; and it takes `delayMs` like a tile, so it enters
+ * as the first step of the beat's cascade instead of appearing before it.
+ */
+export function FollowUpDivider({
+  isNew = false,
+  delayMs = 0,
+  className,
+}: {
+  /** Marks a newly inserted divider, so US-006's entrance animation applies. */
+  isNew?: boolean;
+  /** Stagger, in milliseconds, applied to that entrance animation. */
+  delayMs?: number;
+  className?: string;
+}) {
+  return (
+    <div
+      data-slot="follow-up-divider"
+      className={cn(
+        "col-span-full mt-2 flex items-center gap-3",
+        isNew && TILE_ENTER_CLASS,
+        className,
+      )}
+      // Only the stagger is set here; `app/app.css` states the final state
+      // outright under reduced motion, so nothing is left mid-fade.
+      style={delayMs ? { animationDelay: `${delayMs}ms` } : undefined}
+    >
+      <span
+        data-slot="follow-up-divider-label"
+        className="tile-title shrink-0 text-accent-follow-up"
+      >
+        {FOLLOW_UP_DIVIDER_LABEL}
+      </span>
+      {/* Decorative: the word beside it already announces the beat. */}
+      <span
+        data-slot="follow-up-divider-rule"
+        aria-hidden="true"
+        className={cn(
+          "flex-1 rounded-full",
+          DIVIDER_RULE_CLASS,
+          CARD_ACCENTS.gold,
+        )}
+      />
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------ PLACEHOLDER -- */

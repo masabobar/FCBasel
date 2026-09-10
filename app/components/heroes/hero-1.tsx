@@ -4,6 +4,8 @@ import { DonutTile } from "../charts/donut";
 import { HBarTile } from "../charts/h-bars";
 import { VBarTile } from "../charts/v-bars";
 import { Segmented } from "../controls/segmented";
+import { DriverTile } from "../tiles/driver-tile";
+import { RecommendationPanel } from "../tiles/recommendation-panel";
 import { HERO_CHIP_LABEL } from "../../lib/dashboard/chips";
 import {
   InsightPhase,
@@ -14,6 +16,7 @@ import {
   formatMoneyMillions,
   formatNumber,
   formatSharePercent,
+  formatSignedPercent,
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
 import {
@@ -25,11 +28,12 @@ import {
 } from "../../lib/repositories/derive";
 import { HeroId, PeriodKey } from "../../lib/repositories/enums";
 import {
+  type Hero1FollowUp,
   type Hero1Period,
   type Hero1Primary,
 } from "../../lib/repositories/types";
 import {
-  PlaceholderFollowUp,
+  FollowUpDivider,
   SectionHead,
   sectionLabelId,
   tileDelayMs,
@@ -74,8 +78,21 @@ import {
  * `CHF 3.81M` and the narrative's `58%` cannot outlive an edit to the units
  * beneath them. Every string is rendered through `app/lib/format.ts`.
  *
- * THE NARRATIVE IS VERBATIM and is rendered straight from the dataset — this
- * file does not restate it, so there is no second copy to paraphrase.
+ * BOTH NARRATIVES ARE VERBATIM and are rendered straight from the dataset —
+ * this file does not restate either, so there is no second copy to paraphrase.
+ *
+ * ── THE FOLLOW-UP BEAT (US-035) ──────────────────────────────────────────────
+ * "Which badge should we push next?" does NOT append a section. It flips this
+ * one's phase to `withFollowUp` and three more grid rows appear under the three
+ * above: the shared gold `FollowUpDivider`, a `DriverTile` of the badge trend,
+ * and a `RecommendationPanel` carrying the advice. The section that was already
+ * on screen grows; nothing is replaced and nothing is duplicated.
+ *
+ * It is the prototype's first "so-what" moment, so the ORDER OF THE THREE is
+ * the argument: the seam says a second question was asked, the bars show that
+ * Sunrise is moving fastest, and the panel — an `aside`, structurally not a
+ * data tile — says what to do about it. Interpretation is the point; the chart
+ * is only the evidence under it.
  *
  * MERCHANDISING DATA ONLY. The squad names below are PRINT COUNTS — what fans
  * bought — and no performance figure of any kind appears beside them.
@@ -116,6 +133,29 @@ const NAMES_SUBTITLE = "Shirts sold with a name printed";
 /** Separates the two halves of a card's scope line. */
 const SCOPE_SEPARATOR = " · ";
 
+/**
+ * The follow-up tile's title, as the acceptance criteria pin it.
+ *
+ * "last 3 drops" is the SCOPE OF THE MEASUREMENT, not a figure the tile could
+ * derive: the trend entries carry one movement each and nothing in the dataset
+ * counts drops, so this is copy in the same sense the tile titles above are.
+ */
+export const HERO_1_FOLLOW_UP_TITLE = "Badge selection trend (last 3 drops)";
+
+/**
+ * The scope line under that title, and the reason the tile does NOT re-rank.
+ *
+ * The trend arrives in the order sponsors currently sit in `badgeSplit`
+ * (Bitpanda 44 / Sunrise 24 / Allianz 20 / IWB 12), so the list reads down from
+ * the badge people pick today to the one they pick least — which is what makes
+ * Bitpanda's `+2%` read as *flat and already on top* rather than as a small
+ * number that lost a race. `tests/unit/hero1-follow-up.test.tsx` asserts the
+ * two orders agree, so this line cannot start describing an order the dataset
+ * has stopped having.
+ */
+const TREND_SUBTITLE =
+  "Change per sponsor · ordered by current badge selection";
+
 /* -------------------------------------------------------------- GEOMETRY -- */
 
 /**
@@ -141,11 +181,13 @@ export const HERO_1_PERIOD: PeriodKey = PeriodKey.SEASON_TO_DATE;
 export interface Hero1BodyProps {
   /** The Hero 1 primary dataset, from the root loader. */
   primary: Hero1Primary;
+  /** The badge-trend follow-up: the movements, and the advice they turn on. */
+  followUp: Hero1FollowUp;
   /** Primary answer, or primary plus its follow-up (US-035). */
   phase: InsightSection["phase"];
 }
 
-export function Hero1Body({ primary, phase }: Hero1BodyProps) {
+export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
   /**
    * THE ONE PIECE OF PERIOD STATE IN THIS SECTION. Held above all three tiles,
    * which is what makes a single press move every one of them.
@@ -257,7 +299,61 @@ export function Hero1Body({ primary, phase }: Hero1BodyProps) {
       />
 
       {phase === InsightPhase.WITH_FOLLOW_UP && (
-        <PlaceholderFollowUp heroId={HeroId.HERO_1} delayMs={tileDelayMs(3)} />
+        <>
+          {/*
+            The beat opens on the shared gold seam, so the three tiles above
+            stay the answer to the question that was asked and everything below
+            is visibly the answer to the second one. It is a grid item, not a
+            wrapper: the section grows by three more rows and never becomes a
+            box inside a box.
+          */}
+          <FollowUpDivider isNew delayMs={tileDelayMs(3)} />
+
+          <DriverTile
+            title={HERO_1_FOLLOW_UP_TITLE}
+            period={TREND_SUBTITLE}
+            // The trend entries ARE the rows — one movement per sponsor, signed
+            // in the dataset. Nothing is computed and nothing is retyped.
+            rows={followUp.trend.map((entry) => ({
+              name: entry.sponsor,
+              value: entry.deltaPercent,
+            }))}
+            // AUTHORED ORDER, NOT MAGNITUDE. `magnitude` would open the list on
+            // Sunrise's +38 and push Bitpanda to third, which reads as "Bitpanda
+            // is falling behind" — the opposite of the narrative below it.
+            // Held in `badgeSplit` order, the column says "who is picked most"
+            // and the bars say "who is moving", and the beat's point survives:
+            // Sunrise's +38 is the LONGEST bar wherever it sits, because
+            // `HBars` scales every row against the largest magnitude in the
+            // list. See {@link TREND_SUBTITLE}.
+            rank="none"
+            // Percentages, both directions, from `app/lib/format.ts` — the
+            // sign is the movement's meaning, so it is always spelled out.
+            format={formatSignedPercent}
+            series="blue"
+            // No `showTotal`: adding four percentage movements together
+            // produces a number that means nothing, so the badge stays off.
+            // No gold accent either — the divider above and the panel below
+            // are the beat's gold, and a chart in the beat is still a chart.
+            isNew
+            delayMs={tileDelayMs(4)}
+            className={TILE_SPAN}
+          />
+
+          {/*
+            THE SO-WHAT. An `aside`, not a fourth metric card (US-024): it sits
+            beside the bars at `lg` so the room reads the movement and the
+            advice in one glance. The narrative is handed over VERBATIM, from
+            the dataset — this file states no part of it.
+          */}
+          <RecommendationPanel
+            isNew
+            delayMs={tileDelayMs(5)}
+            className={TILE_SPAN}
+          >
+            {followUp.narrative}
+          </RecommendationPanel>
+        </>
       )}
     </>
   );

@@ -43,7 +43,16 @@ export interface InsightSectionsProps {
 /** The head and tiles for one answered question. */
 function heroBody(section: InsightSection, heroes: HeroesData) {
   if (section.heroId === HeroId.HERO_1) {
-    return <Hero1Body primary={heroes.hero1.primary} phase={section.phase} />;
+    // Primary and follow-up are handed over together, as the dataset holds
+    // them: the phase decides how far the section renders, so the beat's
+    // figures are already on the client when the second question is asked.
+    return (
+      <Hero1Body
+        primary={heroes.hero1.primary}
+        followUp={heroes.hero1.followUp}
+        phase={section.phase}
+      />
+    );
   }
 
   return <PlaceholderBody heroId={section.heroId} phase={section.phase} />;
