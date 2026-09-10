@@ -6,14 +6,37 @@
 
 ## Summary
 
-**Total Completed:** 39 stories
-**Total Points:** 102 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 51 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · only Phase 4 remains
+**Total Completed:** 40 stories
+**Total Points:** 104 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 52 points/day
+**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (1/6 · 2/14)**
 
 ---
 
 ## Completed Stories
+
+### US-040: Presentation sizing & responsiveness (2 pts) — **PHASE 4 OPENS**
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 11 unit (2221 green) + 12 Chrome cases
+**Notes:** A measurement story, measured — real Chrome against `pnpm build` + `pnpm start`, with the
+**full run-of-show loaded first** (three heroes, three follow-ups, 15 cards). New:
+`playwright.config.ts` and `tests/e2e/` (spec + demo-script support); `@playwright/test` was already
+a devDependency, so **the lockfile is untouched**. **Clean at eleven
+viewports** — the five the story names, four projector aspect ratios (16:10, 16:9, two 4:3) and both
+tablet orientations: no page horizontal scroll (`scrollWidth === clientWidth` everywhere), no
+in-card scroll (the department table's `overflow-x-auto` never engages at 1024+), no clipped tile,
+no truncated axis label, no SVG text outside its plot, no clipped legend, and **prompt-bar clearance
++10.5px to +11.2px**. Mid-session resize 1920 → 1024 → 1920 with every section open is clean both
+ways. **One real defect fixed:** Top Products' four-option period filter was clipped by 25.7px at
+1152 and 89.7px at 1024, so `WIDE_SPAN` became `col-span-full xl:col-span-6` — the same measurement
+that made US-036 pick `xl`, and **a proved no-op at all five target viewports**. **The favicon
+defect is closed** (three reviews had called it pre-existing): `public/favicon.ico`, a 32x32 ICO
+derived from the already-local crest by `sips` and **re-encoded from raw samples** so only
+`IHDR`/`IDAT`/`IEND` ship, declared by a new `links` export — `200 image/x-icon`, and the full script
+now runs with **zero console errors and zero responses ≥ 400**. Security triage: the external-binary
+trigger fired and the bytes were read back (ICO header, declared length, chunk table consuming the
+buffer exactly); **US-004's XMP/hostname leak did not recur, but `sips` attached `eXIf` and `sRGB`
+of its own** — both dropped, absence asserted. **Two known limitations recorded in `phase-4.md`
+rather than fixed** (the 390px delta-chip overlap; sub-768px generally), with numbers.
 
 ### US-039: Hero 3 follow-up — why Marketing is off plan *(the causal peak)* (3 pts)
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 63
@@ -54,7 +77,6 @@ holds** — FCZ -CHF 150k, Lugano -CHF 110k, Luzern and Sion -CHF 70k, Luzern fi
 the derived order. **Criterion 5 end to end:** 96px + `nowrap` read off the rendered rows. The
 `-CHF 400k total` badge is summed from those rows; narrative byte-identical, seven hyphens at 0x2d,
 "3,200" comma left as authored (US-011's accepted tension).
-
 
 ### US-036: Hero 2 primary — ticket revenue year on year (3 pts)
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 76
@@ -197,18 +219,14 @@ inside its 300-line limit; full detail in [`../phases/phase-2b.md`](../phases/ph
   `driverTotal`, designed at once for all three consumers (US-035 percentages, US-037 negative
   money with the total badge, US-039 positive money)
 - **CRITERION 3 IS ENFORCED TWO WAYS, not asserted.** Every row is US-021's `HBarRow` through
-  `HBarTile` — the tests read the 150px label and 96px `nowrap` columns back off the rows THIS tile
-  produced — and a source scan then rejects the width constants, `H_BAR_SERIES`, `width` /
-  `toFixed`, the motion hooks, every `useState` / timer, gradients and even a second `Card`
-- **RANKING is stable:** `rankDrivers` sorts by magnitude on a COPY and equal values keep arrival
-  order, so Luzern precedes the tied Sion (asserted equal to US-009's `fixtureDeclines`);
-  `rank="none"` keeps US-035's authored order
-- **THE TOTAL IS DERIVED, so the badge cannot disagree with the bars:** `driverTotal` sums what the
-  rows DISPLAY through `hBarDisplayedValue`, giving `-CHF 400k` (equal to `declineTotal`) and
-  `CHF 410k` (equal to `departmentVariance(Marketing)`), re-derived on rerender
-- **Two seams widened rather than forked:** `HBarTile` gained a `children` slot under the bars, and
-  `DeltaChip` an optional `suffix` so `-CHF 400k total` is ONE chip keeping arrow, sign and
-  `sr-only` direction. Reduced motion lands on final widths, figures *and* badge, zero frames
+  `HBarTile` (the 150px label and 96px `nowrap` columns read back off the rows THIS tile produced),
+  and a source scan then rejects the width constants, `H_BAR_SERIES`, `width` / `toFixed`, the
+  motion hooks, every `useState` / timer, gradients and even a second `Card`
+- **RANKING is stable** (magnitude on a COPY, ties keep arrival order, so Luzern precedes Sion;
+  `rank="none"` keeps US-035's order) and **THE TOTAL IS DERIVED**, so the badge cannot disagree
+  with the bars: `driverTotal` sums what the rows DISPLAY, giving `-CHF 400k` and `CHF 410k`
+- **Two seams widened rather than forked:** `HBarTile` gained a `children` slot, `DeltaChip` an
+  optional `suffix`, so `-CHF 400k total` is ONE chip. Reduced motion lands final, zero frames
 - **Security triage: no trigger fires** — `note` / `totalLabel` are React nodes React escapes.
   **One seam:** no real-Chrome pass until US-035 / US-037 / US-039 mount it
 
@@ -220,21 +238,15 @@ Condensed to keep this log inside its 300-line limit; full detail in
 [`../phases/phase-2b.md`](../phases/phase-2b.md).
 
 - `tiles/recommendation-panel.tsx` + the `RECOMMENDATION_VARIANTS` table. **The panel is
-  structurally NOT a tile, and every row of the difference is asserted:** an `aside` named by its
-  "Recommendation" eyebrow, a 3px gold bar down the **side**, `rounded-panel` on a `bg-gold/10`
-  surface, no `shadow-tile`, and none of the card's metric chrome
-- **THE CAPTION STRIP WAS REUSED, NOT REBUILT:** US-005's `CardCaption` gained a `section`
-  placement (wraps, never truncated) beside its `tile` one, so the AI glyph and its escaping exist
-  once; scans reject a second `Sparkles` in either consumer
-- **Verbatim fidelity is the load-bearing test:** US-039's recommendation renders byte-identical
-  (`toBe`), with no truncation or casing class and `toUpperCase` / `.replace(` / `.slice(`
-  scan-rejected — signed-off copy cannot be "improved" on its way to the projector
-- Criterion 3 is ORDER, so DOM order is asserted: the narrative precedes every `svg`, card and the
-  panel, inside a live `InsightSections` render. Gold stayed sanctioned (reached through
-  `CARD_ACCENTS`, no ring or glow); reduced motion lands on the final state with no frame requested
-- **Security triage: no trigger fires** — panel text and captions are React nodes React escapes,
-  proven with an `<img onerror>` string. **One seam:** no real-Chrome pass until US-035/037/039
-  mount it
+  structurally NOT a tile, and every row of the difference is asserted** — an `aside` named by its
+  "Recommendation" eyebrow, gold down the **side**, `rounded-panel` on `bg-gold/10`, no
+  `shadow-tile`, no metric chrome — and **the caption strip was reused, not rebuilt** (US-005's
+  `CardCaption` gained a `section` placement; scans reject a second `Sparkles`)
+- **Verbatim fidelity is the load-bearing test:** US-039's recommendation renders byte-identical,
+  with truncation, casing, `.replace(` and `.slice(` scan-rejected. Criterion 3 is ORDER, so DOM
+  order is asserted in a live render; gold stayed sanctioned; reduced motion lands final
+- **Security triage: no trigger fires** — panel text is a React node React escapes (`<img onerror>`
+  proof). **One seam:** no real-Chrome pass until US-035/037/039 mount it
 
 ## Phase 3a: Conversational Interface — closed 2026-09-10 (6/6 stories · 17/17 pts)
 

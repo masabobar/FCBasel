@@ -2,7 +2,7 @@
 
 **Version:** 1.13.0
 **Last Updated:** 2026-09-10
-**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-10 after US-039 — **the screen is now COMPLETE: every hero beat is real content and the last placeholder in the product is gone.** Hero 3 runs END TO END: its causal follow-up shows Marketing's three spend drivers behind the shared gold seam, with a derived CHF 410k total badge equal to the variance the table above derives, the webshop conversion gap on the same tile, and the recommendation as a gold `aside`. Earlier note, after US-037 — Hero 2 runs end to end. Still no API: no route, no loader change and no request — Chrome records 0 requests after first paint through the whole demo script)*
+**Last Refreshed By `/screen-map`:** *(hand-updated 2026-09-10 after US-040 — **the complete screen was MEASURED in Chrome at eleven viewports with the full demo script loaded, and a favicon was added**: no page or in-card horizontal scroll, no clipped tile, axis label or legend, and the prompt bar clears the canvas everywhere; see the drift report below. Earlier note, after US-039 — **the screen is now COMPLETE: every hero beat is real content and the last placeholder in the product is gone.** Hero 3 runs END TO END: its causal follow-up shows Marketing's three spend drivers behind the shared gold seam, with a derived CHF 410k total badge equal to the variance the table above derives, the webshop conversion gap on the same tile, and the recommendation as a gold `aside`. Earlier note, after US-037 — Hero 2 runs end to end. Still no API: no route, no loader change and no request — Chrome records 0 requests after first paint through the whole demo script)*
 **Status:** Approved
 
 > Hand-curated: navigation hierarchy, screen metadata, story back-links.
@@ -169,9 +169,20 @@ each is the last item on the canvas grid, so the states above are exclusive rath
 
 ---
 
-## 4. Drift Report (hand-checked 2026-09-10, after US-039)
+## 4. Drift Report (hand-checked 2026-09-10, after US-040)
 
 - **Stories referencing screens not in this map:** *(none)*
+- **Routes added by US-040:** *(none)*, and the one asset it adds is static. `public/favicon.ico`
+  (32x32, derived from the already-local crest) is served from `public/` and declared by a `links`
+  export in `app/root.tsx` — no path, no param, no body, no status-code surface, and **no runtime
+  fetch**: `/favicon.ico` was a 404 before this story and is now `200 image/x-icon` from the same
+  origin, which is what removed the console error on every load. SCREEN-001 gained no region, no
+  state and no content; the only layout change is Top Products reflowing to full width below `xl`
+  (its four-option period filter was clipped at 1152 and 1024 — measured). **The screen was measured
+  in Chrome against the built bundle at eleven viewports with the full demo script loaded** — the
+  five presentation sizes, four projector aspect ratios and both tablet orientations — with no page
+  horizontal scroll, no in-card scroll, no clipped tile, label or legend, and positive prompt-bar
+  clearance at every one.
 - **Routes added by US-039:** *(none)*. `app/routes.ts` is untouched and no loader changed: the beat's
   three drivers, its conversion pair and its narrative all travel in the SAME root-loader payload
   US-034 introduced, and the derived total is computed at render time from the rows on screen.

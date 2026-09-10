@@ -205,8 +205,25 @@ describe("BaselineRow — exactly four tiles, in the specified order", () => {
     const [webshop, match, products, partners] = slots("card");
     expect(webshop!.className).toContain("lg:col-span-3");
     expect(match!.className).toContain("lg:col-span-3");
-    expect(products!.className).toContain("lg:col-span-6");
+    expect(products!.className).toContain("xl:col-span-6");
     expect(partners!.className).toContain("col-span-full");
+  });
+
+  /**
+   * US-040, measured in Chrome against the built bundle: Top Products' header
+   * needs 460px for its title block plus the four-option `Segmented`, and
+   * `lg:col-span-6` gives it only 432px at 1152 and 368px at 1024, clipping
+   * "Year to date" against `Card`'s `overflow-hidden` by 25.7px and 89.7px.
+   * `xl:col-span-6` is 496px at 1280 and full width below, so the reflow
+   * happens before the clip can. Do not step this back to `lg` — the same
+   * measurement is why US-036 chose `xl` for Hero 2's tile pair.
+   */
+  it("reflows Top Products to full width below xl, so its filter never clips", () => {
+    renderRow();
+
+    const products = slots("card")[2];
+    expect(products!.className).toContain("col-span-full");
+    expect(products!.className).not.toContain("lg:col-span-6");
   });
 
   it("carries no narrative caption — prose belongs to the answers", () => {

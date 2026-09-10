@@ -6,7 +6,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 **Duration:** Days 5-6 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 
 > **Not in this phase:** new functionality, or anything that changes a hero's content.
 > A live, high-stakes room is unforgiving; one ugly or wrong render in front of the owner is
@@ -18,7 +18,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Priority:** P0
 **Total Story Points:** 14
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 **Source:** Build Specification E8; Framing §4 principle 4 ("Instant and flawless").
 
 ### Stories:
@@ -27,7 +27,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed
   - **Description:** Size the whole surface for a laptop-to-projector setup.
   - **Acceptance Criteria:**
     - Renders correctly at **1920×1080 with no horizontal scroll**; type legible from across a room
@@ -121,11 +121,15 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **By Priority:** P0: 4 stories, 9 points · P1: 2 stories, 5 points · P2: 0
 
-**By Status:** ✅ 0 · 🔄 0 · 📋 6 stories, 14 points · ⏸️ 0
+**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 5 stories, 12 points · ⏸️ 0
+
+> **Known limitations** decided out of scope during this phase are recorded in
+> [`../../output/phases/phase-4.md`](../../output/phases/phase-4.md) under "Known limitations",
+> with the measured numbers. Read them before reopening anything they cover.
 
 ---
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-3b-heroes.md) · [Future →](future.md) · [Dashboard](../../output/progress/DASHBOARD.md)
 
-**Last Updated:** 2026-09-09
+**Last Updated:** 2026-09-10

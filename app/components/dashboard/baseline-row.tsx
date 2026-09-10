@@ -110,9 +110,10 @@ export const TOP_PRODUCTS_PERIOD_LABEL = "Period for top products";
  * 4 below.
  *
  * The two KPI tiles are quarter-width because a single big number needs no more
- * room than that; Top Products takes half because its fixed 150px label column
- * plus a 96px value column leave a bar track that must stay readable at 1080p;
- * and the partner strip takes the full width so its six plates sit in one row
+ * room than that; Top Products takes half from `xl` up because its fixed 150px
+ * label column plus a 96px value column leave a bar track that must stay
+ * readable at 1080p, and the full width below that (see {@link WIDE_SPAN}); and
+ * the partner strip takes the full width so its six plates sit in one row
  * rather than wrapping into an awkward 4 + 2.
  *
  * Every span is a factor of the column count at its breakpoint, so nothing
@@ -125,7 +126,20 @@ export const TOP_PRODUCTS_PERIOD_LABEL = "Period for top products";
  * has about height.
  */
 const KPI_SPAN = "col-span-full self-start sm:col-span-4 lg:col-span-3";
-const WIDE_SPAN = "col-span-full lg:col-span-6";
+/**
+ * Top Products is half-width at `xl` AND ABOVE, NOT at `lg` — measured, the
+ * same way US-036 chose `xl` for Hero 2's tile pair (US-040).
+ *
+ * Six of twelve columns is 496px at 1280 and the tile's header needs 460px of
+ * it (title block plus the four-option `Segmented` in the `action` slot), so it
+ * fits with room to spare at every viewport this prototype is presented at. At
+ * `lg` it does not: 432px at 1152 and 368px at 1024, which clipped the last
+ * period option — "Year to date" — against `Card`'s `overflow-hidden` by 25.7px
+ * and 89.7px respectively. Half-width was never the point; a readable bar track
+ * next to a readable filter row was, and below 1280 the full width is what
+ * delivers it. The reflow costs nothing: the tile simply takes its own row.
+ */
+const WIDE_SPAN = "col-span-full xl:col-span-6";
 const FULL_SPAN = "col-span-full";
 
 /** Header icons. Decorative — `Card` puts the meaning in the title. */

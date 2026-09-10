@@ -23,6 +23,35 @@ import type { Route } from "./+types/root";
 
 import "./app.css";
 
+/**
+ * The browser-tab icon, self-hosted like every other asset
+ * (`constraints.md` §3, "Asset self-hosting").
+ *
+ * WHY THIS EXISTS AT ALL. `public/` held only the crest, so every page load
+ * left the browser probing `/favicon.ico`, getting a 404 and logging a console
+ * error — which US-045's "no console errors" criterion does not permit. Three
+ * reviews recorded it as pre-existing; US-040 owns the shell's chrome, so it is
+ * fixed here.
+ *
+ * DERIVED FROM THE CREST THAT IS ALREADY LOCAL. `public/favicon.ico` is a
+ * one-entry ICO wrapping a 32x32 PNG downsampled from `public/fcb-crest.png`
+ * with macOS `sips` (no image dependency added, exactly as US-004 did) and
+ * re-encoded from raw samples so only `IHDR`/`IDAT`/`IEND` survive — `sips`
+ * attaches an `eXIf` block of its own, and re-encoding is what guarantees none
+ * of it ships. `tests/unit/favicon.test.ts` reads the committed bytes and
+ * proves all of that. Nothing is fetched at runtime.
+ *
+ * DECLARING IT IS HALF THE FIX AND SERVING IT IS THE OTHER HALF. The `<link>`
+ * below is what a browser uses in preference to a bare probe; the file living
+ * at the conventional path is what answers the probe anyway — a bookmark, a
+ * link preview, or a browser that ignores the tag.
+ */
+export const FAVICON_HREF = "/favicon.ico";
+
+export function links(): Route.LinkDescriptors {
+  return [{ rel: "icon", type: "image/x-icon", href: FAVICON_HREF }];
+}
+
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
