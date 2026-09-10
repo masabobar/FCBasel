@@ -1,7 +1,7 @@
 # Phase 3b: Scripted Hero Flows & Narrative Orchestration
 
 **Duration:** 2026-09-13 to 2026-09-14 (~6.6 AI-hours)
-**Status:** In Progress (1/6 · 3/16 pts)
+**Status:** In Progress (2/6 · 5/16 pts)
 **Started:** 2026-09-10
 **Target Completion:** 2026-09-14
 **Actual Completion:** —
@@ -32,12 +32,12 @@ protection.
 
 ### Epic 7: E7 — Scripted Hero Flows (16 story points)
 
-**Priority:** P0 · **Status:** In Progress (1/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
+**Priority:** P0 · **Status:** In Progress (2/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-034 | Hero 1 primary — shirt sales, badge share, printed names | 3 | ✅ Done |
-| US-035 | Hero 1 follow-up — which badge to push next | 2 | 📋 Todo |
+| US-035 | Hero 1 follow-up — which badge to push next | 2 | ✅ Done |
 | US-036 | Hero 2 primary — ticket revenue year on year | 3 | 📋 Todo |
 | US-037 | Hero 2 follow-up — which fixtures are driving the drop | 2 | 📋 Todo |
 | US-038 | Hero 3 primary — department budget vs actual vs target | 3 | 📋 Todo |
@@ -90,9 +90,9 @@ protection.
 > upstream.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 3 / 16 (19%)
-- **Completed Stories:** 1 / 6
-- **Tests Passing:** 1906 / 1906 · **Coverage:** 100% lines (`app/**`) · **Commits:** 1
+- **Completed Story Points:** 5 / 16 (31%)
+- **Completed Stories:** 2 / 6
+- **Tests Passing:** 1949 / 1949 · **Coverage:** 100% lines (`app/**`) · **Commits:** 2
 
 ---
 
@@ -124,6 +124,23 @@ independent and can be built in any order.
 ---
 
 ## Progress Log
+
+### US-035 — Hero 1 follow-up (2 pts) · 2026-09-10 · ✅ Done
+
+The first **so-what** beat, and pure assembly: `DriverTile` (US-023) for the badge trend and
+`RecommendationPanel` (US-024) for the advice, behind a gold **Follow-up** divider placed in
+`hero-section.tsx` so US-037 and US-039 reuse it rather than each making their own.
+
+- **Phase flips, never appends** — showing the follow-up leaves ONE section with the primary tiles
+  in place, and the follow-up chip is withdrawn by US-029's derived visibility.
+- **Narrative renders from the dataset** — the string appears zero times in the component layer,
+  and is asserted byte-identical in tests.
+- 43 tests added (1949 green); lint, format, typecheck, build all clean.
+
+> **Provenance note:** this story's dispatch was interrupted after implementation but before commit.
+> The work was verified independently against its acceptance criteria and all five gates before
+> being committed as `2881275`, rather than trusted or re-run.
+
 
 ### US-034 — Hero 1 primary (3 pts) · 2026-09-10 · ✅ Done
 

@@ -15,6 +15,14 @@
 
 ## Completed Stories
 
+### US-035: Hero 1 follow-up — which badge to push next (2 pts)
+**Completed:** 2026-09-10 · **By:** AI · **Commit:** 2881275 · **Tests Added:** 43
+**Notes:** Pure assembly — DriverTile + RecommendationPanel behind a shared gold Follow-up divider.
+Phase flips rather than appending. Narrative renders from the dataset, absent from the component layer.
+Dispatch was interrupted before commit; the work was independently verified against all five gates
+and its acceptance criteria before being committed.
+
+
 ## Phase 1a: Setup & Design System — closed 2026-09-09 (6 stories · 14 pts)
 
 Condensed to keep this log inside its 300-line limit; the **full per-story detail lives in

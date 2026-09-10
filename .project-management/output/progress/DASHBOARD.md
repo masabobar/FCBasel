@@ -15,7 +15,7 @@
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
 | **Phase 3b** | 19% — In Progress (1/6 · 3/16) | 100% | 🟢 On Track |
 | **Stories Completed** | 34/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 89/116 | 116 | 🟢 On Track |
+| **Story Points Done** | 88/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -24,8 +24,8 @@
 
 ## 📅 Today's Progress (2026-09-10)
 
-**Stories Completed Today:** 2 (US-033, US-034) · **34 total**
-**Currently Working On:** US-035 — Hero 1 follow-up (2 pts)
+**Stories Completed Today:** 3 (US-033, US-034, US-035) · **34 total**
+**Currently Working On:** US-036 — Hero 2 primary, ticket revenue year on year (3 pts)
 **Story Points Completed Today:** 6 · **89 total**
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
@@ -246,7 +246,7 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 99.84% stmts / 98.32% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 1849/1849 | TBD | 🟢 Good |
+| Passing Tests | 1949/1949 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |

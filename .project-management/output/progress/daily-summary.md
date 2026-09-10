@@ -9,7 +9,7 @@
 
 **Stories Completed:** 34 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
 with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scripted answer on screen**.
-**Story Points:** 89
+**Story Points:** 88
 **Time Worked:** ~24.3 hours · **Files Changed:** 277 · **Tests Added:** 1906
 
 ---
