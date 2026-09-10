@@ -31,24 +31,40 @@
  * to be able to build the same view model from a mock.
  */
 
-import { type Hero1, type Hero1Repository } from "../repositories/types";
+import {
+  type Hero1,
+  type Hero1Repository,
+  type Hero2,
+  type Hero2Repository,
+} from "../repositories/types";
 
 /**
  * Everything the inserted sections render, in hero order.
  *
- * Hero 2 and Hero 3 join this object when US-036 and US-038 land; each is one
- * more repository read below and one more field here.
+ * Hero 3 joins this object when US-038 lands: one more repository read below
+ * and one more field here.
  */
 export interface HeroesData {
   /** Merchandising — shirt sales, sponsor badges, printed names. */
   readonly hero1: Hero1;
+  /** Ticketing — matchday revenue by fixture and by month, year on year. */
+  readonly hero2: Hero2;
 }
 
-/** Read the hero datasets out of their repositories, all at once. */
+/**
+ * Read the hero datasets out of their repositories, all at once.
+ *
+ * `Promise.all` rather than one `await` per hero: the reads are independent, so
+ * a slower implementation behind one repository must not serialise the others.
+ */
 export async function loadHeroes(
   hero1Repository: Hero1Repository,
+  hero2Repository: Hero2Repository,
 ): Promise<HeroesData> {
-  const [hero1] = await Promise.all([hero1Repository.hero()]);
+  const [hero1, hero2] = await Promise.all([
+    hero1Repository.hero(),
+    hero2Repository.hero(),
+  ]);
 
-  return { hero1 };
+  return { hero1, hero2 };
 }

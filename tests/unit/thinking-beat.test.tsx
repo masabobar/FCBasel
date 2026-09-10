@@ -737,7 +737,12 @@ describe("the prompt bar is busy for the length of the beat", () => {
   });
 
   it("makes a second submit during the beat a no-op", () => {
-    renderApp();
+    // ON THE REDUCED-MOTION PATH, so `getTimerCount()` still measures what it
+    // claims to. Hero 2's tiles are real content now (US-036) and their
+    // entrance schedules frames of its own; with the preference set, `useGrow`
+    // and `useCountUp` schedule nothing and the only timer the process can hold
+    // is the beat's own.
+    renderApp({ reducedMotion: true });
 
     ask("ticket revenue");
     expect(panel()).not.toBeNull();
@@ -746,7 +751,7 @@ describe("the prompt bar is busy for the length of the beat", () => {
     // be attempted — and US-028's `busy` guard drops it.
     ask("department budgets");
     tap(SEND_BUTTON_LABEL);
-    landBeat();
+    landBeat(true);
 
     expect(sections()).toHaveLength(1);
     expect(sections()[0]).toHaveAttribute("data-hero-id", HeroId.HERO_2);

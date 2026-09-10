@@ -6,14 +6,25 @@
 
 ## Summary
 
-**Total Completed:** 34 stories
-**Total Points:** 89 / 116
+**Total Completed:** 36 stories
+**Total Points:** 94 / 116
 **Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 43 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (1/6 · 3/16)**
+**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (3/6 · 8/16)**
 
 ---
 
 ## Completed Stories
+
+### US-036: Hero 2 primary — ticket revenue year on year (3 pts)
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 76
+**Notes:** First mount of `GroupedBarTile`; the hero holds layout, copy and three formatter
+compositions only (no `<svg>`, no hex, no re-typed figure). One new module, `CompareBars`, borrowing
+`hBarMax` / `hBarPercent` / `H_BAR_SERIES` from US-021 — US-038 reuses it. **Both scope labels on
+screen and the mismatch asserted real** (monthly 9,770 > fixtures 7,830); every total derived, with
+the dataset proved to store none of them. Narrative byte-identical (229 chars, hyphens at 0x2d).
+Chip collision measured in Chrome: 59.5px chips in 83.4px cells, and the pair stacks below `xl`
+because 1024 leaves only 51.8px. Known limit: chips still overlap at a 390px phone, outside the
+1920x1080 presentation target.
 
 ### US-035: Hero 1 follow-up — which badge to push next (2 pts)
 **Completed:** 2026-09-10 · **By:** AI · **Commit:** 2881275 · **Tests Added:** 43

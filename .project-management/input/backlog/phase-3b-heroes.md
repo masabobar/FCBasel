@@ -6,7 +6,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 **Duration:** Days 4-5 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 16
-**Status:** In Progress (2/6 completed)
+**Status:** In Progress (3/6 completed)
 
 > **Applies to every story in this epic:**
 > - Each hero renders its tiles **in the defined order**, with the E2 insertion animation and its
@@ -23,7 +23,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (2/6 completed)
+**Status:** In Progress (3/6 completed)
 **Source:** Build Specification E7 and pattern §5.3; Reference Implementation Guide §8, §13.
 
 ### Stories:
@@ -74,7 +74,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-10)
   - **Description:** *"Show me the ticket revenue of last year and this year. Show me the difference
     for each match - for example FCB vs FCZ, 25/26 vs 26/27."*
   - **Acceptance Criteria:**
@@ -168,7 +168,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **By Priority:** P0: 6 stories, 16 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 5 stories, 13 points · ⏸️ 0
+**By Status:** ✅ 3 stories, 8 points · 🔄 0 · 📋 3 stories, 8 points · ⏸️ 0
 
 ---
 

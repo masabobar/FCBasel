@@ -14,7 +14,10 @@ import { askQuestion } from "./lib/dashboard/intents";
 import { CanvasPanel, useCanvasPanel } from "./lib/dashboard/use-canvas-panel";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 import { useThinking } from "./lib/dashboard/use-thinking";
-import { hero1Repository } from "./lib/repositories/index.server";
+import {
+  hero1Repository,
+  hero2Repository,
+} from "./lib/repositories/index.server";
 import type { Route } from "./+types/root";
 
 import "./app.css";
@@ -51,7 +54,7 @@ export function Layout({ children }: { children: ReactNode }) {
  * surface (`screen-map.md`'s API table stays empty).
  */
 export async function loader() {
-  return await loadHeroes(hero1Repository);
+  return await loadHeroes(hero1Repository, hero2Repository);
 }
 
 /**

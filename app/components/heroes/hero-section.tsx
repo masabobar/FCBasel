@@ -21,10 +21,10 @@ import {
  * This is the INSERTION MACHINERY (US-014): the section frame, its place in
  * the canvas grid, the entrance stagger, and the auto-scroll that brings it
  * into view. WHAT goes inside is per hero and arrives as `children`, chosen by
- * `./insight-sections.tsx` — Hero 1's real content is `./hero-1.tsx` (US-034)
- * and Heroes 2 and 3 are still the **clearly-marked placeholder** below
- * ({@link PlaceholderBody}), which invents no narrative and no number until
- * US-036 and US-038 replace it.
+ * `./insight-sections.tsx` — Hero 1's real content is `./hero-1.tsx` (US-034),
+ * Hero 2's is `./hero-2.tsx` (US-036), and Hero 3 is still the
+ * **clearly-marked placeholder** below ({@link PlaceholderBody}), which invents
+ * no narrative and no number until US-038 replaces it.
  *
  * ONE GRID, NOT TWO. A section is not a box that owns its own layout: it spans
  * the canvas grid's full width and re-uses the parent's column tracks through
@@ -175,7 +175,7 @@ export const PLACEHOLDER_MARKER = "Placeholder";
 
 /** Where the hero's verbatim narrative goes — never paraphrased here. */
 export const PLACEHOLDER_NARRATIVE =
-  "Placeholder — the narrative for this answer is stated here first, verbatim from its dataset (US-036 and US-038).";
+  "Placeholder — the narrative for this answer is stated here first, verbatim from its dataset (US-038).";
 
 /** Where the hero's tiles go. */
 export const PLACEHOLDER_TILE_BODY =
@@ -190,10 +190,10 @@ export const PLACEHOLDER_FOLLOW_UP_BODY =
  * that is already on screen, so the flip is visibly a section GROWING rather
  * than a new section appearing.
  *
- * Still shared by all three heroes, Hero 1 included: US-035, US-037 and US-039
- * replace it one hero at a time. It takes `delayMs` rather than an index
- * because it follows however many tiles its hero rendered — three for Hero 1,
- * one for a hero still on the placeholder.
+ * Still shared by the heroes whose beat is unbuilt: US-035 replaced Hero 1's,
+ * and US-037 and US-039 replace the other two one at a time. It takes `delayMs`
+ * rather than an index because it follows however many tiles its hero rendered
+ * — three for Hero 2, one for a hero still on the placeholder.
  */
 export function PlaceholderFollowUp({
   heroId,
@@ -219,10 +219,10 @@ export function PlaceholderFollowUp({
  * A whole section's stand-in body — head and one tile — for a hero whose real
  * content has not been built yet.
  *
- * THE SEAM: US-036 and US-038 replace this for their hero exactly as US-034 did
- * for Hero 1, by adding a branch to `./insight-sections.tsx` and a module
- * beside `./hero-1.tsx`. Nothing in this file changes, and the hero id stops
- * being rendered at that point — it is an identifier, not a label.
+ * THE SEAM: US-038 replaces this for Hero 3 exactly as US-034 and US-036 did
+ * for Heroes 1 and 2, by adding a branch to `./insight-sections.tsx` and a
+ * module beside `./hero-1.tsx`. Nothing in this file changes, and the hero id
+ * stops being rendered at that point — it is an identifier, not a label.
  */
 export function PlaceholderBody({
   heroId,

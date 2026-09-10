@@ -1,16 +1,17 @@
 # Daily Work Summary
 
 **Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
-**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 + US-034)
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-036)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 34 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
-with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scripted answer on screen**.
-**Story Points:** 88
-**Time Worked:** ~24.3 hours · **Files Changed:** 277 · **Tests Added:** 1906
+**Stories Completed:** 36 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
+with US-033 (6/6 · 17/17) and took Phase 3b to halfway: **Heroes 1 and 2 both answer, and Hero 1
+also so-whats** (US-034 to US-036).
+**Story Points:** 94
+**Time Worked:** ~25.5 hours · **Files Changed:** 288 · **Tests Added:** 2025
 
 ---
 
@@ -124,18 +125,17 @@ with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scrip
   **Criterion ④ by source scan** — `hasSection` has exactly two readers, so gating and chip
   visibility are two readings of ONE list and Reset re-gates for free. **Criterion ⑤ twice** — as a
   property over all 27 sessions and on the real `App`. 46 tests, 1849/1849.
-- **US-034 (2026-09-10) — Hero 1 primary. PHASE 3b OPENS (1/6 · 3/16).** The heart of the prototype
-  starts, and it is **composition, not invention**: `VBarTile` and `DonutTile` reach a screen for the
-  first time beside `HBarTile`, `Segmented` and US-024's head, while `hero-1.tsx` adds only layout,
-  copy and ONE piece of state (no `<svg>` by scan). **One `Segmented` in the SECTION HEAD drives all
-  three tiles** — a single click moves bars, ring and names together, in all four periods and in real
-  Chrome — and **nothing snaps**: mid-flight labels read `16’975 / 7’855 / 4’387`, continuing from the
-  figures on screen. **Narrative byte-identical** (hex, length 214, ASCII sweep, and against the
-  backlog itself). **No figure re-typed**: every displayed number ≥ 100 in all four periods asserted
-  absent from five sources; revenue is `units × CHF 99`, the Home share is `homeKitShare`, and the
-  fixture holds no stored copy. **Badge segments sum exactly** to the centre figure in all four
-  periods. Figures arrive through a new **root loader**; Chrome records 0 requests after paint.
-  57 tests, 1906/1906.
+- **US-034 to US-036 (2026-09-10) — PHASE 3b AT HALFWAY (3/6 · 8/16).** Full account in
+  [`../phases/phase-3b.md`](../phases/phase-3b.md). All three stories are **composition, not
+  invention**: `VBarTile`, `DonutTile` and then `GroupedBarTile` reach a screen for the first time,
+  and neither hero file holds an `<svg>` or a re-typed figure (proved by scan). US-034's ONE
+  `Segmented` in the section head moves bars, ring and names together and **nothing snaps**;
+  US-035 **flips** the section into its so-what beat behind a shared gold divider; US-036 answers
+  Hero 2 with **both scope labels on screen and the mismatch proved real** (monthly 9,770 >
+  fixtures 7,830), every total derived from the eight pairs the bars plot, and the eight delta chips
+  **measured in Chrome** (59.5px in 83.4px cells; the pair stacks below `xl` because 1024 leaves
+  51.8px). Three narratives byte-identical — hex, exact length, ASCII sweep, hyphens at 0x2d, and
+  against the backlog itself. 176 tests, 2025/2025.
 
 ---
 
@@ -202,20 +202,17 @@ with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scrip
   state shows the branded-red panel at **4.5% derived from the red token**. **Phase 3a: 5/6, 14/17.**
 
 - ✅ US-033 — Follow-up context gating (3 pts, 2026-09-10) — all 5 criteria met: a typed follow-up
-  resolves to the deep-dive only once its parent has been shown; otherwise the **parent renders
-  first and the follow-up chip is then offered** to tap, never an error and never nothing; the
-  follow-up **flips** its parent section rather than appending; the section list drives **both**
-  gating and chip visibility (pinned by source scan to one predicate with two readers); and each
-  hero runs start-to-follow-up alone, so the presenter can show just one.
-  **PHASE 3a COMPLETE: 6/6 stories, 17/17 points.**
+  resolves to the deep-dive only once its parent has been shown, otherwise the **parent renders and
+  the chip is then offered**; the follow-up **flips** its parent section; one predicate with two
+  readers drives both gating and chip visibility. **PHASE 3a COMPLETE: 6/6 · 17/17.**
 
-- ✅ US-034 — Hero 1 primary (3 pts, 2026-09-10) — all 6 criteria met: the chip label is the
-  section's heading (imported from US-029's config, not retyped); US-030's keyword set is untouched;
-  the three tiles render **in order** with the pinned figures (22’400 / 10’300 / 5’800, total 38’500
-  shirts · CHF 3.81M; 3’080 ~8%, 44/24/20/12; Shaqiri 3’180 → Daniliuc 760); the narrative is
-  **verbatim**; one section-level `Segmented` drives all three tiles with badge segments derived per
-  period and summing exactly; and a bar's hover reads units, share and revenue while every label
-  counts up on a filter change. **Phase 3b: 1/6 stories, 3/16 points.**
+- ✅ US-034 / US-035 / US-036 (8 pts, 2026-09-10) — every criterion met. Hero 1: three tiles **in
+  order** with the pinned figures, one `Segmented` driving all of them, badge segments summing
+  exactly, and a follow-up beat that flips the section rather than appending. Hero 2: grouped bars
+  over eight fixtures (25/26 navy, 26/27 red) with eight signed delta chips, the totals tile at
+  **CHF 7.83M vs CHF 7.88M, -0.6%** with a down arrow, labelled compare bars and `-CHF 50k`, and the
+  full-width twelve-month chart with the current season filled — **both scopes labelled**. All three
+  narratives **verbatim**. **Phase 3b: 3/6 stories, 8/16 points.**
 
 *(Condensed to keep this log inside its 300-line limit — full detail in
 [`completed.md`](completed.md) and [`../phases/phase-3a.md`](../phases/phase-3a.md).)*
@@ -242,14 +239,17 @@ with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scrip
 - **PHASE 3a IS CLOSED (6/6 · 17/17), and the demo choreography is whole:** a question arrives by
   chip or by typing, waits through the beat and lands; off-script meets the fallback, and a
   follow-up asked cold renders its parent and then offers the chip.
-- **PHASE 3b IS UNDER WAY: US-034 put the first scripted answer on screen** — Hero 1's three tiles
+- **PHASE 3b IS HALFWAY (3/6 · 8/16): US-034 and US-036 put two scripted answers on screen** — Hero 1's tiles
   under one narrative and one period filter, every figure from the US-008 repository through a new
   root loader. It confirmed the phase's premise: assembly plus copy, no new visual.
-- **Next: US-035 — Hero 1 follow-up (2 pts)**, sharpening the section already on screen with the
-  badge-selection trend and a recommendation panel.
+- **US-035 added Hero 1's so-what beat and US-036 answered Hero 2** — the fixture chart's first
+  mount, both scope labels on screen with the mismatch proved real, and the eight delta chips
+  measured in Chrome (59.5px in 83.4px cells).
+- **Next: US-037 — Hero 2 follow-up (2 pts)**, ranking the four declining fixtures behind the gold
+  divider already in the section frame.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
-3a (17 pts, done) + 3b, the demo itself (16 pts, 3 done).
+3a (17 pts, done) + 3b, the demo itself (16 pts, 8 done).
 
 ---
 
@@ -257,8 +257,8 @@ with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scrip
 
 - **The deadline is this week.** Sponsor showing first, owner audience the following week. ~52
   AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
-- Phases 1a, 1b, 2a, 2b and 3a are complete and 3b is under way (89/116 points); continue with
-  `/holycode-pm:execute-work story US-035`.
+- Phases 1a, 1b, 2a, 2b and 3a are complete and 3b is halfway (94/116 points); continue with
+  `/holycode-pm:execute-work story US-037`.
 - **US-028's three seams are now ALL filled:** `children` (US-029), `onSubmit` (US-030) and `busy`
   (US-031), plus `key={generation}` for a half-typed question. **There is exactly one timer in the
   app and a test pins it there:** a story growing its own submit path, timer or chip styling is a

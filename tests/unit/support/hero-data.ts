@@ -1,5 +1,6 @@
 import { type HeroesData, loadHeroes } from "../../../app/lib/dashboard/heroes";
 import { createMockHero1Repository } from "../../../app/lib/mock/hero1";
+import { createMockHero2Repository } from "../../../app/lib/mock/hero2";
 
 /**
  * The hero datasets, read exactly as the root loader reads them (US-034).
@@ -11,4 +12,7 @@ import { createMockHero1Repository } from "../../../app/lib/mock/hero1";
  *
  * Not a `*.test.ts` file, so vitest does not collect it.
  */
-export const HEROES: HeroesData = await loadHeroes(createMockHero1Repository());
+export const HEROES: HeroesData = await loadHeroes(
+  createMockHero1Repository(),
+  createMockHero2Repository(),
+);

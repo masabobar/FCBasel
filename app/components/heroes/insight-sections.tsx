@@ -7,6 +7,7 @@ import {
 import { type RevealFocus } from "../../lib/dashboard/use-dashboard";
 import { HeroId } from "../../lib/repositories/enums";
 import { Hero1Body } from "./hero-1";
+import { Hero2Body } from "./hero-2";
 import { HeroSection, PlaceholderBody } from "./hero-section";
 
 /**
@@ -27,8 +28,8 @@ import { HeroSection, PlaceholderBody } from "./hero-section";
  * IT IS ALSO WHERE A HERO ID BECOMES CONTENT ({@link heroBody}). The dispatch
  * lives here rather than inside `./hero-section.tsx` so the frame does not
  * import the heroes and the heroes can import the frame's head and stagger —
- * one direction, no cycle. US-036 and US-038 each add one branch below and one
- * module beside `./hero-1.tsx`.
+ * one direction, no cycle. US-038 adds the last branch below and one module
+ * beside `./hero-1.tsx` and `./hero-2.tsx`.
  */
 
 export interface InsightSectionsProps {
@@ -53,6 +54,12 @@ function heroBody(section: InsightSection, heroes: HeroesData) {
         phase={section.phase}
       />
     );
+  }
+
+  if (section.heroId === HeroId.HERO_2) {
+    // Hero 2 needs no follow-up data yet: its beat is still the shared
+    // placeholder, and US-037 adds `followUp` here the way US-035 did above.
+    return <Hero2Body primary={heroes.hero2.primary} phase={section.phase} />;
   }
 
   return <PlaceholderBody heroId={section.heroId} phase={section.phase} />;

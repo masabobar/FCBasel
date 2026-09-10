@@ -1,7 +1,7 @@
 # Phase 3b: Scripted Hero Flows & Narrative Orchestration
 
 **Duration:** 2026-09-13 to 2026-09-14 (~6.6 AI-hours)
-**Status:** In Progress (2/6 · 5/16 pts)
+**Status:** In Progress (3/6 · 8/16 pts)
 **Started:** 2026-09-10
 **Target Completion:** 2026-09-14
 **Actual Completion:** —
@@ -32,13 +32,13 @@ protection.
 
 ### Epic 7: E7 — Scripted Hero Flows (16 story points)
 
-**Priority:** P0 · **Status:** In Progress (2/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
+**Priority:** P0 · **Status:** In Progress (3/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-034 | Hero 1 primary — shirt sales, badge share, printed names | 3 | ✅ Done |
 | US-035 | Hero 1 follow-up — which badge to push next | 2 | ✅ Done |
-| US-036 | Hero 2 primary — ticket revenue year on year | 3 | 📋 Todo |
+| US-036 | Hero 2 primary — ticket revenue year on year | 3 | ✅ Done |
 | US-037 | Hero 2 follow-up — which fixtures are driving the drop | 2 | 📋 Todo |
 | US-038 | Hero 3 primary — department budget vs actual vs target | 3 | 📋 Todo |
 | US-039 | Hero 3 follow-up — why Marketing is off plan | 3 | 📋 Todo |
@@ -90,9 +90,9 @@ protection.
 > upstream.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 5 / 16 (31%)
-- **Completed Stories:** 2 / 6
-- **Tests Passing:** 1949 / 1949 · **Coverage:** 100% lines (`app/**`) · **Commits:** 2
+- **Completed Story Points:** 8 / 16 (50%)
+- **Completed Stories:** 3 / 6
+- **Tests Passing:** 2025 / 2025 · **Coverage:** 100% lines (`app/**`) · **Commits:** 3
 
 ---
 
@@ -118,12 +118,57 @@ independent and can be built in any order.
 | Narrative string paraphrased during implementation | High | Medium | Verbatim is an explicit DoD item, checked character-for-character | AI | Open |
 | A figure re-typed into a hero drifts from the dataset | High | Medium | Heroes read E3 only; verified in review | AI | Open |
 | Upstream phase slips and compresses this one | High | Medium | This phase is untouchable in the cut order — cut polish instead | Human | Open |
-| Scope difference between Hero 2's charts reads as an error | Medium | Medium | Both charts labelled with their scope (US-009, US-036) | AI | Open |
+| Scope difference between Hero 2's charts reads as an error | Medium | Medium | Both charts labelled with their scope (US-009, US-036) | AI | ✅ Closed (US-036) |
 | Hero 3 follow-up under-delivers as the emotional peak | High | Low | Recommendation panel visually distinct; narrative leads with cause, not data | AI | Open |
 
 ---
 
 ## Progress Log
+
+### US-036 — Hero 2 primary (3 pts) · 2026-09-10 · ✅ Done
+
+Composition again, and the first mount of `GroupedBarTile` (US-019): `app/components/heroes/hero-2.tsx`
+holds layout, copy and three formatter compositions, and a source scan proves it contains no `<svg>`,
+no hex and no re-typed figure. Only `CompareBars` was new (`app/components/tiles/compare-bars.tsx`) —
+US-021's `HBars` cannot sit in a 4-of-12 KPI tile, its 150px/96px columns being a review decision for
+ranked lists, so the new module borrows `hBarMax`, `hBarPercent` and `H_BAR_SERIES` rather than
+restating any of them. US-038's overall tile reuses it.
+
+- **BOTH SCOPE LABELS ARE ON SCREEN, and the mismatch is asserted as real.** The fixture chart and
+  the totals tile carry `fixtures.scopeLabel` ("Eight highest-grossing home fixtures … excluding the
+  season-ticket base"); the monthly chart carries `monthly.scopeLabel` ("All home fixtures per
+  month …"). The section head deliberately has NO scope line — one line cannot describe two scopes.
+  Tests assert the labels differ AND that the monthly totals genuinely exceed the fixture totals
+  (9,770 > 7,830), so the labels can never describe a difference that stopped existing.
+- **Every total is derived.** `fixtureTotals` sums the same eight pairs the bars plot: `CHF 7.83M`,
+  `CHF 7.88M`, `-CHF 50k` and the headline `-0.6%`. The dataset is asserted to hold no key matching
+  `total|delta|pct|percent|change|sum`, and its serialised form to contain none of those figures;
+  editing FCZ moves the headline to `+1.3%` in test, which is the proof it is not stored.
+- **Narrative byte-identical**: UTF-8 hex against a retyped literal, exact length (229), an ASCII
+  sweep, both hyphens (`(-0.6%)`, `-CHF 150k`) pinned to `0x2d`, and a match against the sentence in
+  the backlog itself. It renders from the dataset; the string is absent from the component layer.
+- **The eight chips do not collide — measured, not assumed.** Geometry: eight equal cells, none
+  overlapping, all right of the axis gutter, and the tallest bar (YB 1,610) stays clear of the chip
+  band. In Chrome the widest chip is 59.5px in an 83.4px cell at 1440 (min gap 25.2px, 13.0px at
+  1280). Chips are bare signed magnitudes (`+130`) with the unit in the title `(CHF 000)`: a
+  money-formatted chip measures **97.6px in an 83.4px cell** and would overlap by 14px, which is why
+  the shared component's `formatDelta` prop is given `formatSignedNumber` here.
+- **The tiles pair at `xl`, not `lg`** — for the same measured reason: two thirds of the canvas at
+  1024 leaves a 51.8px cell, so the pair stacks below `xl` (cell 81.0px) instead. Verified at 1920 /
+  1440 / 1280 / 1024 / 834 / 768: no overlap, no horizontal scroll. *Known limit:* at a 390px phone
+  the cell is 36px and chips still overlap — outside the 1920×1080 presentation target, and a
+  candidate for Phase 4 if phone support is ever wanted.
+- **Chrome pass (built SSR bundle):** three tiles in order, `CHF 7.83M` with `-0.6%` and a down
+  arrow, compare bars `CHF 7.88M` / `CHF 7.83M` on one 336px track, `-CHF 50k vs Season 25/26`,
+  fixture hover `FCZ · Season 25/26 CHF 1'390k · Season 26/27 CHF 1'240k · -CHF 150k`, month hover
+  `Sep · CHF 1'180k / CHF 1'240k`, legend on both charts, re-ask → ONE section / three cards, **zero
+  requests after first paint** and no console error but the pre-existing missing `favicon.ico`.
+  Reduced motion: no zero-height bar, compare fills at 100% / 99.37%, every line drawn.
+- **Security triage — no security-relevant changes detected:** no endpoint, dependency, env var,
+  storage, `innerHTML`, user-supplied URL, request or logging. The root loader gained one more
+  static in-memory read; the data is aggregate ticketing named by opposing CLUB, no PII.
+- 76 new tests, **2025 green**. Hero 2's follow-up keeps the shared placeholder until US-037.
+
 
 ### US-035 — Hero 1 follow-up (2 pts) · 2026-09-10 · ✅ Done
 
@@ -185,5 +230,5 @@ layout, copy and ONE piece of period state, and a source scan proves it holds no
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-10
-**Phase Status:** In Progress (1/6 · 3/16 pts)
+**Phase Status:** In Progress (3/6 · 8/16 pts)
 **Previous:** [Phase 3a](phase-3a.md) · **Next:** [Phase 4 — Hardening](phase-4.md)
