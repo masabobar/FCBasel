@@ -57,9 +57,16 @@ function heroBody(section: InsightSection, heroes: HeroesData) {
   }
 
   if (section.heroId === HeroId.HERO_2) {
-    // Hero 2 needs no follow-up data yet: its beat is still the shared
-    // placeholder, and US-037 adds `followUp` here the way US-035 did above.
-    return <Hero2Body primary={heroes.hero2.primary} phase={section.phase} />;
+    // Handed over together for the same reason: the declining-fixtures beat
+    // (US-037) explains the primary's figures, so both halves of Hero 2 arrive
+    // from the one read the loader already made.
+    return (
+      <Hero2Body
+        primary={heroes.hero2.primary}
+        followUp={heroes.hero2.followUp}
+        phase={section.phase}
+      />
+    );
   }
 
   return <PlaceholderBody heroId={section.heroId} phase={section.phase} />;

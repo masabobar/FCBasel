@@ -6,32 +6,39 @@
 
 ## Summary
 
-**Total Completed:** 36 stories
-**Total Points:** 94 / 116
+**Total Completed:** 37 stories
+**Total Points:** 96 / 116
 **Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 43 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (3/6 · 8/16)**
+**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (4/6 · 10/16)**
 
 ---
 
 ## Completed Stories
 
+### US-037: Hero 2 follow-up — which fixtures are driving the drop (2 pts)
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 56
+**Notes:** The second so-what beat, and the story US-023 was built for — **no module, bar, badge or
+divider was built**: three grid rows join `hero-2.tsx` (shared `FollowUpDivider`, one `DriverTile`,
+`RecommendationPanel` in its navy `narrative` variant). Phase flips, never appends: one section,
+four cards, chip withdrawn. **The tie holds** — FCZ -CHF 150k, Lugano -CHF 110k, Luzern -CHF 70k,
+Sion -CHF 70k, Luzern before Sion, asserted against the dataset's own derived order. **Criterion 5
+end to end:** 96px + `nowrap` read off the rendered rows via `getComputedStyle`. The `-CHF 400k
+total` badge is summed from those rows; narrative byte-identical, seven hyphens at 0x2d, and the
+"3,200" comma left as authored (US-011's accepted tension).
+
 ### US-036: Hero 2 primary — ticket revenue year on year (3 pts)
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 76
 **Notes:** First mount of `GroupedBarTile`; the hero holds layout, copy and three formatter
-compositions only (no `<svg>`, no hex, no re-typed figure). One new module, `CompareBars`, borrowing
-`hBarMax` / `hBarPercent` / `H_BAR_SERIES` from US-021 — US-038 reuses it. **Both scope labels on
-screen and the mismatch asserted real** (monthly 9,770 > fixtures 7,830); every total derived, with
-the dataset proved to store none of them. Narrative byte-identical (229 chars, hyphens at 0x2d).
-Chip collision measured in Chrome: 59.5px chips in 83.4px cells, and the pair stacks below `xl`
-because 1024 leaves only 51.8px. Known limit: chips still overlap at a 390px phone, outside the
-1920x1080 presentation target.
+compositions only, plus one new module (`CompareBars`, borrowing US-021's scale — US-038 reuses it).
+**Both scope labels on screen and the mismatch asserted real** (monthly 9,770 > fixtures 7,830);
+every total derived, narrative byte-identical (229 chars). Chips measured in Chrome (59.5px in
+83.4px cells), so the pair stacks below `xl`; known limit: they overlap at a 390px phone.
 
 ### US-035: Hero 1 follow-up — which badge to push next (2 pts)
 **Completed:** 2026-09-10 · **By:** AI · **Commit:** 2881275 · **Tests Added:** 43
 **Notes:** Pure assembly — DriverTile + RecommendationPanel behind a shared gold Follow-up divider.
-Phase flips rather than appending. Narrative renders from the dataset, absent from the component layer.
-Dispatch was interrupted before commit; the work was independently verified against all five gates
-and its acceptance criteria before being committed.
+Phase flips rather than appending; narrative renders from the dataset. Dispatch was interrupted
+before commit; the work was verified independently against all five gates before being committed.
 
 
 ## Phase 1a: Setup & Design System — closed 2026-09-09 (6 stories · 14 pts)
@@ -250,26 +257,23 @@ detail lives in [`../phases/phase-3a.md`](../phases/phase-3a.md)**, which is the
   `withFollowUpShown` unconditionally **fails 10** of the new tests
 - **ONE GATE (criterion 1):** `renderedKind(sections, heroId, asked)` and `isFollowUpGated` in one
   small module, read by `use-dashboard.ts` (the answer) and `use-thinking.ts` (the beat), so the
-  panel and the canvas cannot disagree. It reads US-030's `INTENT_REQUIRES_PARENT`, which makes the
-  flag load-bearing rather than decorative
+  panel and the canvas cannot disagree. It reads US-030's `INTENT_REQUIRES_PARENT`
 - **THE TWO-STEP, ALL THREE HEROES, ON THE REAL `App` (criterion 2):** cold typed follow-up → the
   **PARENT** renders at `primary` → the follow-up chip is *then* offered → tap → the phase flips.
-  **One section, never two.** Never an error, never the fallback, never the empty state, no
-  `role="alert"`, no `aria-invalid`, and no blame vocabulary in the gate's source
+  **One section, never two.** Never an error, never the fallback, never the empty state, and no
+  blame vocabulary in the gate's source
 - **THE FLIP, NOT AN APPEND (criterion 3):** verified rather than rebuilt — `withFollowUpShown` was
   already correct; idempotence and position-preservation asserted alongside
 - **ONE SOURCE OF TRUTH (criterion 4):** a **source scan** pins `hasSection` and
   `INTENT_REQUIRES_PARENT` to exactly two readers each, so gating and US-029's chip derivation are
-  two readings of ONE list — no parallel registry of shown heroes. The chip path was therefore
-  **already gated by construction**, asserted over all 27 hero × phase sessions; the **typed** path
-  is what this story owns. Reset re-gates every follow-up for free, no reset code touched
-- **HERO INDEPENDENCE (criterion 5), proved twice:** as a property (a hero's gate against the whole
-  session equals its gate against its own entry alone, over all 27 shapes) and on the real `App` —
-  each hero runs primary → follow-up with the other two never touched
+  two readings of ONE list — no parallel registry. The chip path was therefore **already gated by
+  construction** (all 27 sessions); the **typed** path is what this story owns, and Reset re-gates
+  every follow-up for free with no reset code touched
+- **HERO INDEPENDENCE (criterion 5), proved twice:** as a property (over all 27 session shapes) and
+  on the real `App` — each hero runs primary → follow-up with the other two never touched
 - **Documented choice:** a gated cold follow-up shows the **PARENT's** thinking message and sources,
   because the panel must name the answer actually arriving. Asserted per hero, both ways round
-- **US-015's ①②④ re-confirmed closed** (US-013 / US-029 / US-031) in `phase-2a.md` and
-  `phase-2a-shell.md`; nothing dangles
+- **US-015's ①②④ re-confirmed closed** (US-013 / US-029 / US-031); nothing dangles
 - **Security triage — no security-relevant changes detected:** no endpoint, dependency, storage,
   `innerHTML`, URL, request or logging; the gate is a pure function of a section list and a closed
   enum, and the typed string never reaches it
@@ -285,13 +289,11 @@ detail lives in [`../phases/phase-3a.md`](../phases/phase-3a.md)**, which is the
   four periods and in real Chrome. Nothing snaps: same `<rect>` node across a press, mid-flight
   labels 16’975 / 7’855 / 4’387 — never through zero.
 - **Narrative byte-identical** (UTF-8 hex, length 214, ASCII sweep, cross-checked against the
-  backlog); rendered from the dataset, absent from the component layer.
-- **No figure re-typed** — every displayed number ≥ 100 across four periods asserted absent from
-  five source files. Kit revenue and Home share derived; badge segments sum exactly per period.
+  backlog); rendered from the dataset, absent from the component layer. **No figure re-typed** —
+  every displayed number ≥ 100 across four periods asserted absent from five source files.
 - **Chrome pass:** tiles in order, 0 network requests after paint, no overflow, no truncated label.
 - **Security triage:** no security-relevant changes — no endpoint, dependency, env var, storage,
-  `innerHTML`, user URL or logging. Aggregate merchandising only; no PII, no named-individual
-  performance figure (asserted absent).
+  `innerHTML`, user URL or logging. Aggregate merchandising only, no PII (asserted).
 
 ---
 

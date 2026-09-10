@@ -2,7 +2,9 @@ import { GroupedBarTile, groupedBarDelta } from "../charts/grouped-bars";
 import { LineChartTile } from "../charts/line-chart";
 import { CompareBars } from "../tiles/compare-bars";
 import { DeltaChip } from "../tiles/delta-chip";
+import { DriverTile } from "../tiles/driver-tile";
 import { KpiTile } from "../tiles/kpi-tile";
+import { RecommendationPanel } from "../tiles/recommendation-panel";
 import { HERO_CHIP_LABEL } from "../../lib/dashboard/chips";
 import {
   InsightPhase,
@@ -17,11 +19,14 @@ import {
   formatSignedNumber,
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
-import { fixtureTotals } from "../../lib/repositories/derive";
+import { fixtureDeclines, fixtureTotals } from "../../lib/repositories/derive";
 import { HeroId } from "../../lib/repositories/enums";
-import { type Hero2Primary } from "../../lib/repositories/types";
 import {
-  PlaceholderFollowUp,
+  type Hero2FollowUp,
+  type Hero2Primary,
+} from "../../lib/repositories/types";
+import {
+  FollowUpDivider,
   SectionHead,
   sectionLabelId,
   tileDelayMs,
@@ -88,9 +93,24 @@ import {
  *
  * ── THE FOLLOW-UP BEAT (US-037) ─────────────────────────────────────────────
  * "Which fixtures are driving the drop?" flips this section's phase and adds
- * rows BELOW the three tiles — it does not append a section. Until US-037 lands
- * that is the shared, clearly-marked `PlaceholderFollowUp`, which invents no
- * narrative and no number.
+ * three rows BELOW the three tiles — it does not append a section. The shared
+ * gold `FollowUpDivider`, a `DriverTile` of the four declining fixtures, and a
+ * `RecommendationPanel` in its NARRATIVE variant carrying the verbatim
+ * explanation. The section that was already on screen grows.
+ *
+ * IT IS THE SECOND "SO-WHAT" BEAT, and the argument is the order of the three:
+ * the seam says a second question was asked, the bars say WHICH fixtures (FCZ
+ * and Lugano are two thirds of the fall on their own), and the panel says WHY —
+ * attendance, not pricing. The panel is `narrative`, not `recommendation`: this
+ * beat explains rather than prescribes, and gold is already spent on the seam.
+ *
+ * NOT ONE FIGURE IN THE BEAT IS TYPED EITHER. The four declines are
+ * `fixtureDeclines`, derived from the same eight pairs the chart above plots,
+ * and the `-CHF 400k total` badge is US-023's `driverTotal` — computed from the
+ * rows ON SCREEN, so the badge cannot disagree with the bars. Ranking is
+ * US-023's too, and it is STABLE for ties: Luzern and Sion both fell CHF 70k,
+ * and Luzern stays ahead of it because that is the order the fixtures derive
+ * in. Nothing here re-sorts, re-sums or re-states any of that.
  *
  * TICKETING DATA ONLY. A fixture is named by the opposing club; no
  * named-individual figure appears anywhere in this section.
@@ -113,6 +133,39 @@ export const HERO_2_TILE_TITLES = {
 
 /** Reads `Season 26/27 vs Season 25/26` under the headline figure. */
 const VERSUS_WORD = "vs";
+
+/**
+ * The follow-up tile's title — what the beat's bars are a list OF.
+ *
+ * Copy in the same sense the three titles above are: it names the list, it does
+ * not count it. How many fixtures fell and by how much is
+ * `fixtureDeclines`' answer, and it is never restated in a string.
+ */
+export const HERO_2_FOLLOW_UP_TITLE = "Fixtures driving the drop";
+
+/**
+ * The scope line under that title. It states the ORDER, because the order is
+ * the tile's claim: biggest decline first, which is what makes the top row the
+ * fixture to talk about in the room.
+ */
+const DECLINE_SUBTITLE =
+  "Year-on-year fall per fixture · ranked by size of decline";
+
+/**
+ * THE ONE-LINE ATTENDANCE NOTE (criterion 3), under the bars.
+ *
+ * A footnote on the data, not narrative: it says what KIND of cause every bar
+ * in the list shares, so the four rows are not read as four separate stories.
+ *
+ * IT IS DELIBERATELY NOT A COPY OF THE NARRATIVE'S CLAUSE. The dataset's
+ * sentence makes the same point at length ("the fall is driven by lower
+ * attendance rather than pricing", with the FCZ seat count behind it), and this
+ * line is worded independently so the verbatim copy exists in exactly one
+ * place — `tests/unit/hero2-follow-up.test.tsx` scans the component layer for
+ * that clause and fails if it reappears here. It also carries no figure, so
+ * nothing in it can drift from the fixtures.
+ */
+const ATTENDANCE_NOTE = "Every fixture here fell on attendance, not on price.";
 
 /* -------------------------------------------------------------- GEOMETRY -- */
 
@@ -144,6 +197,17 @@ const TOTALS_TILE_SPAN = "col-span-full xl:col-span-4";
 const MONTHLY_TILE_SPAN = "col-span-full";
 
 /**
+ * The beat's two rows: half the grid each at `lg`, so the room reads WHICH
+ * fixtures and WHY in one glance.
+ *
+ * `lg` and not `xl` here, unlike the fixture chart above: a four-row bar list is
+ * a 150px label column plus a 96px value column (US-021), which fits half the
+ * canvas comfortably at 1024 — the eight-chip collision that forced the
+ * fixture chart to `xl` has nothing to do with this tile.
+ */
+const FOLLOW_UP_TILE_SPAN = "col-span-full lg:col-span-6";
+
+/**
  * View-box height of the monthly chart, in the chart's own units. Taller than
  * the hero band's 168, because this one is the full width of the canvas.
  *
@@ -160,11 +224,17 @@ const MONTHLY_CHART_HEIGHT = 220;
 export interface Hero2BodyProps {
   /** The Hero 2 primary dataset, from the root loader. */
   primary: Hero2Primary;
+  /**
+   * The declining-fixtures follow-up. It carries the VERBATIM explanation and
+   * nothing else — the four declines and their total are derived from
+   * `primary.fixtures` below, never stored beside the sentence.
+   */
+  followUp: Hero2FollowUp;
   /** Primary answer, or primary plus its follow-up (US-037). */
   phase: InsightSection["phase"];
 }
 
-export function Hero2Body({ primary, phase }: Hero2BodyProps) {
+export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
   const { previousSeason, currentSeason, fixtures, monthly } = primary;
 
   // The chart's own shape: the fixture IS the pair's identity, so the bars
@@ -178,6 +248,10 @@ export function Hero2Body({ primary, phase }: Hero2BodyProps) {
   // DERIVED, from the same eight pairs the bars above plot. There is no stored
   // total anywhere in the dataset to read instead.
   const totals = fixtureTotals(fixtures.fixtures);
+
+  // The follow-up's four rows, from those same pairs: the fixtures that fell,
+  // biggest fall first, with equal falls in fixture order (Luzern, then Sion).
+  const declines = fixtureDeclines(fixtures.fixtures);
 
   return (
     <>
@@ -317,10 +391,61 @@ export function Hero2Body({ primary, phase }: Hero2BodyProps) {
       />
 
       {phase === InsightPhase.WITH_FOLLOW_UP && (
-        // US-037 replaces this with the declining-fixtures beat: a gold
-        // divider, the ranked declines and the verbatim advice. Until then the
-        // shared placeholder, which invents nothing.
-        <PlaceholderFollowUp heroId={HeroId.HERO_2} delayMs={tileDelayMs(3)} />
+        <>
+          {/*
+            The beat opens on the shared gold seam — the same component Hero 1's
+            beat opens on, never a second gold rule. It is a grid item, so the
+            section grows by three more rows instead of becoming a box in a box.
+          */}
+          <FollowUpDivider isNew delayMs={tileDelayMs(3)} />
+
+          <DriverTile
+            title={HERO_2_FOLLOW_UP_TITLE}
+            period={DECLINE_SUBTITLE}
+            // DERIVED, from the eight pairs the chart above plots: the four
+            // fixtures that fell, each as the SIZE of its fall. There is no
+            // stored list of declines to read instead.
+            rows={declines.map((decline) => ({
+              name: decline.opponent,
+              value: decline.drop,
+            }))}
+            // Every row is a decline, so the tile shows the magnitudes as
+            // negative money and grows them leftwards in the variance token —
+            // and `-CHF 150k` gets its minus BEFORE the unit (US-021).
+            negative
+            // The same composition the hover boxes use, so the beat and the
+            // chart above spell CHF thousands identically. The 96px `nowrap`
+            // value column keeps `-CHF 150k` on one line.
+            format={money}
+            // MAGNITUDE ORDER, the tile's default: biggest decline first, and
+            // stable for ties, so Luzern stays ahead of Sion.
+            //
+            // `-CHF 400k total` in the card's action slot, summed by US-023
+            // from the rows above it. No literal is passed and no judgement is
+            // needed: a decline's sign IS its meaning.
+            showTotal
+            note={ATTENDANCE_NOTE}
+            isNew
+            delayMs={tileDelayMs(4)}
+            className={FOLLOW_UP_TILE_SPAN}
+          />
+
+          {/*
+            THE SO-WHAT. An `aside`, not a fourth metric card (US-024). The
+            NARRATIVE variant, because this beat interprets rather than
+            prescribes — and because gold is spent once per beat, on the seam
+            above. The sentence is handed over VERBATIM, from the dataset; this
+            file states no part of it.
+          */}
+          <RecommendationPanel
+            variant="narrative"
+            isNew
+            delayMs={tileDelayMs(5)}
+            className={FOLLOW_UP_TILE_SPAN}
+          >
+            {followUp.narrative}
+          </RecommendationPanel>
+        </>
       )}
     </>
   );

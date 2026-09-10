@@ -84,6 +84,7 @@ import {
 /* ----------------------------------------------------------------- DATA -- */
 
 const PRIMARY = HEROES.hero2.primary;
+const FOLLOW_UP = HEROES.hero2.followUp;
 const FIXTURES = PRIMARY.fixtures.fixtures;
 const MONTHS = PRIMARY.monthly.months;
 const TOTALS = fixtureTotals(FIXTURES);
@@ -1044,8 +1045,9 @@ describe("Hero 2 — asking twice refreshes the section in place", () => {
       withFollowUpShown(withHeroShown([], HeroId.HERO_2), HeroId.HERO_2),
     );
 
-    // US-037 fills it in; until then the beat is the shared placeholder, and
-    // it is a fourth tile of THIS section rather than a second section.
+    // The beat (US-037) is a fourth tile of THIS section plus its seam and its
+    // panel, never a second section. Its content is asserted in
+    // `tests/unit/hero2-follow-up.test.tsx`.
     expect(slots("insight-section")).toHaveLength(1);
     expect(section()).toHaveAttribute(
       "data-phase",
@@ -1128,7 +1130,13 @@ describe("Hero 2 — reduced motion shows the final state, not a frozen one", ()
 describe("Hero2Body — the section body, mounted directly", () => {
   it("renders the head and the three tiles without the frame around it", () => {
     const frames = stubFrames();
-    render(<Hero2Body primary={PRIMARY} phase={InsightPhase.PRIMARY} />);
+    render(
+      <Hero2Body
+        primary={PRIMARY}
+        followUp={FOLLOW_UP}
+        phase={InsightPhase.PRIMARY}
+      />,
+    );
     settle(frames);
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(

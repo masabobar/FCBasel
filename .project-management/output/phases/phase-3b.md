@@ -1,7 +1,7 @@
 # Phase 3b: Scripted Hero Flows & Narrative Orchestration
 
 **Duration:** 2026-09-13 to 2026-09-14 (~6.6 AI-hours)
-**Status:** In Progress (3/6 · 8/16 pts)
+**Status:** In Progress (4/6 · 10/16 pts)
 **Started:** 2026-09-10
 **Target Completion:** 2026-09-14
 **Actual Completion:** —
@@ -32,14 +32,14 @@ protection.
 
 ### Epic 7: E7 — Scripted Hero Flows (16 story points)
 
-**Priority:** P0 · **Status:** In Progress (3/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
+**Priority:** P0 · **Status:** In Progress (4/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
 | US-034 | Hero 1 primary — shirt sales, badge share, printed names | 3 | ✅ Done |
 | US-035 | Hero 1 follow-up — which badge to push next | 2 | ✅ Done |
 | US-036 | Hero 2 primary — ticket revenue year on year | 3 | ✅ Done |
-| US-037 | Hero 2 follow-up — which fixtures are driving the drop | 2 | 📋 Todo |
+| US-037 | Hero 2 follow-up — which fixtures are driving the drop | 2 | ✅ Done |
 | US-038 | Hero 3 primary — department budget vs actual vs target | 3 | 📋 Todo |
 | US-039 | Hero 3 follow-up — why Marketing is off plan | 3 | 📋 Todo |
 
@@ -90,9 +90,9 @@ protection.
 > upstream.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 8 / 16 (50%)
-- **Completed Stories:** 3 / 6
-- **Tests Passing:** 2025 / 2025 · **Coverage:** 100% lines (`app/**`) · **Commits:** 3
+- **Completed Story Points:** 10 / 16 (63%)
+- **Completed Stories:** 4 / 6
+- **Tests Passing:** 2081 / 2081 · **Coverage:** 100% lines (`app/**`) · **Commits:** 4
 
 ---
 
@@ -124,6 +124,45 @@ independent and can be built in any order.
 ---
 
 ## Progress Log
+
+### US-037 — Hero 2 follow-up (2 pts) · 2026-09-10 · ✅ Done
+
+The **second so-what beat**, and the story US-023 was built for: `hero-2.tsx` gained a phase branch
+of three grid rows — US-035's shared `FollowUpDivider`, one `DriverTile`, and `RecommendationPanel`
+in its **`narrative` variant** — and **no new module, no bar, no badge and no divider was built**.
+The tile's own ranking, its derived total, its formatter pass-through and its note slot were all
+already there; the hero contributes one row mapping, one span, two copy strings and the note.
+
+- **The phase FLIPS, it does not append.** One section, four cards: the three primary tiles stay in
+  place (`CHF 7.83M`, eight fixture pairs, both lines still on screen) and the beat joins the same
+  cascade at steps 3/4/5. The follow-up chip is withdrawn by US-029's derived visibility, proved on
+  the real `App` from the chip row. No placeholder text survives anywhere in the section.
+- **Four declines, ranked, and THE TIE HOLDS.** `fixtureDeclines` picks the fallers from the same
+  eight pairs the chart above plots — FCZ `-CHF 150k`, Lugano `-CHF 110k`, Luzern `-CHF 70k`, Sion
+  `-CHF 70k` — and **Luzern precedes Sion** in the rendered rows, asserted against the dataset's own
+  order and against fixture order. US-023's rank is stable (ES2019 `sort`), so the demo cannot
+  reshuffle between runs. The four risers are asserted absent, so the list is the fallers exactly.
+- **Criterion 5 asserted END TO END on the rendered rows.** `getComputedStyle` reads **96px** and
+  `white-space: nowrap` off every value cell in this section, plus one text node and no break for
+  `-CHF 150k` and `-CHF 110k` — US-021's "must not be reverted" decision, verified where it matters
+  rather than only in the component's own suite.
+- **`-CHF 400k total` is DERIVED from the rows on screen** (US-023's `driverTotal` through
+  `hBarDisplayedValue`), in the card's action slot with the down arrow, the explicit sign and the
+  `sr-only` word. No literal `400` exists in the component layer, and halving FCZ's fall moves both
+  the ranking (Lugano first) and the badge (`-CHF 300k`) in test.
+- **Narrative byte-identical**: UTF-8 hex against a retyped literal, exact length, an ASCII sweep,
+  **all seven hyphens** pinned to `0x2d` (`(-CHF 150k)`, `(-110k)`, `(-70k)`, `pricing - the`,
+  `Friday-night`, `kick-off`), and a match against the sentence in the backlog itself. The
+  **"3,200" comma is left exactly as authored** — hand-authored prose against the app's U+2019
+  separator, the tension US-011 recorded as known and accepted — and asserted as such.
+- **The attendance note is worded independently of the narrative** so the verbatim clause exists in
+  one place only; a source scan fails if "lower attendance rather than pricing" reappears in code.
+  The panel is the **navy `narrative` variant**, not the gold one: this beat interprets rather than
+  advises, and gold is spent once per beat, on the seam (asserted: exactly one gold mark).
+- **Security triage — no security-relevant changes detected:** no endpoint, route, dependency, env
+  var, storage, raw SQL, `innerHTML`, user-supplied URL, request or logging. One existing loader
+  field is now read by one more component; the data is aggregate ticketing named by opposing CLUB.
+- 56 new tests, **2081 green** (52 files). Hero 3 keeps its placeholder body until US-038.
 
 ### US-036 — Hero 2 primary (3 pts) · 2026-09-10 · ✅ Done
 
@@ -230,5 +269,5 @@ layout, copy and ONE piece of period state, and a source scan proves it holds no
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-10
-**Phase Status:** In Progress (3/6 · 8/16 pts)
+**Phase Status:** In Progress (4/6 · 10/16 pts)
 **Previous:** [Phase 3a](phase-3a.md) · **Next:** [Phase 4 — Hardening](phase-4.md)

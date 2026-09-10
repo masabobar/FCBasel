@@ -190,10 +190,10 @@ export const PLACEHOLDER_FOLLOW_UP_BODY =
  * that is already on screen, so the flip is visibly a section GROWING rather
  * than a new section appearing.
  *
- * Still shared by the heroes whose beat is unbuilt: US-035 replaced Hero 1's,
- * and US-037 and US-039 replace the other two one at a time. It takes `delayMs`
- * rather than an index because it follows however many tiles its hero rendered
- * — three for Hero 2, one for a hero still on the placeholder.
+ * Still shared by the heroes whose beat is unbuilt: US-035 replaced Hero 1's
+ * and US-037 replaced Hero 2's, so only US-039's Hero 3 reaches this now. It
+ * takes `delayMs` rather than an index because it follows however many tiles
+ * its hero rendered — one for a hero still on the placeholder body.
  */
 export function PlaceholderFollowUp({
   heroId,
