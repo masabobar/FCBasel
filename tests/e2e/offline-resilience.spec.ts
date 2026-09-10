@@ -2,9 +2,13 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { BASE_URL } from "../../playwright.config";
 import {
+  BEAT_MS,
   expectAnswerLanded,
   FOLLOW_UP_CHIP,
   HERO_CHIP,
+  PROMPT_INPUT_LABEL,
+  RESET_LABEL,
+  SEND_BUTTON_LABEL,
   tapChip,
 } from "./support/demo-script";
 import {
@@ -97,13 +101,6 @@ const FALLBACK_MESSAGE =
  * has ever needed a network.
  */
 const OFF_SCRIPT_QUESTION = "what is the weather in basel";
-
-const PROMPT_INPUT_LABEL = "Ask a question about the club";
-const SEND_BUTTON_LABEL = "Send question";
-const RESET_LABEL = "Reset";
-
-/** `THINKING_DELAY_MS` in `app/lib/dashboard/thinking.ts`, plus a margin. */
-const BEAT_MS = 1_150;
 
 /* --------------------------------------------------------------- LOCATORS -- */
 

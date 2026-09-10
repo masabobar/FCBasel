@@ -47,6 +47,28 @@ export const FOLLOW_UP_CHIP = {
   budgets: "Why is Marketing over budget & behind target?",
 } as const;
 
+/**
+ * The three controls a presenter reaches for, by the accessible name on
+ * screen — `app/components/chrome/prompt-bar.tsx` and `./top-bar.tsx`.
+ *
+ * Here rather than in each spec because all three e2e suites drive them and
+ * US-042's sweep drives them dozens of times; a fourth copy of the same string
+ * literal is a fourth place a label change can hide.
+ */
+export const PROMPT_INPUT_LABEL = "Ask a question about the club";
+export const SEND_BUTTON_LABEL = "Send question";
+export const RESET_LABEL = "Reset";
+
+/**
+ * `THINKING_DELAY_MS` in `app/lib/dashboard/thinking.ts`.
+ *
+ * Never used to wait for an answer — the counters in
+ * {@link expectAnswerLanded} do that, and waiting on a clock instead would be
+ * a race. It is used only to wait PAST the beat, to prove a cancelled one
+ * never lands.
+ */
+export const BEAT_MS = 1_150;
+
 /** The run-of-show as US-040 asks it: each hero, then its follow-up. */
 export const DEMO_SCRIPT = [
   { chip: HERO_CHIP.shirts, kind: "hero" },

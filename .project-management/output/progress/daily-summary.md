@@ -1,17 +1,18 @@
 # Daily Work Summary
 
 **Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
-**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-041)
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-042)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 41 — **Phases 1a, 1b, 2a, 2b, 3a AND 3b ALL complete.** Day 2 closed Phase 3a
+**Stories Completed:** 42 — **Phases 1a, 1b, 2a, 2b, 3a AND 3b ALL complete.** Day 2 closed Phase 3a
 with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the causal peak**, and then
-opened Phase 4 with US-040 (eleven viewports measured) and **US-041, which severed the network and
-found two real runtime fetches**. **Story Points:** 106
-**Time Worked:** ~31 hours · **Files Changed:** 324 · **Tests Added:** 2225 unit + 16 Chrome cases
+took Phase 4 to 3/6: US-040 (eleven viewports measured), **US-041, which severed the network and
+found two real runtime fetches**, and **US-042, which pressed the whole interactive surface**.
+**Story Points:** 109
+**Time Worked:** ~32 hours · **Files Changed:** 328 · **Tests Added:** 2225 unit + 32 Chrome cases
 
 ---
 
@@ -21,8 +22,7 @@ found two real runtime fetches**. **Story Points:** 106
   [`../phases/phase-1a.md`](../phases/phase-1a.md): the RR 7.18 SSR scaffold verified by execution
   (Railway deploy still a human step), ESLint 9 + Prettier + husky with the hook *proved* to fire,
   one design-token set held in lockstep by a drift test, the crest self-hosted after verifying its
-  bytes, one `Card` shell of collapsing slots, and four keyframes where **reduced motion renders
-  final state**.
+  bytes, one `Card` shell, and four keyframes where **reduced motion renders final state**.
 - **Phase 1b — US-007 to US-011 (10 pts), closed.** Condensed; full account in
   [`../phases/phase-1b.md`](../phases/phase-1b.md). US-007 set the shape (enums, types, repository
   interface, server-only selection, every headline **computed from the series**); US-008 to US-010
@@ -39,9 +39,8 @@ found two real runtime fetches**. **Story Points:** 106
   refreshing in place. And Reset as a **fourth transition, not a mode**, cancelling the pending
   beat first and idempotent by reference. 592/592 green.
 - **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
-  depends on. **Count-up counts from the figure on screen, not from zero** (a target changed
-  mid-flight opens the new animation *on that very figure*), and **reduced motion means final state
-  in the same render** with **zero** frames requested. 52 tests.
+  depends on. **Count-up counts from the figure on screen, not from zero**, and **reduced motion
+  means final state in the same render** with **zero** frames requested. 52 tests.
 - **US-017 — KPI tile & variance chip.** The shape the other nine follow. **"Colour is never the
   sole signal" stops being a slogan:** on navy the up and down chips' class strings are asserted
   **identical** while glyph, sign and spoken word differ. **Direction is arithmetic, judgement is
@@ -49,11 +48,9 @@ found two real runtime fetches**. **Story Points:** 106
 - **US-021 — Horizontal bar tile.** The most reused chart, built once for five consumers. **Both
   review decisions are read back off the rendered element:** a 150px label column with truncation
   *rejected* and a 96px `nowrap` value column via `getComputedStyle`. 55 tests.
-- **US-016 — Hero band. Phase 2a is closed (5/5 · 16/16).** The navy band above the baseline row,
-  and the first thing to mount `LineChart` and `Segmented`. **ONE `Segmented` drives both halves**
+- **US-016 — Hero band. Phase 2a is closed (5/5 · 16/16).** **ONE `Segmented` drives both halves**
   from a single `BaselinePeriod` entry, so the chart and the new `AttendanceRing` cannot disagree
-  about the month — the shape US-034 reused for three tiles. **The total and its delta are
-  `seriesTotals` off the plotted array.** Chrome-verified at 1920×1080. 92 tests.
+  about the month — the shape US-034 reused for three tiles. Chrome-verified at 1920×1080. 92 tests.
 - **US-018 — Vertical bar chart tile.** The kit-split chart US-034 composes. **Bar persistence is
   the story and the test is a re-rank:** columns keyed by category, so a filter press hands `Home`
   the *same* `<rect>` — an index key **fails exactly two tests**. 52 tests.
@@ -69,11 +66,10 @@ found two real runtime fetches**. **Story Points:** 106
   trap is closed by construction:** colour comes from `row.judgement` (US-010) through `DeltaChip`,
   so **Marketing's +410 renders ADVERSE** while Sponsoring's +840 renders FAVOURABLE, with a scan
   blocking the judgement migrating back in. 54 tests, 1315/1315.
-- **US-023 — Driver / breakdown tile.** `DriverTile`, `DriverTotalBadge` and the pure
-  `rankDrivers` / `driverTotal`, for all three causal follow-ups. **It draws no bars, and the tests
-  keep it that way** (every row is US-021's `HBarRow`; a scan rejects bar geometry, the width
-  constants, the motion hooks and local state), adding tie-stable ranking, a total **derived from
-  the rows on screen**, and a note line. 43 tests, 1358/1358.
+- **US-023 — Driver / breakdown tile.** For all three causal follow-ups. **It draws no bars, and the
+  tests keep it that way** (every row is US-021's `HBarRow`; a scan rejects bar geometry, the width
+  constants, the motion hooks and local state), plus tie-stable ranking and a total **derived from
+  the rows on screen**. 43 tests, 1358/1358.
 - **US-024 — Recommendation panel & narrative caption strip.** The last story of Phase 2b. **The
   strip was reused, not rebuilt**, and **the panel is structurally not a tile** — an `aside`, told
   apart from a `Card` by test. **Verbatim byte for byte**; narrative before every chart. 35, 1393.
@@ -85,10 +81,9 @@ found two real runtime fetches**. **Story Points:** 106
   **no line of code** — the phase flip stops deriving it. Proved over **all 27** hero × phase
   combinations; **US-015's criterion ② is thereby SATISFIED**. 57 tests, 1498/1498.
 - **US-030 — Intent normalisation, scoring & tie-breaking. A freely TYPED question now resolves
-  (3/6 · 10/17), and this was the riskiest story in the build.** The acceptance is qualitative, so
-  **the suite is the deliverable as much as the code — A FAITHFUL PORT, VERIFIED NOT TRUSTED:**
-  normalise → **+2 / +1** → threshold **2 hero / 3 follow-up** → **strictly-greater** over an
-  ordered config, with an **oracle** test asserting identical scores *and* winners over a 90-phrase
+  (3/6 · 10/17), and this was the riskiest story in the build.** **A FAITHFUL PORT, VERIFIED NOT
+  TRUSTED:** normalise → **+2 / +1** → threshold **2 hero / 3 follow-up** → **strictly-greater** over
+  an ordered config, with an **oracle** test asserting identical scores *and* winners over a 90-phrase
   corpus. **34 paraphrases**; a three-way 2/2/2 tie goes to Hero 1; one input yields **one** match
   or `null`; **the two inherited over-matches are PINNED**. No model, no dependency — scanned. 89.
 - **US-031 — Thinking beat. The answer no longer appears the instant it is asked, and it is
@@ -106,33 +101,28 @@ found two real runtime fetches**. **Story Points:** 106
   the 2 source-scan tests — so the story is the rule made explicit and proved, with the dead end
   guarded by **mutation** (the ungated call fails 10 tests). **The two-step runs on the real `App`
   for all three heroes:** cold typed follow-up → PARENT at `primary` → chip offered → tap → phase
-  flips, one section never two. **Criterion ④ by source scan** (`hasSection` has exactly two
-  readers, so Reset re-gates for free) and **⑤ twice**, as a property over all 27 sessions and on
-  the real `App`. 46 tests, 1849/1849.
+  flips, one section never two. **Criterion ④ by source scan**, **⑤ twice** — a property over all 27
+  sessions and on the real `App`. 46 tests, 1849/1849.
 - **US-034 to US-039 (2026-09-10) — PHASE 3b COMPLETE, 6/6 · 16/16.** Condensed; full account in
   [`../phases/phase-3b.md`](../phases/phase-3b.md). All six are **composition, not invention**:
-  `VBarTile`, `DonutTile`, `GroupedBarTile` and `DepartmentTableTile` each reach a screen for the
-  first time, no hero file holds an `<svg>`, a `<table>` or a re-typed figure (proved by scan), and
-  **US-037 built nothing at all**. US-034's ONE `Segmented` moves bars, ring and names together
-  with nothing snapping; US-036 puts both scope labels on screen with the mismatch proved real;
-  **US-038 settles the revenue/cost trap in front of the owner** (Marketing's +0.41 ADVERSE against
-  Sponsoring's +0.84 FAVOURABLE); **US-039 is the causal peak** — three drivers whose derived
-  `CHF 410k total` **equals** Marketing's variance — and it deleted `PlaceholderFollowUp`, so **no
-  stand-in is left in the product**. Six narratives byte-identical. 361 tests, 2210/2210.
+  four tiles reach a screen for the first time, no hero file holds an `<svg>`, a `<table>` or a
+  re-typed figure (proved by scan), and **US-037 built nothing at all**. US-034's ONE `Segmented`
+  moves bars, ring and names together with nothing snapping; **US-038 settles the revenue/cost trap
+  in front of the owner** (Marketing's +0.41 ADVERSE against Sponsoring's +0.84 FAVOURABLE);
+  **US-039 is the causal peak** — three drivers whose derived `CHF 410k total` **equals** Marketing's
+  variance — and it deleted `PlaceholderFollowUp`, so **no stand-in is left in the product**. Six
+  narratives byte-identical. 361 tests, 2210/2210.
 - **US-040 (2026-09-10) — PHASE 4 OPENS. The story is a measurement, so it was measured.** Full
   account in [`../phases/phase-4.md`](../phases/phase-4.md). Real Chrome against the **built SSR
   bundle**, with the **full run-of-show loaded before any reading was taken** — new
-  `playwright.config.ts` and `tests/e2e/`, and **no dependency added** (`@playwright/test` was
-  already there). **Clean at eleven viewports** (the five named, four projector aspect ratios, both
-  tablet orientations): no page or in-card horizontal scroll, no clipped tile, axis label or legend,
-  no SVG text outside its plot, prompt-bar clearance +10.5px to +11.2px, and a mid-session
-  1920 → 1024 → 1920 resize clean **both ways**. **One real defect fixed** — Top Products' four
-  option filter was clipped 25.7px at 1152 and 89.7px at 1024, so `WIDE_SPAN` moved to
-  `xl:col-span-6`, US-036's precedent, **proved a no-op at every target viewport**. **And the
+  `playwright.config.ts` and `tests/e2e/`, and **no dependency added**. **Clean at eleven viewports**
+  (the five named, four projector aspect ratios, both tablet orientations): no page or in-card
+  horizontal scroll, no clipped tile, axis label or legend, no SVG text outside its plot, prompt-bar
+  clearance +10.5px to +11.2px, and a mid-session 1920 → 1024 → 1920 resize clean **both ways**.
+  **One real defect fixed** — Top Products' four-option filter was clipped 25.7px at 1152 and 89.7px
+  at 1024, so `WIDE_SPAN` moved to `xl:col-span-6`, **a no-op at every target viewport**. **And the
   favicon 404 that three reviews waved through is closed:** a 32x32 ICO derived from the local crest
-  and re-encoded so only `IHDR`/`IDAT`/`IEND` ship (`sips` had attached `eXIf` + `sRGB`), declared
-  by a `links` export — the script now runs with **zero console errors**. Two known limitations
-  **recorded, not fixed**, with the numbers.
+  and re-encoded so only `IHDR`/`IDAT`/`IEND` ship. Two known limitations **recorded, not fixed**.
 - **US-041 (2026-09-10) — THE OFFLINE DEMO IS PROVEN, AND PROVING IT FOUND TWO RUNTIME FETCHES.**
   Full account in [`../phases/phase-4.md`](../phases/phase-4.md). `setOffline(true)` **and** an abort
   route over `**`, against the built bundle, running the whole script with the screen asserted at
@@ -143,8 +133,16 @@ found two real runtime fetches**. **Story Points:** 106
   replaced **the whole dashboard with an error boundary from one click** → `shouldRevalidate` false
   on both routes. **10 requests, all local, 0 after first paint**; zero
   fetch/webfont/foreign-origin/`fcb.ch`, zero console errors, every `src`/`href` root-relative.
-
----
+- **US-042 (2026-09-10) — EVERY PATH NOW PROVEN TO LEAD SOMEWHERE.** Full account in
+  [`../phases/phase-4.md`](../phases/phase-4.md). US-041's lesson taken literally: a path is anything
+  a presenter can click, type or press. 16 Chrome cases ending at one `expectAlive` helper (shell up,
+  >= 4 tiles, >= 3 chips, no error boundary, empty console) over **23 paraphrases**, **16
+  hostile/off-script strings** (all on the fallback, never echoed), 6 no-op inputs, **8 two-subject
+  questions asked twice** for determinism, 3 cold typed follow-ups, the **sidebar link pressed 5x
+  with six answers up**, the inert placeholders force-clicked, **141 canvas slots**, **both tab rings
+  activated with Enter and Space**, a keyboard-only demo, Reset spammed mid-beat, and
+  reload/back/forward. **No dead end — and mutation-tested to prove that means something.** **KL-3
+  recorded, not fixed:** a reload restores the scroll offset; the fix was tried and is not local.
 
 ## Stories Completed Today
 
@@ -215,22 +213,21 @@ found two real runtime fetches**. **Story Points:** 106
   error. **Two real runtime fetches found and fixed** — `/__manifest` and a `/_root.data`
   revalidation that blanked the dashboard offline. **PHASE 4: 2/6 · 4/14.**
 
+- ✅ US-042 — Dead-end path sweep (3 pts, 2026-09-10) — all 6 criteria met **end to end in Chrome
+  across the whole interactive surface**, not just the conversation: 16 new cases, 23 paraphrases, 16
+  off-script strings, both tab rings activated, 141 canvas slots, the sidebar and the browser itself.
+  **No dead end found, and the sweep is mutation-tested.** KL-3 recorded. **PHASE 4: 3/6 · 7/14.**
+
 *(Condensed to keep this log inside its 300-line limit — full detail in
 [`completed.md`](completed.md) and the phase files.)*
 
----
-
 ## Stories In Progress
 
-*None* — next up is US-042, dead-end path sweep.
-
----
+*None* — next up is US-044, brand fidelity & legibility QA.
 
 ## Open Human Step
 
 - **Deploy to Railway** (US-001, the remaining AC): `railway login && railway init && railway up`, then record the URL in `output/phases/phase-1a.md`.
-
----
 
 ## Next Day Plan
 
@@ -245,26 +242,27 @@ found two real runtime fetches**. **Story Points:** 106
   US-037 and US-039 added no component at all and US-038 added only a formatter.
 - **The prototype is FEATURE COMPLETE and the demo script runs end to end in Chrome.** No placeholder
   remains anywhere in the product.
-- **PHASE 4 IS AT 2/6 · 4/14.** US-040 measured the finished screen at eleven viewports and left a
-  **"Known limitations"** section in `phase-4.md` that later stories must read first; **US-041 then
-  severed the network and killed the last two runtime fetches** — `/__manifest` and a `/_root.data`
-  revalidation that blanked the whole dashboard offline from one click on the sidebar.
-- **Next: US-042 — dead-end path sweep (3 pts).** Every path, several paraphrases per hero.
+- **PHASE 4 IS AT 3/6 · 7/14.** US-040 measured the finished screen at eleven viewports and left a
+  **"Known limitations"** section in `phase-4.md` that later stories must read first; **US-041 severed
+  the network and killed the last two runtime fetches**; **US-042 pressed every path** and found none
+  that dead-ends, adding KL-3 to that same section.
+- **Next: US-044 — brand fidelity & legibility QA (2 pts), then US-043 and US-045.** Tokens exactly,
+  gold only where sanctioned, no em or en dashes anywhere.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
 3a (17 pts, done) → Phase 3b, the demo itself (16 pts, done) → Phase 4 hardening (14 pts).
 
----
-
 ## Notes
 
 - Sponsor showing first, owner audience the following week. ~52 AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
-- Phases 1a to 3b are complete and Phase 4 is at 2/6 (106/116 points); continue with
-  `/holycode-pm:execute-work story US-042`.
-- **US-040 and US-041 set the hardening pattern: measure, do not assert.** Every claim in Phase 4
-  comes from real Chrome against `pnpm build` + `pnpm start` with the whole run-of-show loaded —
-  jsdom answers layout questions with zeros and a grep answers network questions wrongly, which is
-  how a `__manifest` probe and a `_root.data` revalidation survived forty stories of review.
+- Phases 1a to 3b are complete and Phase 4 is at 3/6 (109/116 points); continue with
+  `/holycode-pm:execute-work story US-044`.
+- **US-040, US-041 and US-042 set the hardening pattern: measure, do not assert.** Every claim in
+  Phase 4 comes from real Chrome against `pnpm build` + `pnpm start` with the whole run-of-show
+  loaded — jsdom answers layout questions with zeros and a grep answers network questions wrongly,
+  which is how a `__manifest` probe and a `_root.data` revalidation survived forty stories of review.
+  **US-042 adds the corollary: sweep the whole surface, not the happy path** — the dead end US-041
+  found was on the one element nobody had ever clicked.
 - **US-028's three seams are ALL filled** (US-029/030/031), and **there is exactly one timer in the
   app with a test pinning it there.** **US-029's rule for anything the chip row or a panel needs:
   DERIVE IT FROM `sections`** — why Reset restores the row for free, and why **US-033's gate reads
@@ -280,17 +278,19 @@ found two real runtime fetches**. **Story Points:** 106
 - **US-024 set the verbatim contract Phase 3b depends on** — `toBe`, not "contains" (US-032 took it
   to UTF-8 bytes) — and the narrative is stated BEFORE the charts.
 - **US-030 settled how the matcher may change:** its two over-matches are the asserted contract, so
-  tightening either is deliberate, never a tidy-up. **US-032 is the catch behind it**, its absence
-  assertions are the requirement, and **US-033 keeps gating in one module for both paths.**
+  tightening either is deliberate, never a tidy-up. **US-032 is the catch behind it** and **US-033
+  keeps gating in one module for both paths** — all three now also pinned END TO END by US-042.
 - **US-034 to US-039 confirmed Phase 3b is assembly:** a hero adds layout, copy and at most ONE piece
   of state; building a chart or a table, restating a figure or paraphrasing a narrative is a finding.
   **And no component may decide a verdict** — US-022 proved it by scan, US-038 end to end and US-039
   to the last beat: the revenue/cost judgement is DATA from `derive.ts`, never a sign test, and a
   breakdown must reconcile with the row it explains (410 = Marketing's variance).
 - **US-038 settled the last shared-formatter question:** a COMPARISON is formatted by one function
-  for both halves (`formatMoneyMillionsFixed`); a second money-in-millions spelling is a finding.
-  **US-013's no-hardcoded-figure rule still holds:** figures reach a component only through a
-  loader-provided view model, and a test scans for a literal.
+  for both halves; a second money-in-millions spelling is a finding. **US-013's no-hardcoded-figure
+  rule holds:** figures reach a component only through a loader-provided view model.
+- **US-042 settled what a "path" is: anything a presenter can click, type or press** — the sidebar,
+  the chrome, every canvas element, both tab rings and the browser's own reload/back/forward, not
+  just the prompt bar and the chips. Every new interactive element owes that sweep an entry.
 - **US-016's band is first in the cut order and stays cuttable:** one grid item, no shared state.
   Three shell guardrails are *tests*: the app bar's text equals the role labels, the status file
   holds no timer, and the prompt field's subtree may carry no border. **The deadline is this week.**

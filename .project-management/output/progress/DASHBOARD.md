@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-10
-**Current Phase:** Phase 4 - Hardening *(1/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a + 3b all complete**
+**Current Phase:** Phase 4 - Hardening *(3/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a + 3b all complete**
 
 ---
 
@@ -14,9 +14,9 @@
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
 | **Phase 3b** | 100% — Completed (6/6 · 16/16) | 100% | 🟢 Done |
-| **Phase 4** | 29% — Active (2/6 · 4/14) | 100% | 🟢 On Track |
-| **Stories Completed** | 41/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 106/116 | 116 | 🟢 On Track |
+| **Phase 4** | 50% — Active (3/6 · 7/14) | 100% | 🟢 On Track |
+| **Stories Completed** | 42/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 109/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -25,9 +25,9 @@
 
 ## 📅 Today's Progress (2026-09-10)
 
-**Stories Completed Today:** 9 (US-033 to US-039, US-040, **US-041**) · **41 total**
-**Currently Working On:** US-042 — Dead-end path sweep (3 pts)
-**Story Points Completed Today:** 23 · **106 total**
+**Stories Completed Today:** 10 (US-033 to US-039, US-040, US-041, **US-042**) · **42 total**
+**Currently Working On:** US-044 — Brand fidelity & legibility QA (2 pts)
+**Story Points Completed Today:** 26 · **109 total**
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -138,27 +138,23 @@
   `ChipActions` both already took, so **neither module changed**. **Still ONE timer**, closing
   US-015 ④. Reduced motion: 260ms, chips at final state. 91 tests, 1678.
 - ✅ **US-032 — Graceful fallback panel (2 pts)** — **the catch for anything off-script.** Two panels,
-  never conflated: the **fallback**, its copy asserted **byte-identical** (straight apostrophe,
-  closing *hyphen*) against a literal *and* the backlog, re-surfacing the three prepared questions
-  with **US-029's own chip components** (no `<button>` in the file); and the **empty state** — club
-  red at **4.5% derived from `--color-red`**, matching hairline, bold navy heading, lighter subtext,
-  red gradient badge. **Criterion ② asserted as an ABSENCE:** 18 blame/error words out of the copy,
-  the panel *and* the source; no alert role, no red semantics, **the question never echoed** (no
-  question prop exists). No beat precedes it, and `canvasPanelFor` returns ONE panel. 125, 1803.
+  never conflated: the **fallback**, its copy asserted **byte-identical** against a literal *and* the
+  backlog, re-surfacing the three prepared questions with **US-029's own chip components**; and the
+  **empty state** (club red at 4.5% derived from `--color-red`). **Criterion ② asserted as an
+  ABSENCE:** 18 blame/error words out of the copy, the panel *and* the source; no alert role, no red
+  semantics, **the question never echoed** (no question prop exists). 125, 1803.
 - ✅ **US-033 — Follow-up context gating (3 pts)** — **Phase 3a closes.** One gate
   (`follow-up-gate.ts`, two pure functions) read by both the answer and the beat, so a cold typed
-  follow-up renders the **PARENT** first and the follow-up chip is *then* offered to tap — never an
-  error, never the fallback, never nothing. Gating and chip visibility are **two readings of one
-  list** (`hasSection` pinned to two readers by scan), so Reset re-gates for free. Hero independence
-  proved over all **27** sessions and on the real `App`. 46 tests, **1849**.
+  follow-up renders the **PARENT** first and the follow-up chip is *then* offered — never an error,
+  never the fallback, never nothing. Gating and chip visibility are **two readings of one list**, so
+  Reset re-gates for free. Hero independence proved over all **27** sessions. 46, **1849**.
 - ✅ **US-040 — Presentation sizing & responsiveness (2 pts)** — **Phase 4 opens, and the story is a
   measurement.** Real Chrome against the **built SSR bundle** with the **full run-of-show loaded
   before any reading**: clean at **eleven viewports** — no page or in-card horizontal scroll, no
   clipped tile, axis label or legend, no SVG text outside its plot, **prompt-bar clearance +10.5 to
   +11.2px** — and a mid-session 1920 → 1024 → 1920 resize clean **both ways**. **One real defect
-  fixed:** Top Products' filter was clipped 25.7px at 1152 and 89.7px at 1024, so `WIDE_SPAN` moved
-  to `xl:col-span-6`, **proved a no-op at every target viewport**. **And the favicon 404 three
-  reviews waved through is closed.** Two limitations **recorded, not fixed**. 11 tests, **2221**.
+  fixed** (Top Products' filter clipped 25.7px at 1152 → `WIDE_SPAN` at `xl:col-span-6`, a no-op at
+  every target viewport) and **the favicon 404 closed**. Two limitations recorded. 11, **2221**.
 - ✅ **US-041 — Offline resilience verification (2 pts)** — **the disconnect found what no grep
   could, twice.** `setOffline(true)` + an abort route over `**` against the built bundle, running
   the whole script (baseline, three heroes, three follow-ups, the sidebar link, off-script, empty
@@ -167,30 +163,38 @@
   "initial"`. **Finding 2, a demo-killer:** the sidebar's `<Link to="/">` revalidated `/_root.data`,
   which offline failed and replaced **the whole dashboard with an error boundary from one click** →
   `shouldRevalidate: () => false` on both routes. Now **10 requests, all local, 0 after first
-  paint**, zero fetch/webfont/foreign-origin/`fcb.ch`, zero console errors. 3 tests, **2225** + 4
-  offline Chrome cases.
-
----
+  paint**, zero fetch/webfont/foreign-origin, zero console errors. 3 tests, **2225** + 4 cases.
+- ✅ **US-042 — Dead-end path sweep (3 pts)** — **every path proven to lead somewhere, and the sweep
+  is wider than the conversation.** 16 Chrome cases ending at one `expectAlive` helper (shell up,
+  >= 4 tiles, >= 3 chips, no error boundary, empty console): three heroes, three follow-ups, **23
+  paraphrases** each landing its own hero, **16 hostile/off-script strings** (XSS, `javascript:`,
+  SQL, RTL, 50k chars) all on the fallback and never echoed, 6 no-op inputs, **8 two-subject
+  questions asked twice** for determinism, 3 cold typed follow-ups, the **sidebar link pressed 5x
+  with six answers up**, the inert placeholders force-clicked, **141 canvas slots**, **both tab rings
+  activated with Enter and Space**, keyboard-only demo, Reset spammed mid-beat, reload/back/forward.
+  **No dead end — mutation-tested to prove it.** KL-3 recorded, not fixed. **2225** + 16 cases.
 
 ## 🔄 Phase 4 IN PROGRESS — Hardening a feature-complete prototype
 
 **Phases 1a to 3b are all closed** (39 stories · 102 pts): every client question answers end to end
 and each one sharpens, *what* → *so-what*, with **not one placeholder left in the product**.
-**Phase 4 is now open at 2/6 · 4/14.** Nothing new is built from here — **US-040 measured the
-finished screen in real Chrome at eleven viewports** and **US-041 severed the network and ran the
-script**, which cost two real runtime fetches their lives: the router's `/__manifest` probe and a
-`/_root.data` revalidation that blanked the dashboard offline from one click on the sidebar.
+**Phase 4 is now at 3/6 · 7/14.** Nothing new is built from here — **US-040 measured the finished
+screen in real Chrome at eleven viewports**, **US-041 severed the network and ran the script**, which
+cost two real runtime fetches their lives (the router's `/__manifest` probe and a `/_root.data`
+revalidation that blanked the dashboard offline from one click on the sidebar), and **US-042 swept
+the whole interactive surface** — 16 more Chrome cases, no dead end anywhere.
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-042: Dead-end path sweep | 📋 Next | Every path swept: each hero, each follow-up, off-script, empty input, reset — several paraphrases per hero |
+| US-044: Brand fidelity & legibility QA | 📋 Next | Crest, tokens and uppercase headers exact; gold only on target hits and the follow-up accent; no em or en dashes anywhere |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-042: Dead-end path sweep *(the whole surface, in Chrome)* | 2026-09-10 | 3 |
 | US-041: Offline resilience verification *(verified by disconnecting)* | 2026-09-10 | 2 |
 | US-040: Presentation sizing & responsiveness *(measured in Chrome)* | 2026-09-10 | 2 |
 | US-039: Hero 3 follow-up — why Marketing is off plan *(the causal peak)* | 2026-09-10 | 3 |
@@ -211,16 +215,12 @@ script**, which cost two real runtime fetches their lives: the router's `/__mani
 | US-016: Hero band — webshop trend & attendance ring | 2026-09-09 | 5 |
 | US-026: Segmented period filter control | 2026-09-09 | 2 |
 
----
-
 ## ⚠️ Active Blockers
 
 ✅ No active blockers
 
 **Open human step (not a blocker):** the Railway deploy for US-001 — run
 `railway login && railway init && railway up`, then record the shareable URL.
-
----
 
 ## 📈 Velocity & Timeline
 
@@ -232,14 +232,12 @@ script**, which cost two real runtime fetches their lives: the router's `/__mani
 > ⚠️ At **8h/day weekdays only**, AI-realistic lands 2026-09-20, past the deadline. The lever is
 > hours per day, not scope — the P1 cut set (US-043, US-045) is worth only 0.82 days.
 
----
-
 ## 🧪 Quality Metrics
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 99.71% stmts / 97.96% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 2221/2221 unit (55 files) + 12/12 Chrome | TBD | 🟢 Good |
+| Passing Tests | 2225/2225 unit (55 files) + 32/32 Chrome | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -249,18 +247,19 @@ script**, which cost two real runtime fetches their lives: the router's `/__mani
 > every hex, the type scale and the colour discipline, fails the build if `app/app.css` and
 > `app/lib/tokens.ts` disagree, and asserts that no reduced-motion path strands an element at zero.
 > The data suites pin the Specification figures, prove every total is *derived* and sweep every number
-> in all six narratives (US-011). The component suites test the same way: variance stays
-> distinguishable with the colour *removed* (US-017), review decisions are read back off the rendered
-> element (US-019/US-021), US-022's source cannot NAME a verdict, US-013 scans for a literal figure,
-> and US-032 proves an ABSENCE — no blame word, no alert role, no echoed input. US-033 pins its
-> claim by **source scan** and its dead end by **mutation**. The gate: `tsc`, ESLint 9, Prettier.
+> in all six narratives (US-011). The component suites do the same: variance stays distinguishable
+> with the colour *removed* (US-017), review decisions are read back off the rendered element,
+> US-022's source cannot NAME a verdict, and US-032 proves an ABSENCE — no blame word, no alert role,
+> no echoed input. US-033 pins its claim by **source scan** and its dead end by **mutation**.
 > **US-040 added the second kind of suite: a real browser.** `pnpm test:e2e` drives the full
 > run-of-show in Chrome against the built SSR bundle and measures what jsdom answers with zeros —
 > horizontal scroll, tile and legend clipping, SVG label boxes against their plots, prompt-bar
-> clearance — at eleven viewports, plus the favicon and an error-free console. **US-041 added the
-> third kind: a severed network** — it logs every request, disconnects the context and runs the whole
-> script, so a lazy chunk, a webfont or a revalidation cannot return unnoticed. Separate from
-> `pnpm test` (minutes, not seconds); no dependency added.
+> clearance — at eleven viewports. **US-041 added the third kind: a severed network**, logging every
+> request before disconnecting the context, so a lazy chunk, a webfont or a revalidation cannot
+> return unnoticed. **US-042 added the fourth: the whole interactive surface pressed** — every chip,
+> 23 paraphrases, 16 hostile strings, 141 canvas slots, both tab rings activated with Enter and
+> Space, reload/back/forward, all ending at one `expectAlive` helper and an empty console; the sweep
+> itself is mutation-tested. Separate from `pnpm test` (minutes, not seconds); no dependency added.
 
 ---
 
@@ -274,12 +273,12 @@ script**, which cost two real runtime fetches their lives: the router's `/__mani
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
 | Phase 3a: Conversation | ✅ Completed | 6/6 | 17/17 | 100% |
 | Phase 3b: Heroes | ✅ Completed | 6/6 | 16/16 | 100% |
-| Phase 4: Hardening | 🔄 Active | 2/6 | 4/14 | 29% |
+| Phase 4: Hardening | 🔄 Active | 3/6 | 7/14 | 50% |
 
 ---
 
 ## 🔗 Quick Links
-- **[Current Phase Plan](../phases/phase-4.md)** - Phase 4, Hardening (2/6) + **Known limitations**
+- **[Current Phase Plan](../phases/phase-4.md)** - Phase 4, Hardening (3/6) + **Known limitations**
 - **[Phase 3b Plan](../phases/phase-3b.md)** - Completed 2026-09-10 (6/6 · 16/16 pts)
 - **[Phase 3a Plan](../phases/phase-3a.md)** - Completed 2026-09-10 (6/6 · 17/17 pts)
 - **[Phase 2b Plan](../phases/phase-2b.md)** - Completed 2026-09-09 (11/11 · 29/29 pts)
@@ -293,8 +292,8 @@ script**, which cost two real runtime fetches their lives: the router's `/__mani
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-**Last Auto-Update:** US-041 completed at 2026-09-10 — **THE OFFLINE DEMO IS NOW PROVEN, AND PROVING IT FOUND TWO REAL RUNTIME FETCHES THAT NO CODE REVIEW HAD.** Verified the way the phase file demands: `context.setOffline(true)` **and** `context.route("**", abort("internetdisconnected"))` — two mechanisms, so a fetch cannot hide behind the weakness of either — against the **built SSR bundle** (`pnpm build` + `pnpm start`), never the dev server, whose HMR websocket is a live network dependency by design; `navigator.onLine` is asserted `false` before the first chip is tapped. New: `tests/e2e/offline-resilience.spec.ts` (4 Chrome cases) and `tests/e2e/support/network.ts`, reusing US-040's harness rather than building a second one. **Lockfile untouched.** **THE WHOLE SCRIPT RAN OFFLINE WITH THE SCREEN ASSERTED AT EVERY BEAT** — baseline (4 cards, hero band, empty state, 3 chips) → Hero 1 → Hero 2 → Hero 3, each recognised by its own tile titles → all three follow-ups, 3 gold dividers, the causal peak's "What's driving Marketing", chips back to 3 → **the sidebar's Dashboard link pressed with six answers on screen** → off-script question (fallback copy verbatim, 3 chips re-offered, nothing removed, the question never echoed) → empty submit (a true no-op) → reset (back to the 4 cards) → **reset again mid-beat**, with the pending beat proved *cancelled* by waiting out twice its delay. Re-run identically with **reduced motion** forced. **FINDING 1 — `GET /__manifest?paths=%2F&version=…`:** React Router's default lazy route discovery marks every `<Link>` `data-discover="true"` and fetches the route manifest on hydration — a real fetch to a real endpoint from the shipped bundle, invisible to any grep of `app/**`. Fixed with `routeDiscovery: { mode: "initial" }`; there is exactly ONE route, so nothing to discover. **FINDING 2 — `GET /_root.data`, AND IT WAS A DEMO-KILLER:** the sidebar's Dashboard row is a `<Link to="/">` and the presenter is *always already on that route*, but React Router treats a press as a navigation and revalidates. Offline the request failed, the navigation errored, and **the entire dashboard — 4 baseline cards, all 6 answers — was replaced by an error boundary from ONE click**, with no way back but a reload an offline machine cannot serve. Fixed at the root cause: `shouldRevalidate: () => false` on **both** matched routes, because the single fetch skips the call only when no route wants data — and the answer was wrong online too, since the figures are bundled seed modules that cannot have changed. **REQUEST LOG — 10 requests, all local, `0` after first paint, offline and online alike:** `/`, `/fcb-crest.png`, six `/assets/*.js` chunks (all `modulepreload`ed by the document, so nothing is lazy) and `/assets/root-*.css`. **Zero** `fetch`/`xhr`/`websocket`/`eventsource` at any point, zero webfont requests (the type stack is system-only by US-003), zero non-local origins, **zero to `fcb.ch`** (asserted by name), zero failed requests and **zero console errors**; `/favicon.ico` checked by request at 200. And the half a request log cannot see: **every `src`/`href` in the rendered document is root-relative**, asserted, so an absolute URL behind a media query or a `srcset` cannot slip in unfetched. **Security triage — no trigger fired; the no-external-origin result IS the story's measurement.** No route, handler, SQL, `innerHTML`, upload, env var, secret, auth or logging change; lockfile untouched, so no advisory gate. **A10/SSRF: no surface at all** — `app/**` holds no `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or HTTP client, and no user input reaches a URL. **A05:** both fixes *reduce* the served surface. 3 new unit tests pin both fixes so neither can be silently reverted; **2225 green** (55 files) + **16 Chrome cases** (12 sizing, 4 offline). **Next: US-042, dead-end path sweep.**
+**Last Auto-Update:** US-042 completed at 2026-09-10 — **EVERY PATH NOW PROVEN TO LEAD SOMEWHERE, AND THE SWEEP IS WIDER THAN THE CONVERSATION.** US-041's lesson taken literally: the interactive surface is everything a presenter can click, type or press, and the defect it found lived on the one element nobody had ever exercised. New: `tests/e2e/dead-end-path-sweep.spec.ts` (**16 Chrome cases**) and `tests/e2e/support/paths.ts`, reusing US-040/US-041's harnesses; the three control labels and `BEAT_MS` moved into `support/demo-script.ts` so three specs share one copy. **No `app/**` source changed, lockfile untouched** — e2e is now **32 cases**, unit stays **2225 green** (55 files). **"Dead-end-free" is ONE helper, `expectAlive`, asserted on every single path:** shell mounted and >= 4 tiles (the screen changed or is deliberately unchanged, never silently broken) · >= 3 prepared chips and > 2,000 chars of rendered text (always a next step, never a blank canvas) · no error boundary, no sideways scroll, never two transient panels at once — plus **an empty console per case** through US-041's own recorder. **SWEPT (all green):** three heroes · three follow-ups · **23 paraphrases**, each landing its intended hero and no other · **16 off-script strings** including an `<img onerror>` payload, `<script>`, a broken attribute, `javascript:`, SQL, a template expression, a CSS selector, a path traversal, an RTL override, combining marks, five scripts in one line and **50,000 characters** — every one on the graceful fallback with its three chips, and **never echoed into the page** · **6 empty/whitespace inputs**, true no-ops via Enter *and* the send button, chips unmoved · **8 two-subject questions asked twice each**: exactly one hero, identical both runs · **3 cold typed follow-ups**, parent first, then the chip offered and taken · **the sidebar Dashboard link pressed 5x with six answers on screen** (nothing lost, no history entry) · the three **inert placeholders** proved `<span>` / `pointer-events: none` / `tabIndex -1` / no `href` and then clicked with a forced real mouse · crest, workspace label, connection status, avatar, top bar, sidebar, canvas · **141 canvas slots clicked** · **the whole tab ring at the baseline (11 stops) and on a full canvas (19 stops)**, every stop activated with Enter *and* Space, no focus trap, a focus outline on all but the prompt input (by design — the field draws one ring on `:focus-within`) · the demo driven **keyboard-only** end to end · Reset x5 with nothing to clear, x6 over a full canvas, x6 mid-beat with the beat waited out, and over the fallback · double-tapped hero and follow-up chips, three chips in one burst, a chip tapped mid-beat, five submits of one question, a hero re-asked after its follow-up — **never a duplicate section** · reload, mid-beat reload, back and forward. **NO DEAD END FOUND, AND THE SWEEP WAS MUTATION-TESTED SO THAT MEANS SOMETHING:** raising `INTENT_THRESHOLD[HERO]` 2 -> 5 failed the paraphrase case, and pointing the sidebar link at a dead route failed on *"the app shell is gone"* — the exact defect class US-041 measured. Both reverted. **ONE PRESENTATION WART RECORDED AS KL-3 RATHER THAN FIXED:** a reload restores the scroll offset, landing the presenter at the foot of a freshly cleared baseline with the app bar out of view (1920x1080 -> `scrollY 185`, greeting at `top: -89`; 1440x900 -> `scrollY 340`). It is **not** a dead end by this story's own definition, and the fix is not local — removing `<ScrollRestoration />` was tried end to end and Chrome's own restoration reproduces the offset, so closing it needs new behaviour. Deferred to US-043/US-045 with the numbers on record. **Security triage — the A03 user-input trigger fired and is the story's own measurement:** every hostile string typed into the real field on the served page, then every sink read — no `__fcb*` global created (nothing executed), `onerror=` / `svg/onload` / `DROP TABLE` nowhere in the document, no `src`/`href`/`action`/`style` carrying `javascript:` or any question fragment, `localStorage` empty, `document.cookie` empty, and the only `sessionStorage` key React Router's `react-router-scroll-positions`, integers, asserted to hold no question text. **Next: US-044, brand fidelity & legibility QA.**
 
-*Previously (US-040, 2026-09-10):* Phase 4 opened with a measurement rather than an assertion — real Chrome against the built bundle with the full run-of-show loaded, **clean at eleven viewports** (no page or in-card horizontal scroll, no clipped tile, label or legend, prompt-bar clearance +10.5 to +11.2px) and a mid-session resize clean both ways; **one real defect fixed** (Top Products' filter clipped 25.7px at 1152 and 89.7px at 1024 → `WIDE_SPAN` moved to `xl:col-span-6`, proved a no-op at every target viewport), **the favicon 404 closed** with a re-encoded 32x32 ICO from the local crest, and two limitations **recorded, not fixed** under `phase-4.md`'s durable "Known limitations" heading. 11 tests, 2221 green.
+*Previously (US-041, 2026-09-10):* the offline demo was proven by **disconnecting** — `setOffline(true)` **and** an abort route over `**`, against the built SSR bundle — and proving it found **two real runtime fetches no code review had**: the router's `/__manifest` discovery probe (fixed with `routeDiscovery: { mode: "initial" }`) and a `/_root.data` revalidation fired by the sidebar's own Dashboard link, which offline replaced **the entire dashboard with an error boundary from one click** (fixed with `shouldRevalidate: () => false` on both matched routes). Request log: **10 requests, all local, 0 after first paint**, zero `fetch`/`xhr`/`websocket`, zero webfonts, zero foreign origins, zero console errors.
 
 *Previously (US-039, 2026-09-10):* the causal peak went on screen and **Phase 3b closed (6/6 · 16/16)** — three grid rows joined `hero-3.tsx` with **no module, bar, badge, divider or panel built**, `PlaceholderFollowUp` deleted so no stand-in remains in the product, and the drivers explaining the whole overspend (`CHF 240k` / `CHF 150k` / `CHF 20k`, badge `CHF 410k total` **equal to** the variance the table derives). Narrative byte-identical at 468 chars; the whole demo script run in Chrome with zero requests after first paint. 63 tests, 2210 green.

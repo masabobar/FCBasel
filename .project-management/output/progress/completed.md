@@ -6,14 +6,46 @@
 
 ## Summary
 
-**Total Completed:** 41 stories
-**Total Points:** 106 / 116
+**Total Completed:** 42 stories
+**Total Points:** 109 / 116
 **Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 52 points/day
 **Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (2/6 · 4/14)**
 
 ---
 
 ## Completed Stories
+
+### US-042: Dead-end path sweep (3 pts) — **EVERY PATH PROVEN TO LEAD SOMEWHERE**
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 16 Chrome cases (32 e2e total; unit stays 2225)
+**Notes:** US-041's lesson taken literally — **the interactive surface is everything a presenter can
+click, type or press**, and the defect it found lived on the one element nobody had ever exercised.
+New: `tests/e2e/dead-end-path-sweep.spec.ts` + `support/paths.ts`, reusing US-040/US-041's harnesses;
+the three control labels and `BEAT_MS` moved into `support/demo-script.ts` so three specs share one
+copy. **No `app/**` source changed; lockfile untouched.** **"Dead-end-free" is ONE helper,
+`expectAlive`, on every path:** shell mounted and >= 4 tiles · >= 3 prepared chips and > 2,000 chars
+of text · no error boundary, no sideways scroll, never two transient panels — plus **an empty console
+per case**. **Swept:** three heroes · three follow-ups · **23 paraphrases**, each landing its intended
+hero and no other · **16 off-script strings** (XSS, `<script>`, broken attribute, `javascript:`, SQL,
+template expression, CSS selector, path traversal, RTL override, combining marks, five scripts in one
+line, **50,000 chars**) all on the fallback with its three chips, **never echoed** · **6
+empty/whitespace no-ops** via Enter *and* the send button · **8 two-subject questions asked twice**:
+exactly one hero, identical both runs · **3 cold typed follow-ups**, parent first then the chip
+offered and taken · **the sidebar Dashboard link pressed 5x with six answers up** (nothing lost, no
+history entry) · the three **inert placeholders** proved `<span>` / `pointer-events: none` /
+`tabIndex -1` / no `href`, then force-clicked with a real mouse · crest, workspace label, status,
+avatar, top bar, sidebar, canvas · **141 canvas slots** · **both tab rings** (11 stops baseline, 19
+full canvas), every stop activated with Enter *and* Space, no focus trap · the demo driven
+**keyboard-only** · Reset x5 idle, x6 over a full canvas, x6 mid-beat with the beat waited out, and
+over the fallback · double-taps, three chips in one burst, a chip mid-beat, five submits of one
+question, a hero re-asked after its follow-up — **never a duplicate section** · reload, mid-beat
+reload, back and forward. **NO DEAD END FOUND, and the sweep is mutation-tested:** threshold 2 -> 5
+failed the paraphrase case, a dead sidebar route failed on *"the app shell is gone"*. **KL-3 recorded,
+not fixed** — a reload restores the scroll offset (1920x1080 -> `scrollY 185`); not a dead end by this
+story's definition, and removing `<ScrollRestoration />` was tried and does not close it.
+**Triage: the A03 user-input trigger fired and is the story's own measurement** — every hostile string
+typed on the served page, then every sink read: nothing executed, no markup, no attribute, no URL,
+`localStorage` and cookies empty, the only `sessionStorage` key React Router's scroll integers.
+Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
 
 ### US-041: Offline resilience verification (2 pts) — **TWO RUNTIME FETCHES FOUND AND KILLED**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 3 unit (2225 green) + 4 offline Chrome cases
@@ -157,33 +189,17 @@ entry stays in full below the table — it is the story that closed the phase.
 ---
 
 ### US-016: Hero band — webshop trend & attendance ring (5 pts)
-**Completed:** 2026-09-09 (Phase 2a story, executed in the Phase 2b run once US-025/026/027 existed) — **it closes Phase 2a at 5/5 · 16/16 pts**
-**Files Changed:** 13 code/test + 7 tracking docs · **Tests Added:** 92 — 1090/1090 green, 99.75% stmts / 100% lines of `app/**`
-**Notes:** All 6 acceptance criteria met, **plus** the loose end US-013 left (Top Products' period
-filter). Full detail in [`../phases/phase-2a.md`](../phases/phase-2a.md).
+**Completed:** 2026-09-09 · 92 tests (1090 green) — **it closes Phase 2a at 5/5 · 16/16.** One period
+control drives both the webshop chart and the attendance ring, proven structurally *and*
+behaviourally; `attendance-ring.tsx` is the one genuinely new visual (pure `ringGeometry` clamped to
+0-1, the sweep a `stroke-dasharray` transition, hover and focus answering identically).
+`personaGreeting(now)` takes the DATE so server and browser cannot disagree about the hour. **One
+real defect found and fixed in `LineChart`:** its end axis labels were clipped by the svg bounds, so
+`axisLabelAnchor` now anchors the first and last inwards. Full detail:
+[`../phases/phase-2a.md`](../phases/phase-2a.md).
 
-**What Was Done:**
-- `dashboard/hero-band.tsx` — greeting, ONE period filter, the webshop chart in the wider left
-  column, the ring and its stats in the narrower right one. It **composes** `Segmented`,
-  `LineChart` + `LineChartLegend`, `KpiFigure onDark`, `DeltaChip` and the US-027 hooks, inventing
-  only layout, copy and one piece of state (a test asserts no `<svg>`, no timer, no rAF in the file)
-- `charts/attendance-ring.tsx` — **the one genuinely new visual.** Hand-built SVG: pure
-  `ringGeometry` (clamped to 0–1; a non-finite share draws nothing rather than `NaN`), the sweep a
-  `stroke-dasharray` transition off `useGrow`, the centre counting through `useCountUp`, and a hover
-  that swaps average attendance for "% of capacity" **and answers focus identically**
-- `lib/persona.ts` gained `personaGreeting(now)` — it takes the DATE, so server and browser cannot
-  disagree about the hour; `HeroBandData` holds **no total and no delta**
-- **① One control, two widgets, proven twice** — structurally and behaviourally
-- **⑤ / ⑥ measured in real Chrome at 1920×1080:** no horizontal scroll (nor 1440/1280/834/390), the
-  KPI **still `CHF 148’200` in the frame after the click** then 54 distinct strings to `CHF 132’400`,
-  the re-keyed line's offset 1px → 0px, 43 arc dash pairs on the SAME element; under reduced motion
-  one KPI string and one ring value. **One real defect found and fixed in `LineChart`:** its end axis
-  labels were clipped by the svg's bounds, so `axisLabelAnchor` anchors the first and last inwards
-- **Security triage: no security-relevant changes detected**
 
----
-
-## Phase 2b: Component Library — CLOSED 2026-09-09 (11/11 · 29/29 pts; the three most recent in full)
+## Phase 2b: Component Library — CLOSED 2026-09-09 (11/11 · 29/29 pts)
 
 Condensed to keep this log inside its 300-line limit; the **full per-story detail lives in
 [`../phases/phase-2b.md`](../phases/phase-2b.md)** and in the completion notes in
@@ -201,67 +217,25 @@ Condensed to keep this log inside its 300-line limit; the **full per-story detai
 | US-020 Donut / ring tile | 3 | 56 | `charts/donut.tsx` — `donutGeometry` (pure), `Donut`, `DonutTile` for US-034: four gapped segments, a counting centre and a legend. **Not US-016's single-arc gold gauge**, sharing only the dasharray technique. **Two hover surfaces, ONE state** — an arc and its legend row write the same index, and rows are real buttons so focus does what hover does. **Segments morph rather than re-enter** (arcs keyed by sponsor). The arithmetic is `badgeSegments`' (US-008), so segments sum exactly to the centre total on every period and ten adversarial ones. |
 
 ### US-022: Department table tile (3 pts)
-**Completed:** 2026-09-09 · 54 tests (1315 green), **100% on the new file** · all 5 criteria met,
-both review decisions held. Condensed to keep this log inside its 300-line limit; full detail in
-[`../phases/phase-2b.md`](../phases/phase-2b.md).
+**Completed:** 2026-09-09 · 54 tests, 100% on the new file. A real `<table>` for six rows and a
+total. **The revenue/cost trap is closed by construction:** colour comes from `row.judgement`, so
+Marketing's +410 renders UP and ADVERSE while Sponsoring's +840 renders UP and FAVOURABLE, and a
+source scan rejects `FAVOURABLE`/`ADVERSE`, any `variance` comparison and any `DepartmentType`
+equality. The flag is `needsAttention`, not a hardcode — Marketing's name never appears in the
+source. Full detail: [`../phases/phase-2b.md`](../phases/phase-2b.md).
 
-- `tiles/department-table.tsx` — `DepartmentTable`, `DepartmentTableTile` and the pure `targetMark` /
-  `targetBarPercent` / `columnAlignClass`. **A real `<table>`** (thead/tbody/tfoot, `scope` headers,
-  `sr-only` caption); no TanStack Table for six rows and a total
-- **THE REVENUE/COST TRAP IS CLOSED BY CONSTRUCTION.** Colour comes from `row.judgement` (US-010's
-  `varianceJudgement`) via `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while
-  **Sponsoring's +840 renders UP and FAVOURABLE**. A source scan rejects `FAVOURABLE` / `ADVERSE`,
-  any `variance <>` comparison and any `DepartmentType` equality, so it cannot migrate back in
-- **The flag is `needsAttention`, not a hardcode** — exactly one row, Marketing, whose name never
-  appears in the source; carried three ways (gold tint, glyph, "Over budget and behind target")
-- **REVIEW DECISION 1 — CHF millions, never "000":** 21.00 / 21.84 and a 69.00 / 69.68 total under
-  the unremovable `MILLIONS_NOTE`; a test rejects `/000/` anywhere in the tile
-- **REVIEW DECISION 2 — numeric headers right-aligned, "% of target" INCLUDED:** one
-  `columnAlignClass` rule read by the header `<th>` *and* its cells, proven column by column
-- **The gold near-target band:** 95-99 a deep-gold ring, 100+ a filled dot, below 95 nothing — so
-  **Hospitality (95) is marked and Merchandising (92) is not**, differing in shape as well as tone
-- Rows keyed by department NAME, long names wrap inside a card-bounded `overflow-x-auto`, totals come
-  from `departmentTotals()` on the rows on screen, and the club variance is deliberately NEUTRAL
-- **Security triage: no security-relevant changes detected.** **The one seam — nothing mounted the
-  table — was closed by US-038**, which asserts the trap, the flag and the gold band in Chrome
 
 ### US-023: Driver / breakdown tile (2 pts)
-**Completed:** 2026-09-09 · 43 tests (1358 green), **100% on the new file** · all 3 criteria met.
-A deliberate REUSE story: a thin tile plus the tests that keep it thin. Condensed to keep this log
-inside its 300-line limit; full detail in [`../phases/phase-2b.md`](../phases/phase-2b.md).
-
-- `tiles/driver-tile.tsx` — `DriverTile`, `DriverTotalBadge` and the pure `rankDrivers` /
-  `driverTotal`, designed at once for all three consumers (US-035 percentages, US-037 negative
-  money with the total badge, US-039 positive money)
-- **CRITERION 3 IS ENFORCED TWO WAYS, not asserted.** Every row is US-021's `HBarRow` through
-  `HBarTile` (the 150px label and 96px `nowrap` columns read back off the rows THIS tile produced),
-  and a source scan then rejects the width constants, `H_BAR_SERIES`, `width` / `toFixed`, the
-  motion hooks, every `useState` / timer, gradients and even a second `Card`
-- **RANKING is stable** (magnitude on a COPY, ties keep arrival order, so Luzern precedes Sion;
-  `rank="none"` keeps US-035's order) and **THE TOTAL IS DERIVED**, so the badge cannot disagree
-  with the bars: `driverTotal` sums what the rows DISPLAY, giving `-CHF 400k` and `CHF 410k`
-- **Two seams widened rather than forked:** `HBarTile` gained a `children` slot, `DeltaChip` an
-  optional `suffix`, so `-CHF 400k total` is ONE chip. Reduced motion lands final, zero frames
-- **Security triage: no trigger fires** — `note` / `totalLabel` are React nodes React escapes.
-  **One seam:** no real-Chrome pass until US-035 / US-037 / US-039 mount it
-
-### US-024: Recommendation panel & narrative caption strip (2 pts)
-**Completed:** 2026-09-09 — **it closes Phase 2b at 11/11 · 29/29 pts** · 35 tests (1393 green),
-99.82% stmts / 98.17% branches / 100% lines · all 3 criteria met.
-
-Condensed to keep this log inside its 300-line limit; full detail in
+**Completed:** 2026-09-09 · 43 tests. A deliberate REUSE story — every row is US-021's `HBarRow`, and
+a source scan rejects the width constants, the motion hooks, gradients and a second `Card`, so the
+tile cannot thicken. Ranking is stable (magnitude on a copy, ties keep arrival order). Full detail:
 [`../phases/phase-2b.md`](../phases/phase-2b.md).
 
-- `tiles/recommendation-panel.tsx` + the `RECOMMENDATION_VARIANTS` table. **The panel is
-  structurally NOT a tile, and every row of the difference is asserted** — an `aside` named by its
-  "Recommendation" eyebrow, gold down the **side**, `rounded-panel` on `bg-gold/10`, no
-  `shadow-tile`, no metric chrome — and **the caption strip was reused, not rebuilt** (US-005's
-  `CardCaption` gained a `section` placement; scans reject a second `Sparkles`)
-- **Verbatim fidelity is the load-bearing test:** US-039's recommendation renders byte-identical,
-  with truncation, casing, `.replace(` and `.slice(` scan-rejected. Criterion 3 is ORDER, so DOM
-  order is asserted in a live render; gold stayed sanctioned; reduced motion lands final
-- **Security triage: no trigger fires** — panel text is a React node React escapes (`<img onerror>`
-  proof). **One seam:** no real-Chrome pass until US-035/037/039 mount it
+
+### US-024: Recommendation panel & narrative caption strip (2 pts)
+**Completed:** 2026-09-09 · 30 tests. Gold accent panel plus the caption strip; gold as an ACCENT
+only, never a third fill. Full detail: [`../phases/phase-2b.md`](../phases/phase-2b.md).
+
 
 ## Phase 3a: Conversational Interface — closed 2026-09-10 (6/6 stories · 17/17 pts)
 

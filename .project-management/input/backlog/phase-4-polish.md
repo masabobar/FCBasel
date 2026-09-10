@@ -6,7 +6,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 **Duration:** Days 5-6 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (2/6 completed)
+**Status:** In Progress (3/6 completed)
 
 > **Not in this phase:** new functionality, or anything that changes a hero's content.
 > A live, high-stakes room is unforgiving; one ugly or wrong render in front of the owner is
@@ -18,7 +18,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Priority:** P0
 **Total Story Points:** 14
-**Status:** In Progress (2/6 completed)
+**Status:** In Progress (3/6 completed)
 **Source:** Build Specification E8; Framing §4 principle 4 ("Instant and flawless").
 
 ### Stories:
@@ -56,7 +56,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed
   - **Description:** Verify every path end to end — the fallback always catches.
   - **Acceptance Criteria:**
     - Every path verified dead-end-free: each hero, each follow-up, off-script input, empty input,
@@ -121,7 +121,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **By Priority:** P0: 4 stories, 9 points · P1: 2 stories, 5 points · P2: 0
 
-**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 5 stories, 12 points · ⏸️ 0
+**By Status:** ✅ 3 stories, 7 points · 🔄 0 · 📋 3 stories, 7 points · ⏸️ 0
 
 > **Known limitations** decided out of scope during this phase are recorded in
 > [`../../output/phases/phase-4.md`](../../output/phases/phase-4.md) under "Known limitations",
