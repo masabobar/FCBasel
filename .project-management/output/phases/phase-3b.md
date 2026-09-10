@@ -1,8 +1,8 @@
 # Phase 3b: Scripted Hero Flows & Narrative Orchestration
 
 **Duration:** 2026-09-13 to 2026-09-14 (~6.6 AI-hours)
-**Status:** Planning
-**Started:** —
+**Status:** In Progress (1/6 · 3/16 pts)
+**Started:** 2026-09-10
 **Target Completion:** 2026-09-14
 **Actual Completion:** —
 
@@ -32,11 +32,11 @@ protection.
 
 ### Epic 7: E7 — Scripted Hero Flows (16 story points)
 
-**Priority:** P0 · **Status:** Todo · **Dependencies:** Phases 1b, 2a, 2b, 3a
+**Priority:** P0 · **Status:** In Progress (1/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
-| US-034 | Hero 1 primary — shirt sales, badge share, printed names | 3 | 📋 Todo |
+| US-034 | Hero 1 primary — shirt sales, badge share, printed names | 3 | ✅ Done |
 | US-035 | Hero 1 follow-up — which badge to push next | 2 | 📋 Todo |
 | US-036 | Hero 2 primary — ticket revenue year on year | 3 | 📋 Todo |
 | US-037 | Hero 2 follow-up — which fixtures are driving the drop | 2 | 📋 Todo |
@@ -90,9 +90,9 @@ protection.
 > upstream.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 0 / 16 (0%)
-- **Completed Stories:** 0 / 6
-- **Tests Passing:** 0 / 0 · **Coverage:** 0% · **Commits:** 0
+- **Completed Story Points:** 3 / 16 (19%)
+- **Completed Stories:** 1 / 6
+- **Tests Passing:** 1906 / 1906 · **Coverage:** 100% lines (`app/**`) · **Commits:** 1
 
 ---
 
@@ -125,11 +125,48 @@ independent and can be built in any order.
 
 ## Progress Log
 
-_Entries appear here as `/execute-work` completes stories._
+### US-034 — Hero 1 primary (3 pts) · 2026-09-10 · ✅ Done
+
+**The first scripted answer, and it is composition: not one chart was built.** `VBarTile` (US-018)
+and `DonutTile` (US-020) reach a screen for the first time here, beside `HBarTile` (US-021),
+`Segmented` (US-026) and US-024's section head — `app/components/heroes/hero-1.tsx` contributes
+layout, copy and ONE piece of period state, and a source scan proves it holds no `<svg>`.
+
+- **THE SINGLE FILTER IS THE STORY.** One `Segmented` in the SECTION HEAD (not a card's `action`
+  slot — a filter driving three tiles cannot belong to one of them) over one `periodKey` held above
+  all three tiles, the shape US-016's band already uses. One press moves the bars, the ring and the
+  names together: proved by reading all three tiles before and after a single click, for **all four
+  periods**, and again in real Chrome.
+- **Nothing snaps.** The section adds no key of its own, so the bars, arcs and rows reconcile by
+  CATEGORY and transition; mid-flight the labels read `16’975 / 7’855 / 4’387` — counting down from
+  the figures on screen, never through zero — and the `<rect>` node is asserted to be the SAME
+  element across the press.
+- **Narrative byte-identical**, asserted as UTF-8 hex against a retyped literal, by exact length
+  (214), by an ASCII-range sweep of every character, and against the sentence in the backlog itself,
+  so the two copies in the repo cannot drift together. It is rendered straight from the dataset —
+  the string exists nowhere in the component layer.
+- **Not one figure re-typed.** Every displayed number ≥ 100 across all four periods (units, per-kit
+  revenue, totals, badge totals, the four derived segments, print counts) is asserted absent from
+  five source files. Kit revenue is `units × CHF 99` and the Home share is `homeKitShare`; the
+  fixture is proved to hold no `revenue`, `total` or `share` key to read instead.
+- **Badge segments sum EXACTLY to the centre figure in all four periods**, read off the rendered
+  legend (3’080 = 1’355+739+616+370; 1’136 = 500+273+227+136).
+- **Data reaches the sections through a ROOT loader** (`app/lib/dashboard/heroes.ts`, mirroring
+  `baseline.ts`): the sections are inserted by `root.tsx`, the repositories are server-only, and the
+  prototype makes no request after load — Chrome confirms **0 requests** after the first paint.
+- **Chrome pass (built SSR bundle, 1440×950):** three tiles in order with the pinned figures, hover
+  reading `Home · 22’400 shirts · 58% of shirt sales · CHF 2’217’600`, no horizontal overflow, no
+  truncated name label, re-ask → one section / three cards, **zero console errors**.
+- **Security triage — no security-relevant changes detected:** no endpoint, dependency, env var,
+  storage, `innerHTML`, user-supplied URL, request or logging. The one new loader takes no input and
+  reads static in-memory fixtures; the data it serialises is aggregate merchandising with no PII and
+  no named-individual performance figure (asserted).
+- 57 new tests, **1906 green**. Heroes 2 and 3 keep the clearly-marked placeholder body until
+  US-036 / US-038.
 
 ---
 
 **Created:** 2026-09-09
-**Last Updated:** 2026-09-09
-**Phase Status:** Planning
+**Last Updated:** 2026-09-10
+**Phase Status:** In Progress (1/6 · 3/16 pts)
 **Previous:** [Phase 3a](phase-3a.md) · **Next:** [Phase 4 — Hardening](phase-4.md)

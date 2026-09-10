@@ -1,9 +1,13 @@
+import { type HeroesData } from "../../lib/dashboard/heroes";
 import {
+  type InsightSection,
   type InsightSections as InsightSectionList,
   sectionKey,
 } from "../../lib/dashboard/sections";
 import { type RevealFocus } from "../../lib/dashboard/use-dashboard";
-import { HeroSection } from "./hero-section";
+import { HeroId } from "../../lib/repositories/enums";
+import { Hero1Body } from "./hero-1";
+import { HeroSection, PlaceholderBody } from "./hero-section";
 
 /**
  * The "Insight sections" region of the dashboard (`screen-map.md` §2.2): one
@@ -19,16 +23,37 @@ import { HeroSection } from "./hero-section";
  * ORDER IS THE ORDER THE QUESTIONS WERE ASKED. This maps the list as it comes,
  * and `app/lib/dashboard/sections.ts` keeps a refreshed section in the position
  * it already held, so the region reads as a transcript of the session.
+ *
+ * IT IS ALSO WHERE A HERO ID BECOMES CONTENT ({@link heroBody}). The dispatch
+ * lives here rather than inside `./hero-section.tsx` so the frame does not
+ * import the heroes and the heroes can import the frame's head and stagger —
+ * one direction, no cycle. US-036 and US-038 each add one branch below and one
+ * module beside `./hero-1.tsx`.
  */
 
 export interface InsightSectionsProps {
   /** The answered questions, in the order asked. */
   sections: InsightSectionList;
+  /** The hero datasets, from the root loader. Figures come from here only. */
+  heroes: HeroesData;
   /** Which section just changed — the one to bring into view. */
   focus: RevealFocus | null;
 }
 
-export function InsightSections({ sections, focus }: InsightSectionsProps) {
+/** The head and tiles for one answered question. */
+function heroBody(section: InsightSection, heroes: HeroesData) {
+  if (section.heroId === HeroId.HERO_1) {
+    return <Hero1Body primary={heroes.hero1.primary} phase={section.phase} />;
+  }
+
+  return <PlaceholderBody heroId={section.heroId} phase={section.phase} />;
+}
+
+export function InsightSections({
+  sections,
+  heroes,
+  focus,
+}: InsightSectionsProps) {
   // A fragment, so every section is a direct child of the canvas grid.
   return (
     <>
@@ -39,7 +64,9 @@ export function InsightSections({ sections, focus }: InsightSectionsProps) {
           key={sectionKey(section)}
           section={section}
           focusTick={focus?.heroId === section.heroId ? focus.tick : null}
-        />
+        >
+          {heroBody(section, heroes)}
+        </HeroSection>
       ))}
     </>
   );

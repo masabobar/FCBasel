@@ -201,16 +201,32 @@ export function kitRevenueTotal(period: Hero1Period): number {
 }
 
 /**
- * The Home kit's share of shirt units, 0 to 1. The tile shows it rounded, so
- * the exact 58.18% and the displayed 58% both come from this one number.
+ * One kit's share of the period's shirt units, 0 to 1.
+ *
+ * Hero 1's bar tooltip quotes units, share and revenue together, and the share
+ * it quotes has to be the SAME arithmetic the narrative's "58% of shirt sales"
+ * comes from - so there is one division, here, rather than a second one written
+ * inline in the tooltip. {@link homeKitShare} is this function pinned to the
+ * Home kit.
  */
-export function homeKitShare(period: Hero1Period): number {
+export function kitUnitsShare(
+  period: Hero1Period,
+  variant: KitVariant,
+): number {
   const total = kitUnitsTotal(period);
   if (total === 0) {
     return 0;
   }
-  const home = period.kits.find((kit) => kit.variant === KitVariant.HOME);
-  return (home?.units ?? 0) / total;
+  const kit = period.kits.find((one) => one.variant === variant);
+  return (kit?.units ?? 0) / total;
+}
+
+/**
+ * The Home kit's share of shirt units, 0 to 1. The tile shows it rounded, so
+ * the exact 58.18% and the displayed 58% both come from this one number.
+ */
+export function homeKitShare(period: Hero1Period): number {
+  return kitUnitsShare(period, KitVariant.HOME);
 }
 
 /** Share of shirts carrying a sponsor badge, 0 to 1. */

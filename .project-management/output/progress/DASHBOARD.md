@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-10
-**Current Phase:** Phase 3b - Heroes *(0/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a all complete**
+**Current Phase:** Phase 3b - Heroes *(1/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a all complete**
 
 ---
 
@@ -9,12 +9,13 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 74% | 100% | 🟢 On Track |
+| **Overall Progress** | 77% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
-| **Stories Completed** | 33/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 86/116 | 116 | 🟢 On Track |
+| **Phase 3b** | 19% — In Progress (1/6 · 3/16) | 100% | 🟢 On Track |
+| **Stories Completed** | 34/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 89/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -23,9 +24,9 @@
 
 ## 📅 Today's Progress (2026-09-10)
 
-**Stories Completed Today:** 1 (US-033) · **33 total**
-**Currently Working On:** US-034 — Hero 1 primary (3 pts)
-**Story Points Completed Today:** 3 · **86 total**
+**Stories Completed Today:** 2 (US-033, US-034) · **34 total**
+**Currently Working On:** US-035 — Hero 1 follow-up (2 pts)
+**Story Points Completed Today:** 6 · **89 total**
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -169,7 +170,7 @@
 
 ---
 
-## 🏁 Phase 3b open — The Three Hero Flows
+## 🏁 Phase 3b under way — The Three Hero Flows
 
 **Phase 3a** closed at 100% on 2026-09-10 (6/6 · 17/17 pts), joining **1a, 1b, 2a and 2b**: a
 question can now be typed or tapped, is matched, waits a beat, and either answers or lands softly —
@@ -179,12 +180,13 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-034: Hero 1 primary — shirt sales by kit & sponsor badge | 📋 Next | The first scripted answer, composing the US-017/021/024 tiles onto the US-014 canvas |
+| US-035: Hero 1 follow-up — which badge to push next | 📋 Next | Sharpens the section US-034 put on screen: the badge-selection trend and a recommendation panel |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-034: Hero 1 primary — shirt sales, badges, printed names | 2026-09-10 | 3 |
 | US-033: Follow-up context gating | 2026-09-10 | 3 |
 | US-032: Graceful fallback panel | 2026-09-09 | 2 |
 | US-031: Thinking beat | 2026-09-09 | 2 |
@@ -214,8 +216,7 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | US-007: Persona baseline datasets | 2026-09-09 | 2 |
 | US-006: Tile-insertion motion & reduced-motion support | 2026-09-09 | 3 |
 | US-005: Tile card anatomy | 2026-09-09 | 2 |
-| US-004: Self-hosted FCB crest | 2026-09-09 | 1 |
-| US-003: Design token set | 2026-09-09 | 3 |
+| US-003 / US-004: Design token set & self-hosted crest | 2026-09-09 | 4 |
 
 ---
 
@@ -273,7 +274,7 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
 | Phase 3a: Conversation | ✅ Completed | 6/6 | 17/17 | 100% |
-| Phase 3b: Heroes | 🔄 Active | 0/6 | 0/16 | 0% |
+| Phase 3b: Heroes | 🔄 Active | 1/6 | 3/16 | 19% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
 ---
@@ -294,6 +295,6 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-**Last Auto-Update:** US-033 completed at 2026-09-10 — **PHASE 3a IS CLOSED (6/6 · 17/17 pts)**, and the conversational layer is complete end to end: a question can be typed or tapped, is matched or lands softly, waits a beat, and answers. US-033 closed it by making **follow-up gating a single rule in a single place**. `app/lib/dashboard/follow-up-gate.ts` holds two pure functions — `renderedKind(sections, heroId, asked)` and `isFollowUpGated` — and they are read by BOTH halves of the behaviour: `use-dashboard.ts` for the answer that lands, `use-thinking.ts` for the beat that precedes it, so the panel and the canvas can never disagree. **Stated plainly and verified: the behaviour was already correct at HEAD.** `withFollowUpShown` alone *is* a no-op for an absent hero, but no caller ever invoked it ungated — US-014's `showFollowUp` already branched on `hasSection` and US-031's beat already chose the parent's message; reverting both to HEAD fails only the 2 source-scan tests, not one behavioural one. **So this story is not a bug fix; it is the rule made explicit, single-sourced and exhaustively proved** — and the dead end is now guarded by **mutation** instead: calling `withFollowUpShown` unconditionally fails **10** of the new tests, so the silent no-op can never be reintroduced. **The two-step is driven end to end on the real `App` for all three heroes:** a cold typed follow-up renders the **PARENT** at `primary`, the follow-up chip is *then* offered, and tapping it flips that same section's phase — **one section, never two**; never an error, never the fallback, never the empty state, no `role="alert"`. **The chip path was already gated by construction** (US-029 derives a follow-up chip only for a section at `PRIMARY`, asserted over all **27** hero × phase sessions) — **the typed path is the one this story owns**. **Criterion ④ is proved as an absence of parallel state:** a source scan pins `hasSection` and `INTENT_REQUIRES_PARENT` to exactly two readers each, so gating and chip visibility are two readings of ONE list, and Reset re-gates every follow-up for free with no reset code touched. **Criterion ⑤ twice over:** as a property (a hero's gate against the whole session equals its gate against its own entry alone) and on the real `App` — each hero runs primary → follow-up with the other two never touched, which is exactly what a presenter showing one flow needs. **Documented choice:** a gated cold follow-up shows the **PARENT's** thinking message and sources, because the panel must name the answer actually arriving. **US-015's criteria ①②④ re-confirmed closed** (US-013 / US-029 / US-031) in `phase-2a.md` and `phase-2a-shell.md`; nothing dangles. No dependency, no request, no storage, no hex. 46 new tests, **1849 green**. **Next is US-034** — Hero 1 primary, the first scripted answer and the opening of Phase 3b.
+**Last Auto-Update:** US-034 completed at 2026-09-10 — **PHASE 3b IS OPEN AND THE FIRST SCRIPTED ANSWER IS ON SCREEN (1/6 · 3/16 pts).** This is the phase the prototype exists for, and US-034 proved it is **composition, not invention**: not one chart was built. `VBarTile` (US-018) and `DonutTile` (US-020) reach a screen for the first time here, beside `HBarTile` (US-021), `Segmented` (US-026) and US-024's section head — `app/components/heroes/hero-1.tsx` contributes layout, copy and **one piece of state**, and a source scan proves it holds no `<svg>`, `<rect>` or `viewBox`. **THE SINGLE FILTER IS THE STORY (criterion ⑤):** ONE `Segmented` in the SECTION HEAD — not in a card's `action` slot, because a filter that drives three tiles cannot belong to one of them — over ONE `periodKey` held above all three, the shape US-016's band already uses. A **single click** is asserted to move the bars, the ring AND the names together, for **all four periods**, and again in real Chrome. **NOTHING SNAPS:** the section adds no key of its own, so bars, arcs and rows reconcile by CATEGORY and transition; mid-flight the labels read `16’975 / 7’855 / 4’387` — continuing from the figures on screen, never through zero — and the `<rect>` is asserted to be the SAME node across the press. **THE NARRATIVE IS BYTE-IDENTICAL (criterion ④):** UTF-8 hex against a retyped literal, exact length (**214**), an ASCII-range sweep of every character, and a match against the sentence **in the backlog itself**, so the two copies in this repository cannot drift together; it is rendered straight from the dataset, and the string exists nowhere in the component layer. **NOT ONE FIGURE RE-TYPED (criterion ③):** every displayed number ≥ 100 across all four periods — units, per-kit revenue, totals, badge totals, the four derived segments and the print counts — is asserted absent from five source files, in three spellings each. **Kit revenue is `units × CHF 99` and the Home share is `homeKitShare`**, and the fixture is proved to hold no `revenue`, `total` or `share` key to read instead. **BADGE SEGMENTS SUM EXACTLY** to the centre figure in **all four** periods, read off the rendered legend (3’080 = 1’355+739+616+370; 1’136 = 500+273+227+136) — the rounding correction stays in `derive.ts`, which `hero-1.tsx` never calls. **HOVER READS THREE THINGS (criterion ⑥):** `Home · 22’400 shirts · 58% of shirt sales · CHF 2’217’600`, the share from one new `kitUnitsShare` that `homeKitShare` now delegates to — one division, not two. **Data reaches the sections through a ROOT loader** (`app/lib/dashboard/heroes.ts`, mirroring `baseline.ts`), because `root.tsx` is what inserts them; repositories stay server-only and Chrome records **0 requests** after the first paint. **Chrome pass on the built SSR bundle (1440×950):** three tiles in order with the pinned figures, no horizontal overflow, no truncated name label, re-ask → **one section, three cards**, zero console errors. **Security triage — no security-relevant changes detected:** no endpoint, dependency, env var, storage, `innerHTML`, user-supplied URL, request or logging; the new loader takes no input, and the data it serialises is aggregate merchandising with no PII and **no named-individual performance figure** (asserted absent). 57 new tests, **1906 green**. Heroes 2 and 3 keep the clearly-marked placeholder body. **Next is US-035** — Hero 1's follow-up, sharpening the section already on screen.
 
-*Previously (US-032, 2026-09-09):* the screen can no longer dead-end. This is one of the three behaviours the backlog marks untouchable at any cost, because the owner typing something unprepared is the live, unrecoverable moment — so the story built **two distinct panels and never conflates them**. **The fallback** answers a typed question that matched nothing: `askQuestion` returning `null` is handed straight to `useCanvasPanel`, the panel goes up in the SAME commit (**no thinking beat precedes it** — `vi.getTimerCount()` is 0, because a beat promises an answer and none is coming), and it carries the client-approved copy **byte-identical** — asserted as UTF-8 bytes against a retyped literal *and* against the acceptance criterion in the backlog itself, with the straight apostrophe in "I've" and the closing **hyphen** (never an em or en dash) pinned by code point. **Criterion ② is asserted as an absence, not a hope:** eighteen blame/error words ("sorry", "error", "invalid", "understand", "unfortunately", "failed", "try again", …) are proved out of the copy, out of the rendered panel *and* out of the source; there is no `role="alert"`, no `aria-live="assertive"`, no `aria-invalid` and no red error semantics anywhere near it — the surface is the neutral white panel, because red never means "bad" in this product. **The typed question is never echoed back:** the panel has no question prop at all (its props are asserted exactly), so an `<img onerror>` payload creates no element and appears nowhere in the panel's markup — A03 closed structurally rather than by escaping. **The next step is always there:** the three prepared questions are re-surfaced INSIDE the panel using **US-029's own chip components** — same `data-slot`, same classes as the row above the field, no `<button>` in the new file — drawn from the frozen `HERO_CHIPS`, so a follow-up chip can never point at an answer that is not on screen, and a tap from the panel resolves through the chip path. **The empty state** is the other panel: the canvas before anything has been asked, the recorded review feedback rendered as the club red at **4.5% DERIVED from `--color-red`** (`bg-red/4.5` compiles to `color-mix(… var(--color-red) 4.5% …)` = `rgba(211,1,12,0.045)`; the literal and every hex are absent by scan), a matching red hairline, a **bold navy heading**, a lighter one-line subtext and a **red gradient icon badge**, decorative. **All three panels are mutually exclusive by construction:** `canvasPanelFor` returns ONE of thinking / fallback / empty / none, asserted over every combination and in the DOM at each of the four canvas states. **Reset returns to the empty state**, and the fallback is otherwise *derived*: the hook holds the section list the miss was asked against, so any answer drops the panel with no clearing code at all. No new timer, no keyframe, no token, no dependency. 125 new tests, **1803 green**. **Next is US-033** — follow-up context gating, the last story in Phase 3a
+*Previously (US-033, 2026-09-10):* Phase 3a closed by making **follow-up gating a single rule in a single place**. `app/lib/dashboard/follow-up-gate.ts` holds two pure functions read by BOTH halves of the behaviour — `use-dashboard.ts` for the answer, `use-thinking.ts` for the beat — so the panel and the canvas can never disagree. **Stated plainly and verified: the behaviour was already correct at HEAD**; reverting the wiring fails only the 2 source-scan tests, so the story is the rule made explicit and exhaustively proved, with the dead end guarded by **mutation** (an ungated `withFollowUpShown` fails 10 tests). **The two-step runs on the real `App` for all three heroes:** a cold typed follow-up renders the **PARENT** at `primary`, the follow-up chip is *then* offered, and tapping it flips that same section — one section, never two; never an error, never the fallback, never the empty state. **Criterion ④ as an absence of parallel state:** a source scan pins `hasSection` and `INTENT_REQUIRES_PARENT` to exactly two readers each, so gating and chip visibility are two readings of ONE list and Reset re-gates for free. **Criterion ⑤ twice** — as a property over all 27 sessions and on the real `App`. 46 tests, 1849 green.

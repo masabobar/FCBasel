@@ -9,10 +9,13 @@ import { FallbackPanel } from "./components/heroes/fallback-panel";
 import { InsightSections } from "./components/heroes/insight-sections";
 import { ThinkingPanel } from "./components/heroes/thinking-panel";
 import { selectChip, suggestionChips } from "./lib/dashboard/chips";
+import { loadHeroes } from "./lib/dashboard/heroes";
 import { askQuestion } from "./lib/dashboard/intents";
 import { CanvasPanel, useCanvasPanel } from "./lib/dashboard/use-canvas-panel";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 import { useThinking } from "./lib/dashboard/use-thinking";
+import { hero1Repository } from "./lib/repositories/index.server";
+import type { Route } from "./+types/root";
 
 import "./app.css";
 
@@ -32,6 +35,23 @@ export function Layout({ children }: { children: ReactNode }) {
       </body>
     </html>
   );
+}
+
+/**
+ * The hero datasets are fetched on the server, once, per request.
+ *
+ * WHY THE ROOT AND NOT THE ROUTE. The insight sections are inserted HERE, as
+ * siblings of the routed page, so their figures have to reach this component —
+ * and they have to be on the client BEFORE a question is asked, because the
+ * prototype makes no network call after load and Hero 1's period filter is
+ * client state driving three tiles at once. `lib/dashboard/heroes.ts` does the
+ * reading, exactly as `lib/dashboard/baseline.ts` does for the route.
+ *
+ * This is NOT an HTTP endpoint. It adds no route, no path and no status-code
+ * surface (`screen-map.md`'s API table stays empty).
+ */
+export async function loader() {
+  return await loadHeroes(hero1Repository);
 }
 
 /**
@@ -108,7 +128,9 @@ export function Layout({ children }: { children: ReactNode }) {
  * with the previous run's typing in front of a freshly cleared dashboard. The
  * chips inside it need no such help — they are derived.
  */
-export default function App() {
+export default function App({
+  loaderData,
+}: Pick<Route.ComponentProps, "loaderData">) {
   const dashboard = useDashboard();
   const { sections, focus, generation, reset } = dashboard;
   const { beat, busy, actions } = useThinking(dashboard);
@@ -135,7 +157,7 @@ export default function App() {
       }
     >
       <Outlet />
-      <InsightSections sections={sections} focus={focus} />
+      <InsightSections sections={sections} heroes={loaderData} focus={focus} />
       {beat && <ThinkingPanel beat={beat} />}
       {canvas.panel === CanvasPanel.FALLBACK && (
         <FallbackPanel onSelect={(chip) => selectChip(chip, actions)} />

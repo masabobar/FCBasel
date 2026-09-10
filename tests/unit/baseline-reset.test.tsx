@@ -41,6 +41,7 @@ import {
   BaselineRow,
 } from "../../app/components/dashboard/baseline-row";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
+import { HEROES } from "./support/hero-data";
 import { type Clock } from "../../app/lib/calendar";
 import {
   type BaselineData,
@@ -76,7 +77,7 @@ function Harness() {
   return (
     <AppShell onReset={reset}>
       <BaselineRow data={DATA} />
-      <InsightSections sections={sections} focus={focus} />
+      <InsightSections sections={sections} heroes={HEROES} focus={focus} />
       <button type="button" onClick={() => showHero(HeroId.HERO_1)}>
         ask hero 1
       </button>

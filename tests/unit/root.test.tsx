@@ -11,6 +11,7 @@ import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
 import { InsightPhase } from "../../app/lib/dashboard/sections";
 import { HeroId } from "../../app/lib/repositories/enums";
 import App, { Layout } from "../../app/root";
+import { HEROES } from "./support/hero-data";
 import { settleThinkingBeat } from "./support/thinking-harness";
 
 const ROOT_SOURCE = readFileSync(
@@ -69,7 +70,7 @@ describe("App", () => {
     return render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
-          <Route path="/" element={<App />}>
+          <Route path="/" element={<App loaderData={HEROES} />}>
             <Route index element={<p>child route</p>} />
           </Route>
         </Routes>
@@ -115,7 +116,7 @@ describe("App", () => {
     // canvas, so an answer joins the same grid instead of replacing the view.
     expect(ROOT_SOURCE).toMatch(/useDashboard\(\)/);
     expect(ROOT_SOURCE).toMatch(
-      /<InsightSections sections=\{sections\} focus=\{focus\} \/>/,
+      /<InsightSections sections=\{sections\} heroes=\{loaderData\} focus=\{focus\} \/>/,
     );
     expect(ROOT_SOURCE.indexOf("<Outlet />")).toBeLessThan(
       ROOT_SOURCE.indexOf("<InsightSections"),

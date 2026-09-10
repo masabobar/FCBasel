@@ -49,6 +49,7 @@ import {
 import { HERO_IDS, HeroId } from "../../app/lib/repositories/enums";
 import { radius } from "../../app/lib/tokens";
 import App from "../../app/root";
+import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
 
@@ -395,7 +396,7 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
     return render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
-          <Route path="/" element={<App />}>
+          <Route path="/" element={<App loaderData={HEROES} />}>
             <Route index element={<p>child route</p>} />
           </Route>
         </Routes>

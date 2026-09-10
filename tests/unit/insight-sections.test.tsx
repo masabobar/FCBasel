@@ -13,6 +13,7 @@ import {
   tileDelayMs,
 } from "../../app/components/heroes/hero-section";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
+import { HEROES } from "./support/hero-data";
 import {
   InsightPhase,
   type InsightSection,
@@ -78,7 +79,9 @@ function renderSections(
   sections: SectionList,
   focus: RevealFocus | null = null,
 ) {
-  return render(<InsightSections sections={sections} focus={focus} />);
+  return render(
+    <InsightSections sections={sections} heroes={HEROES} focus={focus} />,
+  );
 }
 
 function sectionNodes(): HTMLElement[] {
@@ -112,7 +115,9 @@ describe("insight sections — insertion", () => {
   });
 
   it("states the narrative first, before any tile", () => {
-    renderSections(asked(HERO_1));
+    // HERO_2 is still on the placeholder; `hero1-section.test.tsx` asserts the
+    // same order on Hero 1's real, verbatim narrative.
+    renderSections(asked(HERO_2));
 
     const section = sectionNodes()[0]!;
     const narrative = section.querySelector('[data-slot="section-narrative"]')!;
@@ -134,7 +139,11 @@ describe("insight sections — insertion", () => {
   it("keeps every earlier section present as the session grows", () => {
     const { rerender } = renderSections(asked(HERO_1));
     rerender(
-      <InsightSections sections={asked(HERO_1, HERO_2, HERO_3)} focus={null} />,
+      <InsightSections
+        sections={asked(HERO_1, HERO_2, HERO_3)}
+        heroes={HEROES}
+        focus={null}
+      />,
     );
 
     expect(sectionNodes()).toHaveLength(3);
@@ -152,7 +161,9 @@ describe("insight sections — insertion", () => {
 /* ------------------------------------------------------------ FOLLOW-UP -- */
 
 describe("insight sections — the follow-up sharpens the section", () => {
-  const sharpened = withFollowUpShown(asked(HERO_1, HERO_2), HERO_1);
+  // Two heroes still on the placeholder body, so this suite stays about the
+  // MECHANIC. Hero 1's real content is `tests/unit/hero1-section.test.tsx`.
+  const sharpened = withFollowUpShown(asked(HERO_2, HERO_3), HERO_2);
 
   it("adds the follow-up panel to the existing section", () => {
     renderSections(sharpened);
@@ -167,7 +178,7 @@ describe("insight sections — the follow-up sharpens the section", () => {
     renderSections(sharpened);
 
     expect(sectionNodes()).toHaveLength(2);
-    expect(heroOrder()).toEqual([HERO_1, HERO_2]);
+    expect(heroOrder()).toEqual([HERO_2, HERO_3]);
   });
 
   it("leaves the other section on its primary answer", () => {
@@ -214,7 +225,7 @@ describe("insight sections — one grid, not two", () => {
 
 describe("insight sections — entrance and stagger", () => {
   it("marks every inserted tile as new", () => {
-    renderSections(withFollowUpShown(asked(HERO_1), HERO_1));
+    renderSections(withFollowUpShown(asked(HERO_2), HERO_2));
 
     const cards = sectionNodes()[0]!.querySelectorAll('[data-slot="card"]');
     expect(cards).toHaveLength(2);
@@ -222,7 +233,7 @@ describe("insight sections — entrance and stagger", () => {
   });
 
   it("staggers the tiles so the cascade reads as one sequence", () => {
-    renderSections(withFollowUpShown(asked(HERO_1), HERO_1));
+    renderSections(withFollowUpShown(asked(HERO_2), HERO_2));
 
     const [first, second] = Array.from(
       sectionNodes()[0]!.querySelectorAll<HTMLElement>('[data-slot="card"]'),
@@ -292,6 +303,7 @@ describe("insight sections — auto-scroll to the newest section", () => {
     rerender(
       <InsightSections
         sections={withHeroShown(sections, HERO_1)}
+        heroes={HEROES}
         focus={focusOn(HERO_1, 2)}
       />,
     );
@@ -336,13 +348,13 @@ describe("insight sections — reduced motion still renders the layout", () => {
   it("renders the same sections, tiles and placement with the tween off", () => {
     stubReducedMotion(true);
     const sections: SectionList = withFollowUpShown(
-      asked(HERO_1, HERO_2),
-      HERO_2,
+      asked(HERO_2, HERO_3),
+      HERO_3,
     );
 
-    renderSections(sections, { heroId: HERO_2, tick: 2 });
+    renderSections(sections, { heroId: HERO_3, tick: 2 });
 
-    expect(heroOrder()).toEqual([HERO_1, HERO_2]);
+    expect(heroOrder()).toEqual([HERO_2, HERO_3]);
     expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(3);
     for (const node of sectionNodes()) {
       expect(node).toHaveClass("col-span-full", "grid-cols-subgrid");
@@ -354,7 +366,7 @@ describe("insight sections — reduced motion still renders the layout", () => {
 
 describe("insight sections — the placeholder is clearly a placeholder", () => {
   const section: InsightSection = {
-    heroId: HERO_1,
+    heroId: HERO_2,
     phase: InsightPhase.WITH_FOLLOW_UP,
     revision: 0,
   };
@@ -369,7 +381,7 @@ describe("insight sections — the placeholder is clearly a placeholder", () => 
   it("names the stories that replace it", () => {
     renderSections([section]);
 
-    expect(sectionNodes()[0]!).toHaveTextContent("US-034 to US-039");
+    expect(sectionNodes()[0]!).toHaveTextContent("US-036 and US-038");
   });
 
   it("invents no figure and no narrative copy", () => {

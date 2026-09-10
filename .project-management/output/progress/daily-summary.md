@@ -1,65 +1,56 @@
 # Daily Work Summary
 
 **Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
-**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033)
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 + US-034)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 33 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
-with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are unblocked.
-**Story Points:** 86
-**Time Worked:** ~22.9 hours · **Files Changed:** 261 · **Tests Added:** 1849
+**Stories Completed:** 34 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
+with US-033 (6/6 · 17/17) and opened Phase 3b with **US-034 — the first scripted answer on screen**.
+**Story Points:** 89
+**Time Worked:** ~24.3 hours · **Files Changed:** 277 · **Tests Added:** 1906
 
 ---
 
 ## Work Log
 
-- **Phase 1a — US-001 to US-006 (14 pts), closed.** Condensed; the full account is in
-  [`../phases/phase-1a.md`](../phases/phase-1a.md). In short: the React Router 7.18 SSR scaffold
-  verified by execution (US-001, Railway deploy still a human step); ESLint 9 + Prettier + husky with
-  the hook *proved* to fire (US-002); one design-token set published as Tailwind v4 properties and as
-  typed objects, held in lockstep by a drift test (US-003); the crest self-hosted after verifying its
-  bytes were PNG (US-004); one `Card` shell of collapsing slots (US-005); and the four reveal
-  keyframes plus `app/lib/motion.ts`, where **reduced motion renders final state rather than
-  switching animation off** (US-006).
-- **Phase 1b — US-007 to US-011 (10 pts), closed.** Condensed; the full account is in
-  [`../phases/phase-1b.md`](../phases/phase-1b.md). US-007 set the shape the rest follow (enums,
-  types and the repository interface, fixtures in `app/lib/mock/`, server-only selection, all four
-  periods, every headline **computed from the series**). US-008 to US-010 built the three hero
-  datasets with **nothing derivable stored** — kit revenue as units × CHF 99, `badgeSegments`
-  correcting its rounding remainder so the parts sum exactly, the two Hero 2 charts kept at
-  deliberately different scopes with `scopeLabel` as a field, and `varianceJudgement` deciding
-  good-or-bad once from `DepartmentType` so a naive "variance > 0" rule is proven to misread exactly
-  one department. US-011 made `app/lib/format.ts` the one place a number becomes a string (sign
-  before the unit, Swiss U+2019 pinned independent of ICU, one rounding rule) and swept every
-  narrative number: **no drift found.** 418/418.
+- **Phase 1a — US-001 to US-006 (14 pts), closed.** Condensed; full account in
+  [`../phases/phase-1a.md`](../phases/phase-1a.md): the RR 7.18 SSR scaffold verified by execution
+  (US-001, Railway deploy still a human step); ESLint 9 + Prettier + husky with the hook *proved* to
+  fire (US-002); one design-token set in Tailwind v4 properties and typed objects, held in lockstep
+  by a drift test (US-003); the crest self-hosted after verifying its bytes were PNG (US-004); one
+  `Card` shell of collapsing slots (US-005); and the four reveal keyframes plus `app/lib/motion.ts`,
+  where **reduced motion renders final state** (US-006).
+- **Phase 1b — US-007 to US-011 (10 pts), closed.** Condensed; full account in
+  [`../phases/phase-1b.md`](../phases/phase-1b.md). US-007 set the shape (enums, types, repository
+  interface, fixtures in `app/lib/mock/`, server-only selection, every headline **computed from the
+  series**); US-008 to US-010 built the three hero datasets with **nothing derivable stored** — kit
+  revenue as units × CHF 99, `badgeSegments` correcting its rounding remainder, `scopeLabel` a field,
+  and `varianceJudgement` deciding good-or-bad once from `DepartmentType`. US-011 made
+  `app/lib/format.ts` the one place a number becomes a string and swept every narrative number:
+  **no drift found.** 418/418.
 - **US-012 / US-014 / US-015 — shell, insertion, reset (8 pts), Phase 2a's first three.** Condensed;
-  the full account is in [`../phases/phase-2a.md`](../phases/phase-2a.md). The navy sidebar, app bar
-  and a canvas grid stepping 12 → 8 → 4, with three things made structural rather than trusted: the
-  **persona is a role** (a test accounts for the app bar's whole text), the placeholder nav is
-  **inert by construction**, and the connection status is **decorative** (no live region, no
-  `fetch`, no timer). Then the mechanic the demo turns on: the dashboard **grows, it never clears** —
-  a memory-only list of `{heroId, phase, revision}`, pure transitions in `sections.ts`, sections as
-  direct children of the SAME canvas grid via `grid-cols-subgrid`, re-asking refreshing in place and
-  a follow-up flipping its parent's phase. And Reset as a **fourth transition, not a mode**,
-  restoring the named baseline that is also the hook's initial state, cancelling the pending beat
-  first (delete that line and two tests fail), and handing back the same list reference when there
-  is nothing to clear, so ten presses in one frame run ONE view transition. 592/592 green.
+  full account in [`../phases/phase-2a.md`](../phases/phase-2a.md). The navy sidebar, app bar and a
+  canvas grid stepping 12 → 8 → 4, with the **persona a role**, the placeholder nav **inert by
+  construction** and the connection status **decorative**. Then the mechanic the demo turns on: the
+  dashboard **grows, it never clears** — a memory-only `{heroId, phase, revision}` list, pure
+  transitions in `sections.ts`, sections as direct children of the SAME grid via `grid-cols-subgrid`,
+  re-asking refreshing in place, a follow-up flipping its parent's phase. And Reset as a **fourth
+  transition, not a mode**, cancelling the pending beat first and idempotent by reference.
+  592/592 green.
 - **US-027 — Motion & animation hooks.** Phase 2b opens with the story every other component in it
   depends on: `useReducedMotion`, `useGrow`, `useCountUp`, `useUid`. **Count-up counts from the
   figure on screen, not from zero** — a test proves a target changed mid-flight opens the new
   animation *on that very figure* and lands exactly on target. **Reduced motion means final state in
   the same render:** `useGrow` is `true` on the first render with **zero** frames requested. One
   reduced-motion source, everything cancelled on unmount, SSR proven by `hydrateRoot`. 52 tests.
-- **US-017 — KPI tile & variance chip.** The first component built on those hooks, and the shape
-  the other nine follow: `DeltaChip`, plus `KpiSparkline`, `KpiFigure` and `KpiTile`. **The chip is
-  where "colour is never the sole signal" stops being a slogan:** direction is carried four times
-  over, and the `light` variant is the proof — on navy the up and down chips' class strings are
-  asserted **identical** while glyph, sign and spoken word still differ. **Direction is arithmetic,
-  judgement is meaning.** Extras arrive as `children`; the `tailwind-merge` trap is closed at the
-  root. 78 tests, 722/722.
+- **US-017 — KPI tile & variance chip.** The first component on those hooks and the shape the other
+  nine follow: `DeltaChip`, `KpiSparkline`, `KpiFigure`, `KpiTile`. **"Colour is never the sole
+  signal" stops being a slogan:** on navy the up and down chips' class strings are asserted
+  **identical** while glyph, sign and spoken word differ. **Direction is arithmetic, judgement is
+  meaning.** 78 tests, 722/722.
 - **US-021 — Horizontal bar tile.** The most reused chart, built once for five consumers as
   `HBarRow` / `HBars` / `HBarTile`. **Both review decisions are read back off the rendered
   element:** a 150px label column with truncation *rejected* (so `Cap "Rotblau"` cannot regain its
@@ -67,33 +58,26 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
   figure** sets anchor side, token and text sign; rows keyed by name, so a filter transitions the
   *same* bar. 55 tests.
 - **US-016 — Hero band. Phase 2a is closed (5/5 · 16/16).** The navy band above the baseline row,
-  and the first thing to mount `LineChart` and `Segmented` in the app. **ONE `Segmented` drives both
-  halves** from a single `BaselinePeriod` entry (one `useState`, one `<Segmented>`, pinned by tests),
-  so the gold-area-over-dashed-white chart (re-keyed by period, replaying the stroke draw) and the
-  new hand-built `AttendanceRing` cannot disagree about the month. **The total and its delta are
-  `seriesTotals` off the plotted array**; the greeting comes from an injectable clock. Chrome at
-  1920×1080: 54 distinct KPI strings, still the old figure in the frame after the click, 43 arc dash
-  pairs on the same element, one value each under reduced motion. One defect fixed. 92 tests.
+  and the first thing to mount `LineChart` and `Segmented`. **ONE `Segmented` drives both halves**
+  from a single `BaselinePeriod` entry, so the chart and the new `AttendanceRing` cannot disagree
+  about the month — the shape US-034 reused for three tiles. **The total and its delta are
+  `seriesTotals` off the plotted array.** Chrome-verified at 1920×1080. 92 tests.
 - **US-018 — Vertical bar chart tile.** The kit-split chart US-034 composes. **Bar persistence is
   the story and the test is a re-rank:** columns keyed by category, so a filter press hands `Home`
   the *same* `<rect>` and its geometry transition carries it — an index key **fails exactly two
   tests**. Gradient caps, hover highlight, wrapping DOM-text labels. 52 tests.
 - **US-019 — Grouped bar chart tile.** US-036's fixture chart: **sixteen bars and eight delta chips
-  in one tile**. **The review's overlap fix is arithmetic and both halves are measured:** a 44-unit
-  left gutter everything is inset to, and a 34-unit chip band that stays empty because the axis
-  maximum is *derived from the geometry* — a fixed 10% headroom fails that test. Pairs keyed by
-  fixture. 63 tests.
+  in one tile**. The review's overlap fix is arithmetic and both halves are measured — a 44-unit left
+  gutter and a 34-unit chip band kept empty by an axis maximum *derived from the geometry*. 63 tests.
 - **US-020 — Donut / ring tile.** US-034's sponsor-badge ring, deliberately a different component
   from US-016's single-arc `AttendanceRing`. **Two hover surfaces write ONE state** (arc and legend
   row), and **the segments morph** — arcs keyed by SPONSOR, so a period press transitions the same
   `<circle>` while one `useCountUp` carries the centre, never via zero. **The arithmetic is
   `badgeSegments`'** (US-008), imported not restated. 56 tests, 1261/1261.
 - **US-022 — Department table tile.** Hero 3's primary tile as a real `<table>`. **The revenue/cost
-  trap is closed by construction:** the colour comes from `row.judgement` (US-010) through
-  `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while Sponsoring's +840 renders
-  FAVOURABLE, and a source scan blocks the judgement migrating back into the tile. CHF millions with
-  an unremovable subtitle; numeric headers right-aligned by one rule header and cells share.
-  54 tests, 1315/1315.
+  trap is closed by construction:** colour comes from `row.judgement` (US-010) through `DeltaChip`,
+  so **Marketing's +410 renders UP and ADVERSE** while Sponsoring's +840 renders FAVOURABLE, and a
+  source scan blocks the judgement migrating back in. 54 tests, 1315/1315.
 - **US-023 — Driver / breakdown tile.** `DriverTile`, `DriverTotalBadge` and the pure
   `rankDrivers` / `driverTotal`, for all three causal follow-ups. **It draws no bars, and the tests
   keep it that way:** every row is US-021's `HBarRow` through `HBarTile`, and a source scan rejects
@@ -125,13 +109,10 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
   immediately fails **22** tests. **Both paths pause and neither module changed**, and a no-match
   calls neither action, so an off-script question shows **no beat**. **Still ONE timer**, so
   **US-015 criterion ④ is satisfied**, proved by mutation twice over. 91 tests, 1678/1678.
-- **US-032 — Graceful fallback panel. The screen can no longer dead-end (5/6 · 14/17)**, one of the
-  three behaviours the backlog marks untouchable. **Two panels, never conflated.** **The copy is
-  byte-identical:** UTF-8 bytes against a retyped literal *and* the backlog criterion, apostrophe and
-  closing **hyphen** pinned by code point. **Criterion ② asserted as an ABSENCE:** 18 blame words out
-  of copy, panel *and* source; no alert role, no red semantics; **the question is never echoed**.
-  **No beat precedes it**, and the next step is always there. **The three panels are mutually
-  exclusive by construction.** 125 tests, 1803/1803.
+- **US-032 — Graceful fallback panel. The screen can no longer dead-end (5/6 · 14/17).** Two panels,
+  never conflated; the copy **byte-identical** against a literal *and* the backlog; criterion ②
+  asserted as an ABSENCE (18 blame words, no alert role, the question never echoed); no beat
+  precedes it; the three panels mutually exclusive by construction. 125 tests, 1803/1803.
 - **US-033 (2026-09-10) — Follow-up context gating. PHASE 3a CLOSES at 6/6 · 17/17.**
   `follow-up-gate.ts` holds the rule as two pure functions read by BOTH the answer
   (`use-dashboard.ts`) and the beat (`use-thinking.ts`). **Stated plainly: the behaviour was already
@@ -143,6 +124,18 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
   **Criterion ④ by source scan** — `hasSection` has exactly two readers, so gating and chip
   visibility are two readings of ONE list and Reset re-gates for free. **Criterion ⑤ twice** — as a
   property over all 27 sessions and on the real `App`. 46 tests, 1849/1849.
+- **US-034 (2026-09-10) — Hero 1 primary. PHASE 3b OPENS (1/6 · 3/16).** The heart of the prototype
+  starts, and it is **composition, not invention**: `VBarTile` and `DonutTile` reach a screen for the
+  first time beside `HBarTile`, `Segmented` and US-024's head, while `hero-1.tsx` adds only layout,
+  copy and ONE piece of state (no `<svg>` by scan). **One `Segmented` in the SECTION HEAD drives all
+  three tiles** — a single click moves bars, ring and names together, in all four periods and in real
+  Chrome — and **nothing snaps**: mid-flight labels read `16’975 / 7’855 / 4’387`, continuing from the
+  figures on screen. **Narrative byte-identical** (hex, length 214, ASCII sweep, and against the
+  backlog itself). **No figure re-typed**: every displayed number ≥ 100 in all four periods asserted
+  absent from five sources; revenue is `units × CHF 99`, the Home share is `homeKitShare`, and the
+  fixture holds no stored copy. **Badge segments sum exactly** to the centre figure in all four
+  periods. Figures arrive through a new **root loader**; Chrome records 0 requests after paint.
+  57 tests, 1906/1906.
 
 ---
 
@@ -204,12 +197,9 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
   **Phase 3a: 4/6 stories, 12/17 points.**
 
 - ✅ US-032 — Graceful fallback panel (2 pts) — all 4 criteria met: a no-match shows the friendly
-  panel with the copy **byte-identical** (hyphen, not an em dash) followed by the three suggestion
-  chips; it never shows an error, never blames the user and never leaves the screen without a next
-  step (eighteen blame words, the alert role and red semantics all asserted ABSENT); "show me player
-  injuries" and gibberish land there identically; and before any question the empty state shows the
-  branded-red panel at **4.5% derived from the red token**, bold navy heading, lighter one-line
-  subtext, red gradient icon badge. **Phase 3a: 5/6 stories, 14/17 points.**
+  panel with the copy **byte-identical** followed by the three chips; never an error, never blame,
+  never a dead end (18 blame words, the alert role and red semantics asserted ABSENT); and the empty
+  state shows the branded-red panel at **4.5% derived from the red token**. **Phase 3a: 5/6, 14/17.**
 
 - ✅ US-033 — Follow-up context gating (3 pts, 2026-09-10) — all 5 criteria met: a typed follow-up
   resolves to the deep-dive only once its parent has been shown; otherwise the **parent renders
@@ -218,6 +208,14 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
   gating and chip visibility (pinned by source scan to one predicate with two readers); and each
   hero runs start-to-follow-up alone, so the presenter can show just one.
   **PHASE 3a COMPLETE: 6/6 stories, 17/17 points.**
+
+- ✅ US-034 — Hero 1 primary (3 pts, 2026-09-10) — all 6 criteria met: the chip label is the
+  section's heading (imported from US-029's config, not retyped); US-030's keyword set is untouched;
+  the three tiles render **in order** with the pinned figures (22’400 / 10’300 / 5’800, total 38’500
+  shirts · CHF 3.81M; 3’080 ~8%, 44/24/20/12; Shaqiri 3’180 → Daniliuc 760); the narrative is
+  **verbatim**; one section-level `Segmented` drives all three tiles with badge segments derived per
+  period and summing exactly; and a bar's hover reads units, share and revenue while every label
+  counts up on a filter change. **Phase 3b: 1/6 stories, 3/16 points.**
 
 *(Condensed to keep this log inside its 300-line limit — full detail in
 [`completed.md`](completed.md) and [`../phases/phase-3a.md`](../phases/phase-3a.md).)*
@@ -242,15 +240,16 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
 - **Phases 1a, 1b, 2a and 2b are all closed** (69 points): seven tile kinds, four chart geometries,
   the segmented control, the motion hooks and the two insight elements, no per-hero copy anywhere.
 - **PHASE 3a IS CLOSED (6/6 · 17/17), and the demo choreography is whole:** a question arrives by
-  chip or by typing, waits through the beat and lands; anything off-script meets the fallback
-  instead of silence; and a follow-up asked cold renders its parent and then offers the chip.
-- **Next: US-034 — Hero 1 primary (3 pts)**, opening Phase 3b. All three hero stories declared
-  US-033 as a dependency and are now unblocked. Phase 3b is composition only — every hero beat
-  assembles existing components and supplies the pre-authored strings, which US-024 proved render
-  verbatim.
+  chip or by typing, waits through the beat and lands; off-script meets the fallback, and a
+  follow-up asked cold renders its parent and then offers the chip.
+- **PHASE 3b IS UNDER WAY: US-034 put the first scripted answer on screen** — Hero 1's three tiles
+  under one narrative and one period filter, every figure from the US-008 repository through a new
+  root loader. It confirmed the phase's premise: assembly plus copy, no new visual.
+- **Next: US-035 — Hero 1 follow-up (2 pts)**, sharpening the section already on screen with the
+  badge-selection trend and a recommendation panel.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
-3a (17 pts, done) + 3b, the demo itself (16 pts, 0 done).
+3a (17 pts, done) + 3b, the demo itself (16 pts, 3 done).
 
 ---
 
@@ -258,8 +257,8 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
 
 - **The deadline is this week.** Sponsor showing first, owner audience the following week. ~52
   AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
-- Phases 1a, 1b, 2a, 2b and 3a are all complete (86/116 points); continue with
-  `/holycode-pm:execute-work story US-034`.
+- Phases 1a, 1b, 2a, 2b and 3a are complete and 3b is under way (89/116 points); continue with
+  `/holycode-pm:execute-work story US-035`.
 - **US-028's three seams are now ALL filled:** `children` (US-029), `onSubmit` (US-030) and `busy`
   (US-031), plus `key={generation}` for a half-typed question. **There is exactly one timer in the
   app and a test pins it there:** a story growing its own submit path, timer or chip styling is a
@@ -282,6 +281,8 @@ with US-033 (6/6 · 17/17); Phase 3b is now open and its three hero stories are 
   tightening either is a deliberate decision, never a tidy-up. **US-032 is the catch behind it** and
   its absence assertions (no blame word, no alert role, no echoed input) are the requirement, not a
   style note. **US-033 added the third rule: gating is decided in one module, for both paths.**
+- **US-034 confirmed Phase 3b is assembly:** a hero adds layout, copy and at most ONE piece of
+  state; building a chart, restating a figure or paraphrasing a narrative there is a review finding.
 - **US-013 set the no-hardcoded-figure pattern:** figures reach a component only through a
   loader-provided view model; a test scans for a literal figure.
 - **US-025's chart is the only line chart**: a second `smoothPath` anywhere is a review finding.

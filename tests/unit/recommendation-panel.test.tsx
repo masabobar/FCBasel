@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { VBarTile } from "../../app/components/charts/v-bars";
 import { SectionHead } from "../../app/components/heroes/hero-section";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
+import { HEROES } from "./support/hero-data";
 import {
   CARD_ACCENTS,
   CARD_CAPTION_VARIANTS,
@@ -485,7 +486,9 @@ describe("US-024 criterion 3 — the narrative is stated before the charts", () 
     const heading = screen.getByRole("heading", { name: "Marketing" });
 
     expect(precedes(heading, slot("section-narrative")!)).toBe(true);
-    expect(head.firstElementChild).toBe(heading);
+    // The heading leads the head; US-034 put a section-level period filter
+    // opposite it, so it is no longer necessarily the head's first ELEMENT.
+    expect(head).toContainElement(heading);
     expect(head.lastElementChild).toBe(slot("section-narrative"));
   });
 
@@ -493,6 +496,7 @@ describe("US-024 criterion 3 — the narrative is stated before the charts", () 
     render(
       <InsightSections
         sections={withHeroShown([], HeroId.HERO_1)}
+        heroes={HEROES}
         focus={null}
       />,
     );

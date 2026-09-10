@@ -6,10 +6,10 @@
 
 ## Summary
 
-**Total Completed:** 33 stories
-**Total Points:** 86 / 116
+**Total Completed:** 34 stories
+**Total Points:** 89 / 116
 **Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 43 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b open (0/6)**
+**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (1/6 · 3/16)**
 
 ---
 
@@ -254,6 +254,46 @@ detail lives in [`../phases/phase-3a.md`](../phases/phase-3a.md)**, which is the
 - **Security triage — no security-relevant changes detected:** no endpoint, dependency, storage,
   `innerHTML`, URL, request or logging; the gate is a pure function of a section list and a closed
   enum, and the typed string never reaches it
+
+---
+
+### US-034: Hero 1 primary — shirt sales, badge share, printed names (3 pts) — **PHASE 3b OPENS**
+
+*2026-09-10 · 57 tests · 1906 green · 100% lines (`app/**`)*
+
+- **COMPOSITION, NOT INVENTION — not one chart was built.** `VBarTile` (US-018) and `DonutTile`
+  (US-020) reach a screen for the first time, beside `HBarTile` (US-021), `Segmented` (US-026) and
+  US-024's section head. `hero-1.tsx` adds layout, copy and ONE piece of state — no `<svg>` by scan
+- **THE SINGLE FILTER IS THE STORY (criterion 5):** one `Segmented` in the SECTION HEAD — not a
+  card's `action` slot, because a filter driving three tiles cannot belong to one of them — over one
+  `periodKey` held above all three. Proved by reading bars, ring AND names before and after a
+  **single click**, across all four periods, and again in real Chrome
+- **NOTHING SNAPS.** The section adds no key of its own, so bars, arcs and rows reconcile by
+  CATEGORY: mid-flight the labels read `16’975 / 7’855 / 4’387` — continuing from the figures on
+  screen, never through zero — and the `<rect>` is asserted to be the SAME node across the press
+- **NARRATIVE BYTE-IDENTICAL (criterion 4):** UTF-8 hex against a retyped literal, exact length
+  (214), an ASCII sweep of every character, and a match against the sentence **in the backlog
+  itself**, so the two copies in the repo cannot drift together. Rendered straight from the dataset;
+  the string exists nowhere in the component layer
+- **NOT ONE FIGURE RE-TYPED (criterion 3):** every displayed number ≥ 100 across all four periods —
+  units, per-kit revenue, totals, badge totals, the four derived segments, print counts — asserted
+  absent from five source files. Kit revenue is `units × CHF 99` and the Home share is
+  `homeKitShare`; the fixture is proved to hold no `revenue`, `total` or `share` key to read instead
+- **BADGE SEGMENTS SUM EXACTLY** to the centre figure in **all four** periods, read off the rendered
+  legend (3’080 = 1’355+739+616+370; 1’136 = 500+273+227+136) — the rounding correction stays in
+  `derive.ts`, and `hero-1.tsx` never calls `badgeSegments`
+- **HOVER READS THREE THINGS (criterion 6):** `Home · 22’400 shirts · 58% of shirt sales ·
+  CHF 2’217’600` — the share from one new `kitUnitsShare` that `homeKitShare` now delegates to
+- **DATA REACHES THE SECTIONS THROUGH A ROOT LOADER** (`app/lib/dashboard/heroes.ts`, mirroring
+  `baseline.ts`): sections are inserted by `root.tsx`, so repositories stay server-only. The
+  per-hero dispatch lives in `insight-sections.tsx`, so the frame does not import the heroes and the
+  heroes can import its head — one direction, no cycle
+- **Chrome pass** (built SSR bundle, 1440×950): tiles in order with the pinned figures, **0 requests
+  after paint**, no horizontal overflow, no truncated label, re-ask → one section, zero errors
+- **Security triage — no security-relevant changes detected:** no endpoint, dependency, env var,
+  storage, `innerHTML`, user-supplied URL, request or logging. The new loader takes no input and
+  reads static in-memory fixtures; the data is aggregate merchandising with no PII and no
+  named-individual performance figure (asserted absent)
 
 ---
 

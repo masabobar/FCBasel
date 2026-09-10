@@ -6,7 +6,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 **Duration:** Days 4-5 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 16
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 
 > **Applies to every story in this epic:**
 > - Each hero renders its tiles **in the defined order**, with the E2 insertion animation and its
@@ -23,7 +23,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** Not Started (0/6 completed)
+**Status:** In Progress (1/6 completed)
 **Source:** Build Specification E7 and pattern §5.3; Reference Implementation Guide §8, §13.
 
 ### Stories:
@@ -32,7 +32,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-10)
   - **Description:** *"Show me shirt sales split into home, away and third kit. How many have sponsor
     badges (Bitpanda, Allianz, Sunrise, IWB) printed, and the top 5 printed names."*
   - **Acceptance Criteria:**
@@ -168,11 +168,11 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **By Priority:** P0: 6 stories, 16 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 0 · 🔄 0 · 📋 6 stories, 16 points · ⏸️ 0
+**By Status:** ✅ 1 story, 3 points · 🔄 0 · 📋 5 stories, 13 points · ⏸️ 0
 
 ---
 
 **Navigation:**
 [← Master Index](README.md) · [← Previous](phase-3a-conversation.md) · [Next Phase →](phase-4-polish.md) · [Dashboard](../../output/progress/DASHBOARD.md)
 
-**Last Updated:** 2026-09-09
+**Last Updated:** 2026-09-10

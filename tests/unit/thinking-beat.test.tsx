@@ -63,6 +63,7 @@ import {
 import { MOTION_CLASS } from "../../app/lib/motion";
 import { HERO_IDS, HeroId } from "../../app/lib/repositories/enums";
 import App from "../../app/root";
+import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 
 /* ------------------------------------------------------------- SOURCES -- */
@@ -148,7 +149,7 @@ function renderApp({ reducedMotion = false } = {}): void {
   render(
     <MemoryRouter initialEntries={["/"]}>
       <Routes>
-        <Route path="/" element={<App />}>
+        <Route path="/" element={<App loaderData={HEROES} />}>
           <Route index element={<p>child route</p>} />
         </Route>
       </Routes>
