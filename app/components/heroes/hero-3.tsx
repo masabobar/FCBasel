@@ -14,6 +14,7 @@ import {
   formatMoneyMillionsFixed,
   formatNumber,
   formatPercent,
+  formatSignedMoneyCompact,
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
 import {
@@ -138,11 +139,12 @@ import {
  *
  * NOT ONE FIGURE IN THE BEAT IS TYPED EITHER. The three drivers are the
  * dataset's own rows, the conversion pair is its own measurement, and the
- * `CHF 410k total` badge is US-023's `driverTotal` — summed from the rows ON
+ * `+CHF 410k total` badge is US-023's `driverTotal` — summed from the rows ON
  * SCREEN, which is what makes it equal to the Marketing variance the table
  * above derives. The badge's judgement is the one thing that cannot come from
  * the sign: an overspend going UP is bad news, so it is passed ADVERSE, the
- * same Revenue / Cost reading the table makes one row at a time.
+ * same Revenue / Cost reading the table makes one row at a time. The SIGN is
+ * still written, because the badge is a variance chip (US-044).
  *
  * DEPARTMENTS, NEVER PEOPLE. This is the section closest to the
  * named-individual guardrail and it stays aggregate: departmental budgets,
@@ -433,9 +435,15 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
               name: driver.name,
               value: driver.amount,
             }))}
-            // Every row is money over plan, so the same compact composition the
-            // beat's badge uses spells all four figures identically.
+            // Every row is money over plan, so one compact composition spells
+            // all four figures identically.
             format={money}
+            // THE BADGE IS A VARIANCE, THE ROWS ARE MAGNITUDES (US-044). A row
+            // reads `CHF 240k` of overspend; the total reads `+CHF 410k`,
+            // because a variance chip always writes its sign and this one is a
+            // rise. Same composition, signed — see `totalFormat` in
+            // `app/components/tiles/driver-tile.tsx`.
+            totalFormat={signedMoney}
             // MAGNITUDE ORDER, the tile's default: the biggest slice of the
             // overspend first, which is the one the recommendation acts on.
             //
@@ -504,15 +512,27 @@ function moneyMillions(thousands: number): string {
 }
 
 /**
- * `CHF 240k` — one driver's overspend against plan, and the beat's total.
+ * `CHF 240k` — one driver's overspend against plan, as a bar label.
  *
  * Compact, because the beat's figures are hundreds of thousands rather than the
  * tens of millions the two tiles above report, and a bar label reads at a
- * glance. The badge is handed the SAME function by `DriverTile`, so the total
- * and the rows cannot spell the currency differently.
+ * glance. UNSIGNED: each row is an amount that went somewhere, not a movement.
  */
 function money(thousands: number): string {
   return formatMoneyCompact(chfFromThousands(thousands));
+}
+
+/**
+ * `+CHF 410k` — the beat's TOTAL, which is a movement and therefore signed.
+ *
+ * The same compact composition as {@link money}, so the badge and the bars
+ * cannot spell CHF thousands differently; the only difference is the sign,
+ * which a variance chip always writes (`app/lib/format.ts`). Marketing's
+ * overspend is a RISE, so the sign is a plus and the token is still the
+ * negative one — US-022's trap, spelled out.
+ */
+function signedMoney(thousands: number): string {
+  return formatSignedMoneyCompact(chfFromThousands(thousands));
 }
 
 /**

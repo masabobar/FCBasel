@@ -20,6 +20,7 @@ import {
   chfFromThousands,
   formatMoneyCompact,
   formatNumber,
+  formatSignedMoneyCompact,
   formatSignedPercent,
 } from "../../app/lib/format";
 import { COUNT_UP_DURATION_MS } from "../../app/lib/hooks/use-motion";
@@ -390,6 +391,49 @@ describe("DriverTile — the action-slot badge, derived from the rows", () => {
     // UP and ADVERSE at once — an overspend that grew is bad news (US-022).
     expect(chip.dataset.direction).toBe("UP");
     expect(chip.dataset.judgement).toBe(VarianceJudgement.ADVERSE);
+  });
+
+  /**
+   * `totalFormat` — US-044.
+   *
+   * The badge is a `DeltaChip` and a `DeltaChip` always writes its sign, but the
+   * ROWS of an overspend breakdown are magnitudes and read better without one.
+   * Where the two disagree the caller signs the badge alone; the currency
+   * spelling still comes from one composition, so the badge and the bars cannot
+   * drift apart.
+   */
+  it("signs the badge without signing the rows when the caller passes `totalFormat`", () => {
+    renderSettled(
+      <DriverTile
+        title="What's driving Marketing"
+        rows={DRIVERS}
+        format={formatMoneyCompact}
+        totalFormat={formatSignedMoneyCompact}
+        showTotal
+        totalJudgement={VarianceJudgement.ADVERSE}
+      />,
+    );
+
+    expect(actionChip()!.textContent).toContain("+CHF 410k");
+    for (const value of slots("h-bar-value")) {
+      expect(value.textContent).not.toMatch(/^[+-]/);
+    }
+  });
+
+  it("falls back to the rows' formatter when no `totalFormat` is given", () => {
+    renderSettled(
+      <DriverTile
+        title="Fixtures driving the drop"
+        rows={DECLINES}
+        negative
+        format={formatMoneyCompact}
+        showTotal
+      />,
+    );
+
+    // A decline's minus arrives with the amount, so the rows' formatter is
+    // already right for both halves and nothing needs overriding.
+    expect(actionChip()!.textContent).toContain("-CHF 400k");
   });
 
   it("takes a caller's own label for the trailing word", () => {

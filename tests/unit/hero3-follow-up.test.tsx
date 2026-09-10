@@ -82,6 +82,7 @@ import {
   chfFromThousands,
   formatMoneyCompact,
   formatPercent,
+  formatSignedMoneyCompact,
 } from "../../app/lib/format";
 import { COUNT_UP_DURATION_MS } from "../../app/lib/hooks/use-motion";
 import {
@@ -121,9 +122,14 @@ const CONVERSION = FOLLOW_UP.conversion;
  */
 const FLAGGED = departmentsNeedingAttention(DEPARTMENTS)[0]!;
 
-/** `CHF 240k` — the beat's figures, spelled by the app's own formatter. */
+/** `CHF 240k` — the beat's bar labels, spelled by the app's own formatter. */
 function money(thousands: number): string {
   return formatMoneyCompact(chfFromThousands(thousands));
+}
+
+/** `+CHF 410k` — the beat's TOTAL, which is a variance and so carries its sign. */
+function signedMoney(thousands: number): string {
+  return formatSignedMoneyCompact(chfFromThousands(thousands));
 }
 
 /* --------------------------------------------------------------- SOURCE -- */
@@ -543,15 +549,37 @@ describe("Hero 3 follow-up — what is driving Marketing (criterion 2)", () => {
 /* ============================ ④ THE TOTAL *IS* MARKETING'S VARIANCE ===== */
 
 describe("Hero 3 follow-up — the drivers explain the WHOLE overspend", () => {
-  it("badges `CHF 410k total` in the card's action slot", () => {
+  it("badges `+CHF 410k total` in the card's action slot", () => {
     renderSections();
 
     const badge = totalBadge()!;
     expect(badge).not.toBeNull();
     expect(slot("card-action", driverTile())).toContainElement(badge);
-    expect(badge.textContent).toContain(money(driverTotal(DRIVERS)));
-    expect(badge.textContent).toContain("CHF 410k");
+    expect(badge.textContent).toContain(signedMoney(driverTotal(DRIVERS)));
+    expect(badge.textContent).toContain("+CHF 410k");
     expect(slot("delta-suffix", badge)!.textContent).toBe(DRIVER_TOTAL_LABEL);
+  });
+
+  /**
+   * US-044 measured this on the SERVED page and found it unsigned: the one
+   * variance chip on the whole canvas with no sign in front of it.
+   *
+   * The rows stay unsigned — each is an amount that went somewhere, not a
+   * movement — so the badge and the bars are checked against each other here,
+   * spelling CHF thousands identically and differing only in the sign.
+   */
+  it("signs the total even though the movement is a RISE, and leaves the rows unsigned", () => {
+    renderSections();
+
+    const badge = totalBadge()!;
+    expect(badge.textContent).toMatch(/\+CHF/);
+    expect(badge.dataset.direction).toBe(VarianceDirection.UP);
+    expect(badge.dataset.judgement).toBe(VarianceJudgement.ADVERSE);
+
+    for (const value of slots("h-bar-value", driverTile())) {
+      expect(value.textContent).not.toMatch(/^[+-]/);
+      expect(value.textContent).toContain("CHF");
+    }
   });
 
   it("EQUALS the variance the table above derives — 240 + 150 + 20 = 410", () => {

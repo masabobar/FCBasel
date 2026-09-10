@@ -49,9 +49,11 @@ import { DeltaChip } from "./delta-chip";
  *   US-037 declining fixtures  `negative` money — `formatMoneyCompact`,
  *                           ranked, `showTotal` for `-CHF 400k total`, plus
  *                           the attendance `note`
- *   US-039 Marketing drivers   positive money — `formatMoneyCompact`, ranked,
- *                           `showTotal` with `totalJudgement` ADVERSE, because
- *                           an overspend going UP is bad news (US-022's trap)
+ *   US-039 Marketing drivers   positive money — `formatMoneyCompact` for the
+ *                           rows, ranked, `showTotal` with `totalJudgement`
+ *                           ADVERSE because an overspend going UP is bad news
+ *                           (US-022's trap), and `totalFormat` signed — see
+ *                           {@link DriverTileProps.totalFormat}
  *
  * NO NUMBER IS FORMATTED HERE either: the total is a number and the string is
  * whatever `format` the rows already use, which is why the badge and the bars
@@ -186,6 +188,24 @@ export interface DriverTileProps extends Omit<HBarTileProps, "children"> {
    * combined behind its back.
    */
   showTotal?: boolean;
+  /**
+   * How the BADGE's total becomes text, where that differs from the rows'.
+   *
+   * WHY THE ROWS' FORMATTER IS NOT ALWAYS THE BADGE'S (US-044). The rows are
+   * bar labels and read as MAGNITUDES — `CHF 240k` of Marketing's overspend
+   * went on paid social. The badge is a `DeltaChip`, and a `DeltaChip` is a
+   * VARIANCE: `app/lib/format.ts` is explicit that variance is never carried by
+   * colour alone, so the sign is written even when it is a plus. Where the rows
+   * are already signed (US-035's badge trend) or negative (US-037's declines,
+   * whose minus arrives with the amount) the rows' formatter is right for both
+   * and this is left alone; where the rows are positive magnitudes of an
+   * ADVERSE movement it is not, and US-039's `CHF 410k total` measured as the
+   * one variance chip on the whole canvas with no sign in front of it.
+   *
+   * Defaults to `format`, so the badge and the bars still spell the currency
+   * identically unless a caller deliberately signs one of them.
+   */
+  totalFormat?: (value: number) => string;
   /** The badge's trailing word. Defaults to {@link DRIVER_TOTAL_LABEL}. */
   totalLabel?: ReactNode;
   /** The badge's judgement, where the total's sign is not its meaning. */
@@ -205,6 +225,7 @@ export function DriverTile({
   format,
   negative,
   showTotal = false,
+  totalFormat,
   totalLabel,
   totalJudgement,
   note,
@@ -218,7 +239,7 @@ export function DriverTile({
   const badge = showTotal ? (
     <DriverTotalBadge
       total={driverTotal(ranked, negative)}
-      format={format}
+      format={totalFormat ?? format}
       judgement={totalJudgement}
       label={totalLabel}
     />

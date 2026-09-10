@@ -6,14 +6,40 @@
 
 ## Summary
 
-**Total Completed:** 42 stories
-**Total Points:** 109 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 52 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (2/6 · 4/14)**
+**Total Completed:** 43 stories
+**Total Points:** 111 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 56 points/day · **Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (4/6 · 9/14 — every P0 closed)**
 
 ---
 
 ## Completed Stories
+
+### US-044: Brand fidelity & legibility QA (2 pts) — **BRAND FIDELITY MEASURED, NOT REVIEWED**
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 13 Chrome cases (45 e2e total) + 3 unit (2228)
+**Notes:** US-041's lesson applied to the palette — the source scans already passed, so the value was
+in reading the SERVED page. New `tests/e2e/brand-fidelity.spec.ts` + `support/brand.ts`, reusing
+US-040/041/042's harnesses: one `getComputedStyle` walk per moment, every painted value resolved to
+sRGB (Tailwind's `/opacity` composites in **oklab**, converted back through the CSS Color 4 matrices)
+and classified in Node against `app/lib/tokens.ts` **itself** — not one hex copied into a test. Read
+at **four moments**: baseline (the only `red-vivid`), mid-beat (the gold sweep), the full script at
+1920x1080, the fallback's prose. **COLOUR INVENTORY — 19 distinct colours over 886 painted elements,
+every one a token,** at 15 alphas, plus `#101840` from the SHADOW tokens and `rgba(0,0,0,0)`; **the
+only non-palette hexes are two partner brand colours** (Bitpanda, Sunrise — the other four coincide
+with FCB tokens by accident), read from the DATASET so US-007's exception cannot drift. **GOLD AUDIT
+— 41 paints, all inside a CLOSED `data-slot` allowlist** with a written sanction each: target marks
+(x11), the follow-up seam (x6), the recommendation panel (x16), the flagged Marketing row and its
+flag, plus the Reference-Guide band and chrome uses. `#b8960b` on one partner plate is **NOT** gold —
+Feldschlosschen's own colour shares `accentFollowUp`'s hex, so it is excluded by SLOT. **No gold on
+`card`, `card-accent` or `insight-section`: the ring the Reference Guide removed (US-006) stays gone.**
+**ONE REAL DEFECT FOUND AND FIXED — the only variance chip on the canvas with no sign:** Hero 3's
+driver total rendered `CHF 410k total` because `DriverTile` handed the badge the ROWS' formatter,
+right for a bar label but wrong for a `DeltaChip`. Exactly US-022's trap — a POSITIVE figure that is
+ADVERSE. Fixed with a `totalFormat` prop defaulting to `format`: **`+CHF 410k total`**, rows still
+unsigned. **All 23 chips now carry sign, arrow, spoken direction and the pos/neg token**, with the
+trap asserted positively. Also: 31 uppercase headers at 700/`0.04em`, every figure `tabular-nums`,
+19 tab stops ringed (the prompt input's ring on its field wrapper, asserted), **0 non-hyphen dashes**
+incl. **U+2212**, `FCB 2-1 Sion` with U+002D by code point. Border ratios 1.10-1.24:1 and four
+marginal ink pairs **recorded as KL-4, not "improved"**. **Triage: no trigger fired.** Lockfile clean.
 
 ### US-042: Dead-end path sweep (3 pts) — **EVERY PATH PROVEN TO LEAD SOMEWHERE**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 16 Chrome cases (32 e2e total; unit stays 2225)
