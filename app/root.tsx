@@ -1,10 +1,9 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
   type ShouldRevalidateFunction,
 } from "react-router";
 
@@ -21,6 +20,7 @@ import { askQuestion } from "./lib/dashboard/intents";
 import { CanvasPanel, useCanvasPanel } from "./lib/dashboard/use-canvas-panel";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 import { useThinking } from "./lib/dashboard/use-thinking";
+import { disableScrollRestoration } from "./lib/motion";
 import {
   hero1Repository,
   hero2Repository,
@@ -59,6 +59,22 @@ export function links(): Route.LinkDescriptors {
   return [{ rel: "icon", type: "image/x-icon", href: FAVICON_HREF }];
 }
 
+/**
+ * The document shell.
+ *
+ * THERE IS NO `<ScrollRestoration />`, AND ITS ABSENCE IS THE FIX FOR KL-3.
+ * A reload starts a fresh session at the baseline (state is memory-only by
+ * specification), and the component replayed the PREVIOUS session's scroll
+ * offset into it — clamped to the much shorter page, that put the presenter at
+ * the foot of a freshly cleared canvas with the crest and Reset off screen
+ * (measured `scrollY 185` at 1920x1080). Half of the fix is removing it; the
+ * other half is `disableScrollRestoration` below, which switches off Chrome's
+ * own restoration. See `app/lib/motion.ts` for why neither half works alone.
+ *
+ * Nothing is lost by its absence: the product has one route, never revalidates
+ * (see `shouldRevalidate`) and derives no scroll state, so there is no
+ * navigation whose scroll position anybody wants restored.
+ */
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -70,7 +86,6 @@ export function Layout({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
-        <ScrollRestoration />
         <Scripts />
       </body>
     </html>
@@ -206,6 +221,20 @@ export default function App({
   const { sections, focus, generation, reset } = dashboard;
   const { beat, busy, actions } = useThinking(dashboard);
   const canvas = useCanvasPanel(dashboard, beat !== null);
+
+  /**
+   * KL-3, closed (US-043). Told once, on the first client render, and never
+   * again — the mode is a property of the history entry, so it holds for the
+   * life of the document and for the reload that follows it. It runs here, in
+   * the one component that is always mounted, rather than in `Layout`, because
+   * `Layout` also renders on the server and this is a browser-only fact.
+   *
+   * Long before any presenter can scroll: the offset a reload would restore is
+   * read at unload, and nothing in this application sets the mode back.
+   */
+  useEffect(() => {
+    disableScrollRestoration();
+  }, []);
 
   return (
     <AppShell

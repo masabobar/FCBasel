@@ -647,6 +647,146 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
   });
 });
 
+/* ============================================ THE SEAM, CLOSED (US-043) == */
+
+/**
+ * THE ONE FRAME NOBODY HAD LOOKED AT — and the flicker US-043 found in Chrome.
+ *
+ * `document.startViewTransition` runs its update callback ASYNCHRONOUSLY, after
+ * the browser has captured the outgoing frame. jsdom has no such API, so
+ * `animateReflow` runs the update inline here and the whole suite above never
+ * met the gap. In a real browser the beat's `setBeat(null)` was therefore
+ * flushed on its own, one or two frames BEFORE the answer: `useCanvasPanel` read
+ * that as "nothing has been asked yet" and painted the EMPTY STATE back into the
+ * spot the panel had just left, which then ghosted across the whole 400ms
+ * reflow.
+ *
+ * So the API is stubbed with the real one's asynchrony — the exact condition the
+ * defect needed — and the seam is asserted frame by frame. A regression would
+ * fail HERE, in the fast unit gate, and not only in the e2e frame sampler.
+ */
+describe("the seam between the panel and the answer (US-043)", () => {
+  /** Update callbacks captured from `startViewTransition`, not yet run. */
+  let deferred: (() => void)[] = [];
+
+  /**
+   * A view transition that behaves like Chrome's: it takes the update, returns
+   * immediately, and applies it only when the browser is ready.
+   */
+  function stubDeferredViewTransition(): void {
+    deferred = [];
+    Object.assign(document, {
+      startViewTransition: (update: () => void) => {
+        deferred.push(update);
+        return {
+          ready: Promise.resolve(),
+          finished: Promise.resolve(),
+          updateCallbackDone: Promise.resolve(),
+          skipTransition: () => {},
+        };
+      },
+    });
+  }
+
+  /** The browser gets around to applying the captured update. */
+  function applyDeferredUpdates(): void {
+    const updates = deferred;
+    deferred = [];
+    act(() => {
+      for (const update of updates) update();
+    });
+  }
+
+  function emptyState(): HTMLElement | null {
+    return document.querySelector<HTMLElement>(
+      '[data-slot="empty-state-panel"]',
+    );
+  }
+
+  afterEach(() => {
+    Reflect.deleteProperty(document, "startViewTransition");
+  });
+
+  it("never paints a canvas with neither the panel nor the answer", () => {
+    stubDeferredViewTransition();
+    renderApp();
+    expect(emptyState()).not.toBeNull();
+
+    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    expect(panel()).not.toBeNull();
+    expect(emptyState()).toBeNull();
+
+    // The timer fires: the answer is REQUESTED, and the browser has taken the
+    // update but not applied it. The panel must still be up — this is the frame
+    // the empty state used to flash into.
+    landBeat();
+    expect(
+      deferred,
+      "the landing did not go through a view transition",
+    ).toHaveLength(1);
+    expect(panel(), "the panel came down before its answer").not.toBeNull();
+    expect(
+      emptyState(),
+      "the empty state flashed back between the two",
+    ).toBeNull();
+    expect(sections()).toHaveLength(0);
+
+    // The update lands. One commit: panel gone, answer up, no empty state and
+    // no second panel.
+    applyDeferredUpdates();
+    expect(panel()).toBeNull();
+    expect(panels()).toHaveLength(0);
+    expect(emptyState()).toBeNull();
+    expect(sections()).toHaveLength(1);
+  });
+
+  it("holds the seam for a follow-up, which reflows the canvas", () => {
+    stubDeferredViewTransition();
+    renderApp();
+
+    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    landBeat();
+    applyDeferredUpdates();
+    expect(sections()).toHaveLength(1);
+
+    tap(followUpChipName(HeroId.HERO_1));
+    landBeat();
+    // The panel stands until the phase flip is applied — never a section
+    // stripped of its beat with a panel already gone.
+    expect(panel()).not.toBeNull();
+    expect(sections()[0]).toHaveAttribute("data-phase", InsightPhase.PRIMARY);
+
+    applyDeferredUpdates();
+    expect(panel()).toBeNull();
+    expect(sections()[0]).toHaveAttribute(
+      "data-phase",
+      InsightPhase.WITH_FOLLOW_UP,
+    );
+  });
+
+  it("still lets Reset take the panel down without any answer landing", () => {
+    // The panel now waits for a reveal, so Reset — which lands none — has to be
+    // able to drop it on its own. `generation` is that path, and it must not
+    // have been broken by making the answer the other one.
+    stubDeferredViewTransition();
+    renderApp();
+
+    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    expect(panel()).not.toBeNull();
+
+    tap(/reset/i);
+    expect(panel()).toBeNull();
+    expect(emptyState()).not.toBeNull();
+
+    // And the cancelled beat never lands, even once the clock runs past it.
+    landBeat();
+    applyDeferredUpdates();
+    expect(sections()).toHaveLength(0);
+    expect(panel()).toBeNull();
+    expect(emptyState()).not.toBeNull();
+  });
+});
+
 describe("the panel a presenter sees, per flow", () => {
   it.each(HERO_IDS)("names %s's systems while its hero runs", (heroId) => {
     renderApp();
@@ -895,7 +1035,11 @@ describe("Reset pressed mid-beat (US-015 criterion 4)", () => {
 
 describe("one timer in the whole application", () => {
   it("schedules the beat through the dashboard's pending timer", () => {
-    expect(HOOK_CODE).toMatch(/schedule\(\s*\(\) => \{/);
+    // The delay is handed to `useDashboard`'s single `schedule`, with the
+    // landing as its callback. US-043 reduced that callback to the landing
+    // ALONE — taking the panel down there painted a canvas with neither panel
+    // nor answer — so this asserts the call, not the callback's shape.
+    expect(HOOK_CODE).toMatch(/schedule\(\s*land\s*,\s*thinkingDelayMs\(/);
   });
 
   it("creates no timer of its own anywhere in the beat", () => {

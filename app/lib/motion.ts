@@ -11,7 +11,9 @@
  *   3. the view-transition wrapper that makes the grid reflow smoothly;
  *   4. the two scrolls — bringing a just-revealed section into view, and
  *      returning to the top on Reset — which are motion too and so read the
- *      same preference.
+ *      same preference;
+ *   5. the one scroll this product does NOT want: the browser's own restoration
+ *      on reload, switched off in `disableScrollRestoration` (KL-3).
  *
  * CONSUMERS: THE FOUR HOOKS LIVE NEXT DOOR (US-027)
  * Anything that animates from React — chart geometry, a KPI number, an SVG
@@ -95,10 +97,31 @@ export function prefersReducedMotion(): boolean {
 
 /* --------------------------------------------------------- GRID REFLOW -- */
 
+/** The one member of the transition object this module reads. */
+interface ViewTransitionHandle {
+  /** Resolves when the tween has finished and the pseudo-elements are gone. */
+  readonly finished?: Promise<unknown>;
+}
+
 /** `startViewTransition` is not in every browser's lib.dom yet. */
 type ViewTransitionDocument = Document & {
-  startViewTransition?: (update: () => void) => unknown;
+  startViewTransition?: (
+    update: () => void,
+  ) => ViewTransitionHandle | undefined;
 };
+
+/**
+ * The reflow tween on screen right now, or `null` when the canvas is at rest.
+ *
+ * MODULE STATE, AND IT HAS TO BE. A view transition paints on
+ * `::view-transition-*` pseudo-elements in a snapshot containing block that is
+ * pinned to the viewport, so anything that SCROLLS while one is running slides
+ * the live content out from under a static snapshot of the old one. This is the
+ * one fact the two scrolls below need and cannot derive: `getAnimations()` has
+ * nothing to report yet at the moment the section's mount effect runs, because
+ * the pseudo-elements do not exist until the update callback has returned.
+ */
+let reflowInFlight: Promise<unknown> | null = null;
 
 /**
  * A string reduced to something safe to use as a CSS identifier: anything
@@ -147,11 +170,54 @@ export function animateReflow(update: () => void): void {
       : (document as ViewTransitionDocument);
 
   if (!doc?.startViewTransition || prefersReducedMotion()) {
+    // Nothing will be tweening, so nothing has to wait for it.
+    reflowInFlight = null;
     update();
     return;
   }
 
-  doc.startViewTransition(update);
+  const finished = doc.startViewTransition(update)?.finished ?? null;
+  reflowInFlight = finished;
+
+  // Released when this tween ends, and only if it is still the current one —
+  // a second insertion replaces it rather than clearing the newer one. Both
+  // outcomes settle: a transition that is SKIPPED rejects, and a skipped tween
+  // is exactly as finished as a completed one for the purposes below.
+  const settle = () => {
+    if (reflowInFlight === finished) reflowInFlight = null;
+  };
+  void finished?.then(settle, settle);
+}
+
+/**
+ * Run something once the reflow tween has finished — or straight away when
+ * none is running.
+ *
+ * WHY THE SCROLLS WAIT (US-043, measured). Both scrolls below used to run in
+ * the same commit as the insertion, which put a ~700px smooth scroll on top of
+ * a 400ms view transition. The result, in Chrome against the built bundle: the
+ * outgoing snapshot stayed pinned to the viewport while the live page glided
+ * under it, so the reveal showed a doubled canvas and a white band up to ~80px
+ * across the top of the screen for the length of the tween. Nothing was
+ * dropping frames — it is a compositing artifact of moving the viewport while
+ * the browser is cross-fading a snapshot of it.
+ *
+ * Waiting also puts the reveal in the ORDER THE CRITERION STATES: panel,
+ * section, cards, numbers, geometry, and the auto-scroll LAST. The tiles
+ * stagger in while the tween runs, so the wait is not dead time.
+ *
+ * It is not a timer (`.claude/rules` — the beat's is the only one in the
+ * application): it is the transition's own `finished` promise, so the wait is
+ * exactly as long as the tween and no longer.
+ */
+export function afterReflow(run: () => void): void {
+  const tween = reflowInFlight;
+  if (!tween) {
+    run();
+    return;
+  }
+
+  void tween.then(run, run);
 }
 
 /* ----------------------------------------------------------- AUTO-SCROLL -- */
@@ -176,10 +242,58 @@ export function animateReflow(update: () => void): void {
 export function scrollRevealedIntoView(target: Element | null): void {
   if (typeof target?.scrollIntoView !== "function") return;
 
-  target.scrollIntoView({
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-    block: "start",
+  // After the reflow tween, never during it — see {@link afterReflow}.
+  afterReflow(() => {
+    target.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "start",
+    });
   });
+}
+
+/**
+ * Take the browser's scroll restoration out of the demo's hands — KL-3, closed
+ * here by US-043.
+ *
+ * WHAT WENT WRONG (measured by US-042, at the bottom of a full canvas, then
+ * reloaded): session state is memory-only by specification, so a reload starts a
+ * fresh session at the baseline — but the SCROLL OFFSET survived it. Clamped to
+ * the much shorter baseline page, the restored offset landed the presenter at
+ * its foot with the app bar — crest and Reset — scrolled out of view.
+ * `scrollY 185` at 1920x1080, `scrollY 340` at 1440x900.
+ *
+ * WHY IT IS ONE LINE AND WHY THE LINE HAS TO BE HERE. Two mechanisms restore
+ * that offset and BOTH have to go, which is what US-042 measured and why it
+ * deferred the fix rather than guessing at it:
+ *
+ *   1. `<ScrollRestoration />` wrote `react-router-scroll-positions` into
+ *      `sessionStorage` and replayed it on the next load. It is gone from
+ *      `app/root.tsx` — with one route, no revalidation and no derived scroll
+ *      state, it had nothing left to restore that the presenter wants restored.
+ *   2. Chrome's OWN restoration then produced the identical offset, which is
+ *      why removing the component alone was tried and rejected. `manual` is
+ *      what switches that off, and it is also why the component had to go
+ *      first: its `pagehide` handler sets the mode back to `auto` as the
+ *      document unloads, so the two fixes cannot be applied in either order —
+ *      only together.
+ *
+ * IT BELONGS IN THIS MODULE because a reload landing mid-page is a layout jump,
+ * which is the same thing {@link scrollToTop} and {@link scrollRevealedIntoView}
+ * exist to prevent — the three of them are now the whole of where this product
+ * decides where the viewport points.
+ *
+ * Reports whether the mode was actually taken, so a test can assert the fix
+ * rather than assert the call. An environment without `history` — the server,
+ * jsdom without navigation — is a no-op and returns `false`: the preference
+ * cannot be set, and nothing depends on it having been.
+ */
+export function disableScrollRestoration(): boolean {
+  if (typeof window === "undefined" || !window.history) return false;
+
+  // Not every engine implements the property; assigning to a missing one is
+  // silently ignored, so the result is read back rather than assumed.
+  window.history.scrollRestoration = "manual";
+  return window.history.scrollRestoration === "manual";
 }
 
 /**
@@ -203,9 +317,13 @@ export function scrollToTop(): void {
     return;
   }
 
-  window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
+  // After the reflow tween, for the same reason the reveal's scroll waits —
+  // Reset clears sections, which is a reflow like any other.
+  afterReflow(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
   });
 }

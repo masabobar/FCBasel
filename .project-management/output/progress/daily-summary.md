@@ -1,20 +1,20 @@
 # Daily Work Summary
 
 **Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
-**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-042, US-044)
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-044)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 43 — **Phases 1a, 1b, 2a, 2b, 3a AND 3b ALL complete.** Day 2 closed Phase 3a
+**Stories Completed:** 44 — **Phases 1a, 1b, 2a, 2b, 3a AND 3b ALL complete.** Day 2 closed Phase 3a
 with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the causal peak**, and then
-took Phase 4 to 4/6 with every P0 in it closed: US-040 (eleven viewports measured), **US-041, which
+took Phase 4 to 5/6 with every P0 in it closed: US-040 (eleven viewports measured), **US-041, which
 severed the network and found two real runtime fetches**, **US-042, which pressed the whole
-interactive surface**, and **US-044, which read every painted colour off the served page** and found
-the one variance chip in the product rendering without its sign.
-**Story Points:** 111
-**Time Worked:** ~33 hours · **Files Changed:** 334 · **Tests Added:** 2228 unit + 45 Chrome cases
+interactive surface**, **US-044, which read every painted colour off the served page** and found the
+one variance chip rendering without its sign, and **US-043, which sampled every frame of the reveal**
+and found two more. **Story Points:** 114
+**Time Worked:** ~34 hours · **Files Changed:** 343 · **Tests Added:** 2242 unit + 60 Chrome cases
 
 ---
 
@@ -55,50 +55,42 @@ the one variance chip in the product rendering without its sign.
   tile**, with the review's overlap fix as arithmetic and both halves measured — a 44-unit gutter and a
   34-unit chip band kept empty by an axis maximum *derived from the geometry*. **The chips' clean range was
   later measured end to end by US-040** (see `phase-4.md`, KL-1). 63 tests.
-- **US-020 — Donut / ring tile.** US-034's sponsor-badge ring, deliberately a different component from
-  US-016's single-arc `AttendanceRing`. **Two hover surfaces write ONE state**, **the segments morph** (arcs
-  keyed by SPONSOR, one `useCountUp` on the centre, never via zero), and **the arithmetic is
-  `badgeSegments`'** (US-008), imported not restated. 56 tests, 1261/1261.
+- **US-020 — Donut / ring tile.** US-034's sponsor-badge ring, a different component from US-016's
+  single-arc `AttendanceRing`. **Two hover surfaces write ONE state**, **the segments morph** (arcs keyed by
+  SPONSOR, never via zero), and **the arithmetic is `badgeSegments`'** (US-008). 56 tests, 1261/1261.
 - **US-022 — Department table tile.** Hero 3's primary tile as a real `<table>`. **The revenue/cost trap is
   closed by construction:** colour comes from `row.judgement` (US-010) through `DeltaChip`, so **Marketing's
   +410 renders ADVERSE** while Sponsoring's +840 renders FAVOURABLE, with a scan blocking the judgement
   migrating back in. 54 tests, 1315/1315.
 - **US-023 — Driver / breakdown tile.** For all three causal follow-ups. **It draws no bars, and the tests
-  keep it that way** (every row is US-021's `HBarRow`; a scan rejects bar geometry, the width constants, the
-  motion hooks and local state), plus tie-stable ranking and a total **derived from the rows on screen**. 43
-  tests, 1358/1358.
-- **US-024 — Recommendation panel & narrative caption strip.** The last story of Phase 2b. **The strip was
-  reused, not rebuilt**, and **the panel is structurally not a tile** — an `aside`, told apart from a `Card`
-  by test. **Verbatim byte for byte**; narrative before every chart. 35, 1393.
+  keep it that way** (every row is US-021's `HBarRow`; a scan rejects bar geometry, width constants, motion
+  hooks and local state), plus a total **derived from the rows on screen**. 43 tests, 1358/1358.
+- **US-024 — Recommendation panel & narrative caption strip.** Phase 2b's last story. **The strip was reused,
+  not rebuilt**, and **the panel is structurally not a tile** — an `aside`. **Verbatim byte for byte**. 35.
 - **US-028 — Persistent prompt bar. Phase 3a opens.** The product's only user input. **ONE bordered field IS
-  the typing area** — a test rejects any descendant border or ring. **A real `<form>`**, so Enter and the
-  button share one path; **debounce with no second clock**. 48 tests, 1441.
-- **US-029 — Suggestion chips & chip lifecycle. The screen can now be ASKED a question (2/6 · 5/17).** **THE
-  ROW IS DERIVED, NOT STORED:** criterion ③'s "removed once shown" is implemented in **no line of code** — the
-  phase flip stops deriving it. Proved over **all 27** hero × phase combinations; **US-015's criterion ② is
-  thereby SATISFIED**. 57 tests, 1498/1498.
-- **US-030 — Intent normalisation, scoring & tie-breaking. A freely TYPED question now resolves (3/6 · 10/17),
-  and this was the riskiest story in the build.** **A FAITHFUL PORT, VERIFIED NOT TRUSTED:** normalise → **+2
-  / +1** → threshold **2 hero / 3 follow-up** → **strictly-greater** over an ordered config, with an
-  **oracle** test asserting identical scores *and* winners over a 90-phrase corpus. **34 paraphrases**; a
-  three-way 2/2/2 tie goes to Hero 1; one input yields **one** match or `null`; **the two inherited
-  over-matches are PINNED**. No model, no dependency — scanned. 89.
+  the typing area**; **a real `<form>`**, so Enter and the button share one path. 48 tests, 1441.
+- **US-029 — Suggestion chips & chip lifecycle (2/6 · 5/17).** **THE ROW IS DERIVED, NOT STORED:** criterion
+  ③'s "removed once shown" is implemented in **no line of code** — the phase flip stops deriving it. Proved
+  over **all 27** hero × phase combinations; **US-015's criterion ② is thereby SATISFIED**. 57 tests.
+- **US-030 — Intent normalisation, scoring & tie-breaking (3/6 · 10/17), the riskiest story in the build.**
+  **A FAITHFUL PORT, VERIFIED NOT TRUSTED:** normalise → **+2 / +1** → threshold **2 hero / 3 follow-up** →
+  **strictly-greater** over an ordered config, with an **oracle** test asserting identical scores *and*
+  winners over a 90-phrase corpus. **34 paraphrases**; one input yields **one** match or `null`; **the two
+  inherited over-matches are PINNED**. No model, no dependency — scanned. 89.
 - **US-031 — Thinking beat. The answer no longer appears the instant it is asked, and it is stagecraft rather
   than a query.** **No request is made** (scanned). **THE ORDERING IS ASSERTED:** at `1150ms - 1` the panel is
   up with NO section; at `1150ms` the section is there and the panel gone — landing it immediately fails
   **22** tests. Both paths pause, neither module changed, and a no-match shows **no beat**. **Still ONE
   timer** (US-015 ④), by mutation twice over. 91 tests.
 - **US-032 — Graceful fallback panel. The screen can no longer dead-end (5/6 · 14/17).** Two panels, never
-  conflated; the copy **byte-identical** against a literal *and* the backlog; criterion ② asserted as an
-  ABSENCE (18 blame words, no alert role, the question never echoed); the three panels mutually exclusive by
-  construction. 125 tests, 1803/1803.
+  conflated; the copy **byte-identical**; criterion ② asserted as an ABSENCE (18 blame words, no alert role,
+  the question never echoed); the three panels mutually exclusive by construction. 125 tests, 1803/1803.
 - **US-033 (2026-09-10) — Follow-up context gating. PHASE 3a CLOSES at 6/6 · 17/17.** `follow-up-gate.ts`
   holds the rule as two pure functions read by BOTH the answer and the beat. **Stated plainly: the behaviour
-  was already correct at HEAD** — reverting the wiring fails only the 2 source-scan tests — so the story is
-  the rule made explicit and proved, with the dead end guarded by **mutation** (the ungated call fails 10
-  tests). **The two-step runs on the real `App` for all three heroes:** cold typed follow-up → PARENT at
-  `primary` → chip offered → tap → phase flips, one section never two. **Criterion ④ by source scan**, **⑤
-  twice** — a property over all 27 sessions and on the real `App`. 46 tests, 1849/1849.
+  was already correct at HEAD** — so the story is the rule made explicit and proved, the dead end guarded by
+  **mutation** (the ungated call fails 10 tests). **The two-step runs on the real `App` for all three
+  heroes:** cold typed follow-up → PARENT at `primary` → chip offered → tap → phase flips, one section never
+  two. **Criterion ⑤ twice** — a property over all 27 sessions and on the real `App`. 46 tests, 1849/1849.
 - **US-034 to US-039 (2026-09-10) — PHASE 3b COMPLETE, 6/6 · 16/16.** Condensed; full account in
   [`../phases/phase-3b.md`](../phases/phase-3b.md). All six are **composition, not invention**: four tiles
   reach a screen for the first time, no hero file holds an `<svg>`, a `<table>` or a re-typed figure (proved
@@ -134,8 +126,7 @@ the one variance chip in the product rendering without its sign.
   determinism, 3 cold typed follow-ups, the **sidebar link pressed 5x with six answers up**, the inert
   placeholders force-clicked, **141 canvas slots**, **both tab rings activated with Enter and Space**, a
   keyboard-only demo, Reset spammed mid-beat, and reload/back/forward. **No dead end — and mutation-tested to
-  prove that means something.** **KL-3 recorded, not fixed:** a reload restores the scroll offset; the fix was
-  tried and is not local.
+  prove that means something.** **KL-3 recorded, not fixed — closed by US-043 below.**
 - **US-044 (2026-09-10) — BRAND FIDELITY MEASURED, NOT REVIEWED, AND MEASURING IT FOUND A DEFECT.** Full
   account in [`../phases/phase-4.md`](../phases/phase-4.md). 13 Chrome cases at four moments: **19 distinct
   colours over 886 painted elements, every one a token** (opacity modifiers converted back from oklab,
@@ -143,9 +134,20 @@ the one variance chip in the product rendering without its sign.
   from the dataset · **41 gold paints, all inside a closed `data-slot` allowlist**, and **no gold on any tile
   surface — the removed insertion ring stays removed** · **23 variance chips** with sign, arrow, spoken word
   and the pos/neg token · 31 uppercase headers · every figure tabular · 19 tab stops ringed · **0 non-hyphen
-  dashes**, `FCB 2-1 Sion` included. **Hero 3's `CHF 410k` total badge had no sign** — the only variance chip
-  without one, US-022's trap exactly; fixed via a `totalFormat` prop to **`+CHF 410k`**, rows still unsigned.
-  Border ratios 1.10-1.24:1 **recorded as KL-4, not "improved"**.
+  dashes**, `FCB 2-1 Sion` included. **Hero 3's `CHF 410k` total badge had no sign** — US-022's trap exactly;
+  fixed via a `totalFormat` prop to **`+CHF 410k`**. Borders 1.10-1.24:1 → **KL-4, not "improved"**.
+- **US-043 (2026-09-10) — THE REVEAL SAMPLED FRAME BY FRAME, AND SAMPLING IT FOUND TWO DEFECTS.** Full account
+  in [`../phases/phase-4.md`](../phases/phase-4.md). A `requestAnimationFrame` loop inside the page recording
+  panel, sections, per-card opacity, figure strings, painted bar/arc extents, `scrollY` and the view
+  transition's own `currentTime`, plus a separate frame clock; **each fix re-verified by reverting it and
+  watching its standing test fail.** ⚠️ **On an Apple M1 MacBook Pro — NOT the demo machine:** longest frame
+  **16.8-33.3ms at 1x**, **33.4-49.9ms at 4x**, **33.3-116.7ms at 6x** CPU throttling, p95 16.7-16.8ms.
+  **Defect 1:** `startViewTransition` updates asynchronously, so the panel came down a frame BEFORE its
+  answer and the **empty state flashed back** into the gap — **seam now 0 frames**. **Defect 2:** the beat's
+  source chips sat **14.2px under the prompt bar** once the chip row wrapped — reserve 128 → 176px. Both
+  scrolls now wait out the reflow tween (the reveal's used to start 384ms inside it). **No duration token
+  changed**; beat 1118ms, insertion 400ms, reduced 218ms. **KL-3 CLOSED** — `<ScrollRestoration />` removed
+  AND `history.scrollRestoration = "manual"`, because the component put the mode back on unload.
 
 ## Stories Completed Today
 
@@ -228,7 +230,7 @@ the one variance chip in the product rendering without its sign.
 
 ## Stories In Progress
 
-*None* — next up is US-043, transition & timing polish.
+*None* — next up is US-045, the Chrome demo run-through.
 
 ## Open Human Step
 
@@ -247,13 +249,12 @@ the one variance chip in the product rendering without its sign.
   US-008/009/010 repositories through the root loader. US-037 and US-039 added no component at all.
 - **The prototype is FEATURE COMPLETE and the demo script runs end to end in Chrome.** No placeholder remains
   anywhere in the product.
-- **PHASE 4 IS AT 4/6 · 9/14, EVERY P0 CLOSED.** US-040 measured the finished screen at eleven viewports and
-  left a **"Known limitations"** section in `phase-4.md` that later stories must read first; **US-041 severed
-  the network** and killed the last two runtime fetches; **US-042 pressed every path** and found none that
-  dead-ends; **US-044 measured every painted colour** — 19 distinct, all tokens, 41 gold paints all
-  sanctioned, and one unsigned variance chip fixed. KL-3 and KL-4 join that same section.
-- **Next: US-043 — transition & timing polish (3 pts), then US-045.** KL-3's scroll-restoration wart is
-  explicitly deferred to it.
+- **PHASE 4 IS AT 5/6 · 12/14, EVERY P0 CLOSED.** US-040 measured the finished screen at eleven viewports
+  and left a **"Known limitations"** section in `phase-4.md` that later stories must read first; **US-041
+  severed the network** and killed the last two runtime fetches; **US-042 pressed every path** and found
+  none that dead-ends; **US-044 measured every painted colour** and fixed one unsigned variance chip;
+  **US-043 sampled every frame of the reveal**, fixed two defects and **closed KL-3**. KL-1/2/4 remain.
+- **Next: US-045 — Chrome demo run-through & stability (2 pts), the last story in the plan.**
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
 3a (17 pts, done) → Phase 3b, the demo itself (16 pts, done) → Phase 4 hardening (14 pts).
@@ -261,8 +262,8 @@ the one variance chip in the product rendering without its sign.
 ## Notes
 
 - Sponsor showing first, owner audience the following week. ~52 AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
-- Phases 1a to 3b are complete and Phase 4 is at 4/6 (111/116 points); continue with
-  `/holycode-pm:execute-work story US-043`.
+- Phases 1a to 3b are complete and Phase 4 is at 5/6 (114/116 points); continue with
+  `/holycode-pm:execute-work story US-045`.
 - **US-040 to US-044 set the hardening pattern: measure, do not assert.** Every Phase 4 claim comes from real
   Chrome against `pnpm build` + `pnpm start` with the whole run-of-show loaded — jsdom answers layout in
   zeros, a grep answers network wrongly, and a class name answers colour wrongly, which is how a `__manifest`

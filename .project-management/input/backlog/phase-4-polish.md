@@ -6,7 +6,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 **Duration:** Days 5-6 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (4/6 completed)
+**Status:** In Progress (5/6 completed)
 
 > **Not in this phase:** new functionality, or anything that changes a hero's content.
 > A live, high-stakes room is unforgiving; one ugly or wrong render in front of the owner is
@@ -18,7 +18,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Priority:** P0
 **Total Story Points:** 14
-**Status:** In Progress (4/6 completed)
+**Status:** In Progress (5/6 completed)
 **Source:** Build Specification E8; Framing §4 principle 4 ("Instant and flawless").
 
 ### Stories:
@@ -72,7 +72,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
   - **Story Points:** 3
   - **Priority:** P1
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed
   - **Description:** Tune the choreography so every render feels earned and nothing stutters.
   - **Acceptance Criteria:**
     - Thinking beat, tile insertion and grid reflow are smooth with **no flicker and no layout jump**
@@ -119,9 +119,9 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Total Epics:** 1 | **Total Stories:** 6 | **Total Points:** 14
 
-**By Priority:** P0: 4 stories, 9 points (all done) · P1: 2 stories, 5 points · P2: 0
+**By Priority:** P0: 4 stories, 9 points (all done) · P1: 2 stories, 5 points (US-043 done) · P2: 0
 
-**By Status:** ✅ 4 stories, 9 points · 🔄 0 · 📋 2 stories, 5 points · ⏸️ 0
+**By Status:** ✅ 5 stories, 12 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 0
 
 > **Known limitations** decided out of scope during this phase are recorded in
 > [`../../output/phases/phase-4.md`](../../output/phases/phase-4.md) under "Known limitations",

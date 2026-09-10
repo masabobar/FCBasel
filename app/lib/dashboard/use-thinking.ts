@@ -89,10 +89,25 @@ export interface ThinkingState {
 }
 
 export function useThinking(dashboard: DashboardState): ThinkingState {
-  const { sections, generation, schedule, showHero, showFollowUp } = dashboard;
+  const { sections, focus, generation, schedule, showHero, showFollowUp } =
+    dashboard;
   const reducedMotion = useReducedMotion();
 
+  /**
+   * How many reveals have landed. `useDashboard` bumps it on EVERY reveal —
+   * unconditionally, including a hero re-asked and a follow-up shown twice — so
+   * it is a reliable "the answer is now on screen" signal. See below.
+   */
+  const tick = focus?.tick ?? 0;
+
   const [beat, setBeat] = useState<ThinkingBeat | null>(null);
+
+  /**
+   * The reveal count the panel went up over, or `null` when no panel is up.
+   * The answer landing moves {@link tick} past it, which is how the panel knows
+   * it is done — see the note below.
+   */
+  const [awaitedTick, setAwaitedTick] = useState<number | null>(null);
 
   /**
    * RESET DROPS THE PANEL. `generation` advances on every press, so a beat in
@@ -109,26 +124,61 @@ export function useThinking(dashboard: DashboardState): ThinkingState {
   if (clearedFor !== generation) {
     setClearedFor(generation);
     setBeat(null);
+    setAwaitedTick(null);
   }
 
   /**
-   * Put the panel up, then land the answer once the delay has elapsed.
+   * THE ANSWER TAKES THE PANEL DOWN — US-043, and it is a fix, not a
+   * refactoring.
    *
-   * The two writes in the scheduled callback are one update as far as the
-   * screen is concerned: the panel comes down and the section goes up in the
-   * same commit (`useDashboard` commits inside `flushSync`), so the beat is
-   * never on screen beside the answer it was standing in for.
+   * WHAT WENT WRONG. The scheduled callback used to do `setBeat(null)` and then
+   * land the answer, on the reasonable-looking assumption that the two were one
+   * commit. They are not, and the reason is subtle: landing an answer runs
+   * through `animateReflow`, and `document.startViewTransition` calls its update
+   * callback ASYNCHRONOUSLY, after the browser has captured the outgoing frame.
+   * So React was left with `setBeat(null)` alone at the end of the task, and
+   * PAINTED IT: for two frames the canvas had no panel and no answer, which
+   * `useCanvasPanel` correctly reads as "nothing has been asked yet" — and the
+   * EMPTY STATE flashed back into the exact spot the panel had just left, then
+   * got baked into the view transition's outgoing snapshot and ghosted across
+   * the whole 400ms reflow. Measured in Chrome against the built bundle: a
+   * ~51ms hole in the frame sample with neither panel nor section, and "Your
+   * dashboard is ready" legible over the incoming answer in the screenshots.
+   *
+   * THE FIX IS TO STOP GUESSING WHEN THE ANSWER LANDS AND READ IT. `focus.tick`
+   * advances as part of the reveal's own committed snapshot, so comparing it
+   * against the value at the time the panel went up says exactly one thing:
+   * the answer this beat was standing in for is now on screen. Dropping the
+   * panel during THAT render puts both changes in one commit — no frame with
+   * both, and no frame with neither.
+   *
+   * The React pattern for "adjust state when an input changes", the same one
+   * the Reset wiring above uses. An effect would be a frame too late, which is
+   * the entire bug.
+   */
+  if (awaitedTick !== null && tick !== awaitedTick) {
+    setAwaitedTick(null);
+    setBeat(null);
+  }
+
+  /**
+   * Put the panel up, then ask for the answer once the delay has elapsed.
+   *
+   * The scheduled callback now does ONE thing. Taking the panel down is not its
+   * job — see the note above; it belongs to the render in which the answer
+   * arrives, and nothing here may pre-empt it.
    */
   const run = useCallback(
     (heroId: HeroId, kind: ChipKind, land: () => void) => {
       setBeat(thinkingBeatFor(heroId, kind));
+      // The reveal count the panel went up over. A chip tapped while a beat is
+      // already in flight replaces it and re-reads the same value, because no
+      // reveal has happened in between.
+      setAwaitedTick(tick);
 
-      schedule(() => {
-        setBeat(null);
-        land();
-      }, thinkingDelayMs(reducedMotion));
+      schedule(land, thinkingDelayMs(reducedMotion));
     },
-    [schedule, reducedMotion],
+    [schedule, reducedMotion, tick],
   );
 
   const actions = useMemo<ChipActions>(

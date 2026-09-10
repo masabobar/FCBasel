@@ -914,17 +914,14 @@ test.describe("the one user input", () => {
       );
     }
 
-    // NOT PERSISTED. `localStorage` and cookies are untouched, and the only
-    // `sessionStorage` key is React Router's scroll bookkeeping — integers, not
-    // text. A typed question is never a key and never a value.
+    // NOT PERSISTED, AND NOW NOT AT ALL. `localStorage`, cookies and
+    // `sessionStorage` are all untouched: US-043 removed `<ScrollRestoration />`
+    // to close KL-3, and with it the `react-router-scroll-positions` key this
+    // assertion used to have to excuse. Memory-only state is now literally
+    // true of the browser's storage as well as of the application's.
     expect(storage.localKeys, "localStorage was written").toEqual([]);
     expect(storage.cookie, "a cookie was set").toBe("");
-    expect(
-      storage.sessionKeys.filter(
-        (key) => key !== "react-router-scroll-positions",
-      ),
-      "sessionStorage was written by the application",
-    ).toEqual([]);
+    expect(storage.sessionKeys, "sessionStorage was written").toEqual([]);
     for (const value of storage.sessionValues) {
       expect(value, "a typed question reached sessionStorage").not.toMatch(
         /shirt|DROP TABLE|onerror|javascript:|qwertyuiop/i,

@@ -46,11 +46,26 @@ export const CANVAS_GRID_CLASS =
  * The bar is `fixed` — see `PROMPT_BAR_POSITION_CLASS` for why sticky cannot
  * work inside a shell that clips overflow — so it takes no space in the flow
  * and the canvas has to reserve it, or the last row of tiles would sit under
- * the bar with no way to scroll clear of it. It is comfortably taller than the
- * bar itself (field plus US-029's chip row); if the bar ever grows past this,
- * this number grows with it.
+ * the bar with no way to scroll clear of it. It has to be comfortably taller
+ * than the bar itself (field plus US-029's chip row); if the bar ever grows
+ * past this, this number grows with it.
+ *
+ * 176px, RAISED FROM 128px BY US-043, and the measurement is the reason.
+ * US-029's chip row GROWS as follow-ups are offered — the three hero chips plus
+ * up to three follow-up chips — and past four chips it wraps to a second row.
+ * Measured in Chrome against the built bundle at 1440x900, with the viewport at
+ * rest: the bar is **117px** with a single chip row and **159px** with two, so
+ * the old 128px reserve was 31px SHORT of the bar it was reserving. What that
+ * cost was visible and specific — from the third question on, the last 14.2px of
+ * the thinking panel, its data-source chips, sat UNDER the bar, and the chips
+ * are information rather than decoration (`thinking-panel.tsx`: "which systems
+ * is it looking at" is announced). US-040's `+10.5px` clearance is the same
+ * arithmetic on the one-row bar: `128 - 117`. At 176px both cases clear —
+ * `176 - 159 = +17px` at the tightest — and
+ * `tests/e2e/presentation-sizing.spec.ts` re-measures it at eleven viewports
+ * every run, so this number cannot fall behind the bar again in silence.
  */
-export const PROMPT_BAR_CLEARANCE_CLASS = "pb-32";
+export const PROMPT_BAR_CLEARANCE_CLASS = "pb-44";
 
 export interface AppShellProps {
   /**

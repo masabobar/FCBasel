@@ -6,8 +6,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { RING_GLOW_CLASS } from "../../app/components/charts/attendance-ring";
 import { Card, TILE_ENTER_CLASS } from "../../app/components/tiles/card";
 import {
+  afterReflow,
   animateReflow,
   cssIdentifier,
+  disableScrollRestoration,
   MOTION_CLASS,
   prefersReducedMotion,
   REDUCED_MOTION_QUERY,
@@ -668,5 +670,218 @@ describe("prefersReducedMotion", () => {
     Object.assign(window, { matchMedia: undefined });
 
     expect(prefersReducedMotion()).toBe(false);
+  });
+});
+
+/* ==================================== KL-3, CLOSED BY US-043 ============ */
+
+/**
+ * THE SCROLL THIS PRODUCT DOES NOT WANT — the browser's own restoration.
+ *
+ * KL-3, measured by US-042: state is memory-only, so a reload starts a fresh
+ * session at the baseline, but the SCROLL OFFSET survived it and — clamped to
+ * the much shorter baseline page — landed the presenter at its foot with the
+ * crest and Reset off screen (`scrollY 185` at 1920x1080, `340` at 1440x900).
+ *
+ * The end-to-end proof is `tests/e2e/transition-timing.spec.ts`, which really
+ * scrolls a full canvas and really reloads it. This is the unit half: the mode
+ * is set, it is set to `manual`, and it survives the absence of the API.
+ */
+describe("disableScrollRestoration — KL-3", () => {
+  const original = window.history.scrollRestoration;
+
+  afterEach(() => {
+    window.history.scrollRestoration = original;
+  });
+
+  it("takes scroll restoration off the browser", () => {
+    window.history.scrollRestoration = "auto";
+
+    expect(disableScrollRestoration()).toBe(true);
+    expect(window.history.scrollRestoration).toBe("manual");
+  });
+
+  it("is idempotent — a second call leaves it manual", () => {
+    disableScrollRestoration();
+    disableScrollRestoration();
+
+    expect(window.history.scrollRestoration).toBe("manual");
+  });
+
+  it("reports failure rather than throwing where the mode does not stick", () => {
+    // Not every engine honours the property, and an ignored assignment is
+    // silent — so the result is read back rather than assumed.
+    const history = {
+      get scrollRestoration() {
+        return "auto";
+      },
+      set scrollRestoration(_value: string) {
+        // An engine that accepts the assignment and does nothing with it.
+      },
+    } as unknown as History;
+    const descriptor = Object.getOwnPropertyDescriptor(window, "history");
+    Object.defineProperty(window, "history", {
+      value: history,
+      configurable: true,
+    });
+
+    try {
+      expect(disableScrollRestoration()).toBe(false);
+    } finally {
+      if (descriptor) Object.defineProperty(window, "history", descriptor);
+    }
+  });
+
+  it("is a no-op with no window at all — the server", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(window, "history");
+    Object.defineProperty(window, "history", {
+      value: undefined,
+      configurable: true,
+    });
+
+    try {
+      expect(disableScrollRestoration()).toBe(false);
+    } finally {
+      if (descriptor) Object.defineProperty(window, "history", descriptor);
+    }
+  });
+});
+
+/* ============================ THE SCROLLS WAIT FOR THE TWEEN (US-043) === */
+
+/**
+ * WHY THE TWO SCROLLS NOW WAIT — measured, in Chrome, against the built bundle.
+ *
+ * A view transition paints on pseudo-elements in a snapshot containing block
+ * pinned to the VIEWPORT. Scrolling while one runs therefore slides the live
+ * page out from under a static snapshot of the old one: the reveal showed a
+ * doubled canvas and a white band up to ~80px across the top of the screen for
+ * the length of the tween. No frames were dropped — it is a compositing
+ * artifact of moving the viewport mid-cross-fade, and the screenshots in
+ * US-043's report show it before and after.
+ *
+ * Waiting also puts the reveal in the order criterion 3 states, with the
+ * auto-scroll LAST. It is the transition's own `finished` promise and not a
+ * timer, so the wait is exactly the length of the tween.
+ */
+describe("afterReflow — the scrolls wait for the tween", () => {
+  const originalMatchMedia = window.matchMedia;
+
+  afterEach(() => {
+    window.matchMedia = originalMatchMedia;
+    Reflect.deleteProperty(document, "startViewTransition");
+    vi.restoreAllMocks();
+  });
+
+  function stubNoPreference(): void {
+    window.matchMedia = vi.fn(
+      (query: string) => ({ matches: false, media: query }) as MediaQueryList,
+    );
+  }
+
+  /** A view transition whose tween the test decides the end of. */
+  function stubPendingTransition(): { finish: () => void } {
+    let finish = (): void => {};
+    const finished = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    Object.assign(document, {
+      startViewTransition: (update: () => void) => {
+        update();
+        return { finished };
+      },
+    });
+    return { finish };
+  }
+
+  it("runs at once when no tween is on screen", () => {
+    const run = vi.fn();
+
+    afterReflow(run);
+
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it("holds a scroll until the tween has finished", async () => {
+    stubNoPreference();
+    const { finish } = stubPendingTransition();
+    const scrollIntoView = vi.fn();
+
+    animateReflow(() => {});
+    scrollRevealedIntoView({ scrollIntoView } as unknown as Element);
+
+    // The section has mounted and the tween is mid-flight: nothing may move
+    // the viewport yet.
+    expect(scrollIntoView).not.toHaveBeenCalled();
+
+    finish();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.calls[0]?.[0]).toMatchObject({
+      block: "start",
+      behavior: "smooth",
+    });
+  });
+
+  it("holds Reset's scroll to the top for the same reason", async () => {
+    stubNoPreference();
+    const { finish } = stubPendingTransition();
+    const scrollTo = vi.fn();
+    Object.assign(window, { scrollTo });
+
+    animateReflow(() => {});
+    scrollToTop();
+
+    expect(scrollTo).not.toHaveBeenCalled();
+
+    finish();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(scrollTo).toHaveBeenCalledWith({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  });
+
+  it("does not hold anything back under reduced motion", () => {
+    // No tween runs at all, so there is nothing to wait for — and a scroll
+    // that waited on a promise that never resolves would never happen.
+    window.matchMedia = vi.fn(
+      (query: string) => ({ matches: true, media: query }) as MediaQueryList,
+    );
+    stubPendingTransition();
+    const scrollIntoView = vi.fn();
+
+    animateReflow(() => {});
+    scrollRevealedIntoView({ scrollIntoView } as unknown as Element);
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
+  it("releases the wait even when the tween is SKIPPED", async () => {
+    // A second insertion skips the first transition, which REJECTS `finished`.
+    // A rejection is as finished as a completion here; a scroll that waited on
+    // the settled state only would be lost.
+    stubNoPreference();
+    const finished = Promise.reject(new Error("skipped"));
+    Object.assign(document, {
+      startViewTransition: (update: () => void) => {
+        update();
+        return { finished };
+      },
+    });
+    const scrollIntoView = vi.fn();
+
+    animateReflow(() => {});
+    scrollRevealedIntoView({ scrollIntoView } as unknown as Element);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
   });
 });

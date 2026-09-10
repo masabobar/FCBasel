@@ -6,72 +6,73 @@
 
 ## Summary
 
-**Total Completed:** 43 stories
-**Total Points:** 111 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 56 points/day · **Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (4/6 · 9/14 — every P0 closed)**
+**Total Completed:** 44 stories
+**Total Points:** 114 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 56 points/day · **Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (5/6 · 12/14 — every P0 closed)**
 
 ---
 
 ## Completed Stories
 
+### US-043: Transition & timing polish (3 pts) — **THE REVEAL SAMPLED FRAME BY FRAME**
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 15 Chrome cases (60 e2e total) + 14 unit (2242)
+**Notes:** Every criterion here is a claim about what happens BETWEEN two states, so the instrument is
+a `requestAnimationFrame` loop INSIDE the page (`tests/e2e/support/timing.ts`) recording panel,
+sections, per-card opacity, figure strings, painted bar and arc extents, `scrollY` and the view
+transition's own `currentTime` — plus a separate timestamps-only frame clock, never run in the same
+pass, so the frame budget reported is the product's and not the sampler's. **Each fix was re-verified
+by MUTATION: reverted one at a time, its standing test failed.** **No token changed; lockfile
+untouched.** ⚠️ **HARDWARE: an Apple M1 MacBook Pro (MacBookPro17,1, 8 cores, 16GB, macOS 15.6.1) —
+NOT the demo machine, and nothing here claims it is.** Longest frame **16.8-33.3ms at 1x**,
+**33.4-49.9ms at 4x**, **33.3-116.7ms at 6x** CDP throttling; p95 **16.7-16.8ms** at all three.
+**DEFECT 1:** `startViewTransition` updates ASYNCHRONOUSLY, so `setBeat(null)` was flushed a frame
+BEFORE the answer and `useCanvasPanel` painted the EMPTY STATE back into the spot the panel had just
+left — **one seam frame at 1219.7ms with neither**, then ghosted across the 400ms reflow. Fixed in
+`use-thinking.ts` by dropping the panel in the render where `focus.tick` shows the answer landed:
+**seam 0 frames**. **DEFECT 2:** the chip row wraps past four chips (bar **117.1 → 159.3px** against a
+**128px** reserve), so from the third question on the beat's source chips sat **14.2px UNDER the
+prompt bar**; reserve now 176px, clearance **+33.3 to +76.0px** at all six beats. **TIMING:** both
+scrolls now wait on the reflow tween's own `finished` promise — the reveal's used to start **384ms
+inside** it. Beat **1118ms**, insertion 400ms, reduced 218ms. Sequence: panel 78→1196ms → section
+1230ms → stagger 0/90/180ms → 446 figure strings → 488 geometry values → scroll 1680ms; append drift
+**0.00px over 198 frames**; a filter's first frame is the OLD figures, **zero zeros**; reduced motion
+35 figures + 56 geometry at final state, **0 animations running**. **KL-3 CLOSED.** **Triage: none.**
+Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
+
 ### US-044: Brand fidelity & legibility QA (2 pts) — **BRAND FIDELITY MEASURED, NOT REVIEWED**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 13 Chrome cases (45 e2e total) + 3 unit (2228)
 **Notes:** US-041's lesson applied to the palette — the source scans already passed, so the value was
-in reading the SERVED page. New `tests/e2e/brand-fidelity.spec.ts` + `support/brand.ts`, reusing
-US-040/041/042's harnesses: one `getComputedStyle` walk per moment, every painted value resolved to
-sRGB (Tailwind's `/opacity` composites in **oklab**, converted back through the CSS Color 4 matrices)
-and classified in Node against `app/lib/tokens.ts` **itself** — not one hex copied into a test. Read
-at **four moments**: baseline (the only `red-vivid`), mid-beat (the gold sweep), the full script at
-1920x1080, the fallback's prose. **COLOUR INVENTORY — 19 distinct colours over 886 painted elements,
-every one a token,** at 15 alphas, plus `#101840` from the SHADOW tokens and `rgba(0,0,0,0)`; **the
-only non-palette hexes are two partner brand colours** (Bitpanda, Sunrise — the other four coincide
-with FCB tokens by accident), read from the DATASET so US-007's exception cannot drift. **GOLD AUDIT
-— 41 paints, all inside a CLOSED `data-slot` allowlist** with a written sanction each: target marks
-(x11), the follow-up seam (x6), the recommendation panel (x16), the flagged Marketing row and its
-flag, plus the Reference-Guide band and chrome uses. `#b8960b` on one partner plate is **NOT** gold —
-Feldschlosschen's own colour shares `accentFollowUp`'s hex, so it is excluded by SLOT. **No gold on
-`card`, `card-accent` or `insight-section`: the ring the Reference Guide removed (US-006) stays gone.**
-**ONE REAL DEFECT FOUND AND FIXED — the only variance chip on the canvas with no sign:** Hero 3's
-driver total rendered `CHF 410k total` because `DriverTile` handed the badge the ROWS' formatter,
-right for a bar label but wrong for a `DeltaChip`. Exactly US-022's trap — a POSITIVE figure that is
-ADVERSE. Fixed with a `totalFormat` prop defaulting to `format`: **`+CHF 410k total`**, rows still
-unsigned. **All 23 chips now carry sign, arrow, spoken direction and the pos/neg token**, with the
-trap asserted positively. Also: 31 uppercase headers at 700/`0.04em`, every figure `tabular-nums`,
-19 tab stops ringed (the prompt input's ring on its field wrapper, asserted), **0 non-hyphen dashes**
-incl. **U+2212**, `FCB 2-1 Sion` with U+002D by code point. Border ratios 1.10-1.24:1 and four
-marginal ink pairs **recorded as KL-4, not "improved"**. **Triage: no trigger fired.** Lockfile clean.
+in reading the SERVED page. New `tests/e2e/brand-fidelity.spec.ts` + `support/brand.ts`: one
+`getComputedStyle` walk per moment, every painted value resolved to sRGB (Tailwind's `/opacity`
+composites in **oklab**, converted back through the CSS Color 4 matrices) and classified in Node
+against `app/lib/tokens.ts` **itself** — not one hex copied into a test, read at four moments.
+**19 distinct colours over 886 painted elements, every one a token**, the only non-palette hexes two
+partner brand colours read from the DATASET · **41 gold paints, all inside a CLOSED `data-slot`
+allowlist**, **no gold on any tile surface — the ring US-006 removed stays gone** · **23 variance
+chips** with sign, arrow, spoken word and the pos/neg token · 31 uppercase headers · every figure
+tabular · 19 tab stops ringed · **0 non-hyphen dashes** incl. U+2212, `FCB 2-1 Sion` by code point.
+**ONE REAL DEFECT: Hero 3's `CHF 410k` total badge had no sign** — US-022's trap exactly, a POSITIVE
+figure that is ADVERSE; fixed with a `totalFormat` prop to **`+CHF 410k`**, rows still unsigned.
+Borders 1.10-1.24:1 **recorded as KL-4, not "improved"**. **Triage: no trigger fired.** Lockfile clean.
+Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
 
 ### US-042: Dead-end path sweep (3 pts) — **EVERY PATH PROVEN TO LEAD SOMEWHERE**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 16 Chrome cases (32 e2e total; unit stays 2225)
 **Notes:** US-041's lesson taken literally — **the interactive surface is everything a presenter can
-click, type or press**, and the defect it found lived on the one element nobody had ever exercised.
-New: `tests/e2e/dead-end-path-sweep.spec.ts` + `support/paths.ts`, reusing US-040/US-041's harnesses;
-the three control labels and `BEAT_MS` moved into `support/demo-script.ts` so three specs share one
-copy. **No `app/**` source changed; lockfile untouched.** **"Dead-end-free" is ONE helper,
-`expectAlive`, on every path:** shell mounted and >= 4 tiles · >= 3 prepared chips and > 2,000 chars
-of text · no error boundary, no sideways scroll, never two transient panels — plus **an empty console
-per case**. **Swept:** three heroes · three follow-ups · **23 paraphrases**, each landing its intended
-hero and no other · **16 off-script strings** (XSS, `<script>`, broken attribute, `javascript:`, SQL,
-template expression, CSS selector, path traversal, RTL override, combining marks, five scripts in one
-line, **50,000 chars**) all on the fallback with its three chips, **never echoed** · **6
-empty/whitespace no-ops** via Enter *and* the send button · **8 two-subject questions asked twice**:
-exactly one hero, identical both runs · **3 cold typed follow-ups**, parent first then the chip
-offered and taken · **the sidebar Dashboard link pressed 5x with six answers up** (nothing lost, no
-history entry) · the three **inert placeholders** proved `<span>` / `pointer-events: none` /
-`tabIndex -1` / no `href`, then force-clicked with a real mouse · crest, workspace label, status,
-avatar, top bar, sidebar, canvas · **141 canvas slots** · **both tab rings** (11 stops baseline, 19
-full canvas), every stop activated with Enter *and* Space, no focus trap · the demo driven
-**keyboard-only** · Reset x5 idle, x6 over a full canvas, x6 mid-beat with the beat waited out, and
-over the fallback · double-taps, three chips in one burst, a chip mid-beat, five submits of one
-question, a hero re-asked after its follow-up — **never a duplicate section** · reload, mid-beat
-reload, back and forward. **NO DEAD END FOUND, and the sweep is mutation-tested:** threshold 2 -> 5
-failed the paraphrase case, a dead sidebar route failed on *"the app shell is gone"*. **KL-3 recorded,
-not fixed** — a reload restores the scroll offset (1920x1080 -> `scrollY 185`); not a dead end by this
-story's definition, and removing `<ScrollRestoration />` was tried and does not close it.
-**Triage: the A03 user-input trigger fired and is the story's own measurement** — every hostile string
-typed on the served page, then every sink read: nothing executed, no markup, no attribute, no URL,
-`localStorage` and cookies empty, the only `sessionStorage` key React Router's scroll integers.
-Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
+click, type or press.** New `tests/e2e/dead-end-path-sweep.spec.ts` + `support/paths.ts`, reusing
+US-040/041's harnesses; three control labels and `BEAT_MS` moved into `support/demo-script.ts` so
+three specs share one copy. **No `app/**` source changed; lockfile untouched.** "Dead-end-free" is ONE
+helper, `expectAlive`, on every path: shell mounted and >= 4 tiles · >= 3 prepared chips and > 2,000
+chars of text · no error boundary, no sideways scroll, never two transient panels — plus **an empty
+console per case**. **Swept:** three heroes · three follow-ups · **23 paraphrases** each landing its
+intended hero · **16 off-script strings** (XSS, `javascript:`, SQL, RTL, **50,000 chars**) all on the
+fallback, **never echoed** · 6 empty/whitespace no-ops · 8 two-subject questions asked twice · 3 cold
+typed follow-ups · the sidebar link pressed 5x · three inert placeholders force-clicked · **141 canvas
+slots** · **both tab rings**, every stop on Enter *and* Space · keyboard-only demo · Reset idle, over
+a full canvas, mid-beat and over the fallback · reload, back and forward. **NO DEAD END, and the
+sweep is mutation-tested.** **KL-3 was recorded here, not fixed — CLOSED by US-043 above.**
+**Triage: the A03 user-input trigger fired and is the story's own measurement** — nothing executed,
+no markup, no attribute, no URL, storage empty. Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
 
 ### US-041: Offline resilience verification (2 pts) — **TWO RUNTIME FETCHES FOUND AND KILLED**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 3 unit (2225 green) + 4 offline Chrome cases
@@ -79,17 +80,16 @@ Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
 route over `**`, so a fetch cannot hide behind the weakness of either, against the **built SSR
 bundle**, never the dev server. New: `tests/e2e/offline-resilience.spec.ts` + `support/network.ts`,
 reusing US-040's harness; **lockfile untouched**. **The whole script ran offline, asserted at every
-beat** — baseline (4 cards, band, empty state, 3 chips) → three heroes → three follow-ups (3 gold
-dividers, the causal peak) → the sidebar link → off-script (fallback verbatim, nothing removed) →
-empty submit (true no-op) → reset → **reset mid-beat**, the pending beat proved *cancelled*; repeated
-under **reduced motion**. **Finding 1:** lazy route discovery fetched `/__manifest` on hydration →
+beat** — baseline → three heroes → three follow-ups → the sidebar link → off-script (fallback
+verbatim) → empty submit (a true no-op) → reset → **reset mid-beat**, the pending beat proved
+*cancelled*; repeated under **reduced motion**. **Finding 1:** lazy route discovery fetched `/__manifest` on hydration →
 `routeDiscovery: { mode: "initial" }`. **Finding 2, a demo-killer:** the sidebar's `<Link to="/">`
 revalidated `/_root.data`, which offline failed and replaced **the whole dashboard with an error
 boundary from one click** → `shouldRevalidate: () => false` on **both** routes (wrong online too:
 the figures are bundled). **Log: 10 requests, all local, 0 after first paint** — zero
 fetch/webfont/foreign-origin/`fcb.ch`, zero console errors, favicon 200, every document
-`src`/`href` root-relative. **Triage: no trigger fired; A10/SSRF has no surface at all.**
-Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
+`src`/`href` root-relative. **Triage: no trigger fired; A10/SSRF has no surface at all.** Full
+detail: [`../phases/phase-4.md`](../phases/phase-4.md).
 
 ### US-040: Presentation sizing & responsiveness (2 pts) — **PHASE 4 OPENS**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 11 unit (2221 green) + 12 Chrome cases

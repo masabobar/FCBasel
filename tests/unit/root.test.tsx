@@ -56,6 +56,29 @@ describe("Layout", () => {
     expect(body).toBeDefined();
     expect((body!.props.children as unknown[])[0]).toBe("page content");
   });
+
+  it("renders NO ScrollRestoration — KL-3, closed by US-043", () => {
+    // Half of the fix. The component replayed the previous session's scroll
+    // offset into a freshly cleared baseline (`scrollY 185` at 1920x1080),
+    // and its `pagehide` handler put the mode back to `auto` on the way out,
+    // so `manual` alone could not have closed it. Nothing is lost: one route,
+    // no revalidation, no derived scroll state.
+    const names = nodes.map((node) =>
+      typeof node.type === "function" ? node.type.name : String(node.type),
+    );
+    // The rendered tree, not a substring scan: `disableScrollRestoration` is
+    // the OTHER half of the fix and the docblock above explains the removal,
+    // so both share the word. What must be gone is the ELEMENT — and the
+    // import that would let it back in.
+    expect(names).not.toContain("ScrollRestoration");
+    const imported = /import \{([\s\S]*?)\} from "react-router"/.exec(
+      ROOT_SOURCE,
+    )?.[1];
+    expect(imported, "root no longer imports from react-router").toBeDefined();
+    expect(imported!.split(",").map((name) => name.trim())).not.toContain(
+      "ScrollRestoration",
+    );
+  });
 });
 
 describe("App", () => {
@@ -109,6 +132,19 @@ describe("App", () => {
     expect(
       document.querySelectorAll('[data-slot="insight-section"]'),
     ).toHaveLength(0);
+  });
+
+  it("takes scroll restoration off the browser on mount — KL-3", () => {
+    // The other half of the fix. Memory-only state means a reload starts a
+    // fresh session, so the offset must not survive it either; the mode is a
+    // property of the history entry, so setting it once on mount covers the
+    // reload that follows. `tests/e2e/transition-timing.spec.ts` proves the
+    // effect end to end by really scrolling and really reloading.
+    window.history.scrollRestoration = "auto";
+
+    renderApp();
+
+    expect(window.history.scrollRestoration).toBe("manual");
   });
 
   it("owns the dashboard state above both the canvas and the app bar", () => {
