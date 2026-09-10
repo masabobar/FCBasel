@@ -1,12 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CANVAS_GRID_CLASS } from "../../app/components/chrome/app-shell";
 import {
-  PLACEHOLDER_FOLLOW_UP_BODY,
-  PLACEHOLDER_MARKER,
   SECTION_GRID_CLASS,
   TILE_STAGGER_MS,
   tileDelayMs,
@@ -161,19 +159,25 @@ describe("insight sections — insertion", () => {
 /* ------------------------------------------------------------ FOLLOW-UP -- */
 
 describe("insight sections — the follow-up sharpens the section", () => {
-  // The sharpened hero is HERO_3, whose BEAT is the one still on the shared
-  // placeholder (US-039), so this suite stays about the MECHANIC. The real
-  // content of each section is asserted in its own hero suite.
+  // The sharpened hero is HERO_3, the causal peak (US-039). This suite stays
+  // about the MECHANIC; the real content of each beat is asserted in its own
+  // hero suite.
   const sharpened = withFollowUpShown(asked(HERO_3, HERO_2), HERO_3);
 
-  it("adds the follow-up panel to the existing section", () => {
+  it("adds the follow-up beat to the existing section", () => {
     renderSections(sharpened);
 
     const section = sectionNodes()[0]!;
     expect(section).toHaveAttribute("data-phase", InsightPhase.WITH_FOLLOW_UP);
-    // Hero 3's two primary tiles, plus the beat's stand-in.
+    // Hero 3's two primary tiles, plus the beat's driver tile — and the beat's
+    // seam and its recommendation panel, neither of which is a data tile.
     expect(section.querySelectorAll('[data-slot="card"]')).toHaveLength(3);
-    expect(section).toHaveTextContent(PLACEHOLDER_FOLLOW_UP_BODY);
+    expect(
+      section.querySelector('[data-slot="follow-up-divider"]'),
+    ).not.toBeNull();
+    expect(
+      section.querySelector('[data-slot="recommendation-panel"]'),
+    ).not.toBeNull();
   });
 
   it("appends no section of its own", () => {
@@ -186,12 +190,14 @@ describe("insight sections — the follow-up sharpens the section", () => {
   it("leaves the other section on its primary answer", () => {
     renderSections(sharpened);
 
-    // Hero 2 is real content, so the claim is about its PHASE rather than
-    // about a placeholder string: it keeps its own tiles and gains no beat.
+    // The claim is about its PHASE: it keeps its own tiles and gains no beat —
+    // no seam, no recommendation panel, nothing sharpened.
     const other = sectionNodes()[1]!;
     expect(other).toHaveAttribute("data-phase", InsightPhase.PRIMARY);
-    expect(other).not.toHaveTextContent(PLACEHOLDER_FOLLOW_UP_BODY);
-    expect(other.textContent).not.toContain(PLACEHOLDER_MARKER);
+    expect(other.querySelector('[data-slot="follow-up-divider"]')).toBeNull();
+    expect(
+      other.querySelector('[data-slot="recommendation-panel"]'),
+    ).toBeNull();
   });
 });
 
@@ -243,10 +249,16 @@ describe("insight sections — entrance and stagger", () => {
       sectionNodes()[0]!.querySelectorAll<HTMLElement>('[data-slot="card"]'),
     );
     // The first tile leads; each one after it waits a further step, and the
-    // beat joins the SAME cascade rather than starting a new one.
+    // beat joins the SAME cascade rather than starting a new one — its driver
+    // tile is the FOURTH step, because the gold seam takes the third.
     expect(first!.style.animationDelay).toBe("");
     expect(second!.style.animationDelay).toBe(`${TILE_STAGGER_MS}ms`);
-    expect(third!.style.animationDelay).toBe(`${2 * TILE_STAGGER_MS}ms`);
+    expect(third!.style.animationDelay).toBe(`${3 * TILE_STAGGER_MS}ms`);
+    expect(
+      sectionNodes()[0]!.querySelector<HTMLElement>(
+        '[data-slot="follow-up-divider"]',
+      )!.style.animationDelay,
+    ).toBe(`${2 * TILE_STAGGER_MS}ms`);
   });
 
   it("computes the stagger from one shared step", () => {
@@ -361,7 +373,7 @@ describe("insight sections — reduced motion still renders the layout", () => {
     renderSections(sections, { heroId: HERO_3, tick: 2 });
 
     expect(heroOrder()).toEqual([HERO_1, HERO_3]);
-    // Hero 1's three tiles, Hero 3's two, and the beat's stand-in.
+    // Hero 1's three tiles, Hero 3's two, and the beat's driver tile.
     expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(6);
     for (const node of sectionNodes()) {
       expect(node).toHaveClass("col-span-full", "grid-cols-subgrid");
@@ -369,52 +381,74 @@ describe("insight sections — reduced motion still renders the layout", () => {
   });
 });
 
-/* ----------------------------------------------------- PLACEHOLDER SEAM -- */
+/* ------------------------------------------------ NO STAND-IN REMAINS -- */
 
-describe("insight sections — the last placeholder is clearly a placeholder", () => {
-  const section: InsightSection = {
+describe("insight sections — every beat is real content (US-039)", () => {
+  const sharpened: InsightSection = {
     heroId: HERO_3,
     phase: InsightPhase.WITH_FOLLOW_UP,
     revision: 0,
   };
 
-  /** The stand-in card: the one card in the section that is marked as such. */
-  function placeholderCard(): HTMLElement {
-    const found = Array.from(
-      sectionNodes()[0]!.querySelectorAll<HTMLElement>('[data-slot="card"]'),
-    ).filter((card) => card.textContent!.includes(PLACEHOLDER_MARKER));
-    expect(found).toHaveLength(1);
-    return found[0]!;
+  /** Every `.ts`/`.tsx` file under `app/`, so the scan cannot miss a module. */
+  function appSources(): string[] {
+    const files: string[] = [];
+    const walk = (directory: string): void => {
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const path = `${directory}/${entry.name}`;
+        if (entry.isDirectory()) walk(path);
+        else if (/\.tsx?$/.test(entry.name)) files.push(path);
+      }
+    };
+    walk(resolve(process.cwd(), "app"));
+    return files;
   }
 
-  it("is the FOLLOW-UP beat only — every primary answer is real now", () => {
-    renderSections([section]);
+  it("renders the CAUSAL PEAK where the last stand-in used to be", () => {
+    renderSections([sharpened]);
 
-    // US-038 made Hero 3's primary real, so exactly one stand-in is left in
-    // the whole product: US-039's causal peak.
-    expect(placeholderCard()).toHaveTextContent(PLACEHOLDER_FOLLOW_UP_BODY);
-    expect(sectionNodes()[0]!).toHaveTextContent(
-      HEROES.hero3.primary.narrative,
-    );
+    // US-038 made Hero 3's primary real and US-039 made its beat real, so the
+    // sharpened section is content end to end: the narrative, the beat's own
+    // tile, and the advice panel.
+    const section = sectionNodes()[0]!;
+    expect(section).toHaveTextContent(HEROES.hero3.primary.narrative);
+    expect(section).toHaveTextContent(HEROES.hero3.followUp.narrative);
+    expect(section.textContent).not.toContain("Placeholder");
   });
 
-  it("marks its title and its body as a placeholder", () => {
-    renderSections([section]);
-
-    expect(
-      placeholderCard().textContent!.match(new RegExp(PLACEHOLDER_MARKER, "g"))
-        ?.length,
-    ).toBe(2);
+  it("leaves NO placeholder in any phase of any hero", () => {
+    // Every session shape the product can reach: each hero at each phase.
+    for (const heroId of [HERO_1, HERO_2, HERO_3]) {
+      for (const phase of [InsightPhase.PRIMARY, InsightPhase.WITH_FOLLOW_UP]) {
+        const { unmount } = renderSections([{ heroId, phase, revision: 0 }]);
+        expect(
+          sectionNodes()[0]!.textContent,
+          `${heroId} at ${phase} still shows a stand-in`,
+        ).not.toMatch(/placeholder/i);
+        unmount();
+      }
+    }
   });
 
-  it("invents no figure and no narrative copy of the beat", () => {
-    // The causal peak's narrative is verbatim and its figures are US-010's;
-    // this stand-in must not pre-empt either. No digit may reach the screen
-    // from inside it.
-    renderSections([section]);
+  it("keeps no stand-in component anywhere in the app sources", () => {
+    // The frame's `PlaceholderFollowUp` and its two constants went with the
+    // story that replaced them, so the names are gone from the whole product —
+    // not merely unused in this module. (`PROMPT_PLACEHOLDER`, the prompt
+    // field's own affordance, is a different thing and is left alone.)
+    const files = appSources();
+    expect(files.length).toBeGreaterThan(20);
 
-    const text = placeholderCard().textContent!.replace(/HERO_\d/g, "");
-    expect(text).not.toMatch(/\d/);
+    for (const path of files) {
+      const source = readFileSync(path, "utf8");
+      for (const name of [
+        "PlaceholderFollowUp",
+        "PLACEHOLDER_MARKER",
+        "PLACEHOLDER_FOLLOW_UP_BODY",
+        "placeholder-follow-up-body",
+      ]) {
+        expect(source, `${path} still mentions ${name}`).not.toContain(name);
+      }
+    }
   });
 
   it("uses no literal colour value", () => {

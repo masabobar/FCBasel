@@ -1,6 +1,8 @@
 import { CompareBars } from "../tiles/compare-bars";
 import { DepartmentTableTile } from "../tiles/department-table";
+import { DriverTile } from "../tiles/driver-tile";
 import { KpiTile } from "../tiles/kpi-tile";
+import { RecommendationPanel } from "../tiles/recommendation-panel";
 import { HERO_CHIP_LABEL } from "../../lib/dashboard/chips";
 import {
   InsightPhase,
@@ -8,6 +10,7 @@ import {
 } from "../../lib/dashboard/sections";
 import {
   chfFromThousands,
+  formatMoneyCompact,
   formatMoneyMillionsFixed,
   formatNumber,
   formatPercent,
@@ -15,13 +18,18 @@ import {
 } from "../../lib/format";
 import {
   departmentPerformanceRows,
+  departmentsNeedingAttention,
   departmentsOnTarget,
   departmentTotals,
 } from "../../lib/repositories/derive";
 import { HeroId, VarianceJudgement } from "../../lib/repositories/enums";
-import { type Hero3Primary } from "../../lib/repositories/types";
 import {
-  PlaceholderFollowUp,
+  type ConversionGap,
+  type Hero3FollowUp,
+  type Hero3Primary,
+} from "../../lib/repositories/types";
+import {
+  FollowUpDivider,
   SectionHead,
   sectionLabelId,
   tileDelayMs,
@@ -106,14 +114,35 @@ import {
  * a closed full-year budget, so there is no period to choose and no `Segmented`
  * here; adding one would invent a control the question does not ask for.
  *
- * ── THE FOLLOW-UP SEAM (US-039) ─────────────────────────────────────────────
- * "Why is Marketing over budget and behind target?" is THE CAUSAL PEAK, and it
- * is the last unbuilt beat: this file keeps the shared `PlaceholderFollowUp`
- * for it, so the phase flip already grows THIS section rather than appending a
- * new one. US-039 replaces that one line with the beat's own rows — the gold
- * `FollowUpDivider`, the Marketing drivers, the conversion gap and a
- * `RecommendationPanel` — and adds `followUp` to {@link Hero3BodyProps} beside
- * `primary`, exactly as Heroes 1 and 2 hold both halves. Nothing else moves.
+ * ── THE FOLLOW-UP BEAT (US-039) — THE CAUSAL PEAK ───────────────────────────
+ * "Why is Marketing over budget and behind target?" is the beat the whole
+ * prototype exists to produce, and it does NOT append a section: it flips this
+ * one's phase and three more grid rows appear under the two tiles above — the
+ * shared gold `FollowUpDivider`, a `DriverTile` of Marketing's overspend, and a
+ * `RecommendationPanel` in its GOLD `recommendation` variant. The section that
+ * was already on screen grows; the table and the overall tile stay put.
+ *
+ * THE ORDER OF THE THREE IS THE ARGUMENT. The seam says a second question was
+ * asked; the tile says WHERE the money went (match activations CHF 240k, paid
+ * social CHF 150k, the agency retainer CHF 20k) and, in the same tile, that it
+ * bought LESS than planned (webshop conversion against its plan); and the panel
+ * says what to DO — an `aside`, structurally not a data tile (US-024), because
+ * this is the one place on the canvas that advises rather than measures. Unlike
+ * Hero 2's beat the panel is GOLD: this copy ends in an explicit
+ * recommendation, which is exactly what colour rule 4 reserves gold for.
+ *
+ * BOTH HALVES OF THE STORY ARE ON THE TILE. Marketing overspent AND
+ * underdelivered, so the bars alone are only half an answer: the conversion
+ * figures sit under them as the outcome the spend was chasing. Both come from
+ * `followUp`, formatted once at the foot of this file.
+ *
+ * NOT ONE FIGURE IN THE BEAT IS TYPED EITHER. The three drivers are the
+ * dataset's own rows, the conversion pair is its own measurement, and the
+ * `CHF 410k total` badge is US-023's `driverTotal` — summed from the rows ON
+ * SCREEN, which is what makes it equal to the Marketing variance the table
+ * above derives. The badge's judgement is the one thing that cannot come from
+ * the sign: an overspend going UP is bad news, so it is passed ADVERSE, the
+ * same Revenue / Cost reading the table makes one row at a time.
  *
  * DEPARTMENTS, NEVER PEOPLE. This is the section closest to the
  * named-individual guardrail and it stays aggregate: departmental budgets,
@@ -159,6 +188,47 @@ export const HERO_3_FOOTER_LABELS = {
 /** Reads `3 of 6` — the count, then the field it was counted out of. */
 const OF_WORD = "of";
 
+/**
+ * The follow-up tile's title, as the acceptance criteria pin it.
+ *
+ * It NAMES Marketing, and it is the only place in this file that does. The
+ * primary answer must not (the table's flag is derived from the figures, so
+ * naming a department there would hard-code the club's problem); the beat is
+ * asked about one department by name, so its tile says which. The department it
+ * names is the one `departmentsNeedingAttention` flags in the table above —
+ * asserted in `tests/unit/hero3-follow-up.test.tsx`, so the title cannot start
+ * interrogating a department the figures have stopped flagging.
+ */
+export const HERO_3_FOLLOW_UP_TITLE = "What's driving Marketing";
+
+/**
+ * The scope line under that title. It states the ORDER, because the order is
+ * the tile's claim: the biggest slice of the overspend first.
+ */
+const DRIVER_SUBTITLE = "Overspend against plan per driver · biggest first";
+
+/**
+ * THE OUTCOME HALF, under the bars: the webshop conversion the paid-social
+ * spend was chasing, achieved against planned.
+ *
+ * The bars say the money went out; this says what it bought, which is the
+ * difference between "Marketing overspent" and the answer the room actually
+ * asked for. Its two figures are the dataset's, formatted at the foot of this
+ * file — nothing here states either of them.
+ *
+ * The wording is deliberately NOT a copy of the narrative's clause: the
+ * dataset's sentence makes the same point at length ("conversion landed at 2.2%
+ * against a 2.6% plan") and this line is worded independently, so the verbatim
+ * copy exists in exactly one place. A test scans the component layer for that
+ * clause and fails if it reappears here.
+ */
+const CONVERSION_PREFIX = "What that money was meant to buy:";
+const CONVERSION_LABEL = "webshop conversion";
+
+/** Reads `2.2% vs 2.6% plan` — the achieved figure against the planned one. */
+const VERSUS_WORD = "vs";
+const PLAN_WORD = "plan";
+
 /* -------------------------------------------------------------- GEOMETRY -- */
 
 /**
@@ -191,19 +261,34 @@ const OF_WORD = "of";
 const TABLE_TILE_SPAN = "col-span-full xl:col-span-8";
 const OVERALL_TILE_SPAN = "col-span-full xl:col-span-4";
 
+/**
+ * The beat's two rows: half the grid each at `lg`, so the room reads WHERE the
+ * money went and WHAT TO DO about it in one glance — the same span Hero 1's and
+ * Hero 2's beats take, because it is the same pair of elements.
+ *
+ * `lg` and not the `xl` the two tiles above need: a three-row bar list is a
+ * 150px label column plus a 96px value column (US-021), which fits half the
+ * canvas comfortably at 1024. Nothing here has the table's six columns.
+ */
+const FOLLOW_UP_TILE_SPAN = "col-span-full lg:col-span-6";
+
 /* ------------------------------------------------------------------ BODY -- */
 
 export interface Hero3BodyProps {
   /** The Hero 3 primary dataset, from the root loader. */
   primary: Hero3Primary;
   /**
-   * Primary answer, or primary plus its follow-up. The beat itself is US-039's;
-   * until then the phase flip adds the shared placeholder to THIS section.
+   * The causal follow-up: Marketing's spend drivers, the webshop conversion
+   * they were chasing, and the VERBATIM recommendation. Held beside `primary`
+   * exactly as Heroes 1 and 2 hold both halves, so the beat's figures are
+   * already on the client when the second question is asked.
    */
+  followUp: Hero3FollowUp;
+  /** Primary answer, or primary plus its follow-up (US-039). */
   phase: InsightSection["phase"];
 }
 
-export function Hero3Body({ primary, phase }: Hero3BodyProps) {
+export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
   const { departments, blendedTargetPercent } = primary;
 
   // DERIVED ROWS, not raw departments: every row arrives carrying the
@@ -217,6 +302,14 @@ export function Hero3Body({ primary, phase }: Hero3BodyProps) {
   // The above-target COUNT, derived from the same rows: the departments that
   // hit or beat their own outcome target.
   const onTarget = departmentsOnTarget(departments);
+
+  // THE BEAT'S SUBJECT, TAKEN FROM THE FIGURES RATHER THAN FROM A NAME: the
+  // department both over budget and behind target — the one row the table
+  // above flags. Only its `judgement` is read here, because that is the
+  // revenue/cost reading `derive.ts` already made, and it is what tells the
+  // beat's badge that a rising total is bad news. On the seeded data that is
+  // Marketing; if the figures moved, both the flag and the badge would follow.
+  const flagged = departmentsNeedingAttention(departments)[0];
 
   return (
     <>
@@ -322,10 +415,74 @@ export function Hero3Body({ primary, phase }: Hero3BodyProps) {
       </KpiTile>
 
       {phase === InsightPhase.WITH_FOLLOW_UP && (
-        // THE SEAM FOR US-039. The shared placeholder, so the phase flip grows
-        // the section that is already on screen — and so this story invents no
-        // part of the causal peak.
-        <PlaceholderFollowUp heroId={HeroId.HERO_3} delayMs={tileDelayMs(2)} />
+        <>
+          {/*
+            THE CAUSAL PEAK opens on the shared gold seam — the same component
+            Heroes 1 and 2 open on, never a third gold rule. It is a grid item,
+            so the section grows by three more rows instead of becoming a box
+            in a box.
+          */}
+          <FollowUpDivider isNew delayMs={tileDelayMs(2)} />
+
+          <DriverTile
+            title={HERO_3_FOLLOW_UP_TITLE}
+            period={DRIVER_SUBTITLE}
+            // The dataset's own drivers ARE the rows — one amount over plan
+            // each. Nothing is computed and nothing is retyped.
+            rows={followUp.drivers.map((driver) => ({
+              name: driver.name,
+              value: driver.amount,
+            }))}
+            // Every row is money over plan, so the same compact composition the
+            // beat's badge uses spells all four figures identically.
+            format={money}
+            // MAGNITUDE ORDER, the tile's default: the biggest slice of the
+            // overspend first, which is the one the recommendation acts on.
+            //
+            // `CHF 410k total` in the card's action slot, summed by US-023 from
+            // the rows above it — and therefore equal to the variance the table
+            // derives for Marketing, which is the substance of this beat: the
+            // three drivers explain the WHOLE overspend, not part of it.
+            showTotal
+            // THE ONE JUDGEMENT THE SIGN CANNOT CARRY (US-022's trap again).
+            // A rising total is money earned for a revenue department and an
+            // OVERSPEND for this cost centre, so the badge is told which — and
+            // it is told by `derive.ts`, through the judgement already on the
+            // row the table above flags. No verdict is decided in this file.
+            totalJudgement={flagged?.judgement}
+            // The outcome half: what the money bought, under the bars that say
+            // where it went.
+            note={
+              <>
+                {`${CONVERSION_PREFIX} `}
+                <span
+                  data-slot="conversion-gap"
+                  className={`font-semibold text-text ${TABULAR_NUMERALS_CLASS}`}
+                >
+                  {`${CONVERSION_LABEL} ${conversionGap(followUp.conversion)}`}
+                </span>
+              </>
+            }
+            isNew
+            delayMs={tileDelayMs(3)}
+            className={FOLLOW_UP_TILE_SPAN}
+          />
+
+          {/*
+            THE SO-WHAT, AND THE MOMENT THE PROTOTYPE EXISTS FOR. An `aside`,
+            not a third metric card (US-024): advice, in the GOLD
+            `recommendation` variant, because this copy ends in an explicit
+            recommendation. The sentence is handed over VERBATIM, from the
+            dataset; this file states no part of it.
+          */}
+          <RecommendationPanel
+            isNew
+            delayMs={tileDelayMs(4)}
+            className={FOLLOW_UP_TILE_SPAN}
+          >
+            {followUp.narrative}
+          </RecommendationPanel>
+        </>
       )}
     </>
   );
@@ -344,4 +501,32 @@ export function Hero3Body({ primary, phase }: Hero3BodyProps) {
  */
 function moneyMillions(thousands: number): string {
   return formatMoneyMillionsFixed(chfFromThousands(thousands));
+}
+
+/**
+ * `CHF 240k` — one driver's overspend against plan, and the beat's total.
+ *
+ * Compact, because the beat's figures are hundreds of thousands rather than the
+ * tens of millions the two tiles above report, and a bar label reads at a
+ * glance. The badge is handed the SAME function by `DriverTile`, so the total
+ * and the rows cannot spell the currency differently.
+ */
+function money(thousands: number): string {
+  return formatMoneyCompact(chfFromThousands(thousands));
+}
+
+/**
+ * `2.2% vs 2.6% plan` — the achieved conversion against the planned one.
+ *
+ * The ONE place the outcome half becomes text. Both percentages come from the
+ * dataset's measurement and go through the app's own percentage rule, so
+ * neither is rounded here and neither is written here.
+ */
+function conversionGap(conversion: ConversionGap): string {
+  return [
+    formatPercent(conversion.actualPercent),
+    VERSUS_WORD,
+    formatPercent(conversion.planPercent),
+    PLAN_WORD,
+  ].join(" ");
 }

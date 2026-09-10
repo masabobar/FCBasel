@@ -6,7 +6,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 **Duration:** Days 4-5 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 16
-**Status:** In Progress (4/6 completed)
+**Status:** ✅ Completed (6/6)
 
 > **Applies to every story in this epic:**
 > - Each hero renders its tiles **in the defined order**, with the E2 insertion animation and its
@@ -23,7 +23,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **Priority:** P0
 **Total Story Points:** 16
-**Status:** In Progress (4/6 completed)
+**Status:** ✅ Completed (6/6)
 **Source:** Build Specification E7 and pattern §5.3; Reference Implementation Guide §8, §13.
 
 ### Stories:
@@ -141,7 +141,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-10)
   - **Description:** *"Why is Marketing over budget and behind target?"* — the moment the whole
     prototype exists to produce.
   - **Acceptance Criteria:**
@@ -158,7 +158,8 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
       the matchday activations that did convert, and revisit the conversion target with Webshop
       before the winter campaign."*
   - **Dependencies:** US-038, US-023
-  - **Notes:** Per the brief, this is the beat the owner is expected to lean forward on. Protect it.
+  - **Notes:** Per the brief, the beat the owner is expected to lean forward on. Shipped with the
+    three drivers summing to Marketing's derived +410 variance and the narrative byte-identical.
 
 ---
 
@@ -168,7 +169,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **By Priority:** P0: 6 stories, 16 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 5 stories, 13 points · 🔄 0 · 📋 1 story, 3 points · ⏸️ 0
+**By Status:** ✅ 6 stories, 16 points · 🔄 0 · 📋 0 · ⏸️ 0
 
 ---
 

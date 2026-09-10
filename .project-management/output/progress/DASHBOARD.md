@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-10
-**Current Phase:** Phase 3b - Heroes *(5/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a all complete**
+**Current Phase:** Phase 4 - Hardening *(0/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a + 3b all complete**
 
 ---
 
@@ -9,13 +9,14 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 85% | 100% | 🟢 On Track |
+| **Overall Progress** | 88% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
-| **Phase 3b** | 81% — In Progress (5/6 · 13/16) | 100% | 🟢 On Track |
-| **Stories Completed** | 38/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 99/116 | 116 | 🟢 On Track |
+| **Phase 3b** | 100% — Completed (6/6 · 16/16) | 100% | 🟢 Done |
+| **Phase 4** | 0% — Active (0/6 · 0/14) | 100% | 🟢 On Track |
+| **Stories Completed** | 39/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 102/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -24,9 +25,9 @@
 
 ## 📅 Today's Progress (2026-09-10)
 
-**Stories Completed Today:** 6 (US-033, US-034, US-035, US-036, US-037, US-038) · **38 total**
-**Currently Working On:** US-039 — Hero 3 follow-up, the causal peak (3 pts)
-**Story Points Completed Today:** 16 · **99 total**
+**Stories Completed Today:** 7 (US-033, US-034, US-035, US-036, US-037, US-038, US-039) · **39 total**
+**Currently Working On:** None — Phase 3b complete
+**Story Points Completed Today:** 19 · **102 total**
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -170,22 +171,25 @@
 
 ---
 
-## 🏁 Phase 3b under way — The Three Hero Flows
+## 🏁 Phase 3b COMPLETE — The Three Hero Flows all run, both beats each
 
-**Phase 3a** closed at 100% on 2026-09-10 (6/6 · 17/17 pts), joining **1a, 1b, 2a and 2b**: a
-question can now be typed or tapped, is matched, waits a beat, and either answers or lands softly —
-and a follow-up can never dead-end. **Phase 3b** now builds the three answers themselves.
+**Phase 3b** closed at 100% on 2026-09-10 (6/6 · 16/16 pts), joining **1a, 1b, 2a, 2b and 3a**. All
+three client questions now answer end to end and each one sharpens: *what* → *so-what*. **US-039 was
+the causal peak and it landed** — the whole demo script (baseline → three heroes → three follow-ups →
+off-script → reset) runs in real Chrome, and **not one placeholder is left in the product**.
+**Only Phase 4 (hardening) remains.**
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-039: Hero 3 follow-up — why Marketing is off plan *(the causal peak)* | 📋 Next | The beat the owner is expected to lean forward on — the drivers, the conversion gap, and the recommendation |
+| US-040: Presentation sizing & responsiveness | 📋 Next | Phase 4 opens the hardening pass on a feature-complete prototype |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-039: Hero 3 follow-up — why Marketing is off plan *(the causal peak)* | 2026-09-10 | 3 |
 | US-038: Hero 3 primary — department budget vs actual vs target | 2026-09-10 | 3 |
 | US-037: Hero 2 follow-up — which fixtures are driving the drop | 2026-09-10 | 2 |
 | US-036: Hero 2 primary — ticket revenue year on year | 2026-09-10 | 3 |
@@ -203,12 +207,6 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | US-018: Vertical bar chart tile | 2026-09-09 | 3 |
 | US-016: Hero band — webshop trend & attendance ring | 2026-09-09 | 5 |
 | US-026: Segmented period filter control | 2026-09-09 | 2 |
-| US-025: Line chart component | 2026-09-09 | 3 |
-| US-013: Baseline dashboard — four pre-existing tiles | 2026-09-09 | 3 |
-| US-021: Horizontal bar tile | 2026-09-09 | 3 |
-| US-017: KPI tile & variance chip | 2026-09-09 | 2 |
-| US-027: Motion & animation hooks | 2026-09-09 | 3 |
-| US-015: Reset to baseline | 2026-09-09 | 2 |
 | US-014: Dynamic tile insertion & grid reflow | 2026-09-09 | 3 |
 | US-012: Branded application shell | 2026-09-09 | 3 |
 | US-011: Formatters & cross-hero reconciliation | 2026-09-09 | 2 |
@@ -246,8 +244,8 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
-| Test Coverage (`app/**`) | 99.70% stmts / 97.96% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 2147/2147 | TBD | 🟢 Good |
+| Test Coverage (`app/**`) | 99.71% stmts / 97.96% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
+| Passing Tests | 2210/2210 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -275,13 +273,14 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
 | Phase 3a: Conversation | ✅ Completed | 6/6 | 17/17 | 100% |
-| Phase 3b: Heroes | 🔄 Active | 5/6 | 13/16 | 81% |
-| Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
+| Phase 3b: Heroes | ✅ Completed | 6/6 | 16/16 | 100% |
+| Phase 4: Hardening | 🔄 Active | 0/6 | 0/14 | 0% |
 
 ---
 
 ## 🔗 Quick Links
-- **[Current Phase Plan](../phases/phase-3b.md)** - Phase 3b, Heroes (US-034 to US-039)
+- **[Current Phase Plan](../phases/phase-4.md)** - Phase 4, Hardening (US-040 to US-045)
+- **[Phase 3b Plan](../phases/phase-3b.md)** - Completed 2026-09-10 (6/6 · 16/16 pts)
 - **[Phase 3a Plan](../phases/phase-3a.md)** - Completed 2026-09-10 (6/6 · 17/17 pts)
 - **[Phase 2b Plan](../phases/phase-2b.md)** - Completed 2026-09-09 (11/11 · 29/29 pts)
 - **[Phase 2a Plan](../phases/phase-2a.md)** - Completed 2026-09-09 (5/5 · 16/16 pts)
@@ -294,6 +293,6 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-**Last Auto-Update:** US-038 completed at 2026-09-10 — **HERO 3'S PRIMARY ANSWER IS ON SCREEN (5/6 · 13/16 pts), AND THE REVENUE/COST TRAP IS CLOSED IN FRONT OF THE OWNER.** Composition again, and the **first mount of `DepartmentTableTile`** (US-022): `hero-3.tsx` holds layout, copy and ONE formatter composition, and a source scan proves it has no `<svg>`, no `<table>`, no hex and no re-typed figure; the overall tile is US-017's `KpiTile` around US-036's `CompareBars`. `hero-section.tsx` **lost `PlaceholderBody`** — every primary answer is now real, and the only stand-in left in the product is Hero 3's unbuilt beat. **THE TRAP, ASSERTED ON SCREEN, ON THE REAL DATA:** Marketing's **+0.41 renders ADVERSE** (red token, UP arrow, the word "up") while Sponsoring's **+0.84 renders FAVOURABLE** — same sign, opposite meaning — with source scans re-proving that neither the table nor the hero can compute a verdict (no `FAVOURABLE|ADVERSE`, no `variance <|>`, no `actual - budget`), and flipping Marketing's *type* in test flipping the same +410 to FAVOURABLE. Four departments came in above budget; **only three happily.** **EXACTLY ONE ROW IS FLAGGED AND THE DATA PICKS IT:** `data-flagged` matches `needsAttention` on all six rows, the gold tint carries an icon and the sentence "Over budget and behind target", and "Marketing" appears **nowhere** in the component layer — pushing Hospitality over budget in test flags it too. **THE GOLD BAND, END TO END:** Hospitality (95) `NEAR` with its ring, Merchandising (92) `BEHIND` with no mark at all, three `HIT`. **`(CHF 000)` IS NOT IN THE TITLE, DELIBERATELY** — the backlog words it "(full year, CHF 000)" and that half is exactly what US-022 was reported for; shipped as **"Departmental performance (full year)"** under the tile's own non-optional `figures in CHF millions` note, with tests asserting no `000` and no thousands figure anywhere in the tile. **OVERALL TILE:** `CHF 69.68M` with **`+1%`** (`variancePercent` **is** the criteria's +1.0% at +0.99% raw; the app's one percentage rule drops a redundant `.0`) and the chip **NEUTRAL**, matching the same movement in the table's total row — mixed signs across five revenue departments and one cost centre are a fact, not a verdict. Compare bars read **`CHF 69.00M` / `CHF 69.68M`** through one new fixed-decimal formatter, blended target **96%** stays STORED and is asserted not to be any mean, and **above target is `3 of 6`, DERIVED** by the new `departmentsOnTarget`. **Chrome pass at six widths:** table 1051/731/625/710/760/694px, **no horizontal scroll and no overflow at any of them**, no name truncated, re-ask → ONE section / two cards, zero requests after first paint. Narrative **byte-identical** at 270 chars with its only hyphen pinned to `0x2d`. **Security triage — no security-relevant changes detected**, and the dataset closest to the guardrail stays **aggregate**: no salary, no headcount attributed to a person, no individual's target. 66 new tests, **2147 green**. **Next is US-039 — the causal peak.**
+**Last Auto-Update:** US-039 completed at 2026-09-10 — **THE CAUSAL PEAK IS ON SCREEN AND PHASE 3b IS CLOSED (6/6 · 16/16 pts).** Composition to the end: `hero-3.tsx` gained a phase branch of three grid rows — US-035's shared `FollowUpDivider`, one `DriverTile` (US-023), and `RecommendationPanel` (US-024) in its **gold `recommendation` variant** — and **no module, bar, badge, divider or panel was built**. `hero-section.tsx` **LOST `PlaceholderFollowUp`**: the last stand-in in the product is gone, proved by a scan of every `app/**` source. **THE DRIVERS EXPLAIN THE WHOLE OVERSPEND:** Match activations `CHF 240k`, Paid social `CHF 150k`, Agency retainer `CHF 20k`, with the action-slot badge **`CHF 410k total` summed from the rows on screen** — which *is* `departmentVariance` for the department the table above flags, asserted as an equality in the data and on screen. **The retainer renders although the narrative omits it** (the two the prose names are 390 of the 410 — "concentrated in two areas" is true), and the paid-social ROW reads `CHF 150k`, never the sentence's `18%`: two facts about one driver, and only the money is in the dataset. **BOTH HALVES OF THE STORY, ON ONE TILE** — under the bars, *"What that money was meant to buy: webshop conversion 2.2% vs 2.6% plan"*, worded independently of the verbatim clause. **The verdict is still not made in a component:** the badge's ADVERSE reading comes from `derive.ts` through the flagged row's own `judgement`, so `hero-3.tsx` contains no `FAVOURABLE|ADVERSE` and flipping the department's *type* in test flips the badge; "Marketing" appears in the layer exactly once, as the AC-pinned tile title. **The advice is not a metric:** `aside`, accent down the side, no card chrome, not counted among the tiles, and the section's only three gold marks are the seam and the panel. Narrative **byte-identical** at **468** chars — ASCII sweep, all three hyphens `0x2d`, the apostrophe in `Marketing's` `0x27`, `matchday` one word, cross-checked against the backlog. **Chrome pass — THE WHOLE DEMO SCRIPT in one session:** baseline 4 cards → three heroes (12) → three follow-ups, the third asked by TYPING *"why is marketing high?"* (15 cards, 3 seams, 3 panels) → off-script → graceful fallback with the sections untouched → **Reset back to 4 cards**; zero requests after first paint, zero console errors, no horizontal overflow at any of six widths. **Security triage — no security-relevant changes detected**, and the beat closest to the guardrail stays **aggregate**: spend categories and a conversion rate, no salary, no headcount, no named individual. 63 new tests, **2210 green** (54 files). **Phase 3b is complete; only Phase 4 (hardening) remains.**
 
-*Previously (US-037, 2026-09-10):* the second so-what beat went on screen and **not one module, bar, badge or divider was built** — `hero-2.tsx` gained a phase branch of three grid rows (the shared `FollowUpDivider`, one `DriverTile`, `RecommendationPanel` in its navy `narrative` variant). The phase **flips rather than appends** (one section, four cards, the three primary tiles still in place), the four declines are ranked with **Luzern ahead of Sion** on a stable tie, `getComputedStyle` reads **96px / nowrap** off every value cell, and the `-CHF 400k total` badge is derived from the rows on screen. 56 tests, 2081 green.
+*Previously (US-038, 2026-09-10):* Hero 3's primary answer went on screen and **the revenue/cost trap was closed in front of the owner** — Marketing's `+0.41` renders ADVERSE while Sponsoring's `+0.84` renders FAVOURABLE, same sign, opposite meaning, with source scans proving neither the table nor the hero can compute a verdict; exactly one row is flagged and `needsAttention` picks it. Overall `CHF 69.68M` at `+1%` (NEUTRAL), blended target 96% stored, above target `3 of 6` derived. 66 tests, 2147 green.

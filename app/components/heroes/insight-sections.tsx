@@ -29,9 +29,9 @@ import { HeroSection } from "./hero-section";
  * IT IS ALSO WHERE A HERO ID BECOMES CONTENT ({@link heroBody}). The dispatch
  * lives here rather than inside `./hero-section.tsx` so the frame does not
  * import the heroes and the heroes can import the frame's head and stagger —
- * one direction, no cycle. As of US-038 all three branches are real content and
- * there is no placeholder body left to fall through to: `HeroId` has exactly
- * three members, so the last hero IS the final branch.
+ * one direction, no cycle. As of US-039 all three branches are real content in
+ * BOTH phases and there is no placeholder anywhere to fall through to: `HeroId`
+ * has exactly three members, so the last hero IS the final branch.
  */
 
 export interface InsightSectionsProps {
@@ -71,12 +71,17 @@ function heroBody(section: InsightSection, heroes: HeroesData) {
     );
   }
 
-  // HERO_3, the last of the three. Its primary answer is real (US-038) and its
-  // follow-up beat is the one still on the shared placeholder, which the hero
-  // itself renders — so there is no fall-through body here any more. The
-  // dataset's two halves are NOT handed over together yet: US-039 adds
-  // `followUp` here and in `./hero-3.tsx` in one move.
-  return <Hero3Body primary={heroes.hero3.primary} phase={section.phase} />;
+  // HERO_3, the last of the three, and both halves travel together for the
+  // same reason: US-039's causal peak explains the primary's own figures — its
+  // three drivers sum to the variance the table derives — so both arrive from
+  // the one read the loader already made.
+  return (
+    <Hero3Body
+      primary={heroes.hero3.primary}
+      followUp={heroes.hero3.followUp}
+      phase={section.phase}
+    />
+  );
 }
 
 export function InsightSections({

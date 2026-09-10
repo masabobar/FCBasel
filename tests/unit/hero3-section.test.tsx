@@ -42,6 +42,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   Hero3Body,
   HERO_3_COMPARE_LABELS,
+  HERO_3_FOLLOW_UP_TITLE,
   HERO_3_FOOTER_LABELS,
   HERO_3_TILE_TITLES,
 } from "../../app/components/heroes/hero-3";
@@ -99,6 +100,8 @@ import {
 /* ----------------------------------------------------------------- DATA -- */
 
 const PRIMARY = HEROES.hero3.primary;
+/** The beat's own dataset. US-039's suite asserts it; here it is only wired. */
+const FOLLOW_UP = HEROES.hero3.followUp;
 const DEPARTMENTS = PRIMARY.departments;
 const ROWS: readonly DepartmentPerformance[] =
   departmentPerformanceRows(DEPARTMENTS);
@@ -744,12 +747,23 @@ describe("Hero 3 — exactly one department is flagged, and the data picks it", 
     expect(
       ROWS.filter((one) => one.needsAttention).map((one) => one.name),
     ).toEqual([MARKETING]);
-    // Marketing is named nowhere in the component layer, so the flag cannot
-    // outlive the figures.
+    // The flag cannot outlive the figures: no component decides it from a
+    // name. Marketing is named in exactly ONE place in the whole layer — the
+    // TITLE of US-039's follow-up tile, which the acceptance criteria pin as
+    // "What's driving Marketing" — and never in a comparison, a lookup or a
+    // condition. The primary answer's table names no department at all.
     for (const source of SOURCES) {
-      expect(source.code).not.toContain("Marketing");
       expect(source.code).not.toContain("Merchandising");
+      if (source.path === HERO_3_PATH) continue;
+      expect(source.code).not.toContain("Marketing");
     }
+    expect(HERO_3_CODE.match(/Marketing/g)).toHaveLength(1);
+    expect(HERO_3_CODE).toContain(`"${HERO_3_FOLLOW_UP_TITLE}"`);
+    expect(HERO_3_FOLLOW_UP_TITLE).toContain("Marketing");
+    // A name used as DATA rather than as copy: never compared, never matched.
+    expect(HERO_3_CODE).not.toMatch(
+      /===\s*"Marketing|Marketing"\s*===|includes\("Marketing|find\(/,
+    );
   });
 
   it("moves the flag when the figures move", () => {
@@ -1176,8 +1190,9 @@ describe("Hero 3 — asking twice refreshes the section in place", () => {
       withFollowUpShown(withHeroShown([], HeroId.HERO_3), HeroId.HERO_3),
     );
 
-    // The seam for the causal peak: the phase flip GROWS this section rather
-    // than appending one, and the two primary tiles stay in place.
+    // The causal peak: the phase flip GROWS this section rather than appending
+    // one, and the two primary tiles stay in place. The beat itself is
+    // asserted in `tests/unit/hero3-follow-up.test.tsx`.
     expect(slots("insight-section")).toHaveLength(1);
     expect(section()).toHaveAttribute(
       "data-phase",
@@ -1260,7 +1275,13 @@ describe("Hero 3 — reduced motion shows the final state, not a frozen one", ()
 describe("Hero3Body — the section body, mounted directly", () => {
   it("renders the head and both tiles without the frame around it", () => {
     const frames = stubFrames();
-    render(<Hero3Body primary={PRIMARY} phase={InsightPhase.PRIMARY} />);
+    render(
+      <Hero3Body
+        primary={PRIMARY}
+        followUp={FOLLOW_UP}
+        phase={InsightPhase.PRIMARY}
+      />,
+    );
     settle(frames);
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
@@ -1282,10 +1303,25 @@ describe("Hero3Body — the section body, mounted directly", () => {
     expect(code("app/root.tsx")).toContain("hero3Repository");
   });
 
-  it("keeps the follow-up dataset out of this story", () => {
-    // US-039 adds `followUp` to the body's props and to the dispatch in one
-    // move; until then nothing here can render a figure from the causal peak.
-    expect(HERO_3_CODE).not.toMatch(/followUp/);
-    expect(HERO_3_CODE).toContain("PlaceholderFollowUp");
+  it("keeps the beat's own figures out of the PRIMARY answer", () => {
+    // US-039 added `followUp` to the body's props and to the dispatch in one
+    // move. At `primary` the beat renders nothing at all, so no figure from
+    // the causal peak can reach a screen that was asked the first question —
+    // and the stand-in it replaced is gone from the product entirely.
+    const frames = stubFrames();
+    render(
+      <Hero3Body
+        primary={PRIMARY}
+        followUp={FOLLOW_UP}
+        phase={InsightPhase.PRIMARY}
+      />,
+    );
+    settle(frames);
+
+    expect(slots("card")).toHaveLength(2);
+    expect(slot("recommendation-panel")).toBeNull();
+    expect(slot("follow-up-divider")).toBeNull();
+    expect(document.body.textContent).not.toContain(FOLLOW_UP.narrative);
+    expect(HERO_3_CODE).not.toContain("PlaceholderFollowUp");
   });
 });

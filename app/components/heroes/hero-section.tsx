@@ -4,12 +4,7 @@ import { cn } from "../../lib/cn";
 import { type InsightSection } from "../../lib/dashboard/sections";
 import { scrollRevealedIntoView, viewTransitionName } from "../../lib/motion";
 import { type HeroId } from "../../lib/repositories/enums";
-import {
-  Card,
-  CARD_ACCENTS,
-  CardCaption,
-  TILE_ENTER_CLASS,
-} from "../tiles/card";
+import { CARD_ACCENTS, CardCaption, TILE_ENTER_CLASS } from "../tiles/card";
 
 /**
  * One answered question, as a self-contained insight section on the canvas.
@@ -19,10 +14,11 @@ import {
  * the canvas grid, the entrance stagger, and the auto-scroll that brings it
  * into view. WHAT goes inside is per hero and arrives as `children`, chosen by
  * `./insight-sections.tsx` — Hero 1's content is `./hero-1.tsx` (US-034),
- * Hero 2's is `./hero-2.tsx` (US-036) and Hero 3's is `./hero-3.tsx` (US-038).
- * All three primary answers are real; the only stand-in left in the product is
- * {@link PlaceholderFollowUp} below, which Hero 3 renders in place of the
- * causal peak until US-039 builds it.
+ * Hero 2's is `./hero-2.tsx` (US-036) and Hero 3's is `./hero-3.tsx` (US-038
+ * primary, US-039 beat). AS OF US-039 EVERY BEAT IS REAL CONTENT and this
+ * module holds no stand-in of any kind: the placeholder tile that stood in for
+ * the causal peak went with the story that replaced it, so there is nothing
+ * left in the product for a phase flip to fall back to.
  *
  * ONE GRID, NOT TWO. A section is not a box that owns its own layout: it spans
  * the canvas grid's full width and re-uses the parent's column tracks through
@@ -50,9 +46,6 @@ import {
  */
 export const SECTION_GRID_CLASS =
   "col-span-full grid grid-cols-subgrid gap-grid-gap";
-
-/** A placeholder tile: full width on narrow viewports, half the grid at `lg`. */
-const PLACEHOLDER_TILE_CLASS = "col-span-full lg:col-span-6";
 
 /* ----------------------------------------------------------------- STAGGER -- */
 
@@ -163,47 +156,6 @@ export function FollowUpDivider({
         )}
       />
     </div>
-  );
-}
-
-/* ------------------------------------------------------------ PLACEHOLDER -- */
-
-/** Marks the stand-in content, so it can never be mistaken for the real thing. */
-export const PLACEHOLDER_MARKER = "Placeholder";
-
-/** Where the follow-up's recommendation panel goes. */
-export const PLACEHOLDER_FOLLOW_UP_BODY =
-  "Placeholder — the follow-up sharpens this same section from what happened to why, and what to do.";
-
-/**
- * The follow-up beat's stand-in: one gold-accented tile added to the section
- * that is already on screen, so the flip is visibly a section GROWING rather
- * than a new section appearing.
- *
- * THE LAST PLACEHOLDER IN THE PRODUCT. US-035 replaced Hero 1's beat and
- * US-037 replaced Hero 2's; US-038 made Hero 3's PRIMARY answer real, so this
- * is reached by exactly one thing — Hero 3's unbuilt causal peak, which
- * US-039 replaces. When it does, this function and its two constants go with
- * it. It takes `delayMs` rather than an index because it follows however many
- * tiles its hero rendered: two, for Hero 3.
- */
-export function PlaceholderFollowUp({
-  heroId,
-  delayMs,
-}: {
-  heroId: HeroId;
-  delayMs: number;
-}) {
-  return (
-    <Card
-      title={`${PLACEHOLDER_MARKER} follow-up · ${heroId}`}
-      accent="gold"
-      isNew
-      delayMs={delayMs}
-      className={PLACEHOLDER_TILE_CLASS}
-    >
-      <p data-slot="placeholder-follow-up-body">{PLACEHOLDER_FOLLOW_UP_BODY}</p>
-    </Card>
   );
 }
 

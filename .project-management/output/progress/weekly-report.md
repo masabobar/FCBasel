@@ -7,13 +7,13 @@
 
 ## Week Summary
 
-**Stories Completed:** 33
-**Story Points:** 86/116 (74%)
-**Current Phase:** Phase 3b - Scripted Hero Flows, **open at 0/6**
+**Stories Completed:** 39
+**Story Points:** 102/116 (88%)
+**Current Phase:** Phase 4 - Hardening, **open at 0/6**
 *(Phases 1a, 1b, 2a and 2b all completed 2026-09-09 — 2a closed by US-016, 2b by US-024 at 11/11 ·
-29/29. **Phase 3a closed 2026-09-10 by US-033 at 6/6 · 17/17**, which unblocks all three Phase 3b
-hero stories)*
-**Team Velocity:** 43 pts/day (two days of data — 83 then 3)
+29/29. **Phase 3a closed 2026-09-10 by US-033 at 6/6 · 17/17** and **Phase 3b closed the same day by
+US-039 at 6/6 · 16/16** — the three hero flows both beats each)*
+**Team Velocity:** 51 pts/day (two days of data — 83 then 19)
 
 ---
 
@@ -115,7 +115,21 @@ hero stories)*
   chip. Gating and chip visibility are **two readings of one list**, pinned by source scan. Recorded
   honestly: the behaviour was already correct at HEAD, so the story made the rule explicit and
   guarded it by mutation (the ungated call fails 10 tests). 46 tests, **1849 green**.
-- **Phase 3b opens.** Next: US-034 — Hero 1 primary (3 pts).
+- **PHASE 3b OPENED AND CLOSED THE SAME DAY (6/6 · 16/16) — US-034 to US-039.** All three client
+  questions now answer end to end and all three sharpen. Every one is **composition**: `VBarTile`,
+  `DonutTile`, `GroupedBarTile` and `DepartmentTableTile` reach a screen for the first time, and no
+  hero file holds an `<svg>`, a `<table>` or a re-typed figure (proved by scan). US-034's one
+  `Segmented` moves three tiles together; US-036 puts **both scope labels on screen** with the
+  mismatch proved real; US-037 built nothing at all; US-038 closed the **revenue/cost trap** on
+  screen (Marketing's +0.41 ADVERSE beside Sponsoring's +0.84 FAVOURABLE).
+- **US-039 — THE CAUSAL PEAK, and the last story of the phase.** The three Marketing drivers carry a
+  derived `CHF 410k total` that **equals** the variance the table above derives; the conversion gap
+  (2.2% vs 2.6%) sits on the same tile, so the beat says overspent **and** underdelivered; and the
+  advice is a gold `aside` that is structurally not a metric. `PlaceholderFollowUp` was deleted —
+  **no stand-in is left in the product** — and the **whole demo script** (baseline → three heroes →
+  three follow-ups → off-script → reset) now runs in real Chrome with zero requests after first
+  paint. Six narratives byte-identical against the backlog. 63 tests, **2210 green**.
+- **Phase 4 (hardening) opens.** Next: US-040 — presentation sizing & responsiveness (3 pts).
 
 ### Friday, 2026-09-11
 - (To be logged)
@@ -147,9 +161,10 @@ hero stories)*
 2. Phases 2a + 2b — shell, baseline dashboard, component library (45 pts): **complete** (2a 5/5,
    2b 11/11)
 3. Phase 3a — conversation engine (17 pts): **complete** (6/6, closed by US-033)
-3. Phase 3b — the three hero flows (16 pts): **next**, starting with US-034; composition only, and
-   US-024 fixed the verbatim contract its narratives depend on
-4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts)
+3. Phase 3b — the three hero flows (16 pts): **complete** (6/6, closed by US-039, the causal peak);
+   composition only, and US-024's verbatim contract held for all six narratives
+4. Phase 4 — hardening: offline resilience, dead-end sweep, brand QA (14 pts): **next**, starting
+   with US-040 — the prototype is feature complete, so everything from here protects it
 
 **Stretch Goal:**
 - Full rehearsal on the demo machine with the network disconnected (US-045)
