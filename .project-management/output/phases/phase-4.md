@@ -1,7 +1,7 @@
 # Phase 4: Demo Hardening & Polish
 
 **Duration:** 2026-09-14 to 2026-09-15 (~6.0 AI-hours)
-**Status:** 🔄 In Progress (1/6 · 2/14 pts)
+**Status:** 🔄 In Progress (2/6 · 4/14 pts)
 **Started:** 2026-09-10
 **Target Completion:** 2026-09-15
 **Actual Completion:** —
@@ -30,12 +30,12 @@ smooth, dead-end-proof, and independent of any network mid-demo.
 
 ### Epic 8: E8 — Demo Hardening & Polish (14 story points)
 
-**Priority:** P0 (US-043, US-045 are P1) · **Status:** 🔄 In Progress (1/6) · **Dependencies:** all prior phases
+**Priority:** P0 (US-043, US-045 are P1) · **Status:** 🔄 In Progress (2/6) · **Dependencies:** all prior phases
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
 | US-040 | Presentation sizing & responsiveness | 2 | P0 | ✅ Done |
-| US-041 | Offline resilience verification | 2 | P0 | 📋 Todo |
+| US-041 | Offline resilience verification | 2 | P0 | ✅ Done |
 | US-042 | Dead-end path sweep | 3 | P0 | 📋 Todo |
 | US-043 | Transition & timing polish | 3 | **P1** | 📋 Todo |
 | US-044 | Brand fidelity & legibility QA | 2 | P0 | 📋 Todo |
@@ -76,9 +76,9 @@ smooth, dead-end-proof, and independent of any network mid-demo.
 - **Risk Level:** Medium — the phase most likely to be compressed by upstream slippage
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 2 / 14 (14%)
-- **Completed Stories:** 1 / 6
-- **Tests Passing:** 2221 / 2221 unit (55 files) + 12 / 12 Chrome measurement cases · **Coverage:** 99.71% stmts / 97.96% branches / 100% funcs / 100% lines of `app/**` · **Commits:** 1
+- **Completed Story Points:** 4 / 14 (29%)
+- **Completed Stories:** 2 / 6
+- **Tests Passing:** 2225 / 2225 unit (55 files) + 16 / 16 Chrome cases (12 sizing, 4 offline) · **Coverage:** 99.71% stmts / 97.96% branches / 100% funcs / 100% lines of `app/**` · **Commits:** 2
 
 ---
 
@@ -99,7 +99,7 @@ be put in front of the owner".
 | Risk | Impact | Prob. | Mitigation | Owner | Status |
 |------|--------|-------|------------|-------|--------|
 | Phase compressed because upstream slipped | High | Medium | Extend daily runtime rather than cutting — the whole P1 set is only 0.82 days at 8h/day | Human | Open |
-| A runtime fetch survives review and breaks the offline demo | High | Low | US-041 verifies by disconnecting, not by inspection | AI | Open |
+| A runtime fetch survives review and breaks the offline demo | High | Low | US-041 verifies by disconnecting, not by inspection | AI | **Closed — and it had: TWO real runtime fetches found and fixed** |
 | An untested path dead-ends live | High | Low | US-042 sweeps every path incl. the most off-script input imaginable | AI | Open |
 | Transition stutters on the actual demo machine | Medium | Medium | US-043 tunes on target hardware, not the dev machine | AI | Open |
 | Projector washes out variance colours | Medium | Medium | Sign and arrow carry the meaning; verified in US-044 | AI | Open |
@@ -236,6 +236,54 @@ logging change; **lockfile untouched, so no dependency advisory gate applies**.
 **Two known limitations recorded above** (KL-1, KL-2) rather than fixed. KL-1's numbers were
 re-measured from scratch and agree with US-036's to the decimal.
 
+### US-041 — Offline resilience verification (2 pts) · 2026-09-10 · ✅ Done
+
+**Verified by disconnecting, and the disconnection paid for itself twice.** `context.setOffline(true)`
+plus `context.route("**", abort("internetdisconnected"))` — two mechanisms, so a fetch cannot hide
+behind the weakness of either — against the **built SSR bundle** (`pnpm build` + `pnpm start`), never
+the dev server, whose HMR websocket is a live network dependency by design; `navigator.onLine` is
+asserted `false` first. New: `tests/e2e/offline-resilience.spec.ts` (4 cases) and
+`tests/e2e/support/network.ts`, reusing US-040's harness. **Lockfile untouched.**
+
+**THE FULL SCRIPT, OFFLINE, ASSERTED AT EVERY BEAT** — baseline (4 cards, hero band, empty state, 3
+chips) → Hero 1 → Hero 2 → Hero 3 (each by its own tile titles, 6 chips offered) → Hero 1, 2 and 3
+follow-ups (3 gold dividers, the causal peak's "What's driving Marketing", chips back to 3) → **the
+sidebar's Dashboard link pressed with six answers on screen** → off-script question (fallback copy
+verbatim, 3 chips, nothing removed, the question never echoed) → empty submit (a true no-op) → reset
+(4 cards) → **reset again mid-beat**, the pending beat proved *cancelled* by waiting out twice the
+delay. Re-run identically with **reduced motion** forced.
+
+**FINDING 1 — `GET /__manifest?paths=%2F&version=…`.** React Router's default lazy route discovery
+marks every `<Link>` `data-discover="true"` and fetches the route manifest on hydration — a real
+fetch to a real endpoint from the shipped bundle, invisible to any grep of `app/**`. **Fixed:**
+`routeDiscovery: { mode: "initial" }` in `react-router.config.ts`; there is exactly ONE route, so
+nothing to discover. Pinned by `tests/unit/app-config.test.ts`.
+
+**FINDING 2 — `GET /_root.data`, AND IT WAS A DEMO-KILLER.** The sidebar's Dashboard row is a
+`<Link to="/">` and the presenter is *always already on that route*, but React Router treats a press
+as a navigation and revalidates. Measured offline: the request failed, the navigation errored, and
+**the entire dashboard — 4 baseline cards, all 6 answers — was replaced by an error boundary from one
+click**, with no way back but a reload an offline machine cannot serve. **Fixed at the root cause:**
+`shouldRevalidate: () => false` on **both** matched routes (`app/root.tsx`, `app/routes/_index.tsx`)
+— the single fetch skips the call only when no route wants data. It was wrong online too: the figures
+are bundled and cannot have changed. The press is now a no-op and a permanent step in the offline
+script; 3 new unit tests pin both routes.
+
+**REQUEST LOG — 10 requests, all local, `0` after first paint, offline and online alike.** `/`,
+`/fcb-crest.png`, six `/assets/*.js` chunks (all `modulepreload`ed by the document — nothing lazy)
+and `/assets/root-*.css`. **Zero** `fetch`/`xhr`/`websocket`/`eventsource` at any point, zero webfont
+requests (system-only type stack, US-003), zero non-local origins, **zero to `fcb.ch`** (asserted by
+name; the only literal in the repo is the crest comment warning against it — the build's apparent
+hits are `.fcb-chip` matching a regex dot), zero failures and **zero console errors**. `/favicon.ico`
+checked by request at 200. And the half a log cannot see: **every `src`/`href` in the document is
+root-relative**, asserted, so an absolute URL behind a media query cannot slip in unfetched.
+
+**Security triage — no trigger fired; the no-external-origin result is the story's own measurement.**
+No route, handler, SQL, `innerHTML`, upload, env var, secret, auth or logging change; lockfile
+untouched, so no advisory gate. **A10/SSRF: no surface at all** — `app/**` holds no `fetch`,
+`XMLHttpRequest`, `WebSocket`, `EventSource` or HTTP client, and no user input reaches a URL. **A05:**
+both fixes *reduce* the served surface.
+
 ---
 
 ## Definition of "Demo Ready"
@@ -248,5 +296,5 @@ question → reset, with no stutter, no error, and no dead end.
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-10
-**Phase Status:** 🔄 In Progress (1/6 · 2/14 pts) — next: US-041 offline resilience verification
+**Phase Status:** 🔄 In Progress (2/6 · 4/14 pts) — next: US-042 dead-end path sweep
 **Previous:** [Phase 3b](phase-3b.md) · **Backlog:** [Master Index](../../input/backlog/README.md)

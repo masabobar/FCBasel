@@ -10,7 +10,7 @@ import { PROMPT_BAR_CLEARANCE_CLASS } from "../../app/components/chrome/app-shel
 import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
 import { InsightPhase } from "../../app/lib/dashboard/sections";
 import { HeroId } from "../../app/lib/repositories/enums";
-import App, { Layout } from "../../app/root";
+import App, { Layout, shouldRevalidate } from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { settleThinkingBeat } from "./support/thinking-harness";
 
@@ -317,5 +317,49 @@ describe("App", () => {
     expect(
       appBar.compareDocumentPosition(page) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+});
+
+/**
+ * US-041 — the revalidation opt-out.
+ *
+ * The sidebar's Dashboard row is a `<Link to="/">` and the presenter is always
+ * already on that route, so a press is a same-URL navigation. React Router
+ * revalidates one of those by default, and the offline suite measured the
+ * consequence: `GET /_root.data` failed with the network severed, the
+ * navigation errored, and the entire dashboard was replaced by an error
+ * boundary. The data is bundled and static, so a re-fetch could never have
+ * learned anything — declining is both the fix and the truth.
+ *
+ * Asserted per route rather than only end to end, because React Router's single
+ * fetch skips the request only when NO matched route asks to revalidate: one of
+ * the two silently returning `true` again would bring the request back.
+ */
+describe("shouldRevalidate", () => {
+  const revalidationArgs = (from: string, to: string) =>
+    ({
+      currentUrl: new URL(from),
+      currentParams: {},
+      nextUrl: new URL(to),
+      nextParams: {},
+      defaultShouldRevalidate: true,
+    }) as Parameters<typeof shouldRevalidate>[0];
+
+  it("declines to re-fetch on a same-URL navigation", () => {
+    expect(
+      shouldRevalidate(
+        revalidationArgs("http://localhost/", "http://localhost/"),
+      ),
+    ).toBe(false);
+  });
+
+  it("declines even when React Router would default to revalidating", () => {
+    // `defaultShouldRevalidate` is `true` above: the opt-out is unconditional,
+    // not a pass-through of the framework's own opinion.
+    expect(
+      shouldRevalidate(
+        revalidationArgs("http://localhost/", "http://localhost/?x=1"),
+      ),
+    ).toBe(false);
   });
 });

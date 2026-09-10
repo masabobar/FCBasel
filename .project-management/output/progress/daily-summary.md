@@ -1,17 +1,17 @@
 # Daily Work Summary
 
 **Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
-**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-040)
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-041)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 40 — **Phases 1a, 1b, 2a, 2b, 3a AND 3b ALL complete.** Day 2 closed Phase 3a
+**Stories Completed:** 41 — **Phases 1a, 1b, 2a, 2b, 3a AND 3b ALL complete.** Day 2 closed Phase 3a
 with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the causal peak**, and then
-**opened Phase 4** with US-040: the finished screen measured in Chrome at eleven viewports.
-**Story Points:** 104
-**Time Worked:** ~30 hours · **Files Changed:** 315 · **Tests Added:** 2221 unit + 12 Chrome cases
+opened Phase 4 with US-040 (eleven viewports measured) and **US-041, which severed the network and
+found two real runtime fetches**. **Story Points:** 106
+**Time Worked:** ~31 hours · **Files Changed:** 324 · **Tests Added:** 2225 unit + 16 Chrome cases
 
 ---
 
@@ -109,28 +109,16 @@ with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the 
   flips, one section never two. **Criterion ④ by source scan** (`hasSection` has exactly two
   readers, so Reset re-gates for free) and **⑤ twice**, as a property over all 27 sessions and on
   the real `App`. 46 tests, 1849/1849.
-- **US-034 to US-039 (2026-09-10) — PHASE 3b COMPLETE, 6/6 · 16/16.** Full account in
-  [`../phases/phase-3b.md`](../phases/phase-3b.md). All five are **composition, not invention**:
-  `VBarTile`, `DonutTile`, `GroupedBarTile` and `DepartmentTableTile` all reach a screen for the
-  first time, and no hero file holds an `<svg>`, a `<table>` or a re-typed figure (proved by scan).
-  US-034's ONE `Segmented` moves bars, ring and names together and **nothing snaps**; US-035
-  **flips** the section into its beat behind a shared gold divider; US-036 puts **both scope labels
-  on screen with the mismatch proved real** (monthly 9,770 > fixtures 7,830) and **measures** its
-  eight chips in Chrome (59.5px in 83.4px cells, so the pair stacks below `xl`); **US-037 built
-  nothing at all** — US-023's `DriverTile` already ranked stably (**Luzern ahead of Sion** at their
-  shared -CHF 70k), already derived its `-CHF 400k total`, already had a note slot. **US-038 settles
-  the revenue/cost trap in front of the owner:** Marketing's +0.41 renders ADVERSE while Sponsoring's
-  +0.84 renders FAVOURABLE, one row is flagged by `needsAttention` alone, Hospitality's 95 earns the
-  gold near mark and Merchandising's 92 does not, and the overall tile reads `CHF 69.68M` / `+1%`
-  NEUTRAL / `CHF 69.00M` / 96% blended / `3 of 6` DERIVED; its title drops the `(CHF 000)` half on
-  purpose, and `PlaceholderBody` is gone. **US-039 is the causal peak and it closes the phase:** three
-  drivers whose derived `CHF 410k total` **equals** Marketing's variance, the retainer row rendering
-  although the narrative names only two areas, the conversion gap (2.2% vs 2.6%) on the same tile,
-  a gold `aside` that is structurally not a metric, and **`PlaceholderFollowUp` deleted — no stand-in
-  is left in the product.** The **whole demo script** now runs in Chrome in one session: baseline →
-  three heroes → three follow-ups (one asked by typing "why is marketing high?") → off-script
-  fallback → Reset. Six narratives byte-identical — hex, exact length, ASCII sweep, every hyphen at
-  0x2d, and against the backlog itself. 361 tests, 2210/2210.
+- **US-034 to US-039 (2026-09-10) — PHASE 3b COMPLETE, 6/6 · 16/16.** Condensed; full account in
+  [`../phases/phase-3b.md`](../phases/phase-3b.md). All six are **composition, not invention**:
+  `VBarTile`, `DonutTile`, `GroupedBarTile` and `DepartmentTableTile` each reach a screen for the
+  first time, no hero file holds an `<svg>`, a `<table>` or a re-typed figure (proved by scan), and
+  **US-037 built nothing at all**. US-034's ONE `Segmented` moves bars, ring and names together
+  with nothing snapping; US-036 puts both scope labels on screen with the mismatch proved real;
+  **US-038 settles the revenue/cost trap in front of the owner** (Marketing's +0.41 ADVERSE against
+  Sponsoring's +0.84 FAVOURABLE); **US-039 is the causal peak** — three drivers whose derived
+  `CHF 410k total` **equals** Marketing's variance — and it deleted `PlaceholderFollowUp`, so **no
+  stand-in is left in the product**. Six narratives byte-identical. 361 tests, 2210/2210.
 - **US-040 (2026-09-10) — PHASE 4 OPENS. The story is a measurement, so it was measured.** Full
   account in [`../phases/phase-4.md`](../phases/phase-4.md). Real Chrome against the **built SSR
   bundle**, with the **full run-of-show loaded before any reading was taken** — new
@@ -145,6 +133,16 @@ with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the 
   and re-encoded so only `IHDR`/`IDAT`/`IEND` ship (`sips` had attached `eXIf` + `sRGB`), declared
   by a `links` export — the script now runs with **zero console errors**. Two known limitations
   **recorded, not fixed**, with the numbers.
+- **US-041 (2026-09-10) — THE OFFLINE DEMO IS PROVEN, AND PROVING IT FOUND TWO RUNTIME FETCHES.**
+  Full account in [`../phases/phase-4.md`](../phases/phase-4.md). `setOffline(true)` **and** an abort
+  route over `**`, against the built bundle, running the whole script with the screen asserted at
+  every beat — baseline, three heroes, three follow-ups, the sidebar link, off-script, empty submit,
+  reset, **reset again mid-beat** — and again under reduced motion. **Finding 1:** lazy route
+  discovery fetched `/__manifest` on hydration → `routeDiscovery: { mode: "initial" }`. **Finding 2,
+  a demo-killer:** the sidebar's `<Link to="/">` revalidated `/_root.data`, which offline failed and
+  replaced **the whole dashboard with an error boundary from one click** → `shouldRevalidate` false
+  on both routes. **10 requests, all local, 0 after first paint**; zero
+  fetch/webfont/foreign-origin/`fcb.ch`, zero console errors, every `src`/`href` root-relative.
 
 ---
 
@@ -206,13 +204,16 @@ with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the 
   equal to Marketing's variance, the conversion gap on the tile, the recommendation beside it.
   Six narratives **verbatim**. **PHASE 3b COMPLETE: 6/6 · 16/16.**
 
-- ✅ US-040 — Presentation sizing & responsiveness (2 pts, 2026-09-10) — all 5 criteria met, **by
-  measurement in real Chrome against the built bundle with the full run-of-show loaded**: eleven
-  viewports clean (no page or in-card horizontal scroll, no clipped tile, axis label or legend,
-  positive prompt-bar clearance), a mid-session resize clean both ways, one clipped period filter
-  fixed by moving its span to `xl`, and the **favicon 404 closed** so the script runs with zero
-  console errors. Two known limitations **recorded with their numbers** in `phase-4.md`.
-  **PHASE 4 OPENS: 1/6 · 2/14.**
+- ✅ US-040 — Presentation sizing & responsiveness (2 pts, 2026-09-10) — all 5 criteria met **by
+  measurement in real Chrome against the built bundle**: eleven viewports clean, a mid-session resize
+  clean both ways, one clipped period filter fixed, the **favicon 404 closed**. Two known limitations
+  **recorded with their numbers** in `phase-4.md`. **PHASE 4 OPENS: 1/6 · 2/14.**
+
+- ✅ US-041 — Offline resilience verification (2 pts, 2026-09-10) — all 4 criteria met **by
+  disconnecting**: the full script offline, asserted beat by beat, plus a reduced-motion pass;
+  **10 requests, all local, 0 after first paint**, no foreign origin, `fcb.ch`, webfont or console
+  error. **Two real runtime fetches found and fixed** — `/__manifest` and a `/_root.data`
+  revalidation that blanked the dashboard offline. **PHASE 4: 2/6 · 4/14.**
 
 *(Condensed to keep this log inside its 300-line limit — full detail in
 [`completed.md`](completed.md) and the phase files.)*
@@ -221,7 +222,7 @@ with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the 
 
 ## Stories In Progress
 
-*None* — next up is US-041, offline resilience verification.
+*None* — next up is US-042, dead-end path sweep.
 
 ---
 
@@ -244,11 +245,11 @@ with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the 
   US-037 and US-039 added no component at all and US-038 added only a formatter.
 - **The prototype is FEATURE COMPLETE and the demo script runs end to end in Chrome.** No placeholder
   remains anywhere in the product.
-- **PHASE 4 IS OPEN (1/6 · 2/14): US-040 measured the finished screen** at eleven viewports against
-  the built bundle, fixed one clipped filter and the favicon 404, and left a **"Known limitations"**
-  section in `phase-4.md` that later stories must read before reopening anything it covers.
-- **Next: US-041 — offline resilience verification (2 pts).** Verified by actually disconnecting the
-  network and running the script, not by scanning for `fetch`.
+- **PHASE 4 IS AT 2/6 · 4/14.** US-040 measured the finished screen at eleven viewports and left a
+  **"Known limitations"** section in `phase-4.md` that later stories must read first; **US-041 then
+  severed the network and killed the last two runtime fetches** — `/__manifest` and a `/_root.data`
+  revalidation that blanked the whole dashboard offline from one click on the sidebar.
+- **Next: US-042 — dead-end path sweep (3 pts).** Every path, several paraphrases per hero.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
 3a (17 pts, done) → Phase 3b, the demo itself (16 pts, done) → Phase 4 hardening (14 pts).
@@ -258,12 +259,12 @@ with US-033 (6/6 · 17/17), closed **Phase 3b (6/6 · 16/16)** on **US-039, the 
 ## Notes
 
 - Sponsor showing first, owner audience the following week. ~52 AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
-- Phases 1a to 3b are complete and Phase 4 is at 1/6 (104/116 points); continue with
-  `/holycode-pm:execute-work story US-041`.
-- **US-040 set the hardening pattern: measure, do not assert.** Every geometric claim in Phase 4
+- Phases 1a to 3b are complete and Phase 4 is at 2/6 (106/116 points); continue with
+  `/holycode-pm:execute-work story US-042`.
+- **US-040 and US-041 set the hardening pattern: measure, do not assert.** Every claim in Phase 4
   comes from real Chrome against `pnpm build` + `pnpm start` with the whole run-of-show loaded —
-  jsdom answers layout questions with zeros. And a decision to leave something alone is **recorded
-  with its numbers** under "Known limitations" in `phase-4.md`, not in a progress log that compacts.
+  jsdom answers layout questions with zeros and a grep answers network questions wrongly, which is
+  how a `__manifest` probe and a `_root.data` revalidation survived forty stories of review.
 - **US-028's three seams are ALL filled** (US-029/030/031), and **there is exactly one timer in the
   app with a test pinning it there.** **US-029's rule for anything the chip row or a panel needs:
   DERIVE IT FROM `sections`** — why Reset restores the row for free, and why **US-033's gate reads

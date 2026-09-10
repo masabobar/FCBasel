@@ -6,14 +6,32 @@
 
 ## Summary
 
-**Total Completed:** 40 stories
-**Total Points:** 104 / 116
+**Total Completed:** 41 stories
+**Total Points:** 106 / 116
 **Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 52 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (1/6 · 2/14)**
+**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b closed 2026-09-10 (6/6 · 16/16)** · **Phase 4 in progress (2/6 · 4/14)**
 
 ---
 
 ## Completed Stories
+
+### US-041: Offline resilience verification (2 pts) — **TWO RUNTIME FETCHES FOUND AND KILLED**
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 3 unit (2225 green) + 4 offline Chrome cases
+**Notes:** Verified by DISCONNECTING, as `phase-4.md` demands — `setOffline(true)` **and** an abort
+route over `**`, so a fetch cannot hide behind the weakness of either, against the **built SSR
+bundle**, never the dev server. New: `tests/e2e/offline-resilience.spec.ts` + `support/network.ts`,
+reusing US-040's harness; **lockfile untouched**. **The whole script ran offline, asserted at every
+beat** — baseline (4 cards, band, empty state, 3 chips) → three heroes → three follow-ups (3 gold
+dividers, the causal peak) → the sidebar link → off-script (fallback verbatim, nothing removed) →
+empty submit (true no-op) → reset → **reset mid-beat**, the pending beat proved *cancelled*; repeated
+under **reduced motion**. **Finding 1:** lazy route discovery fetched `/__manifest` on hydration →
+`routeDiscovery: { mode: "initial" }`. **Finding 2, a demo-killer:** the sidebar's `<Link to="/">`
+revalidated `/_root.data`, which offline failed and replaced **the whole dashboard with an error
+boundary from one click** → `shouldRevalidate: () => false` on **both** routes (wrong online too:
+the figures are bundled). **Log: 10 requests, all local, 0 after first paint** — zero
+fetch/webfont/foreign-origin/`fcb.ch`, zero console errors, favicon 200, every document
+`src`/`href` root-relative. **Triage: no trigger fired; A10/SSRF has no surface at all.**
+Full detail: [`../phases/phase-4.md`](../phases/phase-4.md).
 
 ### US-040: Presentation sizing & responsiveness (2 pts) — **PHASE 4 OPENS**
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 11 unit (2221 green) + 12 Chrome cases
@@ -154,17 +172,14 @@ filter). Full detail in [`../phases/phase-2a.md`](../phases/phase-2a.md).
   `stroke-dasharray` transition off `useGrow`, the centre counting through `useCountUp`, and a hover
   that swaps average attendance for "% of capacity" **and answers focus identically**
 - `lib/persona.ts` gained `personaGreeting(now)` — it takes the DATE, so server and browser cannot
-  disagree about the hour; `HeroBandData` holds **no total and no delta**, so nothing can be read
-  instead of computed
-- **① One control, two widgets, proven twice** — structurally (exactly one `useState`, one
-  `<Segmented>`) and behaviourally (one click moves the line, the KPI, the arc and the stats)
+  disagree about the hour; `HeroBandData` holds **no total and no delta**
+- **① One control, two widgets, proven twice** — structurally and behaviourally
 - **⑤ / ⑥ measured in real Chrome at 1920×1080:** no horizontal scroll (nor 1440/1280/834/390), the
   KPI **still `CHF 148’200` in the frame after the click** then 54 distinct strings to `CHF 132’400`,
   the re-keyed line's offset 1px → 0px, 43 arc dash pairs on the SAME element; under reduced motion
   one KPI string and one ring value. **One real defect found and fixed in `LineChart`:** its end axis
   labels were clipped by the svg's bounds, so `axisLabelAnchor` anchors the first and last inwards
-- **Security triage: no security-relevant changes detected** — no handler/route change, no SQL, no
-  `innerHTML`, no network call, no upload, no dependency or env change, no logging
+- **Security triage: no security-relevant changes detected**
 
 ---
 
@@ -281,20 +296,5 @@ answer and the beat · all 5 criteria met.
 
 ---
 
-
-### US-034: Hero 1 primary — shirt sales, badge share, printed names (3 pts) — **PHASE 3b OPENS**
-*2026-09-10 · commit 39e753a · 57 tests · 1906 green · 100% lines (`app/**`)*
-
-- **Composition, not invention** — no chart built; `hero-1.tsx` holds no `<svg>` by scan. First
-  screen for `VBarTile` and `DonutTile`.
-- **One `Segmented` in the section head drives all three tiles** (criterion 5), across all four
-  periods and in real Chrome. Nothing snaps: same `<rect>` node across a press, mid-flight labels
-  16’975 / 7’855 / 4’387 — never through zero.
-- **Narrative byte-identical** (length 214, backlog cross-check); **no figure re-typed** — every
-  displayed number ≥ 100 across four periods absent from five source files.
-- **Chrome pass:** tiles in order, 0 requests after paint, no overflow, no truncated label.
-- **Security triage:** nothing relevant; aggregate merchandising only, no PII (asserted).
-
----
 
 **Auto-Generated** | Updates during `/execute-work` | Append-only log

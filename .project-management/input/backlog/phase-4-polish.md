@@ -6,7 +6,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 **Duration:** Days 5-6 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (1/6 completed)
+**Status:** In Progress (2/6 completed)
 
 > **Not in this phase:** new functionality, or anything that changes a hero's content.
 > A live, high-stakes room is unforgiving; one ugly or wrong render in front of the owner is
@@ -18,7 +18,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Priority:** P0
 **Total Story Points:** 14
-**Status:** In Progress (1/6 completed)
+**Status:** In Progress (2/6 completed)
 **Source:** Build Specification E8; Framing §4 principle 4 ("Instant and flawless").
 
 ### Stories:
@@ -42,7 +42,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
   - **Story Points:** 2
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** Completed
   - **Description:** Prove that venue Wi-Fi cannot break the demo.
   - **Acceptance Criteria:**
     - **Fully functional with the network disconnected after load** — every hero, every follow-up,

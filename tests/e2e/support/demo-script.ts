@@ -20,21 +20,41 @@ import { expect, type Page } from "@playwright/test";
 /* -------------------------------------------------------- THE RUN OF SHOW -- */
 
 /**
- * Chip labels, verbatim from `app/lib/dashboard/chips.ts`, in the order the
- * Reference Guide's run-of-show asks them: each hero, then its follow-up.
+ * Chip labels, verbatim from `app/lib/dashboard/chips.ts`, keyed by the hero
+ * each one asks about.
  *
  * Typed out rather than imported because this suite drives the SERVED page as a
  * presenter would — through the accessible name on screen. Importing the
  * constant would let a label change and the test keep passing against a chip
  * nobody can find.
+ *
+ * Keyed rather than listed because the run-of-show is asked in two different
+ * orders: US-040 wants each hero followed straight away by its follow-up (the
+ * fastest route to the tallest canvas), and US-041 walks all three heroes
+ * first, then all three follow-ups, which is the order the Reference Guide's
+ * script is presented in. Both orders name the same six chips.
  */
+export const HERO_CHIP = {
+  shirts: "Shirt sales by kit & sponsor badges",
+  tickets: "Ticket revenue, this year vs last",
+  budgets: "Department budgets vs actuals",
+} as const;
+
+/** The three follow-up labels, keyed by the hero they follow. */
+export const FOLLOW_UP_CHIP = {
+  shirts: "Which badge should we push next?",
+  tickets: "Which fixtures are driving the drop?",
+  budgets: "Why is Marketing over budget & behind target?",
+} as const;
+
+/** The run-of-show as US-040 asks it: each hero, then its follow-up. */
 export const DEMO_SCRIPT = [
-  { chip: "Shirt sales by kit & sponsor badges", kind: "hero" },
-  { chip: "Which badge should we push next?", kind: "followUp" },
-  { chip: "Ticket revenue, this year vs last", kind: "hero" },
-  { chip: "Which fixtures are driving the drop?", kind: "followUp" },
-  { chip: "Department budgets vs actuals", kind: "hero" },
-  { chip: "Why is Marketing over budget & behind target?", kind: "followUp" },
+  { chip: HERO_CHIP.shirts, kind: "hero" },
+  { chip: FOLLOW_UP_CHIP.shirts, kind: "followUp" },
+  { chip: HERO_CHIP.tickets, kind: "hero" },
+  { chip: FOLLOW_UP_CHIP.tickets, kind: "followUp" },
+  { chip: HERO_CHIP.budgets, kind: "hero" },
+  { chip: FOLLOW_UP_CHIP.budgets, kind: "followUp" },
 ] as const;
 
 export const HERO_COUNT = DEMO_SCRIPT.filter(
@@ -73,25 +93,54 @@ export async function loadDemoScript(page: Page): Promise<void> {
   let followUps = 0;
 
   for (const step of DEMO_SCRIPT) {
-    // Substring, deliberately NOT `exact`: a follow-up chip prefixes a visually
-    // hidden "Follow-up:" into its accessible name (US-029), so its name is the
-    // hint plus the label. The visible label is what a presenter reads and what
-    // this asserts; the six labels are distinct, so a substring is unambiguous.
-    await page.getByRole("button", { name: step.chip }).click();
+    await tapChip(page, step.chip);
 
     if (step.kind === "hero") heroes += 1;
     else followUps += 1;
 
-    await expect(page.locator('[data-slot="insight-section"]')).toHaveCount(
-      heroes,
-    );
-    await expect(page.locator('[data-slot="follow-up-divider"]')).toHaveCount(
-      followUps,
-    );
-    await expect(page.locator('[data-slot="thinking-panel"]')).toHaveCount(0);
+    await expectAnswerLanded(page, heroes, followUps);
   }
 
   await page.waitForTimeout(SETTLE_MS);
+}
+
+/**
+ * Tap a chip by the label a presenter reads.
+ *
+ * Substring, deliberately NOT `exact`: a follow-up chip prefixes a visually
+ * hidden "Follow-up:" into its accessible name (US-029), so its name is the
+ * hint plus the label. The visible label is what a presenter reads and what
+ * this asserts; the six labels are distinct, so a substring is unambiguous.
+ *
+ * `.first()` because the three hero labels appear twice once the fallback panel
+ * is on the canvas — the panel re-offers the same prepared questions (US-032).
+ * The prompt bar's row is the one a presenter reaches for, and it is first in
+ * the DOM.
+ */
+export async function tapChip(page: Page, chip: string): Promise<void> {
+  await page.getByRole("button", { name: chip }).first().click();
+}
+
+/**
+ * Wait for an answer to be ON SCREEN — the counters, not a clock.
+ *
+ * A hero's answer ADDS a section; a follow-up FLIPS its section's phase and
+ * adds the gold divider (`app/lib/dashboard/sections.ts`), so the two are
+ * counted separately. The absent thinking panel is the third fact: it is what
+ * makes this deterministic instead of a race with a ~1150ms timer.
+ */
+export async function expectAnswerLanded(
+  page: Page,
+  sections: number,
+  followUps: number,
+): Promise<void> {
+  await expect(page.locator('[data-slot="insight-section"]')).toHaveCount(
+    sections,
+  );
+  await expect(page.locator('[data-slot="follow-up-divider"]')).toHaveCount(
+    followUps,
+  );
+  await expect(page.locator('[data-slot="thinking-panel"]')).toHaveCount(0);
 }
 
 /* -------------------------------------------------------- THE MEASUREMENT -- */

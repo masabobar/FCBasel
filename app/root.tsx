@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  type ShouldRevalidateFunction,
+} from "react-router";
 
 import { AppShell } from "./components/chrome/app-shell";
 import { PromptBar } from "./components/chrome/prompt-bar";
@@ -86,6 +93,37 @@ export function Layout({ children }: { children: ReactNode }) {
 export async function loader() {
   return await loadHeroes(hero1Repository, hero2Repository, hero3Repository);
 }
+
+/**
+ * NEVER RE-FETCH. This is US-041's second finding and the more dangerous one.
+ *
+ * WHAT WENT WRONG. The sidebar's Dashboard row is a `<Link to="/">` (US-012) —
+ * the one navigable element in the product — and the presenter is always
+ * already on that route. React Router still treats a press on it as a
+ * navigation, and a navigation REVALIDATES: it fired
+ * `GET /_root.data` against the server. With the venue Wi-Fi gone that request
+ * fails, the navigation errors, and the measured result was the whole
+ * dashboard replaced by an error boundary — four baseline cards, three answers
+ * and the empty state all gone, from ONE click, with no way back but a reload
+ * that an offline machine cannot serve either. `tests/e2e/offline-resilience.spec.ts`
+ * found it by clicking the link with the network severed; nothing in the
+ * application source reads as a fetch.
+ *
+ * WHY THIS IS THE RIGHT FIX AND NOT A PATCH ON THE LINK. The answer would be
+ * wrong even online: the data behind this loader is BUNDLED — three static seed
+ * modules under `app/lib/mock/`, read once through the server-only
+ * repositories — so it cannot have changed since the document was rendered and
+ * there is nothing a re-fetch could learn. Declaring that is the honest fix,
+ * and it holds for every navigation anyone adds later rather than for one link.
+ * With no route asking to revalidate, React Router's single fetch makes no
+ * request at all, so a press on Dashboard is what it should always have been:
+ * nothing happens.
+ *
+ * The initial document render is unaffected — `shouldRevalidate` governs
+ * revalidation only, never the first load of a route — so the figures still
+ * arrive on the server exactly as before.
+ */
+export const shouldRevalidate: ShouldRevalidateFunction = () => false;
 
 /**
  * The application root owns the dashboard's session state.

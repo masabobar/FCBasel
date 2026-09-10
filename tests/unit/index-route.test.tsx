@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import Index, { loader, meta } from "../../app/routes/_index";
+import Index, { loader, meta, shouldRevalidate } from "../../app/routes/_index";
 import {
   BASELINE_TILE_ORDER,
   TOP_PRODUCTS_PERIOD_LABEL,
@@ -186,5 +186,25 @@ describe("index route — the two period filters are independent", () => {
     expect(
       within(productsFilter!).getByRole("radio", { checked: true }),
     ).toHaveTextContent(productsBefore!);
+  });
+});
+
+/**
+ * US-041. The baseline figures are bundled, so this route declines to
+ * revalidate too — the request only disappears when BOTH matched routes do.
+ * See the note in `app/routes/_index.tsx`: offline, the revalidation a press on
+ * the sidebar's Dashboard link triggered took the whole dashboard down with it.
+ */
+describe("shouldRevalidate", () => {
+  it("declines to re-fetch bundled baseline data", () => {
+    expect(
+      shouldRevalidate({
+        currentUrl: new URL("http://localhost/"),
+        currentParams: {},
+        nextUrl: new URL("http://localhost/"),
+        nextParams: {},
+        defaultShouldRevalidate: true,
+      } as Parameters<typeof shouldRevalidate>[0]),
+    ).toBe(false);
   });
 });

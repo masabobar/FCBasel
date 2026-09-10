@@ -14,9 +14,9 @@
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
 | **Phase 3b** | 100% — Completed (6/6 · 16/16) | 100% | 🟢 Done |
-| **Phase 4** | 14% — Active (1/6 · 2/14) | 100% | 🟢 On Track |
-| **Stories Completed** | 40/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 104/116 | 116 | 🟢 On Track |
+| **Phase 4** | 29% — Active (2/6 · 4/14) | 100% | 🟢 On Track |
+| **Stories Completed** | 41/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 106/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -25,9 +25,9 @@
 
 ## 📅 Today's Progress (2026-09-10)
 
-**Stories Completed Today:** 8 (US-033 to US-039, **US-040**) · **40 total**
-**Currently Working On:** US-041 — Offline resilience verification (2 pts)
-**Story Points Completed Today:** 21 · **104 total**
+**Stories Completed Today:** 9 (US-033 to US-039, US-040, **US-041**) · **41 total**
+**Currently Working On:** US-042 — Dead-end path sweep (3 pts)
+**Story Points Completed Today:** 23 · **106 total**
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -153,15 +153,22 @@
   proved over all **27** sessions and on the real `App`. 46 tests, **1849**.
 - ✅ **US-040 — Presentation sizing & responsiveness (2 pts)** — **Phase 4 opens, and the story is a
   measurement.** Real Chrome against the **built SSR bundle** with the **full run-of-show loaded
-  before any reading**: clean at **eleven viewports** (five presentation sizes, four projector
-  aspect ratios, both tablet orientations) — no page or in-card horizontal scroll, no clipped tile,
-  axis label or legend, no SVG text outside its plot, **prompt-bar clearance +10.5 to +11.2px** —
-  and a mid-session 1920 → 1024 → 1920 resize clean **both ways**. **One real defect fixed:** Top
-  Products' four-option filter was clipped 25.7px at 1152 and 89.7px at 1024, so `WIDE_SPAN` moved
-  to `xl:col-span-6` (US-036's precedent), **proved a no-op at every target viewport**. **And the
-  favicon 404 three reviews waved through is closed** — a 32x32 ICO from the local crest, re-encoded
-  so only `IHDR`/`IDAT`/`IEND` ship, so the script runs with **zero console errors**. Two
-  limitations **recorded, not fixed**. 11 tests, **2221** (55 files) + **12 Chrome cases**.
+  before any reading**: clean at **eleven viewports** — no page or in-card horizontal scroll, no
+  clipped tile, axis label or legend, no SVG text outside its plot, **prompt-bar clearance +10.5 to
+  +11.2px** — and a mid-session 1920 → 1024 → 1920 resize clean **both ways**. **One real defect
+  fixed:** Top Products' filter was clipped 25.7px at 1152 and 89.7px at 1024, so `WIDE_SPAN` moved
+  to `xl:col-span-6`, **proved a no-op at every target viewport**. **And the favicon 404 three
+  reviews waved through is closed.** Two limitations **recorded, not fixed**. 11 tests, **2221**.
+- ✅ **US-041 — Offline resilience verification (2 pts)** — **the disconnect found what no grep
+  could, twice.** `setOffline(true)` + an abort route over `**` against the built bundle, running
+  the whole script (baseline, three heroes, three follow-ups, the sidebar link, off-script, empty
+  submit, reset, **reset again mid-beat**) asserted at every beat, and again under reduced motion.
+  **Finding 1:** lazy route discovery fetched `/__manifest` on hydration → `routeDiscovery:
+  "initial"`. **Finding 2, a demo-killer:** the sidebar's `<Link to="/">` revalidated `/_root.data`,
+  which offline failed and replaced **the whole dashboard with an error boundary from one click** →
+  `shouldRevalidate: () => false` on both routes. Now **10 requests, all local, 0 after first
+  paint**, zero fetch/webfont/foreign-origin/`fcb.ch`, zero console errors. 3 tests, **2225** + 4
+  offline Chrome cases.
 
 ---
 
@@ -169,21 +176,22 @@
 
 **Phases 1a to 3b are all closed** (39 stories · 102 pts): every client question answers end to end
 and each one sharpens, *what* → *so-what*, with **not one placeholder left in the product**.
-**Phase 4 is now open at 1/6 · 2/14.** Nothing new is built from here — **US-040 measured the
-finished screen in real Chrome at eleven viewports**, fixed one clipped period filter and the
-favicon 404, and recorded two out-of-scope limitations **with their numbers** under a durable
-"Known limitations" heading in `phase-4.md` that later stories must read first.
+**Phase 4 is now open at 2/6 · 4/14.** Nothing new is built from here — **US-040 measured the
+finished screen in real Chrome at eleven viewports** and **US-041 severed the network and ran the
+script**, which cost two real runtime fetches their lives: the router's `/__manifest` probe and a
+`/_root.data` revalidation that blanked the dashboard offline from one click on the sidebar.
 
 ### Active Stories
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-041: Offline resilience verification | 📋 Next | Verified by disconnecting the network and running the script, not by scanning for `fetch` |
+| US-042: Dead-end path sweep | 📋 Next | Every path swept: each hero, each follow-up, off-script, empty input, reset — several paraphrases per hero |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-041: Offline resilience verification *(verified by disconnecting)* | 2026-09-10 | 2 |
 | US-040: Presentation sizing & responsiveness *(measured in Chrome)* | 2026-09-10 | 2 |
 | US-039: Hero 3 follow-up — why Marketing is off plan *(the causal peak)* | 2026-09-10 | 3 |
 | US-038: Hero 3 primary — department budget vs actual vs target | 2026-09-10 | 3 |
@@ -197,21 +205,11 @@ favicon 404, and recorded two out-of-scope limitations **with their numbers** un
 | US-030: Intent normalisation, scoring & tie-breaking | 2026-09-09 | 5 |
 | US-029: Suggestion chips & chip lifecycle | 2026-09-09 | 3 |
 | US-028: Persistent prompt bar | 2026-09-09 | 2 |
-| US-022: Department table tile | 2026-09-09 | 3 |
 | US-020: Donut / ring tile | 2026-09-09 | 3 |
 | US-019: Grouped bar chart tile | 2026-09-09 | 3 |
 | US-018: Vertical bar chart tile | 2026-09-09 | 3 |
 | US-016: Hero band — webshop trend & attendance ring | 2026-09-09 | 5 |
 | US-026: Segmented period filter control | 2026-09-09 | 2 |
-| US-014: Dynamic tile insertion & grid reflow | 2026-09-09 | 3 |
-| US-012: Branded application shell | 2026-09-09 | 3 |
-| US-011: Formatters & cross-hero reconciliation | 2026-09-09 | 2 |
-| US-010: Hero 3 dataset — departmental performance | 2026-09-09 | 2 |
-| US-009: Hero 2 dataset — ticket revenue year on year | 2026-09-09 | 2 |
-| US-008: Hero 1 dataset — shirt sales, badges, printed names | 2026-09-09 | 2 |
-| US-007: Persona baseline datasets | 2026-09-09 | 2 |
-| US-005 / US-006: Tile card anatomy & tile-insertion motion | 2026-09-09 | 5 |
-| US-003 / US-004: Design token set & self-hosted crest | 2026-09-09 | 4 |
 
 ---
 
@@ -259,8 +257,10 @@ favicon 404, and recorded two out-of-scope limitations **with their numbers** un
 > **US-040 added the second kind of suite: a real browser.** `pnpm test:e2e` drives the full
 > run-of-show in Chrome against the built SSR bundle and measures what jsdom answers with zeros —
 > horizontal scroll, tile and legend clipping, SVG label boxes against their plots, prompt-bar
-> clearance — at eleven viewports, plus the favicon and an error-free console. It is separate from
-> `pnpm test` (minutes, not seconds) and added no dependency.
+> clearance — at eleven viewports, plus the favicon and an error-free console. **US-041 added the
+> third kind: a severed network** — it logs every request, disconnects the context and runs the whole
+> script, so a lazy chunk, a webfont or a revalidation cannot return unnoticed. Separate from
+> `pnpm test` (minutes, not seconds); no dependency added.
 
 ---
 
@@ -274,12 +274,12 @@ favicon 404, and recorded two out-of-scope limitations **with their numbers** un
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
 | Phase 3a: Conversation | ✅ Completed | 6/6 | 17/17 | 100% |
 | Phase 3b: Heroes | ✅ Completed | 6/6 | 16/16 | 100% |
-| Phase 4: Hardening | 🔄 Active | 1/6 | 2/14 | 14% |
+| Phase 4: Hardening | 🔄 Active | 2/6 | 4/14 | 29% |
 
 ---
 
 ## 🔗 Quick Links
-- **[Current Phase Plan](../phases/phase-4.md)** - Phase 4, Hardening (1/6) + **Known limitations**
+- **[Current Phase Plan](../phases/phase-4.md)** - Phase 4, Hardening (2/6) + **Known limitations**
 - **[Phase 3b Plan](../phases/phase-3b.md)** - Completed 2026-09-10 (6/6 · 16/16 pts)
 - **[Phase 3a Plan](../phases/phase-3a.md)** - Completed 2026-09-10 (6/6 · 17/17 pts)
 - **[Phase 2b Plan](../phases/phase-2b.md)** - Completed 2026-09-09 (11/11 · 29/29 pts)
@@ -293,8 +293,8 @@ favicon 404, and recorded two out-of-scope limitations **with their numbers** un
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-**Last Auto-Update:** US-040 completed at 2026-09-10 — **PHASE 4 IS OPEN, AND THE FIRST HARDENING STORY WAS MEASURED RATHER THAN ASSERTED.** Every geometric claim here comes from real Chrome driving `pnpm build` + `pnpm start`, with the **full run-of-show loaded before a single reading was taken** — three heroes, three follow-ups, 15 cards, 3 gold seams — because that is the tallest the canvas ever gets and the only state in which every legend, axis and delta chip this story is accountable for exists. New: `playwright.config.ts` and `tests/e2e/`; `@playwright/test` was already a devDependency, so **the lockfile is untouched**. **CLEAN AT ELEVEN VIEWPORTS** — the five the story names (1920x1080, 1600x900, 1440x900, 1366x768, 1280x800), four projector aspect ratios (1920x1200 16:10, 1280x720 16:9, 1152x864 and 1024x768 4:3) and both tablet orientations (834x1112, 768x1024): `documentElement.scrollWidth === clientWidth` everywhere so **there is no page horizontal scroll anywhere**; **zero in-card scrollers**, and notably the departmental table’s `overflow-x-auto` escape hatch **never engages at 1024 or above**; no tile or card outside its container; **no ellipsis engaged on any axis, bar, legend or table label, no SVG `<text>` painted outside the `<svg>` that owns it and no legend past its tile’s clip edge**; and, scrolled fully down, **prompt-bar clearance of +10.5px at 1920 and 1280, +10.9px at 1600/1440, +10.7px at 1366** — `pb-32` is doing its job. **Mid-session resize both ways** (1920 -> 1600 -> 1280 -> 1024 -> 1366 -> 1920 with all six answers open) clips nothing on the way down and leaves nothing clipped on the way back up. **Type floor holds:** the smallest rendered size on the canvas is 12px (`--text-chart-axis`), and **the type scale was deliberately NOT touched** — that is US-044’s remit. **ONE REAL SIZING DEFECT FOUND AND FIXED:** Top Products’ header needs 460px for its title block plus the four-option `Segmented`, and `lg:col-span-6` gave it 432px at 1152 and 368px at 1024, so `Card`’s `overflow-hidden` cut "Year to date" off by **25.7px and 89.7px**; `WIDE_SPAN` is now `col-span-full xl:col-span-6` (496px at 1280, full width below) — exactly the measurement that made US-036 pick `xl`, **proved a no-op at all five target viewports**, and pinned by a unit test carrying the numbers. **THE FAVICON DEFECT IS CLOSED** after three reviews called it pre-existing: `public/favicon.ico` is a one-entry ICO wrapping a 32x32 PNG **derived from the crest that is already local** (`sips` downsample, no image dependency added, as US-004), centred on a transparent canvas and **re-encoded from raw samples** so only `IHDR`/`IDAT`/`IEND` ship — 1,742 bytes, `200 image/x-icon` from the booted production server, declared by a new `links` export, and **the full script now runs with zero console errors and zero responses >= 400**. **Security triage — the external-binary trigger fired (A04/A08) and the bytes were read back rather than trusted:** ICO directory header, one 32x32 32bpp entry at offset 22, declared payload length equal to the bytes present, PNG magic, IHDR 32x32/8-bit/RGBA/non-interlaced, and the chunk table walked **consuming the buffer exactly, so nothing is appended past `IEND`**. **US-004’s XMP/hostname leak did not recur, but `sips` attached an `eXIf` block and an `sRGB` chunk of its own** — both dropped by the re-encode, and their absence is now asserted so the next regeneration cannot reintroduce them. No route, endpoint, SQL, env var, auth, upload or logging change; **lockfile untouched, so no dependency-advisory gate applies**. **Two known limitations were RECORDED, NOT FIXED**, in `phase-4.md` under a durable "Known limitations" heading — KL-1, Hero 2’s delta chips overlapping at 390px (out of scope by decision; min neighbour gap 61.7px at 1920, 37.3 at 1600, 25.2 at 1440, 19.6 at 1366, **13.0 at 1280 — the tightest anywhere, because 1280 is the `xl` boundary**, 37.3 at 1152, 22.8 at 1024, 28.5 at 834, 20.9 at 768, and clean at every width from 768 up), and KL-2, sub-768px being no target at all. US-036’s numbers were re-measured from scratch and agree to the decimal. 11 new unit tests, **2221 green** (55 files), plus **12 Chrome measurement cases**. **Next: US-041, offline resilience.**
+**Last Auto-Update:** US-041 completed at 2026-09-10 — **THE OFFLINE DEMO IS NOW PROVEN, AND PROVING IT FOUND TWO REAL RUNTIME FETCHES THAT NO CODE REVIEW HAD.** Verified the way the phase file demands: `context.setOffline(true)` **and** `context.route("**", abort("internetdisconnected"))` — two mechanisms, so a fetch cannot hide behind the weakness of either — against the **built SSR bundle** (`pnpm build` + `pnpm start`), never the dev server, whose HMR websocket is a live network dependency by design; `navigator.onLine` is asserted `false` before the first chip is tapped. New: `tests/e2e/offline-resilience.spec.ts` (4 Chrome cases) and `tests/e2e/support/network.ts`, reusing US-040's harness rather than building a second one. **Lockfile untouched.** **THE WHOLE SCRIPT RAN OFFLINE WITH THE SCREEN ASSERTED AT EVERY BEAT** — baseline (4 cards, hero band, empty state, 3 chips) → Hero 1 → Hero 2 → Hero 3, each recognised by its own tile titles → all three follow-ups, 3 gold dividers, the causal peak's "What's driving Marketing", chips back to 3 → **the sidebar's Dashboard link pressed with six answers on screen** → off-script question (fallback copy verbatim, 3 chips re-offered, nothing removed, the question never echoed) → empty submit (a true no-op) → reset (back to the 4 cards) → **reset again mid-beat**, with the pending beat proved *cancelled* by waiting out twice its delay. Re-run identically with **reduced motion** forced. **FINDING 1 — `GET /__manifest?paths=%2F&version=…`:** React Router's default lazy route discovery marks every `<Link>` `data-discover="true"` and fetches the route manifest on hydration — a real fetch to a real endpoint from the shipped bundle, invisible to any grep of `app/**`. Fixed with `routeDiscovery: { mode: "initial" }`; there is exactly ONE route, so nothing to discover. **FINDING 2 — `GET /_root.data`, AND IT WAS A DEMO-KILLER:** the sidebar's Dashboard row is a `<Link to="/">` and the presenter is *always already on that route*, but React Router treats a press as a navigation and revalidates. Offline the request failed, the navigation errored, and **the entire dashboard — 4 baseline cards, all 6 answers — was replaced by an error boundary from ONE click**, with no way back but a reload an offline machine cannot serve. Fixed at the root cause: `shouldRevalidate: () => false` on **both** matched routes, because the single fetch skips the call only when no route wants data — and the answer was wrong online too, since the figures are bundled seed modules that cannot have changed. **REQUEST LOG — 10 requests, all local, `0` after first paint, offline and online alike:** `/`, `/fcb-crest.png`, six `/assets/*.js` chunks (all `modulepreload`ed by the document, so nothing is lazy) and `/assets/root-*.css`. **Zero** `fetch`/`xhr`/`websocket`/`eventsource` at any point, zero webfont requests (the type stack is system-only by US-003), zero non-local origins, **zero to `fcb.ch`** (asserted by name), zero failed requests and **zero console errors**; `/favicon.ico` checked by request at 200. And the half a request log cannot see: **every `src`/`href` in the rendered document is root-relative**, asserted, so an absolute URL behind a media query or a `srcset` cannot slip in unfetched. **Security triage — no trigger fired; the no-external-origin result IS the story's measurement.** No route, handler, SQL, `innerHTML`, upload, env var, secret, auth or logging change; lockfile untouched, so no advisory gate. **A10/SSRF: no surface at all** — `app/**` holds no `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or HTTP client, and no user input reaches a URL. **A05:** both fixes *reduce* the served surface. 3 new unit tests pin both fixes so neither can be silently reverted; **2225 green** (55 files) + **16 Chrome cases** (12 sizing, 4 offline). **Next: US-042, dead-end path sweep.**
+
+*Previously (US-040, 2026-09-10):* Phase 4 opened with a measurement rather than an assertion — real Chrome against the built bundle with the full run-of-show loaded, **clean at eleven viewports** (no page or in-card horizontal scroll, no clipped tile, label or legend, prompt-bar clearance +10.5 to +11.2px) and a mid-session resize clean both ways; **one real defect fixed** (Top Products' filter clipped 25.7px at 1152 and 89.7px at 1024 → `WIDE_SPAN` moved to `xl:col-span-6`, proved a no-op at every target viewport), **the favicon 404 closed** with a re-encoded 32x32 ICO from the local crest, and two limitations **recorded, not fixed** under `phase-4.md`'s durable "Known limitations" heading. 11 tests, 2221 green.
 
 *Previously (US-039, 2026-09-10):* the causal peak went on screen and **Phase 3b closed (6/6 · 16/16)** — three grid rows joined `hero-3.tsx` with **no module, bar, badge, divider or panel built**, `PlaceholderFollowUp` deleted so no stand-in remains in the product, and the drivers explaining the whole overspend (`CHF 240k` / `CHF 150k` / `CHF 20k`, badge `CHF 410k total` **equal to** the variance the table derives). Narrative byte-identical at 468 chars; the whole demo script run in Chrome with zero requests after first paint. 63 tests, 2210 green.
-
-*Previously (US-038, 2026-09-10):* Hero 3's primary answer went on screen and **the revenue/cost trap was closed in front of the owner** — Marketing's `+0.41` renders ADVERSE while Sponsoring's `+0.84` renders FAVOURABLE, same sign, opposite meaning, with source scans proving neither the table nor the hero can compute a verdict; exactly one row is flagged and `needsAttention` picks it. Overall `CHF 69.68M` at `+1%` (NEUTRAL), blended target 96% stored, above target `3 of 6` derived. 66 tests, 2147 green.

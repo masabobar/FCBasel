@@ -1,3 +1,5 @@
+import { type ShouldRevalidateFunction } from "react-router";
+
 import { BaselineRow } from "../components/dashboard/baseline-row";
 import { HeroBand } from "../components/dashboard/hero-band";
 import { loadBaseline } from "../lib/dashboard/baseline";
@@ -26,6 +28,18 @@ export function meta() {
 export async function loader() {
   return await loadBaseline(baselineRepository);
 }
+
+/**
+ * NEVER RE-FETCH — the same declaration `app/root.tsx` makes, and for the same
+ * reason. The four baseline figures come from a bundled seed module through the
+ * US-007 repository, so a revalidation could not learn anything new; it could
+ * only fail. US-041 measured a press on the sidebar's Dashboard link, with the
+ * network severed, replacing the entire dashboard with an error boundary
+ * because the navigation it triggered went to the server for data it already
+ * had. Both routes have to opt out for the request to disappear: React Router's
+ * single fetch skips the call only when NO matched route wants to revalidate.
+ */
+export const shouldRevalidate: ShouldRevalidateFunction = () => false;
 
 /**
  * The single dashboard route — the hero band and the four baseline tiles.
