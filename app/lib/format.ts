@@ -261,6 +261,26 @@ export function formatMoneyMillions(chf: number): string {
   )}${MILLIONS_SUFFIX}`;
 }
 
+/**
+ * Money in millions with its unit, at FIXED two decimals: `CHF 69.00M`.
+ *
+ * THE PAIR FORMATTER, and the reason it is not {@link formatMoneyMillions}.
+ * That one drops trailing zeros because a lone headline figure reads as a
+ * sentence; Hero 3's overall tile states a BUDGET AGAINST AN ACTUAL, one line
+ * under the other, and `CHF 69M` above `CHF 69.68M` reads as two different
+ * scales rather than as two figures of the same measure. Two decimals always,
+ * for the same reason {@link formatMillions} fixes them in the department
+ * table: a comparison is a column, and a column aligns under tabular numerals.
+ *
+ * Use it for BOTH halves of a comparison or for neither - a pair formatted two
+ * ways is the drift this module exists to prevent.
+ */
+export function formatMoneyMillionsFixed(chf: number): string {
+  return `${negativePrefix(chf)}${CURRENCY_PREFIX} ${pinSeparators(
+    twoDecimalsFormat.format(Math.abs(chf) / CHF_PER_MILLION),
+  )}${MILLIONS_SUFFIX}`;
+}
+
 /* ------------------------------------------------------------ PERCENTAGES -- */
 
 /**

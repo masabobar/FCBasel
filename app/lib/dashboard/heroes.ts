@@ -36,19 +36,21 @@ import {
   type Hero1Repository,
   type Hero2,
   type Hero2Repository,
+  type Hero3,
+  type Hero3Repository,
 } from "../repositories/types";
 
 /**
- * Everything the inserted sections render, in hero order.
- *
- * Hero 3 joins this object when US-038 lands: one more repository read below
- * and one more field here.
+ * Everything the inserted sections render, in hero order. All three heroes are
+ * here as of US-038; there is no fourth.
  */
 export interface HeroesData {
   /** Merchandising — shirt sales, sponsor badges, printed names. */
   readonly hero1: Hero1;
   /** Ticketing — matchday revenue by fixture and by month, year on year. */
   readonly hero2: Hero2;
+  /** Departmental budgets — budget against actual against outcome target. */
+  readonly hero3: Hero3;
 }
 
 /**
@@ -60,11 +62,13 @@ export interface HeroesData {
 export async function loadHeroes(
   hero1Repository: Hero1Repository,
   hero2Repository: Hero2Repository,
+  hero3Repository: Hero3Repository,
 ): Promise<HeroesData> {
-  const [hero1, hero2] = await Promise.all([
+  const [hero1, hero2, hero3] = await Promise.all([
     hero1Repository.hero(),
     hero2Repository.hero(),
+    hero3Repository.hero(),
   ]);
 
-  return { hero1, hero2 };
+  return { hero1, hero2, hero3 };
 }

@@ -117,7 +117,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
   - **Story Points:** 3
   - **Priority:** P0
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed (2026-09-10)
   - **Description:** *"Show me the budget of each department, the difference of actuals to budget,
     and the % of target achieved."*
   - **Acceptance Criteria:**
@@ -168,7 +168,7 @@ a two-beat flow: a primary view with a narrative, then an escalating follow-up t
 
 **By Priority:** P0: 6 stories, 16 points · P1: 0 · P2: 0
 
-**By Status:** ✅ 4 stories, 10 points · 🔄 0 · 📋 2 stories, 6 points · ⏸️ 0
+**By Status:** ✅ 5 stories, 13 points · 🔄 0 · 📋 1 story, 3 points · ⏸️ 0
 
 ---
 

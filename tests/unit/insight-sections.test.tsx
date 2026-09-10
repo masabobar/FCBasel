@@ -6,8 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CANVAS_GRID_CLASS } from "../../app/components/chrome/app-shell";
 import {
   PLACEHOLDER_FOLLOW_UP_BODY,
-  PLACEHOLDER_NARRATIVE,
-  PLACEHOLDER_TILE_BODY,
+  PLACEHOLDER_MARKER,
   SECTION_GRID_CLASS,
   TILE_STAGGER_MS,
   tileDelayMs,
@@ -115,16 +114,16 @@ describe("insight sections — insertion", () => {
   });
 
   it("states the narrative first, before any tile", () => {
-    // HERO_3 is still on the placeholder; `hero1-section.test.tsx` and
-    // `hero2-section.test.tsx` assert the same order on the real, verbatim
-    // narratives.
+    // Every hero is real content as of US-038, so the order is asserted on the
+    // verbatim narrative itself. The three hero suites assert the same thing
+    // per section; this is the MECHANIC.
     renderSections(asked(HERO_3));
 
     const section = sectionNodes()[0]!;
     const narrative = section.querySelector('[data-slot="section-narrative"]')!;
     const firstTile = section.querySelector('[data-slot="card"]')!;
 
-    expect(narrative).toHaveTextContent(PLACEHOLDER_NARRATIVE);
+    expect(narrative).toHaveTextContent(HEROES.hero3.primary.narrative);
     expect(
       narrative.compareDocumentPosition(firstTile) &
         Node.DOCUMENT_POSITION_FOLLOWING,
@@ -162,9 +161,9 @@ describe("insight sections — insertion", () => {
 /* ------------------------------------------------------------ FOLLOW-UP -- */
 
 describe("insight sections — the follow-up sharpens the section", () => {
-  // The sharpened hero is the one still on the placeholder body, so this suite
-  // stays about the MECHANIC. The real content is asserted in
-  // `tests/unit/hero1-section.test.tsx` and `tests/unit/hero2-section.test.tsx`.
+  // The sharpened hero is HERO_3, whose BEAT is the one still on the shared
+  // placeholder (US-039), so this suite stays about the MECHANIC. The real
+  // content of each section is asserted in its own hero suite.
   const sharpened = withFollowUpShown(asked(HERO_3, HERO_2), HERO_3);
 
   it("adds the follow-up panel to the existing section", () => {
@@ -172,7 +171,8 @@ describe("insight sections — the follow-up sharpens the section", () => {
 
     const section = sectionNodes()[0]!;
     expect(section).toHaveAttribute("data-phase", InsightPhase.WITH_FOLLOW_UP);
-    expect(section.querySelectorAll('[data-slot="card"]')).toHaveLength(2);
+    // Hero 3's two primary tiles, plus the beat's stand-in.
+    expect(section.querySelectorAll('[data-slot="card"]')).toHaveLength(3);
     expect(section).toHaveTextContent(PLACEHOLDER_FOLLOW_UP_BODY);
   });
 
@@ -186,12 +186,12 @@ describe("insight sections — the follow-up sharpens the section", () => {
   it("leaves the other section on its primary answer", () => {
     renderSections(sharpened);
 
-    // Hero 2 is real content now, so the claim is about its PHASE rather than
+    // Hero 2 is real content, so the claim is about its PHASE rather than
     // about a placeholder string: it keeps its own tiles and gains no beat.
     const other = sectionNodes()[1]!;
     expect(other).toHaveAttribute("data-phase", InsightPhase.PRIMARY);
     expect(other).not.toHaveTextContent(PLACEHOLDER_FOLLOW_UP_BODY);
-    expect(other).not.toHaveTextContent(PLACEHOLDER_TILE_BODY);
+    expect(other.textContent).not.toContain(PLACEHOLDER_MARKER);
   });
 });
 
@@ -232,19 +232,21 @@ describe("insight sections — entrance and stagger", () => {
     renderSections(withFollowUpShown(asked(HERO_3), HERO_3));
 
     const cards = sectionNodes()[0]!.querySelectorAll('[data-slot="card"]');
-    expect(cards).toHaveLength(2);
+    expect(cards).toHaveLength(3);
     for (const card of cards) expect(card).toHaveClass(TILE_ENTER_CLASS);
   });
 
   it("staggers the tiles so the cascade reads as one sequence", () => {
     renderSections(withFollowUpShown(asked(HERO_3), HERO_3));
 
-    const [first, second] = Array.from(
+    const [first, second, third] = Array.from(
       sectionNodes()[0]!.querySelectorAll<HTMLElement>('[data-slot="card"]'),
     );
-    // The first tile leads; the second waits one step.
+    // The first tile leads; each one after it waits a further step, and the
+    // beat joins the SAME cascade rather than starting a new one.
     expect(first!.style.animationDelay).toBe("");
     expect(second!.style.animationDelay).toBe(`${TILE_STAGGER_MS}ms`);
+    expect(third!.style.animationDelay).toBe(`${2 * TILE_STAGGER_MS}ms`);
   });
 
   it("computes the stagger from one shared step", () => {
@@ -359,8 +361,8 @@ describe("insight sections — reduced motion still renders the layout", () => {
     renderSections(sections, { heroId: HERO_3, tick: 2 });
 
     expect(heroOrder()).toEqual([HERO_1, HERO_3]);
-    // Hero 1's three tiles, plus the placeholder's tile and its follow-up.
-    expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(5);
+    // Hero 1's three tiles, Hero 3's two, and the beat's stand-in.
+    expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(6);
     for (const node of sectionNodes()) {
       expect(node).toHaveClass("col-span-full", "grid-cols-subgrid");
     }
@@ -369,35 +371,49 @@ describe("insight sections — reduced motion still renders the layout", () => {
 
 /* ----------------------------------------------------- PLACEHOLDER SEAM -- */
 
-describe("insight sections — the placeholder is clearly a placeholder", () => {
+describe("insight sections — the last placeholder is clearly a placeholder", () => {
   const section: InsightSection = {
     heroId: HERO_3,
     phase: InsightPhase.WITH_FOLLOW_UP,
     revision: 0,
   };
 
-  it("marks every stand-in string as a placeholder", () => {
+  /** The stand-in card: the one card in the section that is marked as such. */
+  function placeholderCard(): HTMLElement {
+    const found = Array.from(
+      sectionNodes()[0]!.querySelectorAll<HTMLElement>('[data-slot="card"]'),
+    ).filter((card) => card.textContent!.includes(PLACEHOLDER_MARKER));
+    expect(found).toHaveLength(1);
+    return found[0]!;
+  }
+
+  it("is the FOLLOW-UP beat only — every primary answer is real now", () => {
     renderSections([section]);
 
-    const text = sectionNodes()[0]!.textContent!;
-    expect(text.match(/Placeholder/g)?.length).toBeGreaterThanOrEqual(4);
-  });
-
-  it("names the stories that replace it", () => {
-    renderSections([section]);
-
-    expect(sectionNodes()[0]!).toHaveTextContent("US-038");
-  });
-
-  it("invents no figure and no narrative copy", () => {
-    // Hero content is Phase 3b and its narratives are verbatim; this story
-    // must not pre-empt either. No digit may reach the screen from here.
-    renderSections([section]);
-
-    const text = sectionNodes()[0]!.textContent!.replace(
-      /US-0\d\d|HERO_\d|Phase \db|Phase \d/g,
-      "",
+    // US-038 made Hero 3's primary real, so exactly one stand-in is left in
+    // the whole product: US-039's causal peak.
+    expect(placeholderCard()).toHaveTextContent(PLACEHOLDER_FOLLOW_UP_BODY);
+    expect(sectionNodes()[0]!).toHaveTextContent(
+      HEROES.hero3.primary.narrative,
     );
+  });
+
+  it("marks its title and its body as a placeholder", () => {
+    renderSections([section]);
+
+    expect(
+      placeholderCard().textContent!.match(new RegExp(PLACEHOLDER_MARKER, "g"))
+        ?.length,
+    ).toBe(2);
+  });
+
+  it("invents no figure and no narrative copy of the beat", () => {
+    // The causal peak's narrative is verbatim and its figures are US-010's;
+    // this stand-in must not pre-empt either. No digit may reach the screen
+    // from inside it.
+    renderSections([section]);
+
+    const text = placeholderCard().textContent!.replace(/HERO_\d/g, "");
     expect(text).not.toMatch(/\d/);
   });
 

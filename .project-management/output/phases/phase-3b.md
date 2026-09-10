@@ -1,7 +1,7 @@
 # Phase 3b: Scripted Hero Flows & Narrative Orchestration
 
 **Duration:** 2026-09-13 to 2026-09-14 (~6.6 AI-hours)
-**Status:** In Progress (4/6 · 10/16 pts)
+**Status:** In Progress (5/6 · 13/16 pts)
 **Started:** 2026-09-10
 **Target Completion:** 2026-09-14
 **Actual Completion:** —
@@ -32,7 +32,7 @@ protection.
 
 ### Epic 7: E7 — Scripted Hero Flows (16 story points)
 
-**Priority:** P0 · **Status:** In Progress (4/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
+**Priority:** P0 · **Status:** In Progress (5/6) · **Dependencies:** Phases 1b, 2a, 2b, 3a
 
 | Story | Title | Pts | Status |
 |---|---|---:|---|
@@ -40,7 +40,7 @@ protection.
 | US-035 | Hero 1 follow-up — which badge to push next | 2 | ✅ Done |
 | US-036 | Hero 2 primary — ticket revenue year on year | 3 | ✅ Done |
 | US-037 | Hero 2 follow-up — which fixtures are driving the drop | 2 | ✅ Done |
-| US-038 | Hero 3 primary — department budget vs actual vs target | 3 | 📋 Todo |
+| US-038 | Hero 3 primary — department budget vs actual vs target | 3 | ✅ Done |
 | US-039 | Hero 3 follow-up — why Marketing is off plan | 3 | 📋 Todo |
 
 **Technical Notes:**
@@ -90,9 +90,9 @@ protection.
 > upstream.
 
 ### Progress Tracking *(auto-updated by `/execute-work`)*
-- **Completed Story Points:** 10 / 16 (63%)
-- **Completed Stories:** 4 / 6
-- **Tests Passing:** 2081 / 2081 · **Coverage:** 100% lines (`app/**`) · **Commits:** 4
+- **Completed Story Points:** 13 / 16 (81%)
+- **Completed Stories:** 5 / 6
+- **Tests Passing:** 2147 / 2147 · **Coverage:** 100% lines (`app/**`) · **Commits:** 5
 
 ---
 
@@ -125,6 +125,60 @@ independent and can be built in any order.
 
 ## Progress Log
 
+### US-038 — Hero 3 primary (3 pts) · 2026-09-10 · ✅ Done
+
+Composition, and the **first mount of `DepartmentTableTile`** (US-022): `app/components/heroes/hero-3.tsx`
+holds layout, copy and ONE formatter composition, and a source scan proves it contains no `<svg>`,
+no `<table>`, no hex and no re-typed figure. The table's rows, total row, Revenue/Cost tags,
+variance chips, target bars and flagged row are all its own; the overall tile is US-017's `KpiTile`
+around US-036's `CompareBars`. `hero-section.tsx` **lost** `PlaceholderBody` — every primary answer
+is now real, so the last stand-in in the product is Hero 3's unbuilt beat.
+
+- **THE REVENUE/COST TRAP, CLOSED AND ASSERTED ON SCREEN.** Marketing's **+0.41 renders ADVERSE**
+  (red token, UP arrow, "up") while Sponsoring's **+0.84 renders FAVOURABLE** — same sign, opposite
+  meaning — in the same rendered table, on the real data. All six rows are asserted against
+  `row.judgement`; source scans re-prove neither the table nor the hero can compute it (no
+  `FAVOURABLE|ADVERSE`, no `variance <|>`, no `actual - budget`), and flipping Marketing's *type* in
+  test flips the same +410 to FAVOURABLE. Four departments came in above budget, **only three
+  happily**.
+- **Exactly ONE row is flagged and the DATA picks it.** `data-flagged` matches `needsAttention` for
+  all six rows, the gold tint carries an icon and the sentence "Over budget and behind target", and
+  "Marketing" appears **nowhere** in the component layer. Pushing Hospitality over budget in test
+  flags it too, with no component edit.
+- **The near-target gold band, end to end:** Hospitality (95) → `NEAR` with its ring, Merchandising
+  (92) → `BEHIND` with no mark at all, three departments → `HIT`. Verified in Chrome as well.
+- **`(CHF 000)` is NOT in the title — deliberately.** The backlog words the tile "Departmental
+  performance (full year, CHF 000)"; the "000" half is exactly the wording US-022 was reported for
+  and corrected (phase-2b review decision 4). Shipped as **"Departmental performance (full year)"**
+  with the tile's own non-optional `figures in CHF millions` note; tests assert no `000` and no
+  thousands figure anywhere in the tile.
+- **Overall tile:** `CHF 69.68M` with **`+1%`** — `variancePercent` **is** the criteria's +1.0%
+  (+0.99% raw); the app's one percentage rule drops a redundant `.0`, and the chip is **NEUTRAL**,
+  matching the same movement in the table's total row (mixed signs are a fact, not a verdict).
+  Compare bars read **`CHF 69.00M` / `CHF 69.68M`** through one new fixed-decimal formatter
+  (`formatMoneyMillionsFixed`) — `formatMoneyMillions` drops trailing zeros, which is right for a
+  lone headline and wrong for a Budget-over-Actual column. Blended target **96%** stays STORED and
+  is asserted not to be any mean; **above target is `3 of 6`, DERIVED** by the new
+  `departmentsOnTarget` (the reference build's own `target >= 100` rule — the dispatch note's
+  "four ≥ 100%" is not what the data says; four are over BUDGET).
+- **One scope, on the head:** `primary.scopeLabel` names the season-ticket inclusion, and the
+  mismatch is asserted GENUINE (Ticketing 24,360 > Hero 2's shown 7,830). Unlike Hero 2, both tiles
+  share one scope, so it is stated once rather than twice.
+- **Narrative byte-identical**: UTF-8 hex against a retyped literal, exact length **270**, an ASCII
+  sweep, the sentence's ONLY hyphen (`target - the only`) pinned to `0x2d`, and a match against the
+  backlog itself. Rendered from the dataset; absent from the component layer.
+- **Chrome pass (built SSR bundle, six widths):** table width 1051/731/625/710/760/694px at
+  1920/1440/1280/1024/834/768 — **no horizontal scroll and no overflow at any of them**, and no name
+  truncated (`text-overflow: clip`). At 1280 the longest name takes a third line; accepted, which is
+  why the column has no ellipsis. Pair shares a row from `xl`. Re-ask → ONE section / two cards;
+  follow-up → same section, three cards. **Zero requests after first paint**, no console error but
+  the pre-existing missing `favicon.ico`. Reduced motion: figures and every bar final, no zero width.
+- **Security triage — no security-relevant changes detected:** no endpoint, route, dependency, env
+  var, storage, raw SQL, `innerHTML`, user-supplied URL, request or logging. The root loader gained
+  one more static in-memory read. The data is **departmental and budgetary and stays aggregate** —
+  no salary, no headcount attributed to a person, no individual's target attainment.
+- 66 new tests, **2147 green** (53 files), 100% lines. Hero 3 keeps the placeholder beat until US-039.
+
 ### US-037 — Hero 2 follow-up (2 pts) · 2026-09-10 · ✅ Done
 
 The **second so-what beat**, and the story US-023 was built for: `hero-2.tsx` gained a phase branch
@@ -143,13 +197,11 @@ already there; the hero contributes one row mapping, one span, two copy strings 
   order and against fixture order. US-023's rank is stable (ES2019 `sort`), so the demo cannot
   reshuffle between runs. The four risers are asserted absent, so the list is the fallers exactly.
 - **Criterion 5 asserted END TO END on the rendered rows.** `getComputedStyle` reads **96px** and
-  `white-space: nowrap` off every value cell in this section, plus one text node and no break for
-  `-CHF 150k` and `-CHF 110k` — US-021's "must not be reverted" decision, verified where it matters
-  rather than only in the component's own suite.
+  `white-space: nowrap` off every value cell here, plus one text node and no break for `-CHF 150k` —
+  US-021's "must not be reverted" decision, verified where it matters, not only in its own suite.
 - **`-CHF 400k total` is DERIVED from the rows on screen** (US-023's `driverTotal` through
-  `hBarDisplayedValue`), in the card's action slot with the down arrow, the explicit sign and the
-  `sr-only` word. No literal `400` exists in the component layer, and halving FCZ's fall moves both
-  the ranking (Lugano first) and the badge (`-CHF 300k`) in test.
+  `hBarDisplayedValue`), in the card's action slot with the arrow, sign and `sr-only` word. No
+  literal `400` exists in code; halving FCZ's fall moves the ranking AND the badge in test.
 - **Narrative byte-identical**: UTF-8 hex against a retyped literal, exact length, an ASCII sweep,
   **all seven hyphens** pinned to `0x2d` (`(-CHF 150k)`, `(-110k)`, `(-70k)`, `pricing - the`,
   `Friday-night`, `kick-off`), and a match against the sentence in the backlog itself. The
@@ -161,8 +213,8 @@ already there; the hero contributes one row mapping, one span, two copy strings 
   advises, and gold is spent once per beat, on the seam (asserted: exactly one gold mark).
 - **Security triage — no security-relevant changes detected:** no endpoint, route, dependency, env
   var, storage, raw SQL, `innerHTML`, user-supplied URL, request or logging. One existing loader
-  field is now read by one more component; the data is aggregate ticketing named by opposing CLUB.
-- 56 new tests, **2081 green** (52 files). Hero 3 keeps its placeholder body until US-038.
+  field is read by one more component; the data is aggregate ticketing named by opposing CLUB.
+  56 new tests, **2081 green** (52 files).
 
 ### US-036 — Hero 2 primary (3 pts) · 2026-09-10 · ✅ Done
 
@@ -186,28 +238,22 @@ restating any of them. US-038's overall tile reuses it.
 - **Narrative byte-identical**: UTF-8 hex against a retyped literal, exact length (229), an ASCII
   sweep, both hyphens (`(-0.6%)`, `-CHF 150k`) pinned to `0x2d`, and a match against the sentence in
   the backlog itself. It renders from the dataset; the string is absent from the component layer.
-- **The eight chips do not collide — measured, not assumed.** Geometry: eight equal cells, none
-  overlapping, all right of the axis gutter, and the tallest bar (YB 1,610) stays clear of the chip
-  band. In Chrome the widest chip is 59.5px in an 83.4px cell at 1440 (min gap 25.2px, 13.0px at
-  1280). Chips are bare signed magnitudes (`+130`) with the unit in the title `(CHF 000)`: a
-  money-formatted chip measures **97.6px in an 83.4px cell** and would overlap by 14px, which is why
-  the shared component's `formatDelta` prop is given `formatSignedNumber` here.
-- **The tiles pair at `xl`, not `lg`** — for the same measured reason: two thirds of the canvas at
-  1024 leaves a 51.8px cell, so the pair stacks below `xl` (cell 81.0px) instead. Verified at 1920 /
-  1440 / 1280 / 1024 / 834 / 768: no overlap, no horizontal scroll. *Known limit:* at a 390px phone
-  the cell is 36px and chips still overlap — outside the 1920×1080 presentation target, and a
-  candidate for Phase 4 if phone support is ever wanted.
+- **The eight chips do not collide — measured, not assumed.** Eight equal cells, none overlapping,
+  all right of the axis gutter, tallest bar (YB 1,610) clear of the chip band. Widest chip 59.5px in
+  an 83.4px cell at 1440; a money-formatted chip would be **97.6px** and overlap by 14px, which is
+  why `formatDelta` is given `formatSignedNumber` and the unit lives in the title `(CHF 000)`.
+- **The tiles pair at `xl`, not `lg`** — two thirds of the canvas at 1024 leaves a 51.8px cell, so
+  the pair stacks below `xl` (81.0px). Verified 1920→768: no overlap, no horizontal scroll. *Known
+  limit:* at a 390px phone the cell is 36px and chips overlap — outside the 1920×1080 target.
 - **Chrome pass (built SSR bundle):** three tiles in order, `CHF 7.83M` with `-0.6%` and a down
   arrow, compare bars `CHF 7.88M` / `CHF 7.83M` on one 336px track, `-CHF 50k vs Season 25/26`,
-  fixture hover `FCZ · Season 25/26 CHF 1'390k · Season 26/27 CHF 1'240k · -CHF 150k`, month hover
-  `Sep · CHF 1'180k / CHF 1'240k`, legend on both charts, re-ask → ONE section / three cards, **zero
-  requests after first paint** and no console error but the pre-existing missing `favicon.ico`.
-  Reduced motion: no zero-height bar, compare fills at 100% / 99.37%, every line drawn.
+  fixture hover `FCZ · 25/26 CHF 1'390k · 26/27 CHF 1'240k · -CHF 150k`, month hover `Sep · CHF
+  1'180k / CHF 1'240k`, re-ask → ONE section, **zero requests after first paint**, no console error
+  but the pre-existing missing `favicon.ico`. Reduced motion: no zero-height bar, every line drawn.
 - **Security triage — no security-relevant changes detected:** no endpoint, dependency, env var,
   storage, `innerHTML`, user-supplied URL, request or logging. The root loader gained one more
   static in-memory read; the data is aggregate ticketing named by opposing CLUB, no PII.
-- 76 new tests, **2025 green**. Hero 2's follow-up keeps the shared placeholder until US-037.
-
+- 76 new tests, **2025 green**.
 
 ### US-035 — Hero 1 follow-up (2 pts) · 2026-09-10 · ✅ Done
 
@@ -221,53 +267,34 @@ The first **so-what** beat, and pure assembly: `DriverTile` (US-023) for the bad
   and is asserted byte-identical in tests.
 - 43 tests added (1949 green); lint, format, typecheck, build all clean.
 
-> **Provenance note:** this story's dispatch was interrupted after implementation but before commit.
-> The work was verified independently against its acceptance criteria and all five gates before
-> being committed as `2881275`, rather than trusted or re-run.
-
+> **Provenance note:** dispatch was interrupted after implementation but before commit; the work was
+> verified independently against its criteria and all five gates before being committed as `2881275`.
 
 ### US-034 — Hero 1 primary (3 pts) · 2026-09-10 · ✅ Done
 
 **The first scripted answer, and it is composition: not one chart was built.** `VBarTile` (US-018)
-and `DonutTile` (US-020) reach a screen for the first time here, beside `HBarTile` (US-021),
-`Segmented` (US-026) and US-024's section head — `app/components/heroes/hero-1.tsx` contributes
-layout, copy and ONE piece of period state, and a source scan proves it holds no `<svg>`.
+and `DonutTile` (US-020) first mount here beside `HBarTile`, `Segmented` and US-024's section head;
+`hero-1.tsx` holds layout, copy and ONE `periodKey`, and a source scan proves it has no `<svg>`.
 
-- **THE SINGLE FILTER IS THE STORY.** One `Segmented` in the SECTION HEAD (not a card's `action`
-  slot — a filter driving three tiles cannot belong to one of them) over one `periodKey` held above
-  all three tiles, the shape US-016's band already uses. One press moves the bars, the ring and the
-  names together: proved by reading all three tiles before and after a single click, for **all four
-  periods**, and again in real Chrome.
-- **Nothing snaps.** The section adds no key of its own, so the bars, arcs and rows reconcile by
-  CATEGORY and transition; mid-flight the labels read `16’975 / 7’855 / 4’387` — counting down from
-  the figures on screen, never through zero — and the `<rect>` node is asserted to be the SAME
-  element across the press.
-- **Narrative byte-identical**, asserted as UTF-8 hex against a retyped literal, by exact length
-  (214), by an ASCII-range sweep of every character, and against the sentence in the backlog itself,
-  so the two copies in the repo cannot drift together. It is rendered straight from the dataset —
-  the string exists nowhere in the component layer.
-- **Not one figure re-typed.** Every displayed number ≥ 100 across all four periods (units, per-kit
-  revenue, totals, badge totals, the four derived segments, print counts) is asserted absent from
-  five source files. Kit revenue is `units × CHF 99` and the Home share is `homeKitShare`; the
-  fixture is proved to hold no `revenue`, `total` or `share` key to read instead.
-- **Badge segments sum EXACTLY to the centre figure in all four periods**, read off the rendered
-  legend (3’080 = 1’355+739+616+370; 1’136 = 500+273+227+136).
+- **THE SINGLE FILTER IS THE STORY.** One `Segmented` in the SECTION HEAD — a filter driving three
+  tiles cannot belong to one of them — over one `periodKey` above all three: one press moves the
+  bars, the ring and the names together, for **all four periods**, and again in real Chrome.
+- **Nothing snaps:** no key of its own, so bars, arcs and rows reconcile by CATEGORY and transition
+  (mid-flight `16’975 / 7’855 / 4’387`, never through zero; the same `<rect>` node across the press).
+- **Narrative byte-identical** (UTF-8 hex, length 214, ASCII sweep, backlog cross-check), rendered
+  from the dataset; **not one figure re-typed** — every displayed number ≥ 100 in all four periods
+  absent from five sources. Badge segments sum EXACTLY to the donut centre (3’080 = 1’355+739+616+370).
 - **Data reaches the sections through a ROOT loader** (`app/lib/dashboard/heroes.ts`, mirroring
-  `baseline.ts`): the sections are inserted by `root.tsx`, the repositories are server-only, and the
-  prototype makes no request after load — Chrome confirms **0 requests** after the first paint.
-- **Chrome pass (built SSR bundle, 1440×950):** three tiles in order with the pinned figures, hover
-  reading `Home · 22’400 shirts · 58% of shirt sales · CHF 2’217’600`, no horizontal overflow, no
-  truncated name label, re-ask → one section / three cards, **zero console errors**.
-- **Security triage — no security-relevant changes detected:** no endpoint, dependency, env var,
-  storage, `innerHTML`, user-supplied URL, request or logging. The one new loader takes no input and
-  reads static in-memory fixtures; the data it serialises is aggregate merchandising with no PII and
-  no named-individual performance figure (asserted).
-- 57 new tests, **1906 green**. Heroes 2 and 3 keep the clearly-marked placeholder body until
-  US-036 / US-038.
+  `baseline.ts`) — server-only repositories, and Chrome confirms **0 requests** after first paint.
+- **Chrome pass (1440×950):** three tiles in order, hover `Home · 22’400 shirts · 58% · CHF
+  2’217’600`, no overflow, no truncated label, re-ask → one section, zero console errors.
+- **Security triage — no security-relevant changes detected.** The one new loader takes no input and
+  reads static fixtures; aggregate merchandising, no PII, no named-individual figure. 57 new tests,
+  **1906 green**.
 
 ---
 
 **Created:** 2026-09-09
 **Last Updated:** 2026-09-10
-**Phase Status:** In Progress (4/6 · 10/16 pts)
+**Phase Status:** In Progress (5/6 · 13/16 pts)
 **Previous:** [Phase 3a](phase-3a.md) · **Next:** [Phase 4 — Hardening](phase-4.md)

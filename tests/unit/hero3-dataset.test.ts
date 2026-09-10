@@ -10,6 +10,7 @@ import {
   departmentVariance,
   departmentVariancePercent,
   departmentsNeedingAttention,
+  departmentsOnTarget,
   driverTotal,
   percentChange,
   varianceJudgement,
@@ -389,6 +390,46 @@ describe("the one department both over budget and behind target", () => {
       variance: 0,
       variancePercent: 0,
     });
+  });
+});
+
+/* ------------------------------------------------------------------------ */
+
+describe("the departments that hit their own outcome target", () => {
+  it("finds three of six, and they are the ones at or above 100%", async () => {
+    // The overall tile's "above target" count is the LENGTH of this list
+    // (US-038), so it can never claim a department the table shows as short.
+    const onTarget = departmentsOnTarget(await repository.departments());
+
+    expect(onTarget.map((row) => row.name)).toEqual([
+      SPONSORING,
+      "Ticketing",
+      "Events",
+    ]);
+    for (const row of onTarget) {
+      expect(row.targetPercent).toBeGreaterThanOrEqual(ON_TARGET_PERCENT);
+      expect(row.behindTarget).toBe(false);
+    }
+  });
+
+  it("excludes a near miss - 95% is still behind target", async () => {
+    // The gold NEAR band is a presentation threshold in the table (US-022);
+    // being behind target is a fact, and Hospitality is behind it.
+    const onTarget = departmentsOnTarget(await repository.departments());
+
+    expect(onTarget.map((row) => row.name)).not.toContain("Hospitality");
+    expect(onTarget.map((row) => row.name)).not.toContain(MERCHANDISING);
+    expect(onTarget.map((row) => row.name)).not.toContain(MARKETING);
+  });
+
+  it("is the exact complement of the departments behind target", async () => {
+    const departments = await repository.departments();
+    const rows = departmentPerformanceRows(departments);
+
+    expect(departmentsOnTarget(departments)).toHaveLength(
+      rows.filter((row) => !row.behindTarget).length,
+    );
+    expect(departmentsOnTarget([])).toEqual([]);
   });
 });
 

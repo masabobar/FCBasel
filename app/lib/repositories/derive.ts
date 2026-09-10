@@ -498,6 +498,25 @@ export function departmentsNeedingAttention(
   );
 }
 
+/**
+ * The departments that HIT OR BEAT their own outcome target, in table order.
+ *
+ * Hero 3's overall tile states an "above target" count, and it is the LENGTH of
+ * this list rather than a figure of its own: the test is `!behindTarget`, the
+ * same fact the table's rows read, so the count can never claim a department
+ * the row above it shows as short. On the seeded data it is THREE of six -
+ * Sponsoring 104, Ticketing 102 and Events 105. Hospitality's 95 and
+ * Merchandising's 92 are behind target however close they look, which is the
+ * distinction the table's gold near-target band draws in the other direction.
+ */
+export function departmentsOnTarget(
+  departments: readonly Department[],
+): DepartmentPerformance[] {
+  return departmentPerformanceRows(departments).filter(
+    (department) => !department.behindTarget,
+  );
+}
+
 /** Total overspend across the named drivers - the follow-up's badge. */
 export function driverTotal(drivers: readonly SpendDriver[]): number {
   return sum(drivers.map((driver) => driver.amount));

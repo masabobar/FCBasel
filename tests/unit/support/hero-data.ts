@@ -1,6 +1,7 @@
 import { type HeroesData, loadHeroes } from "../../../app/lib/dashboard/heroes";
 import { createMockHero1Repository } from "../../../app/lib/mock/hero1";
 import { createMockHero2Repository } from "../../../app/lib/mock/hero2";
+import { createMockHero3Repository } from "../../../app/lib/mock/hero3";
 
 /**
  * The hero datasets, read exactly as the root loader reads them (US-034).
@@ -15,4 +16,5 @@ import { createMockHero2Repository } from "../../../app/lib/mock/hero2";
 export const HEROES: HeroesData = await loadHeroes(
   createMockHero1Repository(),
   createMockHero2Repository(),
+  createMockHero3Repository(),
 );

@@ -17,6 +17,7 @@ import { useThinking } from "./lib/dashboard/use-thinking";
 import {
   hero1Repository,
   hero2Repository,
+  hero3Repository,
 } from "./lib/repositories/index.server";
 import type { Route } from "./+types/root";
 
@@ -54,7 +55,7 @@ export function Layout({ children }: { children: ReactNode }) {
  * surface (`screen-map.md`'s API table stays empty).
  */
 export async function loader() {
-  return await loadHeroes(hero1Repository, hero2Repository);
+  return await loadHeroes(hero1Repository, hero2Repository, hero3Repository);
 }
 
 /**

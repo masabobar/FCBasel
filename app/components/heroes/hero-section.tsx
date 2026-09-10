@@ -1,10 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 import { cn } from "../../lib/cn";
-import {
-  InsightPhase,
-  type InsightSection,
-} from "../../lib/dashboard/sections";
+import { type InsightSection } from "../../lib/dashboard/sections";
 import { scrollRevealedIntoView, viewTransitionName } from "../../lib/motion";
 import { type HeroId } from "../../lib/repositories/enums";
 import {
@@ -21,10 +18,11 @@ import {
  * This is the INSERTION MACHINERY (US-014): the section frame, its place in
  * the canvas grid, the entrance stagger, and the auto-scroll that brings it
  * into view. WHAT goes inside is per hero and arrives as `children`, chosen by
- * `./insight-sections.tsx` — Hero 1's real content is `./hero-1.tsx` (US-034),
- * Hero 2's is `./hero-2.tsx` (US-036), and Hero 3 is still the
- * **clearly-marked placeholder** below ({@link PlaceholderBody}), which invents
- * no narrative and no number until US-038 replaces it.
+ * `./insight-sections.tsx` — Hero 1's content is `./hero-1.tsx` (US-034),
+ * Hero 2's is `./hero-2.tsx` (US-036) and Hero 3's is `./hero-3.tsx` (US-038).
+ * All three primary answers are real; the only stand-in left in the product is
+ * {@link PlaceholderFollowUp} below, which Hero 3 renders in place of the
+ * causal peak until US-039 builds it.
  *
  * ONE GRID, NOT TWO. A section is not a box that owns its own layout: it spans
  * the canvas grid's full width and re-uses the parent's column tracks through
@@ -173,14 +171,6 @@ export function FollowUpDivider({
 /** Marks the stand-in content, so it can never be mistaken for the real thing. */
 export const PLACEHOLDER_MARKER = "Placeholder";
 
-/** Where the hero's verbatim narrative goes — never paraphrased here. */
-export const PLACEHOLDER_NARRATIVE =
-  "Placeholder — the narrative for this answer is stated here first, verbatim from its dataset (US-038).";
-
-/** Where the hero's tiles go. */
-export const PLACEHOLDER_TILE_BODY =
-  "Placeholder — this hero's tiles are inserted here in their defined order (Phase 2b tile components, Phase 3b content).";
-
 /** Where the follow-up's recommendation panel goes. */
 export const PLACEHOLDER_FOLLOW_UP_BODY =
   "Placeholder — the follow-up sharpens this same section from what happened to why, and what to do.";
@@ -190,10 +180,12 @@ export const PLACEHOLDER_FOLLOW_UP_BODY =
  * that is already on screen, so the flip is visibly a section GROWING rather
  * than a new section appearing.
  *
- * Still shared by the heroes whose beat is unbuilt: US-035 replaced Hero 1's
- * and US-037 replaced Hero 2's, so only US-039's Hero 3 reaches this now. It
- * takes `delayMs` rather than an index because it follows however many tiles
- * its hero rendered — one for a hero still on the placeholder body.
+ * THE LAST PLACEHOLDER IN THE PRODUCT. US-035 replaced Hero 1's beat and
+ * US-037 replaced Hero 2's; US-038 made Hero 3's PRIMARY answer real, so this
+ * is reached by exactly one thing — Hero 3's unbuilt causal peak, which
+ * US-039 replaces. When it does, this function and its two constants go with
+ * it. It takes `delayMs` rather than an index because it follows however many
+ * tiles its hero rendered: two, for Hero 3.
  */
 export function PlaceholderFollowUp({
   heroId,
@@ -212,47 +204,6 @@ export function PlaceholderFollowUp({
     >
       <p data-slot="placeholder-follow-up-body">{PLACEHOLDER_FOLLOW_UP_BODY}</p>
     </Card>
-  );
-}
-
-/**
- * A whole section's stand-in body — head and one tile — for a hero whose real
- * content has not been built yet.
- *
- * THE SEAM: US-038 replaces this for Hero 3 exactly as US-034 and US-036 did
- * for Heroes 1 and 2, by adding a branch to `./insight-sections.tsx` and a
- * module beside `./hero-1.tsx`. Nothing in this file changes, and the hero id
- * stops being rendered at that point — it is an identifier, not a label.
- */
-export function PlaceholderBody({
-  heroId,
-  phase,
-}: {
-  heroId: HeroId;
-  phase: InsightPhase;
-}) {
-  return (
-    <>
-      <SectionHead
-        id={sectionLabelId(heroId)}
-        label={`${PLACEHOLDER_MARKER} insight · ${heroId}`}
-        narrative={PLACEHOLDER_NARRATIVE}
-      />
-
-      <Card
-        title={`${PLACEHOLDER_MARKER} tile · ${heroId}`}
-        subtitle="Tiles are Phase 2b · content is Phase 3b"
-        isNew
-        delayMs={tileDelayMs(0)}
-        className={PLACEHOLDER_TILE_CLASS}
-      >
-        <p data-slot="placeholder-tile-body">{PLACEHOLDER_TILE_BODY}</p>
-      </Card>
-
-      {phase === InsightPhase.WITH_FOLLOW_UP && (
-        <PlaceholderFollowUp heroId={heroId} delayMs={tileDelayMs(1)} />
-      )}
-    </>
   );
 }
 

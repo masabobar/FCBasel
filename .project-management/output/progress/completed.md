@@ -6,14 +6,29 @@
 
 ## Summary
 
-**Total Completed:** 37 stories
-**Total Points:** 96 / 116
-**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 43 points/day
-**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (4/6 · 10/16)**
+**Total Completed:** 38 stories
+**Total Points:** 99 / 116
+**Start Date:** 2026-09-09 · **Days Active:** 2 · **Average Velocity:** 45 points/day
+**Phases Completed:** Phase 1a, 1b, 2a, **2b** (all 2026-09-09) · **Phase 3a closed 2026-09-10 (6/6 · 17/17)** · **Phase 3b in progress (5/6 · 13/16)**
 
 ---
 
 ## Completed Stories
+
+### US-038: Hero 3 primary — department budget vs actual vs target (3 pts)
+**Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 66
+**Notes:** First mount of `DepartmentTableTile`; the hero holds layout, copy and ONE formatter
+composition (a source scan proves no `<svg>`, no `<table>`, no hex, no re-typed figure), and the
+overall tile is `KpiTile` around US-036's `CompareBars`. **The revenue/cost trap asserted on screen,
+on the real data:** Marketing's +0.41 renders ADVERSE while Sponsoring's +0.84 renders FAVOURABLE —
+same sign, opposite meaning — and flipping Marketing's type in test flips the verdict. **One row
+flagged, chosen by `needsAttention`**, with "Marketing" absent from the component layer; gold band
+end to end (Hospitality 95 marked, Merchandising 92 not). Title ships as "Departmental performance
+(full year)" — the backlog's "CHF 000" half is exactly what US-022 was reported for, so the scale is
+the tile's own `figures in CHF millions` note. Overall tile: `CHF 69.68M`, `+1%` NEUTRAL (matching
+the table's total row), compare bars `CHF 69.00M` / `CHF 69.68M`, blended target 96% STORED,
+above-target `3 of 6` DERIVED. Narrative byte-identical at 270 chars. `PlaceholderBody` deleted —
+every primary answer is real; only US-039's beat is a stand-in.
 
 ### US-037: Hero 2 follow-up — which fixtures are driving the drop (2 pts)
 **Completed:** 2026-09-10 · **By:** AI · **Tests Added:** 56
@@ -135,50 +150,29 @@ Condensed to keep this log inside its 300-line limit; the **full per-story detai
 | US-020 Donut / ring tile | 3 | 56 | `charts/donut.tsx` — `donutGeometry` (pure), `Donut`, `DonutTile` for US-034: four gapped segments, a counting centre and a legend. **Not US-016's single-arc gold gauge**, sharing only the dasharray technique. **Two hover surfaces, ONE state** — an arc and its legend row write the same index, and rows are real buttons so focus does what hover does. **Segments morph rather than re-enter** (arcs keyed by sponsor). The arithmetic is `badgeSegments`' (US-008), so segments sum exactly to the centre total on every period and ten adversarial ones. |
 
 ### US-022: Department table tile (3 pts)
-**Completed:** 2026-09-09
-**Files Changed:** 1 code (new) + 1 test file (new) + 6 tracking docs
-**Tests Added:** 54 (unit: 54) - 1315/1315 green, **100% on the new file** (stmts / branches / funcs / lines), 99.8% stmts / 98.1% branches of `app/**`
-**Notes:** All 5 acceptance criteria met, both recorded review decisions held, and the revenue/cost
-trap closed structurally rather than by care.
+**Completed:** 2026-09-09 · 54 tests (1315 green), **100% on the new file** · all 5 criteria met,
+both review decisions held. Condensed to keep this log inside its 300-line limit; full detail in
+[`../phases/phase-2b.md`](../phases/phase-2b.md).
 
-**What Was Done:**
-- `app/components/tiles/department-table.tsx` — `DepartmentTable`, `DepartmentTableTile` and the
-  pure `targetMark` / `targetBarPercent` / `columnAlignClass`. **A real `<table>`** (thead / tbody /
-  tfoot, `scope="col"` headers, a `scope="row"` department name, `sr-only` caption), because six
-  departments read across as well as down. No TanStack Table: six rows and a total row
-- **THE REVENUE / COST TRAP IS CLOSED BY CONSTRUCTION.** The colour comes from `row.judgement` —
-  US-010's `varianceJudgement`, decided once from the department's `type` — handed to US-017's
-  `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** (an up arrow in the negative token)
-  while **Sponsoring's +840 renders UP and FAVOURABLE**; a test asserts the two chips share a
-  `data-direction` and differ in class, and a synthetic cost centre *under* budget flips to
-  FAVOURABLE with a down arrow. A source scan rejects the words `FAVOURABLE` / `ADVERSE`, any
-  `variance <>` comparison and any `DepartmentType` equality, so the judgement cannot migrate back
-  into the component
-- **The flag is `needsAttention`, not a hardcode:** exactly one row is flagged and it is Marketing,
-  whose name never appears in the source — giving another department both conditions moves the flag.
-  It is carried three ways (gold tint, an alert glyph, and the sentence "Over budget and behind
-  target" in the a11y tree)
-- **REVIEW DECISION 1 — CHF millions, never "000":** `formatMillions(chfFromThousands(…))` gives
-  21.00 / 21.84 and a 69.00 / 69.68 total, with the unremovable `MILLIONS_NOTE` subtitle "figures in
-  CHF millions". A test rejects `/000/` anywhere in the rendered tile and pins the currency word to a
-  single occurrence — in that note
-- **REVIEW DECISION 2 — numeric headers right-aligned, "% of target" INCLUDED:** `DEPARTMENT_COLUMNS`
-  declares which columns are numeric and `columnAlignClass` is the ONE rule the header `<th>` *and*
-  its body cells read, so the alignment is proven column by column (and by comparing header-to-cell
-  column position element by element), not asserted from a class on one `<th>`. The cell also ends
-  with its FIGURE, so the percentages land on the header's right edge
-- **The gold near-target band:** 95-99 takes a deep-gold ring, 100+ a filled gold dot, below 95
-  nothing — so **Hospitality (95) is marked and Merchandising (92) is not**, and the two marks differ
-  in shape as well as tone, each with an `sr-only` word. Gold appears nowhere else in the file
-- Background-only row hover on the `fast` token; rows keyed by department NAME (a reversed dataset
-  moves the same element); long names wrap (`break-words`, ellipsis classes rejected) inside a
-  card-bounded `overflow-x-auto`; totals come from `departmentTotals()` on the rows on screen, so the
-  footer cannot disagree with them, and the club variance is deliberately NEUTRAL — a fact, not a
-  verdict. Reduced motion renders every target bar at its final width with **zero frames requested**
-- **Security triage: no security-relevant changes detected** — considered and cleared: HTTP handler
-  or route, IDOR, raw SQL, `dangerouslySetInnerHTML`, user-supplied URL / SSRF, upload, dependency
-  or lockfile change (**none**), env var or secret, logging, CSRF, storage API. **One seam:** no
-  real-Chrome pass; nothing mounts the table until US-038
+- `tiles/department-table.tsx` — `DepartmentTable`, `DepartmentTableTile` and the pure `targetMark` /
+  `targetBarPercent` / `columnAlignClass`. **A real `<table>`** (thead/tbody/tfoot, `scope` headers,
+  `sr-only` caption); no TanStack Table for six rows and a total
+- **THE REVENUE/COST TRAP IS CLOSED BY CONSTRUCTION.** Colour comes from `row.judgement` (US-010's
+  `varianceJudgement`) via `DeltaChip`, so **Marketing's +410 renders UP and ADVERSE** while
+  **Sponsoring's +840 renders UP and FAVOURABLE**. A source scan rejects `FAVOURABLE` / `ADVERSE`,
+  any `variance <>` comparison and any `DepartmentType` equality, so it cannot migrate back in
+- **The flag is `needsAttention`, not a hardcode** — exactly one row, Marketing, whose name never
+  appears in the source; carried three ways (gold tint, glyph, "Over budget and behind target")
+- **REVIEW DECISION 1 — CHF millions, never "000":** 21.00 / 21.84 and a 69.00 / 69.68 total under
+  the unremovable `MILLIONS_NOTE`; a test rejects `/000/` anywhere in the tile
+- **REVIEW DECISION 2 — numeric headers right-aligned, "% of target" INCLUDED:** one
+  `columnAlignClass` rule read by the header `<th>` *and* its cells, proven column by column
+- **The gold near-target band:** 95-99 a deep-gold ring, 100+ a filled dot, below 95 nothing — so
+  **Hospitality (95) is marked and Merchandising (92) is not**, differing in shape as well as tone
+- Rows keyed by department NAME, long names wrap inside a card-bounded `overflow-x-auto`, totals come
+  from `departmentTotals()` on the rows on screen, and the club variance is deliberately NEUTRAL
+- **Security triage: no security-relevant changes detected.** **The one seam — nothing mounted the
+  table — was closed by US-038**, which asserts the trap, the flag and the gold band in Chrome
 
 ### US-023: Driver / breakdown tile (2 pts)
 **Completed:** 2026-09-09 · 43 tests (1358 green), **100% on the new file** · all 3 criteria met.

@@ -1,7 +1,7 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-10
-**Current Phase:** Phase 3b - Heroes *(4/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a all complete**
+**Current Phase:** Phase 3b - Heroes *(5/6 stories)* · **Phases 1a + 1b + 2a + 2b + 3a all complete**
 
 ---
 
@@ -9,13 +9,13 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| **Overall Progress** | 79% | 100% | 🟢 On Track |
+| **Overall Progress** | 85% | 100% | 🟢 On Track |
 | **Phase 1a / 1b / 2a** | 100% — Completed | 100% | 🟢 Done |
 | **Phase 2b** | 100% — Completed (11/11 · 29/29) | 100% | 🟢 Done |
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
-| **Phase 3b** | 63% — In Progress (4/6 · 10/16) | 100% | 🟢 On Track |
-| **Stories Completed** | 37/45 | 45 | 🟢 On Track |
-| **Story Points Done** | 96/116 | 116 | 🟢 On Track |
+| **Phase 3b** | 81% — In Progress (5/6 · 13/16) | 100% | 🟢 On Track |
+| **Stories Completed** | 38/45 | 45 | 🟢 On Track |
+| **Story Points Done** | 99/116 | 116 | 🟢 On Track |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |
 
 **Legend:** 🟢 On Track | 🟡 At Risk | 🔴 Off Track
@@ -24,9 +24,9 @@
 
 ## 📅 Today's Progress (2026-09-10)
 
-**Stories Completed Today:** 5 (US-033, US-034, US-035, US-036, US-037) · **37 total**
-**Currently Working On:** US-038 — Hero 3 primary (3 pts)
-**Story Points Completed Today:** 13 · **96 total**
+**Stories Completed Today:** 6 (US-033, US-034, US-035, US-036, US-037, US-038) · **38 total**
+**Currently Working On:** US-039 — Hero 3 follow-up, the causal peak (3 pts)
+**Story Points Completed Today:** 16 · **99 total**
 
 - ✅ **Phase 1a — Setup & Design System (6 stories, 14 pts)** — RR7 SSR scaffold (Railway deploy is a
   human step) · ESLint 9 + Prettier + husky · one token set as Tailwind v4 `@theme static` *and* a
@@ -180,12 +180,13 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 
 | Story | Status | Progress |
 |-------|--------|----------|
-| US-038: Hero 3 primary — department budget vs actual vs target | 📋 Next | The table where the Revenue / Cost tag is load-bearing, plus the overall tile reusing US-036's `CompareBars` |
+| US-039: Hero 3 follow-up — why Marketing is off plan *(the causal peak)* | 📋 Next | The beat the owner is expected to lean forward on — the drivers, the conversion gap, and the recommendation |
 
 ### Recently Completed
 
 | Story | Completed | Points |
 |-------|-----------|--------|
+| US-038: Hero 3 primary — department budget vs actual vs target | 2026-09-10 | 3 |
 | US-037: Hero 2 follow-up — which fixtures are driving the drop | 2026-09-10 | 2 |
 | US-036: Hero 2 primary — ticket revenue year on year | 2026-09-10 | 3 |
 | US-035: Hero 1 follow-up — which badge to push next | 2026-09-10 | 2 |
@@ -246,7 +247,7 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | Metric | Current | Target | Status |
 |--------|---------|--------|--------|
 | Test Coverage (`app/**`) | 99.70% stmts / 97.96% branches / 100% funcs / 100% lines | 80% | 🟢 Good |
-| Passing Tests | 2025/2025 | TBD | 🟢 Good |
+| Passing Tests | 2147/2147 | TBD | 🟢 Good |
 | TypeScript Errors (strict) | 0 | 0 | 🟢 Good |
 | ESLint Problems | 0 errors, 0 warnings | 0 errors | 🟢 Good |
 | Dependency Advisories | 0 | 0 high/critical | 🟢 Good |
@@ -274,7 +275,7 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 | Phase 2a: Shell & Baseline | ✅ Completed | 5/5 | 16/16 | 100% |
 | Phase 2b: Component Library | ✅ Completed | 11/11 | 29/29 | 100% |
 | Phase 3a: Conversation | ✅ Completed | 6/6 | 17/17 | 100% |
-| Phase 3b: Heroes | 🔄 Active | 1/6 | 3/16 | 19% |
+| Phase 3b: Heroes | 🔄 Active | 5/6 | 13/16 | 81% |
 | Phase 4: Hardening | ⏸️ Pending | 0/6 | 0/14 | 0% |
 
 ---
@@ -287,14 +288,12 @@ and a follow-up can never dead-end. **Phase 3b** now builds the three answers th
 - **[Phase 1b Plan](../phases/phase-1b.md)** - Completed 2026-09-09
 - **[Phase 1a Plan](../phases/phase-1a.md)** - Completed 2026-09-09
 - **[Backlog](../../input/backlog/)** - All project backlogs
-- **[Detailed Status](current-status.md)** - Full status report
-- **[Completed Work](completed.md)** - Complete history
-- **[Blockers](blockers.md)** - All blockers
+- **[Detailed Status](current-status.md)** · **[Completed Work](completed.md)** · **[Blockers](blockers.md)**
 - **[Effort Estimate](../reports/ai-hours-estimate-2026-09-09.md)** - AI-hours projection
 
 ---
 
 **💡 Tip:** This file updates automatically during `/execute-work`.
-**Last Auto-Update:** US-037 completed at 2026-09-10 — **THE SECOND SO-WHAT BEAT IS ON SCREEN (4/6 · 10/16 pts).** The story US-023 was built for, and **not one module, bar, badge or divider was built**: `hero-2.tsx` gained a phase branch of three grid rows — US-035's shared `FollowUpDivider`, one `DriverTile`, and `RecommendationPanel` in its **navy `narrative` variant** — while the ranking, the derived total, the formatter pass-through and the note slot all came from the tile that already existed. **THE PHASE FLIPS, IT DOES NOT APPEND:** one section, four cards, the three primary tiles still in place and the beat joining the same cascade at steps 3/4/5; the follow-up chip is withdrawn by US-029's derived visibility, proved on the real `App` from the chip row. **FOUR DECLINES, RANKED, AND THE TIE HOLDS:** `fixtureDeclines` picks the fallers off the same eight pairs the chart above plots — FCZ `-CHF 150k`, Lugano `-CHF 110k`, Luzern `-CHF 70k`, Sion `-CHF 70k` — and **Luzern precedes Sion**, asserted against the dataset's own order and against fixture order, because US-023's rank is stable for ties and a reshuffling demo is not acceptable. **CRITERION 5 ASSERTED END TO END:** `getComputedStyle` reads **96px** and `white-space: nowrap` off every value cell this section renders, with one text node and no break taken for `-CHF 150k` and `-CHF 110k` — US-021's "must not be reverted" decision, verified where it matters. **THE `-CHF 400k total` BADGE IS DERIVED** from the rows on screen (US-023's `driverTotal`), with arrow, sign and `sr-only` word; no literal `400` exists in the component layer, and halving FCZ's fall moves both the ranking (Lugano first) and the badge (`-CHF 300k`) in test. **NARRATIVE BYTE-IDENTICAL:** UTF-8 hex against a retyped literal, exact length, an ASCII sweep, **all seven hyphens** pinned to `0x2d`, and a match against the sentence in the backlog itself — and the **“3,200” comma is left exactly as authored**, the US-011 tension with the app's U+2019 separator being known and accepted. The attendance note is worded independently of the narrative, so the verbatim clause lives in one place and a source scan fails if it reappears in code; gold is spent once per beat, on the seam. **Security triage — no security-relevant changes detected:** no endpoint, route, dependency, env var, storage, `innerHTML`, user-supplied URL, request or logging. 56 new tests, **2081 green**. **Next is US-038** — Hero 3's primary, where the Revenue / Cost tag is load-bearing.
+**Last Auto-Update:** US-038 completed at 2026-09-10 — **HERO 3'S PRIMARY ANSWER IS ON SCREEN (5/6 · 13/16 pts), AND THE REVENUE/COST TRAP IS CLOSED IN FRONT OF THE OWNER.** Composition again, and the **first mount of `DepartmentTableTile`** (US-022): `hero-3.tsx` holds layout, copy and ONE formatter composition, and a source scan proves it has no `<svg>`, no `<table>`, no hex and no re-typed figure; the overall tile is US-017's `KpiTile` around US-036's `CompareBars`. `hero-section.tsx` **lost `PlaceholderBody`** — every primary answer is now real, and the only stand-in left in the product is Hero 3's unbuilt beat. **THE TRAP, ASSERTED ON SCREEN, ON THE REAL DATA:** Marketing's **+0.41 renders ADVERSE** (red token, UP arrow, the word "up") while Sponsoring's **+0.84 renders FAVOURABLE** — same sign, opposite meaning — with source scans re-proving that neither the table nor the hero can compute a verdict (no `FAVOURABLE|ADVERSE`, no `variance <|>`, no `actual - budget`), and flipping Marketing's *type* in test flipping the same +410 to FAVOURABLE. Four departments came in above budget; **only three happily.** **EXACTLY ONE ROW IS FLAGGED AND THE DATA PICKS IT:** `data-flagged` matches `needsAttention` on all six rows, the gold tint carries an icon and the sentence "Over budget and behind target", and "Marketing" appears **nowhere** in the component layer — pushing Hospitality over budget in test flags it too. **THE GOLD BAND, END TO END:** Hospitality (95) `NEAR` with its ring, Merchandising (92) `BEHIND` with no mark at all, three `HIT`. **`(CHF 000)` IS NOT IN THE TITLE, DELIBERATELY** — the backlog words it "(full year, CHF 000)" and that half is exactly what US-022 was reported for; shipped as **"Departmental performance (full year)"** under the tile's own non-optional `figures in CHF millions` note, with tests asserting no `000` and no thousands figure anywhere in the tile. **OVERALL TILE:** `CHF 69.68M` with **`+1%`** (`variancePercent` **is** the criteria's +1.0% at +0.99% raw; the app's one percentage rule drops a redundant `.0`) and the chip **NEUTRAL**, matching the same movement in the table's total row — mixed signs across five revenue departments and one cost centre are a fact, not a verdict. Compare bars read **`CHF 69.00M` / `CHF 69.68M`** through one new fixed-decimal formatter, blended target **96%** stays STORED and is asserted not to be any mean, and **above target is `3 of 6`, DERIVED** by the new `departmentsOnTarget`. **Chrome pass at six widths:** table 1051/731/625/710/760/694px, **no horizontal scroll and no overflow at any of them**, no name truncated, re-ask → ONE section / two cards, zero requests after first paint. Narrative **byte-identical** at 270 chars with its only hyphen pinned to `0x2d`. **Security triage — no security-relevant changes detected**, and the dataset closest to the guardrail stays **aggregate**: no salary, no headcount attributed to a person, no individual's target. 66 new tests, **2147 green**. **Next is US-039 — the causal peak.**
 
-*Previously (US-036, 2026-09-10):* Hero 2's primary answer went on screen — the first mount of `GroupedBarTile`, plus one new module (`CompareBars`, borrowing `hBarMax` / `hBarPercent` / `H_BAR_SERIES` rather than restating them). **BOTH SCOPE LABELS ARE ON SCREEN AND THE MISMATCH IS PROVED REAL** — eight fixtures against all home fixtures per month, with tests asserting the labels differ AND that 9,770 > 7,830, so it can never read as an arithmetic error in the room. Every total derived (`CHF 7.83M`, `CHF 7.88M`, `-CHF 50k`, `-0.6%`; editing FCZ moves the headline to `+1.3%`), narrative byte-identical at 229 chars, and the **eight delta chips measured** rather than assumed: 59.5px in an 83.4px cell at 1440, which is why the chips are bare magnitudes with the unit in the title and why the two upper tiles pair at `xl` rather than `lg`. 76 tests, 2025 green.
+*Previously (US-037, 2026-09-10):* the second so-what beat went on screen and **not one module, bar, badge or divider was built** — `hero-2.tsx` gained a phase branch of three grid rows (the shared `FollowUpDivider`, one `DriverTile`, `RecommendationPanel` in its navy `narrative` variant). The phase **flips rather than appends** (one section, four cards, the three primary tiles still in place), the four declines are ranked with **Luzern ahead of Sion** on a stable tie, `getComputedStyle` reads **96px / nowrap** off every value cell, and the `-CHF 400k total` badge is derived from the rows on screen. 56 tests, 2081 green.

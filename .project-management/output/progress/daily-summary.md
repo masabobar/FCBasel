@@ -1,17 +1,17 @@
 # Daily Work Summary
 
 **Date:** 2026-09-10 (Thursday) · **Last Updated:** 2026-09-10
-**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-037)
+**Covers:** day 1 (2026-09-09, 32 stories) and day 2 (2026-09-10, US-033 to US-038)
 
 ---
 
 ## Today's Summary
 
-**Stories Completed:** 37 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
-with US-033 (6/6 · 17/17) and took Phase 3b past halfway: **Heroes 1 and 2 both answer AND both
-so-what** (US-034 to US-037).
-**Story Points:** 96
-**Time Worked:** ~26 hours · **Files Changed:** 292 · **Tests Added:** 2081
+**Stories Completed:** 38 — **Phases 1a, 1b, 2a, 2b AND 3a ALL complete.** Day 2 closed Phase 3a
+with US-033 (6/6 · 17/17) and took Phase 3b to 5/6: **all three heroes now ANSWER**, two of them
+with their so-what beat (US-034 to US-038). Only the causal peak is left.
+**Story Points:** 99
+**Time Worked:** ~28 hours · **Files Changed:** 304 · **Tests Added:** 2147
 
 ---
 
@@ -125,21 +125,22 @@ so-what** (US-034 to US-037).
   **Criterion ④ by source scan** — `hasSection` has exactly two readers, so gating and chip
   visibility are two readings of ONE list and Reset re-gates for free. **Criterion ⑤ twice** — as a
   property over all 27 sessions and on the real `App`. 46 tests, 1849/1849.
-- **US-034 to US-037 (2026-09-10) — PHASE 3b PAST HALFWAY (4/6 · 10/16).** Full account in
-  [`../phases/phase-3b.md`](../phases/phase-3b.md). All three stories are **composition, not
-  invention**: `VBarTile`, `DonutTile` and then `GroupedBarTile` reach a screen for the first time,
-  and neither hero file holds an `<svg>` or a re-typed figure (proved by scan). US-034's ONE
-  `Segmented` in the section head moves bars, ring and names together and **nothing snaps**;
-  US-035 **flips** the section into its so-what beat behind a shared gold divider; US-036 answers
-  Hero 2 with **both scope labels on screen and the mismatch proved real** (monthly 9,770 >
-  fixtures 7,830), every total derived from the eight pairs the bars plot, and the eight delta chips
-  **measured in Chrome** (59.5px in 83.4px cells; the pair stacks below `xl` because 1024 leaves
-  51.8px). **US-037 is the second so-what beat and built nothing at all** — US-023's `DriverTile`
-  already ranked (stably, so **Luzern stays ahead of Sion** at their shared -CHF 70k), already
-  derived its `-CHF 400k total` from the rows on screen, and already had a note slot; the 96px
-  `nowrap` value column is asserted end to end on those rendered rows. Four narratives
-  byte-identical — hex, exact length, ASCII sweep, every hyphen at 0x2d, and against the backlog
-  itself, with US-037's authored "3,200" comma deliberately left alone. 232 tests, 2081/2081.
+- **US-034 to US-038 (2026-09-10) — PHASE 3b AT 5/6 · 13/16.** Full account in
+  [`../phases/phase-3b.md`](../phases/phase-3b.md). All five are **composition, not invention**:
+  `VBarTile`, `DonutTile`, `GroupedBarTile` and `DepartmentTableTile` all reach a screen for the
+  first time, and no hero file holds an `<svg>`, a `<table>` or a re-typed figure (proved by scan).
+  US-034's ONE `Segmented` moves bars, ring and names together and **nothing snaps**; US-035
+  **flips** the section into its beat behind a shared gold divider; US-036 puts **both scope labels
+  on screen with the mismatch proved real** (monthly 9,770 > fixtures 7,830) and **measures** its
+  eight chips in Chrome (59.5px in 83.4px cells, so the pair stacks below `xl`); **US-037 built
+  nothing at all** — US-023's `DriverTile` already ranked stably (**Luzern ahead of Sion** at their
+  shared -CHF 70k), already derived its `-CHF 400k total`, already had a note slot. **US-038 settles
+  the revenue/cost trap in front of the owner:** Marketing's +0.41 renders ADVERSE while Sponsoring's
+  +0.84 renders FAVOURABLE, one row is flagged by `needsAttention` alone, Hospitality's 95 earns the
+  gold near mark and Merchandising's 92 does not, and the overall tile reads `CHF 69.68M` / `+1%`
+  NEUTRAL / `CHF 69.00M` / 96% blended / `3 of 6` DERIVED; its title drops the `(CHF 000)` half on
+  purpose, and `PlaceholderBody` is gone. Five narratives byte-identical — hex, exact length, ASCII
+  sweep, every hyphen at 0x2d, and against the backlog itself. 298 tests, 2147/2147.
 
 ---
 
@@ -210,14 +211,13 @@ so-what** (US-034 to US-037).
   the chip is then offered**; the follow-up **flips** its parent section; one predicate with two
   readers drives both gating and chip visibility. **PHASE 3a COMPLETE: 6/6 · 17/17.**
 
-- ✅ US-034 to US-037 (10 pts, 2026-09-10) — every criterion met. Hero 1: three tiles **in order**
-  with the pinned figures, one `Segmented` driving all of them, badge segments summing exactly, and
-  a beat that flips the section rather than appending. Hero 2: grouped bars over eight fixtures with
-  eight signed delta chips, the totals tile at **CHF 7.83M vs CHF 7.88M, -0.6%**, the full-width
-  twelve-month chart — **both scopes labelled** — and now its beat: the four declining fixtures
-  ranked (FCZ -CHF 150k, Lugano -CHF 110k, Luzern and Sion -CHF 70k, the tie in dataset order), a
-  derived **-CHF 400k total** badge, a one-line attendance note and values that never wrap. All four
-  narratives **verbatim**. **Phase 3b: 4/6 stories, 10/16 points.**
+- ✅ US-034 to US-038 (13 pts, 2026-09-10) — every criterion met. Hero 1: three tiles **in order**,
+  one `Segmented` driving all of them, badge segments summing exactly. Hero 2: grouped bars over
+  eight fixtures, totals at **CHF 7.83M vs CHF 7.88M, -0.6%**, a full-width twelve-month chart —
+  **both scopes labelled** — plus four ranked declines and a derived **-CHF 400k total**. Hero 3: six
+  departments plus a total row, each tagged Revenue or Cost, **Marketing flagged as both over budget
+  AND behind target**, figures in CHF millions, and the overall tile at **CHF 69.68M vs CHF 69.00M,
+  +1%, 96% blended, 3 of 6 above target**. Five narratives **verbatim**. **Phase 3b: 5/6 · 13/16.**
 
 *(Condensed to keep this log inside its 300-line limit — full detail in
 [`completed.md`](completed.md) and [`../phases/phase-3a.md`](../phases/phase-3a.md).)*
@@ -244,56 +244,56 @@ so-what** (US-034 to US-037).
 - **PHASE 3a IS CLOSED (6/6 · 17/17), and the demo choreography is whole:** a question arrives by
   chip or by typing, waits through the beat and lands; off-script meets the fallback, and a
   follow-up asked cold renders its parent and then offers the chip.
-- **PHASE 3b IS PAST HALFWAY (4/6 · 10/16): both scripted answers AND both their beats are on
-  screen** — every figure from the US-008 / US-009 repositories through the root loader. The phase's
-  premise holds: assembly plus copy, and US-037 added no component at all.
-- **The two so-what beats are the shape the last two stories follow** — a shared gold seam, a
+- **PHASE 3b IS AT 5/6 · 13/16: ALL THREE SCRIPTED ANSWERS ARE ON SCREEN**, two of them with their
+  beat — every figure from the US-008 / US-009 / US-010 repositories through the root loader. The
+  phase's premise holds: US-037 added no component at all and US-038 added only a formatter.
+- **The two so-what beats are the shape the last story follows** — a shared gold seam, a
   `DriverTile` that ranks and totals itself, and a panel that interprets (navy) or advises (gold).
-- **Next: US-038 — Hero 3 primary (3 pts)**, the departmental table where the Revenue / Cost tag is
-  load-bearing, with an overall tile reusing US-036's `CompareBars`.
+- **Next: US-039 — Hero 3 follow-up, the causal peak (3 pts).** US-038 made Marketing's problem
+  visible, so the room's own next question is "why?" — which is exactly this beat. Protect it.
 
 **Priority Stories for This Week:** foundations + shell + component library (69 pts, done) → Phase
-3a (17 pts, done) + 3b, the demo itself (16 pts, 10 done).
+3a (17 pts, done) + 3b, the demo itself (16 pts, 13 done).
 
 ---
 
 ## Notes
 
-- **The deadline is this week.** Sponsor showing first, owner audience the following week. ~52 AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
-- Phases 1a, 1b, 2a, 2b and 3a are complete and 3b is past halfway (96/116 points); continue with
-  `/holycode-pm:execute-work story US-038`.
-- **US-028's three seams are now ALL filled:** `children` (US-029), `onSubmit` (US-030) and `busy`
-  (US-031). **There is exactly one timer in the app and a test pins it there:** a story growing its
-  own submit path, timer or chip styling is a review finding.
-- **US-029 settled the rule for anything the chip row or a panel needs to know: DERIVE IT FROM
-  `sections`** — why Reset restores the row for free, and why **US-033's gate reads that same list**,
-  pinned by a source scan to one predicate with two readers. A second registry is a review finding.
+- Sponsor showing first, owner audience the following week. ~52 AI-core / ~68 AI-realistic hours for 116 points; extend daily runtime before cutting scope.
+- Phases 1a, 1b, 2a, 2b and 3a are complete and 3b is at 5/6 (99/116 points); continue with
+  `/holycode-pm:execute-work story US-039`.
+- **US-028's three seams are ALL filled** (US-029/030/031), and **there is exactly one timer in the
+  app with a test pinning it there:** a story growing its own submit path, timer or chip styling is
+  a review finding.
+- **US-029's rule for anything the chip row or a panel needs: DERIVE IT FROM `sections`** — why
+  Reset restores the row for free, and why **US-033's gate reads that same list** (one predicate,
+  two readers, pinned by scan). A second registry is a review finding.
 - **US-021 is the reuse test for the whole epic, and US-023/024 both passed it** — widen the shared
-  seam, and let a source scan prove the new file holds no copy of what it reused. **US-037 collected
-  the dividend: its whole beat is US-023 configured, and it wrote no bar, badge or divider.**
-- **US-024 set the verbatim contract Phase 3b depends on** (the test that matters is `toBe`, not
-  "contains" — US-032 took it to UTF-8 bytes), and the narrative is stated BEFORE the charts.
-- **The motion hooks are the shared contract for Phase 2b:** reimplementing `useCountUp` or
-  `useGrow` anywhere is a review finding.
+  seam, and prove by scan that the new file holds no copy of what it reused. **US-037 collected the
+  dividend: its beat is US-023 configured, and it wrote no bar, badge or divider.**
+- **US-024 set the verbatim contract Phase 3b depends on** — `toBe`, not "contains" (US-032 took it
+  to UTF-8 bytes) — and the narrative is stated BEFORE the charts.
+- **The motion hooks are the shared contract for Phase 2b** (reimplementing `useCountUp` or
+  `useGrow` is a finding), and **US-025's chart is the only line chart** (a second `smoothPath` too).
 - **Two shared pieces US-017 left:** `DeltaChip` is the *only* variance chip, and `app/lib/cn.ts`
-  protects named size tokens. **All of US-015's seams are closed** (① US-013, ② US-029, ④ US-031) —
-  re-confirmed when US-033 closed Phase 3a.
+  protects named size tokens. **All of US-015's seams are closed** (① US-013, ② US-029, ④ US-031).
 - **US-030 settled how the matcher may change:** its two over-matches are the asserted contract, so
-  tightening either is a deliberate decision, never a tidy-up. **US-032 is the catch behind it** and
-  its absence assertions are the requirement. **US-033: gating is one module, for both paths.**
-- **US-034/037 confirmed Phase 3b is assembly:** a hero adds layout, copy and at most ONE piece of
-  state; building a chart, restating a figure or paraphrasing a narrative there is a review finding.
-- **US-013 set the no-hardcoded-figure pattern:** figures reach a component only through a
-  loader-provided view model; a test scans for a literal figure.
-- **US-025's chart is the only line chart**: a second `smoothPath` anywhere is a review finding.
-- **Keying geometry by NAME is the epic's settled pattern** (US-018/019/020, kept by US-022/023),
-  proved by a **re-rank** test.
+  tightening either is deliberate, never a tidy-up. **US-032 is the catch behind it**, its absence
+  assertions are the requirement, and **US-033 keeps gating in one module for both paths.**
+- **US-034/037/038 confirmed Phase 3b is assembly:** a hero adds layout, copy and at most ONE piece
+  of state; building a chart or a table, restating a figure or paraphrasing a narrative is a finding.
+- **US-038 settled the last shared-formatter question:** a COMPARISON is formatted by one function
+  for both halves (`formatMoneyMillionsFixed`); a second money-in-millions spelling is a finding.
+- **US-013's no-hardcoded-figure pattern:** figures reach a component only through a loader-provided
+  view model, and a test scans for a literal.
+- **Keying geometry by NAME is the epic's settled pattern** (US-018/019/020, kept by US-022/023).
+- **A tile must not be able to decide a verdict:** US-022 proved it by source scan and US-038
+  re-proved it end to end — the revenue/cost judgement is DATA from `derive.ts`, never a sign test.
 - **US-026's `Segmented` is the only period control**, the period stays the CALLER's state, and
   `rounded-full` on it or on US-029's chips is a review finding.
-- **US-016's band is first in the cut order and was built to stay cuttable:** one grid item, no
-  shared state, no import from the baseline row.
+- **US-016's band is first in the cut order and stays cuttable:** one grid item, no shared state.
 - Three shell guardrails are *tests*: the app bar's text equals the role labels, the status file
-  holds no timer, the prompt field's subtree may carry no border.
+  holds no timer, and the prompt field's subtree may carry no border. **The deadline is this week.**
 
 ---
 
