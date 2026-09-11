@@ -48,7 +48,26 @@ export default defineConfig({
     deviceScaleFactor: 1,
   },
   webServer: {
-    command: `pnpm build && E2E_PORT=${PORT} PORT=${PORT} pnpm start`,
+    /**
+     * `node server.js` DIRECTLY, not `pnpm start`.
+     *
+     * `pnpm start` pins `NODE_ENV=production`, which makes the Basic
+     * authentication gate mandatory — the server refuses to boot without
+     * `SITE_AUTH_USER` / `SITE_AUTH_PASSWORD` (`server/basic-auth.js`). That
+     * is deliberately fail-closed for the deploy, and equally deliberately not
+     * what this suite wants: these 64 cases measure the PRODUCT, and putting a
+     * credential prompt in front of every one of them would test the gate
+     * sixty-four times and the dashboard never.
+     *
+     * The gate itself is covered where it belongs, at its own boundary:
+     * `tests/unit/basic-auth.test.ts` (401 / 429 / pass, the lockout, the
+     * handshake exemption, and that nothing of the credential is logged).
+     *
+     * The server process is otherwise IDENTICAL to the deployed one — same
+     * `server.js`, same build, same static middleware and cache headers — so
+     * what this suite measures is still what the room will see.
+     */
+    command: `pnpm build && E2E_PORT=${PORT} PORT=${PORT} node server.js`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

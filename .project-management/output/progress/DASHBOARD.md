@@ -1,9 +1,9 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-11
-**Current Phase:** none — **THE 45-STORY PLAN IS COMPLETE (116/116 points), plus 1 post-plan story.**
+**Current Phase:** none — **THE 45-STORY PLAN IS COMPLETE (116/116 points), plus 2 post-plan stories.**
 **Post-plan:** [Phase 5](../phases/phase-5.md) holds requests that arrived after the plan closed —
-US-046 cosmetic sign-in gate (2 pts, ✅). Totals below cover the original plan; Phase 5 is counted
+US-046 cosmetic sign-in gate (2 pts, ✅) and US-047 deployment access gate (3 pts, ✅). Totals below cover the original plan; Phase 5 is counted
 separately on purpose, so "45/45" keeps meaning the plan that was estimated and committed to.
 
 ---
@@ -18,7 +18,7 @@ separately on purpose, so "45/45" keeps meaning the plan that was estimated and 
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
 | **Phase 3b** | 100% — Completed (6/6 · 16/16) | 100% | 🟢 Done |
 | **Phase 4** | 100% — Completed (6/6 · 14/14) | 100% | 🟢 Done |
-| **Phase 5** *(post-plan)* | 100% — Completed (1/1 · 2/2) | 100% | 🟢 Done |
+| **Phase 5** *(post-plan)* | 100% — Completed (2/2 · 5/5) | 100% | 🟢 Done |
 | **Stories Completed** | **45/45** | 45 | 🟢 Done |
 | **Story Points Done** | **116/116** | 116 | 🟢 Done |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |

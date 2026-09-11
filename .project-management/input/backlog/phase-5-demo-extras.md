@@ -3,9 +3,9 @@
 **Goal:** Requests that arrived after the 45-story plan closed. Each one is optional by the
 specification rather than required by it, and each is added deliberately rather than discovered.
 **Duration:** Post-plan, on request
-**Total Stories:** 1
-**Total Points:** 2
-**Status:** ✅ Completed (1/1 · 2/2)
+**Total Stories:** 2
+**Total Points:** 5
+**Status:** ✅ Completed (2/2 · 5/5)
 
 > **Why this is not Phase 4.** Phase 4's own guardrail reads *"Not in this phase: new functionality"*,
 > and it closed complete at 6/6. A login screen is new functionality, so folding it back into a
@@ -15,9 +15,9 @@ specification rather than required by it, and each is added deliberately rather 
 
 ## Epic 9: E9 — Post-Plan Demo Extras
 
-**Priority:** P2
-**Total Story Points:** 2
-**Status:** ✅ Completed (1/1)
+**Priority:** P0
+**Total Story Points:** 5
+**Status:** ✅ Completed (2/2)
 **Source:** Requested by the PM after the plan closed. Permitted (not required) by
 [`../constraints.md`](../constraints.md) §2.
 
@@ -55,15 +55,41 @@ specification rather than required by it, and each is added deliberately rather 
 
   - **API contract status:** ✅ Verified — no endpoint exists or is needed.
 
+- **US-047**: Deployment access gate (HTTP Basic)
+  - **Story Points:** 3
+  - **Priority:** P0
+  - **Component:** [DevOps]
+  - **Status:** ✅ Completed
+  - **Description:** Put the deployed URL behind HTTP Basic authentication so the shareable link is
+    shared deliberately rather than publicly readable.
+  - **Acceptance Criteria:**
+    - [x] An unauthenticated request to any path returns **401** with `WWW-Authenticate`, so the
+          browser prompts
+    - [x] **The gate covers static assets too** — `build/client/assets/*.js` carries the seeded
+          figures, so gating only the HTML document would leave the content downloadable
+    - [x] Credential comes from `SITE_AUTH_USER` / `SITE_AUTH_PASSWORD`, **never committed**;
+          placeholders in `.env.example`
+    - [x] **Fail-closed:** with `NODE_ENV=production` the server refuses to boot without both; a
+          half-configured pair is an error in every environment
+    - [x] Constant-time comparison; length does not leak
+    - [x] 5 failed attempts per client per 15 min → **429**; the anonymous handshake never counts
+    - [x] No part of the credential is logged
+    - [x] The product suite is unaffected — the Chrome cases still measure the dashboard
+  - **Dependencies:** US-001
+  - **Notes:** ~1 h. Required replacing `@react-router/serve` with a small Express server
+    (`server.js`), because that binary has nowhere to mount middleware. **This is deployment
+    infrastructure, NOT the product access model** — `constraints.md` §2 forbids roles, permissions
+    and the permission-aware AI *in the prototype*, none of which this adds.
+
 ---
 
 ## Phase Summary
 
-**Total Epics:** 1 | **Total Stories:** 1 | **Total Points:** 2
+**Total Epics:** 1 | **Total Stories:** 2 | **Total Points:** 5
 
-**By Priority:** P0: 0 · P1: 0 · P2: 1 story, 2 points — done
+**By Priority:** P0: 1 story, 3 points · P1: 0 · P2: 1 story, 2 points — **all done**
 
-**By Status:** ✅ 1 story, 2 points · 🔄 0 · 📋 0 · ⏸️ 0
+**By Status:** ✅ 2 stories, 5 points · 🔄 0 · 📋 0 · ⏸️ 0
 
 ---
 

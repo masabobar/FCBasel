@@ -54,5 +54,28 @@ export default tseslint.config(
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
+  {
+    /**
+     * The production server (`server.js`, `server/**`).
+     *
+     * Plain ESM JavaScript rather than TypeScript, so that Node can run it
+     * without a build step and without `tsx` — a devDependency a pruned
+     * production install would not have. It therefore sits outside the
+     * TypeScript block above and needs Node's globals named here.
+     *
+     * `console.log` is allowed in this scope alone: the boot lines state
+     * whether the access gate is enabled, and that is exactly the kind of fact
+     * a deploy log must carry.
+     */
+    files: ["server.js", "server/**/*.js"],
+    languageOptions: {
+      globals: { ...globals.node },
+      ecmaVersion: 2023,
+      sourceType: "module",
+    },
+    rules: {
+      "no-console": "off",
+    },
+  },
   prettierConfig,
 );

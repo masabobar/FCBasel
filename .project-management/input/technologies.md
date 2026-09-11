@@ -42,7 +42,8 @@ layout in `templates/` / `init-project-structure-setup.md` Option 3.
 | react-router | ^7.13.0 | Full-stack framework (framework mode with SSR) |
 | @react-router/dev | ^7.13.0 | Dev tooling / Vite plugin |
 | @react-router/node | ^7.13.0 | Node.js adapter for SSR |
-| @react-router/serve | ^7.13.0 | Production server |
+| @react-router/express | ^7.18.3 | Express adapter for the production server |
+| express | ^4.22.2 | Production server (`server.js`) — replaced `@react-router/serve` in US-047 |
 | typescript | ^5.7.0 | Type system |
 | vite | ^6.1.0 | Build tool |
 
@@ -180,6 +181,18 @@ off-script input, empty input, follow-up-before-parent, and reset (US-042).
 Railway's managed PostgreSQL is **not provisioned**; the prototype needs no database. The deployed
 URL is sent to the internal sponsor and opened in the owner meeting, so a cold-start load in Chrome
 must be clean (US-045).
+
+**The deployed URL is access-gated (US-047).** HTTP Basic authentication sits in front of the whole
+site, assets included, so the shareable link is shareable *deliberately* rather than publicly
+readable. Two Railway service variables are **required** — the server refuses to boot without them:
+
+| Variable | Purpose |
+|----------|---------|
+| `SITE_AUTH_USER` | Basic auth username |
+| `SITE_AUTH_PASSWORD` | Basic auth password — generate with `openssl rand -base64 24` |
+
+This is deployment infrastructure, **not** the product's access model, which stays out of scope per
+`constraints.md` §2. See `../output/docs/technical-spec.md` §7.2.
 
 **Browser target:** Chrome is the demo guarantee. Other modern browsers should work, but Chrome is
 what gets rehearsed.

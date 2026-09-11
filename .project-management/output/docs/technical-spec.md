@@ -188,6 +188,33 @@ model the specification puts out of scope, and would create a real credential su
 has no user accounts. `technologies.md` still lists `bcryptjs` and `createCookieSessionStorage` as
 expansion-path defaults **not used by the prototype**.
 
+### 7.2 Deployment access gate — HTTP Basic (US-047)
+
+**A different thing entirely from §7.1, and the two must never be confused.** This one keeps the
+public Railway URL from being readable by anyone who finds it. It is **infrastructure, not the
+product's access model**: still one persona, still no roles, still no accounts. That is why it lives
+in `server/` and not in `app/`.
+
+| Property | Value |
+|---|---|
+| Source | `server/basic-auth.js` (gate + attempt limiter), `server.js` (the server it mounts on) |
+| Credential | `SITE_AUTH_USER` / `SITE_AUTH_PASSWORD`, **env only, never committed**. Placeholders in `.env.example`. |
+| Scope | **Everything.** Mounted before `express.static`, so `build/client/assets/*.js` is covered too — that bundle carries the seeded figures, so gating only the HTML would have left the content public. |
+| Boot behaviour | **Fail-closed.** With `NODE_ENV=production` the server REFUSES TO START without both values. A half-configured pair is an error in every environment. |
+| Comparison | Constant-time (`timingSafeEqual`), both halves always compared, length-padded so length does not leak. |
+| Brute force | 5 failed attempts per client per 15 min → `429` + `Retry-After`. **Anonymous requests never count** — they are Basic auth's handshake, not attempts. |
+| Logging | Outcome and client only. No header, no supplied username, no fragment of either. |
+| Tests | `tests/unit/basic-auth.test.ts` — 401 / 429 / pass, lockout, handshake exemption, redaction. |
+
+**Why the server was replaced.** `react-router-serve` is a closed pipeline with nowhere to mount
+middleware. `server.js` is a small Express server doing exactly what it did (static assets with the
+same cache headers, then the React Router handler) with the gate in front. **Order in `server.js` is
+the security property** — anything added later goes below the gate unless it is deliberately public.
+
+**`pnpm start` pins `NODE_ENV=production`** so the deploy cannot boot unprotected even if the
+platform does not set it. The Chrome suite therefore runs `node server.js` directly
+(`playwright.config.ts`), which is the same process without the mandatory gate.
+
 ---
 
 ## 8. API Specification

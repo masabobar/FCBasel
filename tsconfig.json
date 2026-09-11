@@ -1,5 +1,10 @@
 {
-  "include": ["**/*.ts", "**/*.tsx", ".react-router/types/**/*"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".react-router/types/**/*",
+    "server/**/*.js"
+  ],
   "exclude": ["node_modules", "build", "coverage"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
@@ -12,6 +17,13 @@
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    // `server/**/*.js` is plain ESM JavaScript so Node can run it with no build
+    // step (see `server.js`). Allowing it here lets the unit suite import it
+    // with types INFERRED FROM ITS OWN JSDoc, rather than from a hand-written
+    // `.d.ts` that would quietly drift from the implementation. `checkJs` stays
+    // off: the file is linted and covered by tests, and turning it on would
+    // demand type annotations on the Express middleware signature for no gain.
+    "allowJs": true,
     "isolatedModules": true,
     "skipLibCheck": true,
     "strict": true,
