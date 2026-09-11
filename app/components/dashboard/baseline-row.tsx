@@ -144,6 +144,17 @@ const KPI_SPAN = "col-span-full self-start sm:col-span-4 lg:col-span-3";
  * and 89.7px respectively. Half-width was never the point; a readable bar track
  * next to a readable filter row was, and below 1280 the full width is what
  * delivers it. The reflow costs nothing: the tile simply takes its own row.
+ *
+ * GERMAN IS WIDER, AND THE BREAKPOINT WAS LEFT WHERE IT IS (US-049). Measured
+ * on the served page: the four-option filter is **467px** in German against
+ * 361px in English, so a one-row header needs **774px** — which half the grid
+ * only gives at the 1920 presentation target (816px). At 1536 and 1280 the
+ * German header therefore takes two rows instead of one. That is the intended
+ * degradation and not a clip: `Card`'s header wraps (see `HEADER_TITLE_CLASS`
+ * in `app/components/tiles/card.tsx`) and the filter wraps inside itself, so
+ * every option stays visible and reachable. Moving the breakpoint would have
+ * had to be `min-[1900px]`, which is the presentation target spelled as a
+ * media query — a worse trade than a two-row header on a laptop.
  */
 const WIDE_SPAN = "col-span-full xl:col-span-6";
 const FULL_SPAN = "col-span-full";

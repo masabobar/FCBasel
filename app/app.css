@@ -151,6 +151,15 @@
     font-weight: var(--font-weight-bold);
     letter-spacing: var(--tracking-heading);
     text-transform: uppercase;
+    /*
+     * A title breaks rather than bleeding out of its box (US-049). German
+     * compounds are single long words with no break opportunity in them -
+     * "Gesamtzielerreichung" in the Hero 3 footer's two-up grid ran straight
+     * across the label beside it - and a heading is always inside a column
+     * narrower than the tile. This never fires on a title that has spaces to
+     * break at, so the English pass is untouched.
+     */
+    overflow-wrap: break-word;
   }
 
   .kpi-number {

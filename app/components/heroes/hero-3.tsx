@@ -394,25 +394,34 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
           data-slot="overall-footer"
           className="mt-4 grid grid-cols-2 gap-3 border-t border-line pt-3.5"
         >
-          <div data-slot="overall-blended">
+          {/*
+            EACH CELL IS A COLUMN, AND THE FIGURE IS PUSHED TO ITS FOOT.
+            The two labels are copy, so they are not the same length in every
+            language: "Zielerreichung gesamt" takes two lines where "Blended
+            target" takes one, and two figures sitting at different heights in
+            a two-up footer reads as a rendering fault. Grid items stretch to
+            the row, so `mt-auto` on the figure lands both on one baseline
+            whatever the labels above them do (US-049).
+          */}
+          <div data-slot="overall-blended" className="flex flex-col">
             <div className="tile-title">
               {t(HERO_3_FOOTER_LABEL_KEY.blended)}
             </div>
             <div
               data-slot="overall-blended-value"
-              className={`mt-0.5 text-body font-bold ${TABULAR_NUMERALS_CLASS}`}
+              className={`mt-auto pt-0.5 text-body font-bold ${TABULAR_NUMERALS_CLASS}`}
             >
               {formatPercent(blendedTargetPercent)}
             </div>
           </div>
 
-          <div data-slot="overall-above-target">
+          <div data-slot="overall-above-target" className="flex flex-col">
             <div className="tile-title">
               {t(HERO_3_FOOTER_LABEL_KEY.aboveTarget)}
             </div>
             <div
               data-slot="overall-above-target-value"
-              className={`mt-0.5 text-body font-bold ${TABULAR_NUMERALS_CLASS}`}
+              className={`mt-auto pt-0.5 text-body font-bold ${TABULAR_NUMERALS_CLASS}`}
             >
               {formatNumber(onTarget.length)}
               <span className="ml-1 font-medium text-muted">
