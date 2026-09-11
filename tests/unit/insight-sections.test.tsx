@@ -22,6 +22,7 @@ import {
 import { type RevealFocus } from "../../app/lib/dashboard/use-dashboard";
 import { TILE_ENTER_CLASS } from "../../app/components/tiles/card";
 import { HeroId } from "../../app/lib/repositories/enums";
+import { t } from "./support/i18n";
 
 const { HERO_1, HERO_2, HERO_3 } = HeroId;
 
@@ -121,7 +122,7 @@ describe("insight sections — insertion", () => {
     const narrative = section.querySelector('[data-slot="section-narrative"]')!;
     const firstTile = section.querySelector('[data-slot="card"]')!;
 
-    expect(narrative).toHaveTextContent(HEROES.hero3.primary.narrative);
+    expect(narrative).toHaveTextContent(t(HEROES.hero3.primary.narrativeKey));
     expect(
       narrative.compareDocumentPosition(firstTile) &
         Node.DOCUMENT_POSITION_FOLLOWING,
@@ -411,8 +412,8 @@ describe("insight sections — every beat is real content (US-039)", () => {
     // sharpened section is content end to end: the narrative, the beat's own
     // tile, and the advice panel.
     const section = sectionNodes()[0]!;
-    expect(section).toHaveTextContent(HEROES.hero3.primary.narrative);
-    expect(section).toHaveTextContent(HEROES.hero3.followUp.narrative);
+    expect(section).toHaveTextContent(t(HEROES.hero3.primary.narrativeKey));
+    expect(section).toHaveTextContent(t(HEROES.hero3.followUp.narrativeKey));
     expect(section.textContent).not.toContain("Placeholder");
   });
 
@@ -433,7 +434,7 @@ describe("insight sections — every beat is real content (US-039)", () => {
   it("keeps no stand-in component anywhere in the app sources", () => {
     // The frame's `PlaceholderFollowUp` and its two constants went with the
     // story that replaced them, so the names are gone from the whole product —
-    // not merely unused in this module. (`PROMPT_PLACEHOLDER`, the prompt
+    // not merely unused in this module. (`t(PROMPT_PLACEHOLDER_KEY)`, the prompt
     // field's own affordance, is a different thing and is left alone.)
     const files = appSources();
     expect(files.length).toBeGreaterThan(20);

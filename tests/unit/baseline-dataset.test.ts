@@ -7,8 +7,8 @@ import {
   seriesTotals,
 } from "../../app/lib/repositories/derive";
 import {
-  PARTNER_ROLE_LABEL,
-  PERIOD_LABEL,
+  PARTNER_ROLE_LABEL_KEY,
+  PERIOD_LABEL_KEY,
   PartnerRole,
   PeriodKey,
 } from "../../app/lib/repositories/enums";
@@ -18,6 +18,28 @@ import {
   type BaselineRepository,
 } from "../../app/lib/repositories/types";
 import { color } from "../../app/lib/tokens";
+import { t } from "./support/i18n";
+import { type TranslationKey } from "../../app/lib/i18n";
+import {
+  PRODUCT_LABEL_KEY,
+  type ProductKey,
+} from "../../app/lib/repositories/enums";
+
+/**
+ * The two resolvers this suite needs since US-049: the dataset stores KEYS and
+ * the tiles resolve them, so the assertions resolve them the same way and go
+ * on pinning the words a presenter reads.
+ */
+function webshopLabels(
+  period:
+    { webshop: { labelKeys: readonly TranslationKey[] } } | null | undefined,
+): string[] {
+  return (period?.webshop.labelKeys ?? []).map((key) => t(key));
+}
+
+function productName(row: { product: ProductKey }): string {
+  return t(PRODUCT_LABEL_KEY[row.product]);
+}
 
 /**
  * A fixed "now" so the date-derived x-axis labels are assertable. September is
@@ -67,7 +89,13 @@ describe("Build Specification baseline figures", () => {
   it("lists this month's top products with the specified units", async () => {
     const topProducts = await repository.topProductsFor(PeriodKey.THIS_MONTH);
 
-    expect(topProducts?.rows).toEqual([
+    // The name a presenter reads, beside the figure the Specification pins.
+    expect(
+      topProducts?.rows.map((row) => ({
+        product: productName(row),
+        units: row.units,
+      })),
+    ).toEqual([
       { product: "Home shirt 26/27", units: 1_840 },
       { product: "Home scarf", units: 1_210 },
       { product: "Away shirt 26/27", units: 940 },
@@ -103,7 +131,7 @@ describe("webshop and attendance periods", () => {
       PeriodKey.LAST_3_MONTHS,
       PeriodKey.YEAR_TO_DATE,
     ]);
-    expect(periods.map((period) => period.label)).toEqual([
+    expect(periods.map((period) => t(period.labelKey))).toEqual([
       "This month",
       "Last month",
       "Last 3 months",
@@ -116,11 +144,11 @@ describe("webshop and attendance periods", () => {
 
     expect(periods).toHaveLength(4);
     for (const period of periods) {
-      expect(period.webshop.current).toHaveLength(period.webshop.labels.length);
+      expect(period.webshop.current).toHaveLength(webshopLabels(period).length);
       expect(period.webshop.previous).toHaveLength(
-        period.webshop.labels.length,
+        webshopLabels(period).length,
       );
-      expect(period.webshop.labels.length).toBeGreaterThan(0);
+      expect(webshopLabels(period).length).toBeGreaterThan(0);
     }
   });
 
@@ -179,13 +207,13 @@ describe("date-derived x-axis labels", () => {
   it("labels the last three months from the injected date", async () => {
     const quarter = await periodFor(PeriodKey.LAST_3_MONTHS);
 
-    expect(quarter.webshop.labels).toEqual(["Jul", "Aug", "Sep"]);
+    expect(webshopLabels(quarter)).toEqual(["Jul", "Aug", "Sep"]);
   });
 
   it("slices year to date to the months that have started", async () => {
     const yearToDate = await periodFor(PeriodKey.YEAR_TO_DATE);
 
-    expect(yearToDate.webshop.labels).toEqual([
+    expect(webshopLabels(yearToDate)).toEqual([
       "Jan",
       "Feb",
       "Mar",
@@ -205,8 +233,8 @@ describe("date-derived x-axis labels", () => {
 
     const [, , quarter, yearToDate] = await inJanuary.periods();
 
-    expect(quarter?.webshop.labels).toEqual(["Nov", "Dec", "Jan"]);
-    expect(yearToDate?.webshop.labels).toEqual(["Jan"]);
+    expect(webshopLabels(quarter)).toEqual(["Nov", "Dec", "Jan"]);
+    expect(webshopLabels(yearToDate)).toEqual(["Jan"]);
     expect(yearToDate?.webshop.current).toHaveLength(1);
     expect(yearToDate?.webshop.previous).toHaveLength(1);
   });
@@ -218,7 +246,7 @@ describe("date-derived x-axis labels", () => {
 
     const yearToDate = await inDecember.period(PeriodKey.YEAR_TO_DATE);
 
-    expect(yearToDate?.webshop.labels).toHaveLength(12);
+    expect(webshopLabels(yearToDate)).toHaveLength(12);
     expect(yearToDate?.webshop.current).toHaveLength(12);
   });
 
@@ -230,8 +258,8 @@ describe("date-derived x-axis labels", () => {
     now = new Date(2026, 6, 5);
     const inJuly = await moving.period(PeriodKey.YEAR_TO_DATE);
 
-    expect(inMarch?.webshop.labels).toHaveLength(3);
-    expect(inJuly?.webshop.labels).toHaveLength(7);
+    expect(webshopLabels(inMarch)).toHaveLength(3);
+    expect(webshopLabels(inJuly)).toHaveLength(7);
   });
 });
 
@@ -250,8 +278,8 @@ describe("top products", () => {
       PeriodKey.YEAR_TO_DATE,
     ]);
     for (const period of periods) {
-      expect(period.label).toBe(PERIOD_LABEL[period.key]);
-      expect(period.rows.map((row) => row.product)).toEqual([
+      expect(t(period.labelKey)).toBe(t(PERIOD_LABEL_KEY[period.key]));
+      expect(period.rows.map((row) => productName(row))).toEqual([
         "Home shirt 26/27",
         "Home scarf",
         "Away shirt 26/27",
@@ -263,10 +291,12 @@ describe("top products", () => {
 
   it('keeps the inner quotes in Cap "Rotblau"', async () => {
     const yearToDate = await repository.topProductsFor(PeriodKey.YEAR_TO_DATE);
-    const cap = yearToDate?.rows.find((row) => row.product.startsWith("Cap"));
+    const cap = yearToDate?.rows.find((row) =>
+      productName(row).startsWith("Cap"),
+    );
 
-    expect(cap?.product).toBe('Cap "Rotblau"');
-    expect(cap?.product).toContain('"Rotblau"');
+    expect(cap && productName(cap)).toBe('Cap "Rotblau"');
+    expect(cap && productName(cap)).toContain('"Rotblau"');
     expect(cap?.units).toBe(6_400);
   });
 
@@ -301,7 +331,9 @@ describe("partners", () => {
       PartnerRole.MOBILITY_PARTNER,
     ]);
     for (const partner of partners) {
-      expect(partner.roleLabel).toBe(PARTNER_ROLE_LABEL[partner.role]);
+      expect(t(partner.roleLabelKey)).toBe(
+        t(PARTNER_ROLE_LABEL_KEY[partner.role]),
+      );
     }
   });
 

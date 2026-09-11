@@ -29,11 +29,13 @@
  *
  * THE LABELS ARE HERE, NOT ON `HeroId`. A hero's id is an identifier and is
  * never rendered (`../repositories/enums.ts`); these are the chip's SHORT
- * labels, which are a property of the chip row. Phase 3b's section headings
- * happen to reuse the same wording, and will import it from here rather than
- * retyping it.
+ * labels, which are a property of the chip row. Since US-049 they are
+ * translation KEYS into `app/lib/i18n/locales/*.json` — the chip row is the
+ * most-read copy in the product, so it says what it says in the language the
+ * presenter is speaking.
  */
 
+import { type TranslationKey } from "../i18n";
 import { HERO_IDS, HeroId } from "../repositories/enums";
 import { InsightPhase, type InsightSections } from "./sections";
 
@@ -65,10 +67,10 @@ export type ChipKind = (typeof ChipKind)[keyof typeof ChipKind];
  * Keyed by the shared {@link HeroId} rather than by three loose strings, so a
  * fourth hero cannot be added without its chip label being supplied too.
  */
-export const HERO_CHIP_LABEL: Record<HeroId, string> = {
-  [HeroId.HERO_1]: "Shirt sales by kit & sponsor badges",
-  [HeroId.HERO_2]: "Ticket revenue, this year vs last",
-  [HeroId.HERO_3]: "Department budgets vs actuals",
+export const HERO_CHIP_LABEL_KEY: Record<HeroId, TranslationKey> = {
+  [HeroId.HERO_1]: "chips.hero.HERO_1",
+  [HeroId.HERO_2]: "chips.hero.HERO_2",
+  [HeroId.HERO_3]: "chips.hero.HERO_3",
 };
 
 /**
@@ -76,10 +78,10 @@ export const HERO_CHIP_LABEL: Record<HeroId, string> = {
  * `FOLLOWUPS[*].chip`. Each is phrased as the question a presenter would ask
  * NEXT, which is why it only makes sense once its hero is already answered.
  */
-export const FOLLOW_UP_CHIP_LABEL: Record<HeroId, string> = {
-  [HeroId.HERO_1]: "Which badge should we push next?",
-  [HeroId.HERO_2]: "Which fixtures are driving the drop?",
-  [HeroId.HERO_3]: "Why is Marketing over budget & behind target?",
+export const FOLLOW_UP_CHIP_LABEL_KEY: Record<HeroId, TranslationKey> = {
+  [HeroId.HERO_1]: "chips.followUp.HERO_1",
+  [HeroId.HERO_2]: "chips.followUp.HERO_2",
+  [HeroId.HERO_3]: "chips.followUp.HERO_3",
 };
 
 /* ---------------------------------------------------------------- CHIPS -- */
@@ -90,8 +92,8 @@ export interface SuggestionChip {
   readonly heroId: HeroId;
   /** Primary question or follow-up. */
   readonly kind: ChipKind;
-  /** The short label, rendered verbatim. */
-  readonly label: string;
+  /** The short label, resolved through `t()` and then rendered verbatim. */
+  readonly labelKey: TranslationKey;
 }
 
 export type SuggestionChips = readonly SuggestionChip[];
@@ -106,7 +108,7 @@ export const HERO_CHIPS: SuggestionChips = Object.freeze(
   HERO_IDS.map((heroId) => ({
     heroId,
     kind: ChipKind.HERO,
-    label: HERO_CHIP_LABEL[heroId],
+    labelKey: HERO_CHIP_LABEL_KEY[heroId],
   })),
 );
 
@@ -134,7 +136,7 @@ export function suggestionChips(sections: InsightSections): SuggestionChips {
     .map((section) => ({
       heroId: section.heroId,
       kind: ChipKind.FOLLOW_UP,
-      label: FOLLOW_UP_CHIP_LABEL[section.heroId],
+      labelKey: FOLLOW_UP_CHIP_LABEL_KEY[section.heroId],
     }));
 
   return [...HERO_CHIPS, ...followUps];

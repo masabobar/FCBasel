@@ -57,7 +57,14 @@
  *     target attainment.
  */
 
-import { DEPARTMENT_TYPE_LABEL, DepartmentType } from "../repositories/enums";
+import {
+  DEPARTMENT_LABEL_KEY,
+  DEPARTMENT_TYPE_LABEL_KEY,
+  DepartmentKey,
+  DepartmentType,
+  SPEND_DRIVER_LABEL_KEY,
+  SpendDriverKey,
+} from "../repositories/enums";
 import {
   type ConversionGap,
   type Department,
@@ -79,49 +86,49 @@ import {
  * spend was meant to buy.
  */
 const DEPARTMENTS: readonly {
-  name: string;
+  key: DepartmentKey;
   type: DepartmentType;
   budget: number;
   actual: number;
   targetPercent: number;
 }[] = [
   {
-    name: "Sponsoring & Partnerships",
+    key: DepartmentKey.SPONSORING_PARTNERSHIPS,
     type: DepartmentType.REVENUE,
     budget: 21_000,
     actual: 21_840,
     targetPercent: 104,
   },
   {
-    name: "Ticketing",
+    key: DepartmentKey.TICKETING,
     type: DepartmentType.REVENUE,
     budget: 24_000,
     actual: 24_360,
     targetPercent: 102,
   },
   {
-    name: "Hospitality",
+    key: DepartmentKey.HOSPITALITY,
     type: DepartmentType.REVENUE,
     budget: 7_200,
     actual: 6_840,
     targetPercent: 95,
   },
   {
-    name: "Merchandising (Fanshop)",
+    key: DepartmentKey.MERCHANDISING,
     type: DepartmentType.REVENUE,
     budget: 9_800,
     actual: 9_050,
     targetPercent: 92,
   },
   {
-    name: "Events",
+    key: DepartmentKey.EVENTS,
     type: DepartmentType.REVENUE,
     budget: 3_600,
     actual: 3_780,
     targetPercent: 105,
   },
   {
-    name: "Marketing & Communications",
+    key: DepartmentKey.MARKETING_COMMUNICATIONS,
     type: DepartmentType.COST,
     budget: 3_400,
     actual: 3_810,
@@ -129,10 +136,11 @@ const DEPARTMENTS: readonly {
   },
 ];
 
-/** The rows as the domain sees them, each carrying its own type label. */
+/** The rows as the domain sees them, each carrying its own label keys. */
 const DEPARTMENT_ROWS: readonly Department[] = DEPARTMENTS.map((entry) => ({
   ...entry,
-  typeLabel: DEPARTMENT_TYPE_LABEL[entry.type],
+  labelKey: DEPARTMENT_LABEL_KEY[entry.key],
+  typeLabelKey: DEPARTMENT_TYPE_LABEL_KEY[entry.type],
 }));
 
 /**
@@ -146,10 +154,10 @@ const BLENDED_TARGET_PERCENT = 96;
 /**
  * What the tile covers, stated on the tile. It names the season-ticket
  * inclusion because that is precisely what makes 24,360 here and 7,830 in
- * Hero 2 both correct.
+ * Hero 2 both correct. The sentence itself, in both languages, is in
+ * `app/lib/i18n/locales/*.json`.
  */
-const SCOPE_LABEL =
-  "Full-year departmental totals, budget against actual; Ticketing includes the season-ticket base, so it exceeds the sum of Hero 2's shown fixtures";
+const SCOPE_LABEL_KEY = "hero3.scopeLabel" as const;
 
 /* --------------------------------------------------------- FOLLOW-UP DATA -- */
 
@@ -163,9 +171,21 @@ const SCOPE_LABEL =
  * it the drivers would not add up to the overspend they explain.
  */
 const SPEND_DRIVERS: readonly SpendDriver[] = [
-  { name: "Match activations", amount: 240 },
-  { name: "Paid social", amount: 150 },
-  { name: "Agency retainer", amount: 20 },
+  {
+    key: SpendDriverKey.MATCH_ACTIVATIONS,
+    labelKey: SPEND_DRIVER_LABEL_KEY[SpendDriverKey.MATCH_ACTIVATIONS],
+    amount: 240,
+  },
+  {
+    key: SpendDriverKey.PAID_SOCIAL,
+    labelKey: SPEND_DRIVER_LABEL_KEY[SpendDriverKey.PAID_SOCIAL],
+    amount: 150,
+  },
+  {
+    key: SpendDriverKey.AGENCY_RETAINER,
+    labelKey: SPEND_DRIVER_LABEL_KEY[SpendDriverKey.AGENCY_RETAINER],
+    amount: 20,
+  },
 ];
 
 /**
@@ -181,21 +201,20 @@ const CONVERSION: ConversionGap = {
 /* ----------------------------------------------------------- NARRATIVES -- */
 
 /**
- * VERBATIM from the Reference Guide. The 7.7% and the 12% it quotes are
- * `departmentVariancePercent` of the Merchandising and Marketing rows, the 84%
- * is Marketing's `targetPercent`, and "the only department both over budget and
- * behind target" is `departmentsNeedingAttention` - the tests check all four.
+ * THE COPY LIVES IN `app/lib/i18n/locales/*.json` (US-049); the dataset stores
+ * the key. The English is VERBATIM from the Reference Guide and the German is
+ * a translation of that same approved copy.
+ *
+ * The primary's 7.7% and 12% are `departmentVariancePercent` of the
+ * Merchandising and Marketing rows, its 84% is Marketing's `targetPercent`,
+ * and "the only department both over budget and behind target" is
+ * `departmentsNeedingAttention` - the tests check all four. The follow-up's
+ * CHF 240k, 2.2% and 2.6% are the driver and conversion figures above; its 18%
+ * rise and its recommendation are the part of the story no figure carries.
  */
-const PRIMARY_NARRATIVE =
-  "Most departments are on or ahead of plan. Two need attention: Merchandising is 7.7% under its revenue target, and Marketing & Communications is 12% over its spend budget while sitting at 84% of its outcome target - the only department both over budget and behind target.";
+const PRIMARY_NARRATIVE_KEY = "hero3.narrative.primary" as const;
 
-/**
- * VERBATIM from the Reference Guide. The CHF 240k, the 2.2% and the 2.6% are
- * the driver and conversion figures above; the 18% rise and the recommendation
- * are the part of the story no figure in this dataset carries.
- */
-const FOLLOW_UP_NARRATIVE =
-  "Marketing's overspend is concentrated in two areas: the derby and YB match activations ran about CHF 240k over plan combined, and paid-social spend rose 18% chasing a webshop conversion target that underdelivered - conversion landed at 2.2% against a 2.6% plan. Recommendation: pause the incremental paid-social spend and reallocate about CHF 150k to the matchday activations that did convert, and revisit the conversion target with Webshop before the winter campaign.";
+const FOLLOW_UP_NARRATIVE_KEY = "hero3.narrative.followUp" as const;
 
 /**
  * Hero 3 as one object: the tile and the escalation it opens. Held together so
@@ -204,15 +223,15 @@ const FOLLOW_UP_NARRATIVE =
  */
 const HERO_3: Hero3 = {
   primary: {
-    scopeLabel: SCOPE_LABEL,
+    scopeLabelKey: SCOPE_LABEL_KEY,
     departments: DEPARTMENT_ROWS,
     blendedTargetPercent: BLENDED_TARGET_PERCENT,
-    narrative: PRIMARY_NARRATIVE,
+    narrativeKey: PRIMARY_NARRATIVE_KEY,
   },
   followUp: {
     drivers: SPEND_DRIVERS,
     conversion: CONVERSION,
-    narrative: FOLLOW_UP_NARRATIVE,
+    narrativeKey: FOLLOW_UP_NARRATIVE_KEY,
   },
 };
 
@@ -229,9 +248,9 @@ export function createMockHero3Repository(): Hero3Repository {
   return {
     hero: () => Promise.resolve(HERO_3),
     departments: () => Promise.resolve([...DEPARTMENT_ROWS]),
-    department: (name) =>
+    department: (key) =>
       Promise.resolve(
-        DEPARTMENT_ROWS.find((department) => department.name === name) ?? null,
+        DEPARTMENT_ROWS.find((department) => department.key === key) ?? null,
       ),
   };
 }

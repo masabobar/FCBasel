@@ -1,0 +1,288 @@
+{
+  "app": {
+    "documentTitle": "FC Basel Intelligence Platform",
+    "dashboardHeading": "{workspace} dashboard"
+  },
+  "nav": {
+    "landmark": "Workspace",
+    "dashboard": "Dashboard",
+    "reports": "Reports",
+    "dataSources": "Data Sources",
+    "settings": "Settings"
+  },
+  "crest": {
+    "label": "FC Basel 1893"
+  },
+  "topBar": {
+    "connectionStatus": "Connected · {count} systems",
+    "reset": "Reset",
+    "languageLabel": "Language",
+    "languageEn": "EN",
+    "languageDe": "DE"
+  },
+  "persona": {
+    "workspace": "Sales & Marketing",
+    "avatarInitials": "SM",
+    "avatarLabel": "{workspace} workspace",
+    "greeting": {
+      "MORNING": "Good morning",
+      "AFTERNOON": "Good afternoon",
+      "EVENING": "Good evening"
+    },
+    "greetingLine": "{greeting}, {workspace}"
+  },
+  "login": {
+    "title": "Intelligence Platform",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "hintPrefix": "Demo access:",
+    "error": "That is not the demo credential shown above."
+  },
+  "prompt": {
+    "inputLabel": "Ask a question about the club",
+    "sendLabel": "Send question",
+    "formLabel": "Ask the intelligence platform",
+    "placeholder": "Ask anything about the club's performance"
+  },
+  "chips": {
+    "rowLabel": "Suggested questions",
+    "followUpHint": "Follow-up:",
+    "hero": {
+      "HERO_1": "Shirt sales by kit & sponsor badges",
+      "HERO_2": "Ticket revenue, this year vs last",
+      "HERO_3": "Department budgets vs actuals"
+    },
+    "followUp": {
+      "HERO_1": "Which badge should we push next?",
+      "HERO_2": "Which fixtures are driving the drop?",
+      "HERO_3": "Why is Marketing over budget & behind target?"
+    }
+  },
+  "emptyState": {
+    "heading": "Your dashboard is ready",
+    "subtext": "Tap one of the prepared questions below, or type a question of your own."
+  },
+  "fallback": {
+    "message": "I can pull that together. For this preview, here are the questions I've prepared -"
+  },
+  "thinking": {
+    "hero": {
+      "HERO_1": {
+        "message": "Querying Merchandising, Webshop and flock-printing",
+        "sources": ["Merchandising", "Webshop", "Flock-printing"]
+      },
+      "HERO_2": {
+        "message": "Querying Ticketing and matchday records",
+        "sources": ["Ticketing", "Matchday records"]
+      },
+      "HERO_3": {
+        "message": "Querying Finance and departmental budgets",
+        "sources": ["Finance", "Departmental budgets"]
+      }
+    },
+    "followUp": {
+      "HERO_1": {
+        "message": "Analysing badge selection trends",
+        "sources": ["Badge selection history"]
+      },
+      "HERO_2": {
+        "message": "Breaking down fixture performance",
+        "sources": ["Fixture attendance"]
+      },
+      "HERO_3": {
+        "message": "Tracing Marketing spend and outcomes",
+        "sources": ["Marketing spend", "Webshop conversion"]
+      }
+    }
+  },
+  "band": {
+    "webshop": "Webshop revenue",
+    "attendance": "Home attendance",
+    "subtitle": "Your commercial overview. Ask a question below to expand it.",
+    "previousSeries": "Previous",
+    "periodLabel": "Period for webshop and attendance",
+    "comparison": "vs previous",
+    "homeMatchOne": "home match",
+    "homeMatchMany": "home matches",
+    "of": "of",
+    "latestPrefix": "Latest:"
+  },
+  "baseline": {
+    "webshop": "Webshop revenue",
+    "match": "Last home match",
+    "topProducts": "Top products",
+    "partners": "Active partners",
+    "partnersActive": "{count} active",
+    "comparisonPrefix": "vs",
+    "of": "of",
+    "capacitySuffix": "of capacity",
+    "unitsSold": "Units sold",
+    "topProductsPeriodLabel": "Period for top products"
+  },
+  "hero1": {
+    "kitsTitle": "Shirt sales by kit",
+    "badgesTitle": "Sponsor badges printed",
+    "namesTitle": "Top printed names",
+    "periodLabel": "Period for shirt sales, sponsor badges and printed names",
+    "shirtsWord": "shirts",
+    "ofUnits": "of units",
+    "ofSales": "of shirt sales",
+    "namesSubtitle": "Shirts sold with a name printed",
+    "followUpTitle": "Badge selection trend (last 3 drops)",
+    "trendSubtitle": "Change per sponsor · ordered by current badge selection",
+    "scopeLabel": "Season-to-date merchandising",
+    "narrative": {
+      "primary": "Pulled from Merchandising, Webshop and flock-printing. The Home kit drives 58% of shirt sales; about 8% of shirts carry a sponsor badge, with Bitpanda the most printed; Shaqiri is comfortably the most printed name.",
+      "followUp": "Bitpanda already leads badge selection, but Sunrise is growing fastest - up 38% over the last three drops off a smaller base. Recommendation: feature Sunrise in the next drop to convert its momentum, while keeping Bitpanda as the default option."
+    }
+  },
+  "hero2": {
+    "fixturesTitle": "Matchday ticket revenue by fixture (CHF 000)",
+    "totalsTitle": "Ticket revenue, year on year",
+    "monthsTitle": "Ticket revenue by month",
+    "versus": "vs",
+    "followUpTitle": "Fixtures driving the drop",
+    "declineSubtitle": "Year-on-year fall per fixture · ranked by size of decline",
+    "attendanceNote": "Every fixture here fell on attendance, not on price.",
+    "scopeLabel": {
+      "fixtures": "Eight highest-grossing home fixtures, matchday ticket revenue excluding the season-ticket base",
+      "monthly": "All home fixtures per month, matchday ticket revenue excluding the season-ticket base"
+    },
+    "narrative": {
+      "primary": "Overall matchday ticket revenue is roughly flat year on year (-0.6%), but it varies sharply by fixture: YB, Servette and St. Gallen are up, while FCZ, Lugano and Sion are down. The FCZ match is the single biggest drop, -CHF 150k.",
+      "followUp": "Four fixtures account for the decline: FCZ (-CHF 150k), Lugano (-110k), Luzern (-70k) and Sion (-70k). In each, the fall is driven by lower attendance rather than pricing - the FCZ match sold about 3,200 fewer seats year on year, partly a Friday-night kick-off and partly a reduced away allocation. YB, by contrast, sold out both seasons."
+    }
+  },
+  "hero3": {
+    "tableTitle": "Departmental performance (full year)",
+    "overallTitle": "Overall, actual against budget",
+    "overallSubtitle": "Actual across all departments",
+    "budget": "Budget",
+    "actual": "Actual",
+    "blendedTarget": "Blended target",
+    "aboveTarget": "Above target",
+    "of": "of",
+    "followUpTitle": "What's driving Marketing",
+    "driverSubtitle": "Overspend against plan per driver · biggest first",
+    "conversionPrefix": "What that money was meant to buy:",
+    "conversionLabel": "webshop conversion",
+    "versus": "vs",
+    "plan": "plan",
+    "scopeLabel": "Full-year departmental totals, budget against actual; Ticketing includes the season-ticket base, so it exceeds the sum of Hero 2's shown fixtures",
+    "narrative": {
+      "primary": "Most departments are on or ahead of plan. Two need attention: Merchandising is 7.7% under its revenue target, and Marketing & Communications is 12% over its spend budget while sitting at 84% of its outcome target - the only department both over budget and behind target.",
+      "followUp": "Marketing's overspend is concentrated in two areas: the derby and YB match activations ran about CHF 240k over plan combined, and paid-social spend rose 18% chasing a webshop conversion target that underdelivered - conversion landed at 2.2% against a 2.6% plan. Recommendation: pause the incremental paid-social spend and reallocate about CHF 150k to the matchday activations that did convert, and revisit the conversion target with Webshop before the winter campaign."
+    }
+  },
+  "tiles": {
+    "recommendation": "Recommendation",
+    "narrativeLabel": "What this means",
+    "total": "Total",
+    "millionsNote": "figures in CHF millions",
+    "tableCaption": "Departmental budget against actual, {note}",
+    "flagLabel": "Over budget and behind target",
+    "driverTotal": "total",
+    "donutCentre": "total",
+    "donutLabel": "Share of the total by series",
+    "ringAverage": "avg attendance",
+    "ringCapacity": "of capacity",
+    "attendanceRingLabel": "Average home attendance against capacity",
+    "segmentedLabel": "Period",
+    "followUpDivider": "Follow-up",
+    "targetMark": {
+      "HIT": "on target",
+      "NEAR": "near target",
+      "BEHIND": "behind target"
+    },
+    "column": {
+      "name": "Department",
+      "type": "Type",
+      "budget": "Budget",
+      "actual": "Actual",
+      "variance": "Variance",
+      "targetPercent": "% of target"
+    }
+  },
+  "enum": {
+    "period": {
+      "THIS_MONTH": "This month",
+      "LAST_MONTH": "Last month",
+      "LAST_3_MONTHS": "Last 3 months",
+      "YEAR_TO_DATE": "Year to date",
+      "SEASON_TO_DATE": "Season to date",
+      "CURRENT_MONTH": "Current month"
+    },
+    "week": {
+      "W1": "W1",
+      "W2": "W2",
+      "W3": "W3",
+      "W4": "W4"
+    },
+    "kit": {
+      "HOME": "Home",
+      "AWAY": "Away",
+      "THIRD": "3rd"
+    },
+    "season": {
+      "SEASON_25_26": "Season 25/26",
+      "SEASON_26_27": "Season 26/27"
+    },
+    "month": {
+      "JANUARY": "Jan",
+      "FEBRUARY": "Feb",
+      "MARCH": "Mar",
+      "APRIL": "Apr",
+      "MAY": "May",
+      "JUNE": "Jun",
+      "JULY": "Jul",
+      "AUGUST": "Aug",
+      "SEPTEMBER": "Sep",
+      "OCTOBER": "Oct",
+      "NOVEMBER": "Nov",
+      "DECEMBER": "Dec"
+    },
+    "departmentType": {
+      "REVENUE": "Revenue",
+      "COST": "Cost"
+    },
+    "varianceJudgement": {
+      "FAVOURABLE": "Favourable",
+      "ADVERSE": "Adverse",
+      "NEUTRAL": "On budget"
+    },
+    "varianceDirection": {
+      "UP": "up",
+      "DOWN": "down",
+      "FLAT": "unchanged"
+    },
+    "partnerRole": {
+      "MAIN_SHIRT_SPONSOR": "Main shirt sponsor",
+      "KIT_MANUFACTURER": "Kit manufacturer",
+      "OFFICIAL_PARTNER": "Official partner",
+      "TELECOM_PARTNER": "Telecom partner",
+      "BEVERAGE_PARTNER": "Beverage partner",
+      "MOBILITY_PARTNER": "Mobility partner"
+    },
+    "product": {
+      "HOME_SHIRT": "Home shirt 26/27",
+      "HOME_SCARF": "Home scarf",
+      "AWAY_SHIRT": "Away shirt 26/27",
+      "CAP_ROTBLAU": "Cap \"Rotblau\"",
+      "THIRD_SHIRT": "3rd shirt 26/27"
+    },
+    "department": {
+      "SPONSORING_PARTNERSHIPS": "Sponsoring & Partnerships",
+      "TICKETING": "Ticketing",
+      "HOSPITALITY": "Hospitality",
+      "MERCHANDISING": "Merchandising (Fanshop)",
+      "EVENTS": "Events",
+      "MARKETING_COMMUNICATIONS": "Marketing & Communications"
+    },
+    "spendDriver": {
+      "MATCH_ACTIVATIONS": "Match activations",
+      "PAID_SOCIAL": "Paid social",
+      "AGENCY_RETAINER": "Agency retainer"
+    }
+  }
+}

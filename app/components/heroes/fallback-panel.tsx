@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 
 import { cn } from "../../lib/cn";
 import { HERO_CHIPS, type SuggestionChip } from "../../lib/dashboard/chips";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { MOTION_CLASS, scrollRevealedIntoView } from "../../lib/motion";
 import { SuggestionChips } from "../chrome/suggestion-chips";
 
@@ -75,8 +77,7 @@ import { SuggestionChips } from "../chrome/suggestion-chips";
  * rather than of the question, and hands over the prepared set. Nothing here
  * says the user did anything wrong, because they did not.
  */
-export const FALLBACK_MESSAGE =
-  "I can pull that together. For this preview, here are the questions I've prepared -";
+export const FALLBACK_MESSAGE_KEY: TranslationKey = "fallback.message";
 
 /* ------------------------------------------------------------ GEOMETRY -- */
 
@@ -119,6 +120,7 @@ export interface FallbackPanelProps {
 }
 
 export function FallbackPanel({ onSelect, className }: FallbackPanelProps) {
+  const t = useT();
   const element = useRef<HTMLDivElement>(null);
 
   /**
@@ -158,7 +160,7 @@ export function FallbackPanel({ onSelect, className }: FallbackPanelProps) {
               heading: the panel speaks in the assistant's voice, and the
               headings on this canvas belong to answers that rendered. */}
           <p data-slot="fallback-message" className="font-semibold text-navy">
-            {FALLBACK_MESSAGE}
+            {t(FALLBACK_MESSAGE_KEY)}
           </p>
 
           {/* The next step, always. US-029's row, not a second one. */}

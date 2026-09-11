@@ -41,22 +41,22 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
   Hero3Body,
-  HERO_3_COMPARE_LABELS,
-  HERO_3_FOLLOW_UP_TITLE,
-  HERO_3_FOOTER_LABELS,
-  HERO_3_TILE_TITLES,
+  HERO_3_COMPARE_LABEL_KEY,
+  HERO_3_FOLLOW_UP_TITLE_KEY,
+  HERO_3_FOOTER_LABEL_KEY,
+  HERO_3_TILE_TITLE_KEY,
 } from "../../app/components/heroes/hero-3";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
 import {
-  FLAG_LABEL,
+  FLAG_LABEL_KEY,
   FLAGGED_ROW_CLASS,
-  MILLIONS_NOTE,
+  MILLIONS_NOTE_KEY,
   NEAR_TARGET_MIN_PERCENT,
-  TARGET_MARK_LABEL,
+  TARGET_MARK_LABEL_KEY,
   TargetMark,
-  TOTAL_LABEL,
+  TOTAL_LABEL_KEY,
 } from "../../app/components/tiles/department-table";
-import { HERO_CHIP_LABEL } from "../../app/lib/dashboard/chips";
+import { HERO_CHIP_LABEL_KEY } from "../../app/lib/dashboard/chips";
 import {
   InsightPhase,
   type InsightSections as SectionList,
@@ -96,6 +96,11 @@ import {
   stubMatchMedia,
   type FrameStub,
 } from "./support/motion-harness";
+import { de, t } from "./support/i18n";
+import {
+  DEPARTMENT_LABEL_KEY,
+  DepartmentKey,
+} from "../../app/lib/repositories/enums";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -109,12 +114,21 @@ const TOTALS = departmentTotals(DEPARTMENTS);
 const ON_TARGET = departmentsOnTarget(DEPARTMENTS);
 const BLENDED = PRIMARY.blendedTargetPercent;
 
-const SPONSORING = "Sponsoring & Partnerships";
-const TICKETING = "Ticketing";
-const HOSPITALITY = "Hospitality";
-const MERCHANDISING = "Merchandising (Fanshop)";
-const EVENTS = "Events";
-const MARKETING = "Marketing & Communications";
+/**
+ * Departments are addressed by KEY (US-049) — `data-department` carries the
+ * identifier so a row is findable in either language. {@link departmentName}
+ * is for the assertions that are about the words on screen.
+ */
+const SPONSORING = DepartmentKey.SPONSORING_PARTNERSHIPS;
+const TICKETING = DepartmentKey.TICKETING;
+const HOSPITALITY = DepartmentKey.HOSPITALITY;
+const MERCHANDISING = DepartmentKey.MERCHANDISING;
+const EVENTS = DepartmentKey.EVENTS;
+const MARKETING = DepartmentKey.MARKETING_COMMUNICATIONS;
+
+function departmentName(key: DepartmentKey): string {
+  return t(DEPARTMENT_LABEL_KEY[key]);
+}
 
 /* --------------------------------------------------------------- SOURCE -- */
 
@@ -319,19 +333,21 @@ describe("Hero 3 — the head states the question and its answer", () => {
     renderSections();
 
     const heading = within(section()).getByRole("heading", { level: 2 });
-    expect(heading).toHaveTextContent(HERO_CHIP_LABEL[HeroId.HERO_3]);
-    expect(HERO_CHIP_LABEL[HeroId.HERO_3]).toBe(
+    expect(heading).toHaveTextContent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
+    expect(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3])).toBe(
       "Department budgets vs actuals",
     );
     // Imported, never retyped — one string for the chip and the heading it
     // answers.
-    expect(HERO_3_CODE).toContain("HERO_CHIP_LABEL[HeroId.HERO_3]");
+    expect(HERO_3_CODE).toContain("t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3])");
   });
 
   it("labels the section by that heading, so the canvas stays walkable", () => {
     renderSections();
 
-    expect(section()).toHaveAccessibleName(HERO_CHIP_LABEL[HeroId.HERO_3]);
+    expect(section()).toHaveAccessibleName(
+      t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]),
+    );
   });
 
   it("states the narrative BEFORE any tile", () => {
@@ -387,7 +403,7 @@ describe("Hero 3 — the narrative is the contract (criterion 3)", () => {
 
     const rendered = slot("section-narrative", section())!.textContent!;
     expect(bytes(rendered)).toBe(bytes(AUTHORED));
-    expect(bytes(PRIMARY.narrative)).toBe(bytes(AUTHORED));
+    expect(bytes(t(PRIMARY.narrativeKey))).toBe(bytes(AUTHORED));
     expect(rendered).toHaveLength(AUTHORED.length);
     expect(AUTHORED).toHaveLength(270);
   });
@@ -395,14 +411,14 @@ describe("Hero 3 — the narrative is the contract (criterion 3)", () => {
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two copies inside this repository could drift together; the signed-off
     // document cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(PRIMARY.narrative);
+    expect(BACKLOG).toContain(t(PRIMARY.narrativeKey));
   });
 
   it("is plain ASCII — no smart quote, no em dash, no minus glyph", () => {
-    for (const character of PRIMARY.narrative) {
+    for (const character of t(PRIMARY.narrativeKey)) {
       expect(character.codePointAt(0)!).toBeLessThan(0x80);
     }
-    expect(PRIMARY.narrative).not.toMatch(/[‘’“”–—−]/u);
+    expect(t(PRIMARY.narrativeKey)).not.toMatch(/[‘’“”–—−]/u);
   });
 
   it("pins the dash before the final clause to an ASCII hyphen, 0x2d", () => {
@@ -410,20 +426,22 @@ describe("Hero 3 — the narrative is the contract (criterion 3)", () => {
     // sentence's verdict, and the hyphen is the one character a text pass would
     // promote to an em dash.
     const fragment = "target - the only";
-    expect(PRIMARY.narrative).toContain(fragment);
-    const index = PRIMARY.narrative.indexOf(fragment);
-    expect(PRIMARY.narrative.codePointAt(index + fragment.indexOf("-"))).toBe(
-      0x2d,
-    );
+    expect(t(PRIMARY.narrativeKey)).toContain(fragment);
+    const index = t(PRIMARY.narrativeKey).indexOf(fragment);
+    expect(
+      t(PRIMARY.narrativeKey).codePointAt(index + fragment.indexOf("-")),
+    ).toBe(0x2d);
     // It is the ONLY hyphen in the sentence, so there is nothing else to slip.
-    expect([...PRIMARY.narrative].filter((one) => one === "-")).toHaveLength(1);
+    expect(
+      [...t(PRIMARY.narrativeKey)].filter((one) => one === "-"),
+    ).toHaveLength(1);
   });
 
   it("is never assembled, truncated or transformed on the way to the screen", () => {
     renderSections();
 
     const line = slot("section-narrative", section())!;
-    expect(line.textContent).toBe(PRIMARY.narrative);
+    expect(line.textContent).toBe(t(PRIMARY.narrativeKey));
     expect(line.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
     // No copy of the sentence exists in the component layer at all.
     for (const source of SOURCES) {
@@ -434,19 +452,17 @@ describe("Hero 3 — the narrative is the contract (criterion 3)", () => {
   });
 
   it("quotes figures the tiles actually show", () => {
-    const merchandising = DEPARTMENTS.find(
-      (one) => one.name === MERCHANDISING,
-    )!;
-    const marketing = DEPARTMENTS.find((one) => one.name === MARKETING)!;
+    const merchandising = DEPARTMENTS.find((one) => one.key === MERCHANDISING)!;
+    const marketing = DEPARTMENTS.find((one) => one.key === MARKETING)!;
 
     // 7.7% under its revenue target, 12% over its spend budget, 84% of its
     // outcome target — all three derived from the rows the table renders.
     expect(departmentVariancePercent(merchandising)).toBe(-7.7);
-    expect(PRIMARY.narrative).toContain("7.7% under");
+    expect(t(PRIMARY.narrativeKey)).toContain("7.7% under");
     expect(Math.round(departmentVariancePercent(marketing))).toBe(12);
-    expect(PRIMARY.narrative).toContain("12% over");
+    expect(t(PRIMARY.narrativeKey)).toContain("12% over");
     expect(formatPercent(marketing.targetPercent)).toBe("84%");
-    expect(PRIMARY.narrative).toContain("84% of its outcome target");
+    expect(t(PRIMARY.narrativeKey)).toContain("84% of its outcome target");
   });
 
   it("names the ONE department the figures actually flag", () => {
@@ -455,9 +471,9 @@ describe("Hero 3 — the narrative is the contract (criterion 3)", () => {
     const flagged = departmentsNeedingAttention(DEPARTMENTS);
 
     expect(flagged).toHaveLength(1);
-    expect(flagged[0]!.name).toBe(MARKETING);
-    expect(PRIMARY.narrative).toContain("Marketing & Communications");
-    expect(PRIMARY.narrative).toContain("the only department");
+    expect(flagged[0]!.key).toBe(MARKETING);
+    expect(t(PRIMARY.narrativeKey)).toContain("Marketing & Communications");
+    expect(t(PRIMARY.narrativeKey)).toContain("the only department");
   });
 });
 
@@ -474,8 +490,8 @@ describe("Hero 3 — two tiles, in the defined order (criterion 2)", () => {
     renderSections();
 
     expect(cardTitles()).toEqual([
-      HERO_3_TILE_TITLES.table,
-      HERO_3_TILE_TITLES.overall,
+      t(HERO_3_TILE_TITLE_KEY.table),
+      t(HERO_3_TILE_TITLE_KEY.overall),
     ]);
     expect(cardTitles()[0]).toBe("Departmental performance (full year)");
     // The DOM order IS the reading order: the table first, the headline after.
@@ -514,7 +530,20 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
     renderSections();
 
     expect(DEPARTMENTS).toHaveLength(6);
-    expect(rowNames()).toEqual(DEPARTMENTS.map((one) => one.name));
+    expect(rowNames()).toEqual(DEPARTMENTS.map((one) => one.key));
+    // The row is FOUND by key and READ by name: the identifier is what the
+    // markup carries, the words are what the room sees (US-049).
+    expect(
+      slots("department-name", section()).map((node) => node.textContent),
+    ).toEqual([
+      departmentName(SPONSORING),
+      departmentName(TICKETING),
+      departmentName(HOSPITALITY),
+      departmentName(MERCHANDISING),
+      departmentName(EVENTS),
+      // The flagged row appends its reason, visually hidden.
+      `${departmentName(MARKETING)}${t(FLAG_LABEL_KEY)}`,
+    ]);
     expect(rowNames()).toEqual([
       SPONSORING,
       TICKETING,
@@ -525,7 +554,7 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
     ]);
     expect(slot("department-total-row", section())).not.toBeNull();
     expect(slot("department-total-row", section())).toHaveTextContent(
-      TOTAL_LABEL,
+      t(TOTAL_LABEL_KEY),
     );
   });
 
@@ -533,8 +562,8 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
     renderSections();
 
     for (const each of DEPARTMENTS) {
-      const tag = slot("department-type-tag", cell(each.name, "type"))!;
-      expect(tag).toHaveTextContent(each.typeLabel);
+      const tag = slot("department-type-tag", cell(each.key, "type"))!;
+      expect(tag).toHaveTextContent(t(each.typeLabelKey));
       expect(tag.dataset.type).toBe(each.type);
     }
     // Five earn, one spends — which is what makes the sign of a variance
@@ -543,7 +572,7 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
       DEPARTMENTS.filter((one) => one.type === DepartmentType.REVENUE),
     ).toHaveLength(5);
     const cost = DEPARTMENTS.filter((one) => one.type === DepartmentType.COST);
-    expect(cost.map((one) => one.name)).toEqual([MARKETING]);
+    expect(cost.map((one) => one.key)).toEqual([MARKETING]);
     // The club is neither, so the total row's tag cell is empty rather than
     // carrying an invented type.
     expect(totalCell("type").textContent).toBe("");
@@ -553,13 +582,13 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
     renderSections();
 
     for (const each of ROWS) {
-      expect(cell(each.name, "budget").textContent).toBe(millions(each.budget));
-      expect(cell(each.name, "actual").textContent).toBe(millions(each.actual));
-      expect(varianceChip(each.name)).toHaveTextContent(
+      expect(cell(each.key, "budget").textContent).toBe(millions(each.budget));
+      expect(cell(each.key, "actual").textContent).toBe(millions(each.actual));
+      expect(varianceChip(each.key)).toHaveTextContent(
         signedMillions(each.variance),
       );
       expect(
-        slot("department-target-percent", target(each.name))!.textContent,
+        slot("department-target-percent", target(each.key))!.textContent,
       ).toBe(formatPercent(each.targetPercent));
     }
     // The four figures the room reads first, spelled out.
@@ -602,10 +631,12 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
 
     // US-022's review decision, which must not be reverted.
     expect(slot("department-millions-note", tableCard())!.textContent).toBe(
-      MILLIONS_NOTE,
+      t(MILLIONS_NOTE_KEY),
     );
-    expect(MILLIONS_NOTE).toBe("figures in CHF millions");
-    expect(slot("card-subtitle", tableCard())).toHaveTextContent(MILLIONS_NOTE);
+    expect(t(MILLIONS_NOTE_KEY)).toBe("figures in CHF millions");
+    expect(slot("card-subtitle", tableCard())).toHaveTextContent(
+      t(MILLIONS_NOTE_KEY),
+    );
   });
 
   it("shows no '000' and no thousands figure anywhere in the tile", () => {
@@ -619,8 +650,8 @@ describe("Hero 3 — the table (criterion 2, first tile)", () => {
     }
     // Nor in the title, which the acceptance criteria word as "(CHF 000)" —
     // the half US-022 was reported for and corrected.
-    expect(HERO_3_TILE_TITLES.table).not.toContain("000");
-    expect(HERO_3_TILE_TITLES.table).toContain("full year");
+    expect(t(HERO_3_TILE_TITLE_KEY.table)).not.toContain("000");
+    expect(t(HERO_3_TILE_TITLE_KEY.table)).toContain("full year");
   });
 });
 
@@ -631,20 +662,20 @@ describe("Hero 3 — above budget is EARNED for revenue, OVERSPENT for cost", ()
     // THE STORY'S CENTRAL CORRECTNESS CLAIM, on the real data, on screen.
     renderSections();
 
-    const marketing = ROWS.find((one) => one.name === MARKETING)!;
-    const sponsoring = ROWS.find((one) => one.name === SPONSORING)!;
+    const marketing = ROWS.find((one) => one.key === MARKETING)!;
+    const sponsoring = ROWS.find((one) => one.key === SPONSORING)!;
 
     expect(marketing.variance).toBe(410);
     expect(sponsoring.variance).toBe(840);
 
     // Same sign, same arrow, OPPOSITE meaning.
     for (const each of [marketing, sponsoring]) {
-      expect(varianceChip(each.name)).toHaveAttribute(
+      expect(varianceChip(each.key)).toHaveAttribute(
         "data-direction",
         VarianceDirection.UP,
       );
-      expect(slot("delta-arrow", varianceChip(each.name))).not.toBeNull();
-      expect(varianceChip(each.name)).toHaveTextContent("up");
+      expect(slot("delta-arrow", varianceChip(each.key))).not.toBeNull();
+      expect(varianceChip(each.key)).toHaveTextContent("up");
     }
 
     expect(varianceChip(MARKETING)).toHaveAttribute(
@@ -667,15 +698,15 @@ describe("Hero 3 — above budget is EARNED for revenue, OVERSPENT for cost", ()
     renderSections();
 
     for (const each of ROWS) {
-      expect(varianceChip(each.name)).toHaveAttribute(
+      expect(varianceChip(each.key)).toHaveAttribute(
         "data-judgement",
         each.judgement,
       );
-      expect(row(each.name)).toHaveAttribute("data-judgement", each.judgement);
+      expect(row(each.key)).toHaveAttribute("data-judgement", each.judgement);
     }
     // Four departments came in above budget; only THREE of them happily.
     const above = ROWS.filter((one) => one.overBudget);
-    expect(above.map((one) => one.name)).toEqual([
+    expect(above.map((one) => one.key)).toEqual([
       SPONSORING,
       TICKETING,
       EVENTS,
@@ -706,12 +737,10 @@ describe("Hero 3 — above budget is EARNED for revenue, OVERSPENT for cost", ()
   it("flips the reading when a type flips — the proof it is not the sign", () => {
     // Marketing as a REVENUE department would make the same +410 good news.
     const flipped: Department[] = DEPARTMENTS.map((each) =>
-      each.name === MARKETING
-        ? { ...each, type: DepartmentType.REVENUE }
-        : each,
+      each.key === MARKETING ? { ...each, type: DepartmentType.REVENUE } : each,
     );
     const after = departmentPerformanceRows(flipped).find(
-      (one) => one.name === MARKETING,
+      (one) => one.key === MARKETING,
     )!;
 
     expect(after.variance).toBe(410);
@@ -734,32 +763,34 @@ describe("Hero 3 — exactly one department is flagged, and the data picks it", 
     expect(row(MARKETING).className).toContain(FLAGGED_ROW_CLASS);
     // The tint is visual; the icon and the sentence carry the same news.
     expect(slot("department-flag", row(MARKETING))).not.toBeNull();
-    expect(row(MARKETING)).toHaveTextContent(FLAG_LABEL);
-    expect(FLAG_LABEL).toBe("Over budget and behind target");
+    expect(row(MARKETING)).toHaveTextContent(t(FLAG_LABEL_KEY));
+    expect(t(FLAG_LABEL_KEY)).toBe("Over budget and behind target");
   });
 
   it("takes the flag from `needsAttention`, never from a name", () => {
     renderSections();
 
     for (const each of ROWS) {
-      expect(row(each.name).dataset.flagged).toBe(String(each.needsAttention));
+      expect(row(each.key).dataset.flagged).toBe(String(each.needsAttention));
     }
     expect(
-      ROWS.filter((one) => one.needsAttention).map((one) => one.name),
+      ROWS.filter((one) => one.needsAttention).map((one) => one.key),
     ).toEqual([MARKETING]);
     // The flag cannot outlive the figures: no component decides it from a
     // name. Marketing is named in exactly ONE place in the whole layer — the
     // TITLE of US-039's follow-up tile, which the acceptance criteria pin as
     // "What's driving Marketing" — and never in a comparison, a lookup or a
     // condition. The primary answer's table names no department at all.
+    // Since US-049 it is named in NO component at all: the follow-up title
+    // the acceptance criteria pin ("What's driving Marketing") is a
+    // dictionary entry, and this layer holds only its key.
     for (const source of SOURCES) {
       expect(source.code).not.toContain("Merchandising");
-      if (source.path === HERO_3_PATH) continue;
       expect(source.code).not.toContain("Marketing");
     }
-    expect(HERO_3_CODE.match(/Marketing/g)).toHaveLength(1);
-    expect(HERO_3_CODE).toContain(`"${HERO_3_FOLLOW_UP_TITLE}"`);
-    expect(HERO_3_FOLLOW_UP_TITLE).toContain("Marketing");
+    expect(HERO_3_CODE).toContain(`"hero3.followUpTitle"`);
+    expect(t(HERO_3_FOLLOW_UP_TITLE_KEY)).toContain("Marketing");
+    expect(de(HERO_3_FOLLOW_UP_TITLE_KEY)).toContain("Marketing");
     // A name used as DATA rather than as copy: never compared, never matched.
     expect(HERO_3_CODE).not.toMatch(
       /===\s*"Marketing|Marketing"\s*===|includes\("Marketing|find\(/,
@@ -770,10 +801,10 @@ describe("Hero 3 — exactly one department is flagged, and the data picks it", 
     // Hospitality is behind target but UNDER budget, so it is not flagged.
     // Push it over budget and it is — with no edit to a component.
     const edited: Department[] = DEPARTMENTS.map((each) =>
-      each.name === HOSPITALITY ? { ...each, actual: each.budget + 1 } : each,
+      each.key === HOSPITALITY ? { ...each, actual: each.budget + 1 } : each,
     );
 
-    expect(departmentsNeedingAttention(edited).map((one) => one.name)).toEqual([
+    expect(departmentsNeedingAttention(edited).map((one) => one.key)).toEqual([
       HOSPITALITY,
       MARKETING,
     ]);
@@ -786,10 +817,8 @@ describe("Hero 3 — the near-target gold band, on the rendered rows", () => {
   it("marks Hospitality (95) near target and Merchandising (92) not at all", () => {
     renderSections();
 
-    const hospitality = DEPARTMENTS.find((one) => one.name === HOSPITALITY)!;
-    const merchandising = DEPARTMENTS.find(
-      (one) => one.name === MERCHANDISING,
-    )!;
+    const hospitality = DEPARTMENTS.find((one) => one.key === HOSPITALITY)!;
+    const merchandising = DEPARTMENTS.find((one) => one.key === MERCHANDISING)!;
 
     expect(hospitality.targetPercent).toBe(NEAR_TARGET_MIN_PERCENT);
     expect(merchandising.targetPercent).toBeLessThan(NEAR_TARGET_MIN_PERCENT);
@@ -797,13 +826,13 @@ describe("Hero 3 — the near-target gold band, on the rendered rows", () => {
     expect(target(HOSPITALITY).dataset.mark).toBe(TargetMark.NEAR);
     expect(slot("department-target-dot", target(HOSPITALITY))).not.toBeNull();
     expect(target(HOSPITALITY)).toHaveTextContent(
-      TARGET_MARK_LABEL[TargetMark.NEAR],
+      t(TARGET_MARK_LABEL_KEY[TargetMark.NEAR]),
     );
 
     expect(target(MERCHANDISING).dataset.mark).toBe(TargetMark.BEHIND);
     expect(slot("department-target-dot", target(MERCHANDISING))).toBeNull();
     expect(target(MERCHANDISING)).not.toHaveTextContent(
-      TARGET_MARK_LABEL[TargetMark.NEAR],
+      t(TARGET_MARK_LABEL_KEY[TargetMark.NEAR]),
     );
   });
 
@@ -817,7 +846,7 @@ describe("Hero 3 — the near-target gold band, on the rendered rows", () => {
           : each.targetPercent >= NEAR_TARGET_MIN_PERCENT
             ? TargetMark.NEAR
             : TargetMark.BEHIND;
-      expect(target(each.name).dataset.mark).toBe(expected);
+      expect(target(each.key).dataset.mark).toBe(expected);
     }
     expect(
       slots("department-target", section()).filter(
@@ -874,7 +903,10 @@ describe("Hero 3 — the overall tile (criterion 2, second tile)", () => {
     expect(compareBars()).toHaveLength(2);
     expect(
       compareBars().map((bar) => slot("compare-bar-label", bar)!.textContent),
-    ).toEqual([HERO_3_COMPARE_LABELS.budget, HERO_3_COMPARE_LABELS.actual]);
+    ).toEqual([
+      t(HERO_3_COMPARE_LABEL_KEY.budget),
+      t(HERO_3_COMPARE_LABEL_KEY.actual),
+    ]);
     expect(compareValues()).toEqual([
       moneyMillions(TOTALS.budget),
       moneyMillions(TOTALS.actual),
@@ -913,7 +945,7 @@ describe("Hero 3 — the overall tile (criterion 2, second tile)", () => {
     renderSections();
 
     const blended = slot("overall-blended", overallCard())!;
-    expect(blended).toHaveTextContent(HERO_3_FOOTER_LABELS.blended);
+    expect(blended).toHaveTextContent(t(HERO_3_FOOTER_LABEL_KEY.blended));
     expect(slot("overall-blended-value", blended)!.textContent).toBe(
       formatPercent(BLENDED),
     );
@@ -925,7 +957,7 @@ describe("Hero 3 — the overall tile (criterion 2, second tile)", () => {
     renderSections();
 
     const above = slot("overall-above-target", overallCard())!;
-    expect(above).toHaveTextContent(HERO_3_FOOTER_LABELS.aboveTarget);
+    expect(above).toHaveTextContent(t(HERO_3_FOOTER_LABEL_KEY.aboveTarget));
     expect(slot("overall-above-target-value", above)!.textContent).toBe(
       `${formatNumber(ON_TARGET.length)}of ${formatNumber(ROWS.length)}`,
     );
@@ -933,7 +965,7 @@ describe("Hero 3 — the overall tile (criterion 2, second tile)", () => {
 
     // The count is the length of `departmentsOnTarget`, not a literal: the
     // three departments that hit or beat their own outcome target.
-    expect(ON_TARGET.map((one) => one.name)).toEqual([
+    expect(ON_TARGET.map((one) => one.key)).toEqual([
       SPONSORING,
       TICKETING,
       EVENTS,
@@ -947,7 +979,7 @@ describe("Hero 3 — the overall tile (criterion 2, second tile)", () => {
     // The proof it is derived: lift Hospitality to its target and the count
     // becomes four, with no edit to a component.
     const edited: Department[] = DEPARTMENTS.map((each) =>
-      each.name === HOSPITALITY
+      each.key === HOSPITALITY
         ? { ...each, targetPercent: ON_TARGET_PERCENT }
         : each,
     );
@@ -963,7 +995,7 @@ describe("Hero 3 — one scope, and the mismatch with Hero 2 is labelled", () =>
     renderSections();
 
     const scope = slot("section-scope", section())!;
-    expect(scope.textContent).toBe(PRIMARY.scopeLabel);
+    expect(scope.textContent).toBe(t(PRIMARY.scopeLabelKey));
     // Both tiles are the same six departments over the same full year, so the
     // scope is stated once rather than twice — unlike Hero 2, whose two charts
     // are at two different scopes and each carry their own line.
@@ -981,7 +1013,7 @@ describe("Hero 3 — one scope, and the mismatch with Hero 2 is labelled", () =>
   it("is a GENUINE mismatch: Ticketing here really does exceed Hero 2's", () => {
     // If this stopped being true the label would describe a difference that no
     // longer exists, which is its own kind of lie.
-    const ticketing = DEPARTMENTS.find((one) => one.name === TICKETING)!;
+    const ticketing = DEPARTMENTS.find((one) => one.key === TICKETING)!;
     const fixtures = HEROES.hero2.primary.fixtures.fixtures;
     const shown = fixtures.reduce((total, one) => total + one.current, 0);
 
@@ -995,7 +1027,7 @@ describe("Hero 3 — one scope, and the mismatch with Hero 2 is labelled", () =>
       expect(source.code).not.toContain("season-ticket");
       expect(source.code).not.toContain("Full-year departmental totals");
     }
-    expect(HERO_3_CODE).toContain("primary.scopeLabel");
+    expect(HERO_3_CODE).toContain("t(primary.scopeLabelKey)");
   });
 });
 
@@ -1061,7 +1093,7 @@ describe("Hero 3 — every total, variance and flag is derived", () => {
 
   it("moves the headline when a department moves", () => {
     const edited: Department[] = DEPARTMENTS.map((each) =>
-      each.name === EVENTS ? { ...each, actual: each.budget } : each,
+      each.key === EVENTS ? { ...each, actual: each.budget } : each,
     );
     const after = departmentTotals(edited);
 
@@ -1140,7 +1172,7 @@ describe("Hero 3 — every total, variance and flag is derived", () => {
     // can have reached a row.
     expect(rowNames()).toHaveLength(DEPARTMENTS.length);
     for (const name of rowNames()) {
-      expect(DEPARTMENTS.map((one) => one.name)).toContain(name);
+      expect(DEPARTMENTS.map((one) => one.key)).toContain(name);
     }
   });
 
@@ -1170,8 +1202,8 @@ describe("Hero 3 — asking twice refreshes the section in place", () => {
     expect(slots("insight-section")).toHaveLength(1);
     expect(cards()).toHaveLength(2);
     expect(cardTitles()).toEqual([
-      HERO_3_TILE_TITLES.table,
-      HERO_3_TILE_TITLES.overall,
+      t(HERO_3_TILE_TITLE_KEY.table),
+      t(HERO_3_TILE_TITLE_KEY.overall),
     ]);
     expect(slots("department-row", section())).toHaveLength(6);
     expect(slot("kpi-value", overallCard())!.textContent).toBe("CHF 69.68M");
@@ -1200,8 +1232,8 @@ describe("Hero 3 — asking twice refreshes the section in place", () => {
     );
     expect(cards()).toHaveLength(3);
     expect(cardTitles().slice(0, 2)).toEqual([
-      HERO_3_TILE_TITLES.table,
-      HERO_3_TILE_TITLES.overall,
+      t(HERO_3_TILE_TITLE_KEY.table),
+      t(HERO_3_TILE_TITLE_KEY.overall),
     ]);
     expect(slots("department-row", section())).toHaveLength(6);
   });
@@ -1239,7 +1271,7 @@ describe("Hero 3 — reduced motion shows the final state, not a frozen one", ()
 
     // Not one target bar is left stranded at zero width.
     for (const each of DEPARTMENTS) {
-      const fill = slot("department-target-fill", target(each.name))!;
+      const fill = slot("department-target-fill", target(each.key))!;
       expect(Number(fill.style.width.slice(0, -1))).toBeGreaterThan(0);
     }
     expect(
@@ -1259,10 +1291,10 @@ describe("Hero 3 — reduced motion shows the final state, not a frozen one", ()
     );
 
     expect(cardTitles()).toEqual([
-      HERO_3_TILE_TITLES.table,
-      HERO_3_TILE_TITLES.overall,
+      t(HERO_3_TILE_TITLE_KEY.table),
+      t(HERO_3_TILE_TITLE_KEY.overall),
     ]);
-    expect(rowNames()).toEqual(DEPARTMENTS.map((one) => one.name));
+    expect(rowNames()).toEqual(DEPARTMENTS.map((one) => one.key));
     expect(varianceChip(MARKETING)).toHaveAttribute(
       "data-judgement",
       VarianceJudgement.ADVERSE,
@@ -1285,10 +1317,12 @@ describe("Hero3Body — the section body, mounted directly", () => {
     settle(frames);
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-      HERO_CHIP_LABEL[HeroId.HERO_3],
+      t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]),
     );
     expect(slots("card")).toHaveLength(2);
-    expect(slot("section-narrative")).toHaveTextContent(PRIMARY.narrative);
+    expect(slot("section-narrative")).toHaveTextContent(
+      t(PRIMARY.narrativeKey),
+    );
     expect(slots("department-row")).toHaveLength(6);
   });
 
@@ -1321,7 +1355,7 @@ describe("Hero3Body — the section body, mounted directly", () => {
     expect(slots("card")).toHaveLength(2);
     expect(slot("recommendation-panel")).toBeNull();
     expect(slot("follow-up-divider")).toBeNull();
-    expect(document.body.textContent).not.toContain(FOLLOW_UP.narrative);
+    expect(document.body.textContent).not.toContain(t(FOLLOW_UP.narrativeKey));
     expect(HERO_3_CODE).not.toContain("PlaceholderFollowUp");
   });
 });

@@ -1,0 +1,288 @@
+{
+  "app": {
+    "documentTitle": "FC Basel Intelligence Platform",
+    "dashboardHeading": "Dashboard {workspace}"
+  },
+  "nav": {
+    "landmark": "Arbeitsbereich",
+    "dashboard": "Dashboard",
+    "reports": "Berichte",
+    "dataSources": "Datenquellen",
+    "settings": "Einstellungen"
+  },
+  "crest": {
+    "label": "FC Basel 1893"
+  },
+  "topBar": {
+    "connectionStatus": "Verbunden · {count} Systeme",
+    "reset": "Zurücksetzen",
+    "languageLabel": "Sprache",
+    "languageEn": "EN",
+    "languageDe": "DE"
+  },
+  "persona": {
+    "workspace": "Vertrieb & Marketing",
+    "avatarInitials": "VM",
+    "avatarLabel": "Arbeitsbereich {workspace}",
+    "greeting": {
+      "MORNING": "Guten Morgen",
+      "AFTERNOON": "Guten Tag",
+      "EVENING": "Guten Abend"
+    },
+    "greetingLine": "{greeting}, {workspace}"
+  },
+  "login": {
+    "title": "Intelligence Platform",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "hintPrefix": "Demo-Zugang:",
+    "error": "Das sind nicht die oben angezeigten Demo-Zugangsdaten."
+  },
+  "prompt": {
+    "inputLabel": "Stellen Sie eine Frage zum Club",
+    "sendLabel": "Frage senden",
+    "formLabel": "Die Intelligence-Plattform fragen",
+    "placeholder": "Fragen Sie alles zur Performance des Clubs"
+  },
+  "chips": {
+    "rowLabel": "Vorgeschlagene Fragen",
+    "followUpHint": "Nachfrage:",
+    "hero": {
+      "HERO_1": "Trikotverkäufe nach Ausführung & Sponsorenbadges",
+      "HERO_2": "Ticketeinnahmen, dieses Jahr vs. letztes Jahr",
+      "HERO_3": "Abteilungsbudgets vs. Ist-Werte"
+    },
+    "followUp": {
+      "HERO_1": "Welches Badge sollen wir als Nächstes pushen?",
+      "HERO_2": "Welche Spiele treiben den Rückgang?",
+      "HERO_3": "Warum liegt Marketing über Budget & hinter Ziel?"
+    }
+  },
+  "emptyState": {
+    "heading": "Ihr Dashboard ist bereit",
+    "subtext": "Tippen Sie unten auf eine der vorbereiteten Fragen oder stellen Sie Ihre eigene."
+  },
+  "fallback": {
+    "message": "Das kann ich zusammenstellen. Für diese Vorschau sind hier die Fragen, die ich vorbereitet habe -"
+  },
+  "thinking": {
+    "hero": {
+      "HERO_1": {
+        "message": "Abfrage von Merchandising, Webshop und Flock-Druck",
+        "sources": ["Merchandising", "Webshop", "Flock-Druck"]
+      },
+      "HERO_2": {
+        "message": "Abfrage von Ticketing und Matchday-Daten",
+        "sources": ["Ticketing", "Matchday-Daten"]
+      },
+      "HERO_3": {
+        "message": "Abfrage von Finanzen und Abteilungsbudgets",
+        "sources": ["Finanzen", "Abteilungsbudgets"]
+      }
+    },
+    "followUp": {
+      "HERO_1": {
+        "message": "Analyse der Trends bei der Badge-Auswahl",
+        "sources": ["Historie der Badge-Auswahl"]
+      },
+      "HERO_2": {
+        "message": "Aufschlüsselung der Spielperformance",
+        "sources": ["Zuschauerzahlen je Spiel"]
+      },
+      "HERO_3": {
+        "message": "Nachverfolgung von Marketingausgaben und Ergebnissen",
+        "sources": ["Marketingausgaben", "Webshop-Conversion"]
+      }
+    }
+  },
+  "band": {
+    "webshop": "Webshop-Umsatz",
+    "attendance": "Heimzuschauer",
+    "subtitle": "Ihre kommerzielle Übersicht. Stellen Sie unten eine Frage, um sie zu erweitern.",
+    "previousSeries": "Vorperiode",
+    "periodLabel": "Zeitraum für Webshop und Zuschauer",
+    "comparison": "vs. Vorperiode",
+    "homeMatchOne": "Heimspiel",
+    "homeMatchMany": "Heimspiele",
+    "of": "von",
+    "latestPrefix": "Zuletzt:"
+  },
+  "baseline": {
+    "webshop": "Webshop-Umsatz",
+    "match": "Letztes Heimspiel",
+    "topProducts": "Topprodukte",
+    "partners": "Aktive Partner",
+    "partnersActive": "{count} aktiv",
+    "comparisonPrefix": "vs.",
+    "of": "von",
+    "capacitySuffix": "der Kapazität",
+    "unitsSold": "Verkaufte Einheiten",
+    "topProductsPeriodLabel": "Zeitraum für Topprodukte"
+  },
+  "hero1": {
+    "kitsTitle": "Trikotverkäufe nach Ausführung",
+    "badgesTitle": "Gedruckte Sponsorenbadges",
+    "namesTitle": "Meistgedruckte Namen",
+    "periodLabel": "Zeitraum für Trikotverkäufe, Sponsorenbadges und gedruckte Namen",
+    "shirtsWord": "Trikots",
+    "ofUnits": "der Einheiten",
+    "ofSales": "der Trikotverkäufe",
+    "namesSubtitle": "Trikots mit gedrucktem Namen",
+    "followUpTitle": "Badge-Auswahl im Trend (letzte 3 Drops)",
+    "trendSubtitle": "Veränderung je Sponsor · sortiert nach aktueller Badge-Auswahl",
+    "scopeLabel": "Merchandising seit Saisonbeginn",
+    "narrative": {
+      "primary": "Zusammengeführt aus Merchandising, Webshop und Flock-Druck. Das Heimtrikot macht 58% der Trikotverkäufe aus; rund 8% der Trikots tragen ein Sponsorenbadge, am häufigsten Bitpanda; Shaqiri ist mit Abstand der meistgedruckte Name.",
+      "followUp": "Bitpanda führt die Badge-Auswahl bereits an, doch Sunrise wächst am schnellsten - plus 38% über die letzten drei Drops, von einer kleineren Basis aus. Empfehlung: Sunrise im nächsten Drop prominent platzieren, um diese Dynamik zu nutzen, und Bitpanda als Standardoption beibehalten."
+    }
+  },
+  "hero2": {
+    "fixturesTitle": "Matchday-Ticketeinnahmen je Spiel (CHF 000)",
+    "totalsTitle": "Ticketeinnahmen im Jahresvergleich",
+    "monthsTitle": "Ticketeinnahmen nach Monat",
+    "versus": "vs.",
+    "followUpTitle": "Spiele, die den Rückgang treiben",
+    "declineSubtitle": "Rückgang je Spiel im Jahresvergleich · nach Höhe des Rückgangs",
+    "attendanceNote": "Jedes Spiel hier verlor bei den Zuschauern, nicht beim Preis.",
+    "scopeLabel": {
+      "fixtures": "Acht umsatzstärkste Heimspiele, Matchday-Ticketeinnahmen ohne Saisonkarten-Basis",
+      "monthly": "Alle Heimspiele pro Monat, Matchday-Ticketeinnahmen ohne Saisonkarten-Basis"
+    },
+    "narrative": {
+      "primary": "Die Matchday-Ticketeinnahmen sind im Jahresvergleich insgesamt nahezu stabil (-0.6%), unterscheiden sich aber stark je Spiel: YB, Servette und St. Gallen legen zu, FCZ, Lugano und Sion verlieren. Das Spiel gegen FCZ verzeichnet den grössten Einzelrückgang, -CHF 150k.",
+      "followUp": "Vier Spiele erklären den Rückgang: FCZ (-CHF 150k), Lugano (-110k), Luzern (-70k) und Sion (-70k). In jedem Fall liegt es an geringeren Zuschauerzahlen und nicht am Preis - beim Spiel gegen FCZ wurden rund 3'200 Plätze weniger verkauft als im Vorjahr, teils wegen des Freitagabend-Anstosses, teils wegen eines reduzierten Gästekontingents. YB war dagegen in beiden Saisons ausverkauft."
+    }
+  },
+  "hero3": {
+    "tableTitle": "Abteilungsperformance (Gesamtjahr)",
+    "overallTitle": "Gesamt, Ist gegen Budget",
+    "overallSubtitle": "Ist über alle Abteilungen",
+    "budget": "Budget",
+    "actual": "Ist",
+    "blendedTarget": "Gesamtzielerreichung",
+    "aboveTarget": "Über Ziel",
+    "of": "von",
+    "followUpTitle": "Was Marketing treibt",
+    "driverSubtitle": "Mehrausgaben gegenüber Plan je Treiber · grösste zuerst",
+    "conversionPrefix": "Was dieses Geld bewirken sollte:",
+    "conversionLabel": "Webshop-Conversion",
+    "versus": "vs.",
+    "plan": "Plan",
+    "scopeLabel": "Abteilungstotale für das Gesamtjahr, Budget gegen Ist; Ticketing enthält die Saisonkarten-Basis und übersteigt daher die Summe der in Hero 2 gezeigten Spiele",
+    "narrative": {
+      "primary": "Die meisten Abteilungen liegen im Plan oder darüber. Zwei brauchen Aufmerksamkeit: Merchandising liegt 7.7% unter seinem Ertragsziel, und Marketing & Kommunikation liegt 12% über seinem Ausgabenbudget bei nur 84% Zielerreichung - die einzige Abteilung, die zugleich über Budget und hinter Ziel liegt.",
+      "followUp": "Die Mehrausgaben im Marketing konzentrieren sich auf zwei Bereiche: Die Aktivierungen zum Derby und zum YB-Spiel lagen zusammen rund CHF 240k über Plan, und die Paid-Social-Ausgaben stiegen um 18% für ein Webshop-Conversion-Ziel, das nicht erreicht wurde - die Conversion lag bei 2.2% gegenüber 2.6% im Plan. Empfehlung: die zusätzlichen Paid-Social-Ausgaben stoppen und rund CHF 150k in die Matchday-Aktivierungen umschichten, die konvertiert haben, sowie das Conversion-Ziel vor der Winterkampagne mit dem Webshop überprüfen."
+    }
+  },
+  "tiles": {
+    "recommendation": "Empfehlung",
+    "narrativeLabel": "Was das bedeutet",
+    "total": "Total",
+    "millionsNote": "Angaben in Mio. CHF",
+    "tableCaption": "Abteilungsbudget gegen Ist, {note}",
+    "flagLabel": "Über Budget und hinter Ziel",
+    "driverTotal": "Total",
+    "donutCentre": "Total",
+    "donutLabel": "Anteil am Total nach Serie",
+    "ringAverage": "Ø Zuschauer",
+    "ringCapacity": "der Kapazität",
+    "attendanceRingLabel": "Durchschnittliche Heimzuschauer gegenüber Kapazität",
+    "segmentedLabel": "Zeitraum",
+    "followUpDivider": "Nachfrage",
+    "targetMark": {
+      "HIT": "auf Ziel",
+      "NEAR": "nahe am Ziel",
+      "BEHIND": "hinter Ziel"
+    },
+    "column": {
+      "name": "Abteilung",
+      "type": "Typ",
+      "budget": "Budget",
+      "actual": "Ist",
+      "variance": "Abweichung",
+      "targetPercent": "% vom Ziel"
+    }
+  },
+  "enum": {
+    "period": {
+      "THIS_MONTH": "Dieser Monat",
+      "LAST_MONTH": "Letzter Monat",
+      "LAST_3_MONTHS": "Letzte 3 Monate",
+      "YEAR_TO_DATE": "Seit Jahresbeginn",
+      "SEASON_TO_DATE": "Seit Saisonbeginn",
+      "CURRENT_MONTH": "Aktueller Monat"
+    },
+    "week": {
+      "W1": "W1",
+      "W2": "W2",
+      "W3": "W3",
+      "W4": "W4"
+    },
+    "kit": {
+      "HOME": "Heim",
+      "AWAY": "Auswärts",
+      "THIRD": "3."
+    },
+    "season": {
+      "SEASON_25_26": "Saison 25/26",
+      "SEASON_26_27": "Saison 26/27"
+    },
+    "month": {
+      "JANUARY": "Jan",
+      "FEBRUARY": "Feb",
+      "MARCH": "Mär",
+      "APRIL": "Apr",
+      "MAY": "Mai",
+      "JUNE": "Jun",
+      "JULY": "Jul",
+      "AUGUST": "Aug",
+      "SEPTEMBER": "Sep",
+      "OCTOBER": "Okt",
+      "NOVEMBER": "Nov",
+      "DECEMBER": "Dez"
+    },
+    "departmentType": {
+      "REVENUE": "Ertrag",
+      "COST": "Kosten"
+    },
+    "varianceJudgement": {
+      "FAVOURABLE": "Positiv",
+      "ADVERSE": "Negativ",
+      "NEUTRAL": "Im Budget"
+    },
+    "varianceDirection": {
+      "UP": "gestiegen",
+      "DOWN": "gesunken",
+      "FLAT": "unverändert"
+    },
+    "partnerRole": {
+      "MAIN_SHIRT_SPONSOR": "Haupt-Trikotsponsor",
+      "KIT_MANUFACTURER": "Ausrüster",
+      "OFFICIAL_PARTNER": "Offizieller Partner",
+      "TELECOM_PARTNER": "Telekom-Partner",
+      "BEVERAGE_PARTNER": "Getränkepartner",
+      "MOBILITY_PARTNER": "Mobilitätspartner"
+    },
+    "product": {
+      "HOME_SHIRT": "Heimtrikot 26/27",
+      "HOME_SCARF": "Heimschal",
+      "AWAY_SHIRT": "Auswärtstrikot 26/27",
+      "CAP_ROTBLAU": "Cap \"Rotblau\"",
+      "THIRD_SHIRT": "3. Trikot 26/27"
+    },
+    "department": {
+      "SPONSORING_PARTNERSHIPS": "Sponsoring & Partnerschaften",
+      "TICKETING": "Ticketing",
+      "HOSPITALITY": "Hospitality",
+      "MERCHANDISING": "Merchandising (Fanshop)",
+      "EVENTS": "Events",
+      "MARKETING_COMMUNICATIONS": "Marketing & Kommunikation"
+    },
+    "spendDriver": {
+      "MATCH_ACTIVATIONS": "Matchday-Aktivierungen",
+      "PAID_SOCIAL": "Paid Social",
+      "AGENCY_RETAINER": "Agenturhonorar"
+    }
+  }
+}

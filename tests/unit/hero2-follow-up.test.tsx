@@ -54,24 +54,24 @@ import {
   hBarMax,
   hBarPercent,
 } from "../../app/components/charts/h-bars";
-import { FOLLOW_UP_CHIP_HINT } from "../../app/components/chrome/suggestion-chips";
+import { FOLLOW_UP_CHIP_HINT_KEY } from "../../app/components/chrome/suggestion-chips";
 import {
-  HERO_2_FOLLOW_UP_TITLE,
-  HERO_2_TILE_TITLES,
+  HERO_2_FOLLOW_UP_TITLE_KEY,
+  HERO_2_TILE_TITLE_KEY,
 } from "../../app/components/heroes/hero-2";
 import {
-  FOLLOW_UP_DIVIDER_LABEL,
+  FOLLOW_UP_DIVIDER_LABEL_KEY,
   tileDelayMs,
 } from "../../app/components/heroes/hero-section";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
 import {
-  DRIVER_TOTAL_LABEL,
+  DRIVER_TOTAL_LABEL_KEY,
   driverTotal,
 } from "../../app/components/tiles/driver-tile";
-import { NARRATIVE_LABEL } from "../../app/components/tiles/recommendation-panel";
+import { NARRATIVE_LABEL_KEY } from "../../app/components/tiles/recommendation-panel";
 import {
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
 } from "../../app/lib/dashboard/chips";
 import {
   InsightPhase,
@@ -102,6 +102,7 @@ import {
 } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -195,7 +196,8 @@ function panel(): HTMLElement | null {
 /** The beat's card — the driver tile, the fourth tile of this section. */
 function declineTile(): HTMLElement {
   const tile = cards().find(
-    (card) => card.querySelector("h3")?.textContent === HERO_2_FOLLOW_UP_TITLE,
+    (card) =>
+      card.querySelector("h3")?.textContent === t(HERO_2_FOLLOW_UP_TITLE_KEY),
   );
   if (!tile) throw new Error("the declining-fixtures tile is not on screen");
   return tile;
@@ -275,10 +277,10 @@ describe("Hero 2 follow-up — the section GROWS, it does not multiply", () => {
     expect(
       cards().map((card) => card.querySelector("h3")!.textContent),
     ).toEqual([
-      HERO_2_TILE_TITLES.fixtures,
-      HERO_2_TILE_TITLES.totals,
-      HERO_2_TILE_TITLES.months,
-      HERO_2_FOLLOW_UP_TITLE,
+      t(HERO_2_TILE_TITLE_KEY.fixtures),
+      t(HERO_2_TILE_TITLE_KEY.totals),
+      t(HERO_2_TILE_TITLE_KEY.months),
+      t(HERO_2_FOLLOW_UP_TITLE_KEY),
     ]);
   });
 
@@ -300,7 +302,7 @@ describe("Hero 2 follow-up — the section GROWS, it does not multiply", () => {
     expect(slots("section-head", section())).toHaveLength(1);
     expect(
       within(section()).getByRole("heading", { level: 2 }),
-    ).toHaveTextContent(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    ).toHaveTextContent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
   });
 
   it("shows nothing of the beat while the phase is still PRIMARY", () => {
@@ -309,7 +311,7 @@ describe("Hero 2 follow-up — the section GROWS, it does not multiply", () => {
     expect(divider()).toBeNull();
     expect(panel()).toBeNull();
     expect(cards()).toHaveLength(3);
-    expect(section().textContent).not.toContain(HERO_2_FOLLOW_UP_TITLE);
+    expect(section().textContent).not.toContain(t(HERO_2_FOLLOW_UP_TITLE_KEY));
   });
 
   it("continues the section's ONE cascade rather than starting a second", () => {
@@ -339,7 +341,7 @@ describe("Hero 2 follow-up — the beat opens on the SHARED divider", () => {
 
     expect(slots("follow-up-divider", section())).toHaveLength(1);
     expect(slot("follow-up-divider-label", divider()!)).toHaveTextContent(
-      FOLLOW_UP_DIVIDER_LABEL,
+      t(FOLLOW_UP_DIVIDER_LABEL_KEY),
     );
     expect(slot("follow-up-divider-rule", divider()!)!.className).toContain(
       "bg-gold",
@@ -395,7 +397,7 @@ describe("Hero 2 follow-up — four declining fixtures, ranked (criterion 2)", (
     renderSections();
 
     expect(declineTile().querySelector("h3")).toHaveTextContent(
-      HERO_2_FOLLOW_UP_TITLE,
+      t(HERO_2_FOLLOW_UP_TITLE_KEY),
     );
     expect(slot("card-subtitle", declineTile())!.textContent).toContain(
       "ranked by size of decline",
@@ -555,7 +557,9 @@ describe("Hero 2 follow-up — the `-CHF 400k total` badge (criterion 3)", () =>
     expect(badge).not.toBeNull();
     expect(slot("card-action", declineTile())).toContainElement(badge);
     expect(badge.textContent).toContain("-CHF 400k");
-    expect(slot("delta-suffix", badge)!.textContent).toBe(DRIVER_TOTAL_LABEL);
+    expect(slot("delta-suffix", badge)!.textContent).toBe(
+      t(DRIVER_TOTAL_LABEL_KEY),
+    );
     expect(badge.textContent).toContain("total");
   });
 
@@ -707,7 +711,7 @@ describe("Hero 2 follow-up — the narrative is the contract (criterion 4)", () 
 
     const rendered = narrativeBody().textContent!;
     expect(bytes(rendered)).toBe(bytes(AUTHORED));
-    expect(bytes(FOLLOW_UP.narrative)).toBe(bytes(AUTHORED));
+    expect(bytes(t(FOLLOW_UP.narrativeKey))).toBe(bytes(AUTHORED));
     expect(rendered).toBe(AUTHORED);
     expect(rendered).toHaveLength(AUTHORED.length);
   });
@@ -715,19 +719,19 @@ describe("Hero 2 follow-up — the narrative is the contract (criterion 4)", () 
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two copies inside this repository could drift together; the signed-off
     // document cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(FOLLOW_UP.narrative);
+    expect(BACKLOG).toContain(t(FOLLOW_UP.narrativeKey));
     expect(BACKLOG).toContain(AUTHORED);
   });
 
   it("is plain ASCII — no smart quote, no em dash, no minus glyph", () => {
-    for (const character of FOLLOW_UP.narrative) {
+    for (const character of t(FOLLOW_UP.narrativeKey)) {
       expect(character.codePointAt(0)!).toBeLessThan(0x80);
     }
-    expect(FOLLOW_UP.narrative).not.toMatch(/[‘’“”–—−]/u);
+    expect(t(FOLLOW_UP.narrativeKey)).not.toMatch(/[‘’“”–—−]/u);
   });
 
   it("pins every hyphen in the sentence to an ASCII 0x2d", () => {
-    const narrative = FOLLOW_UP.narrative;
+    const narrative = t(FOLLOW_UP.narrativeKey);
 
     // The four money figures, the spaced hyphen and the two compounds.
     for (const fragment of [
@@ -754,9 +758,9 @@ describe("Hero 2 follow-up — the narrative is the contract (criterion 4)", () 
   it("leaves the '3,200' COMMA exactly as authored", () => {
     // Deliberate and known: hand-authored prose uses a comma, the app's own
     // formatters use the Swiss U+2019 separator (US-011). Do not "correct" it.
-    expect(FOLLOW_UP.narrative).toContain("about 3,200 fewer seats");
-    expect(FOLLOW_UP.narrative).not.toContain("3’200");
-    expect(FOLLOW_UP.narrative).not.toContain("3'200");
+    expect(t(FOLLOW_UP.narrativeKey)).toContain("about 3,200 fewer seats");
+    expect(t(FOLLOW_UP.narrativeKey)).not.toContain("3’200");
+    expect(t(FOLLOW_UP.narrativeKey)).not.toContain("3'200");
     expect(BACKLOG).toContain("about 3,200 fewer seats");
     // The formatter still spells figures the Swiss way; the two coexist.
     expect(formatNumber(3_200)).toBe("3’200");
@@ -766,14 +770,14 @@ describe("Hero 2 follow-up — the narrative is the contract (criterion 4)", () 
     renderSections();
 
     const body = narrativeBody();
-    expect(body.textContent).toBe(FOLLOW_UP.narrative);
+    expect(body.textContent).toBe(t(FOLLOW_UP.narrativeKey));
     expect(body.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
     expect(body.querySelector("*")).toBeNull();
   });
 
   it("exists nowhere in the component layer — it is rendered FROM the dataset", () => {
     for (const source of SOURCES) {
-      expect(source.code).not.toContain(FOLLOW_UP.narrative);
+      expect(source.code).not.toContain(t(FOLLOW_UP.narrativeKey));
       for (const fragment of [
         "Four fixtures account for the decline",
         "lower attendance rather than pricing",
@@ -792,11 +796,11 @@ describe("Hero 2 follow-up — the narrative is the contract (criterion 4)", () 
     // "-CHF 150k" and "(-110k)" are the top two rows, not numbers written
     // into the sentence; the four in the list are the four in the prose.
     const [first, second] = declineValues();
-    expect(FOLLOW_UP.narrative).toContain(`FCZ (${first![1]})`);
-    expect(FOLLOW_UP.narrative).toContain("Lugano (-110k)");
+    expect(t(FOLLOW_UP.narrativeKey)).toContain(`FCZ (${first![1]})`);
+    expect(t(FOLLOW_UP.narrativeKey)).toContain("Lugano (-110k)");
     expect(second![1]).toBe(money(-110));
     for (const decline of DECLINES) {
-      expect(FOLLOW_UP.narrative).toContain(decline.opponent);
+      expect(t(FOLLOW_UP.narrativeKey)).toContain(decline.opponent);
     }
     // YB "sold out both seasons": it is the biggest riser, so it cannot be in
     // the declining list the prose contrasts it with.
@@ -809,7 +813,7 @@ describe("Hero 2 follow-up — the narrative is the contract (criterion 4)", () 
     const aside = panel()!;
     expect(aside.tagName).toBe("ASIDE");
     expect(aside).toHaveAttribute("data-variant", "narrative");
-    expect(aside).toHaveAccessibleName(NARRATIVE_LABEL);
+    expect(aside).toHaveAccessibleName(t(NARRATIVE_LABEL_KEY));
     expect(slot("recommendation-label", aside)).toHaveTextContent(
       "What this means",
     );
@@ -835,7 +839,7 @@ describe("Hero 2 follow-up — every figure comes from the dataset", () => {
       { opponent: "Sion", drop: 70 },
     ]);
     // Nothing stored: the dataset's follow-up carries a narrative and no more.
-    expect(Object.keys(FOLLOW_UP)).toEqual(["narrative"]);
+    expect(Object.keys(FOLLOW_UP)).toEqual(["narrativeKey"]);
     // And the total reconciles with the primary's own movement.
     expect(declineTotal(FIXTURES)).toBe(400);
     expect(fixtureTotals(FIXTURES).delta).toBeGreaterThan(
@@ -931,7 +935,7 @@ describe("Hero 2 follow-up — reduced motion renders the final state", () => {
 
     expect(divider()).not.toBeNull();
     expect(note()).not.toBeNull();
-    expect(narrativeBody().textContent).toBe(FOLLOW_UP.narrative);
+    expect(narrativeBody().textContent).toBe(t(FOLLOW_UP.narrativeKey));
   });
 });
 
@@ -954,9 +958,9 @@ describe("Hero 2 follow-up — asked for real, from the chip row", () => {
   }
 
   /** US-029's visually-hidden "Follow-up:" hint is part of the chip's name. */
-  const followUpChipName = `${FOLLOW_UP_CHIP_HINT} ${
-    FOLLOW_UP_CHIP_LABEL[HeroId.HERO_2]
-  }`;
+  const followUpChipName = `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(
+    FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_2],
+  )}`;
 
   function followUpChips(): HTMLElement[] {
     return screen.queryAllByRole("button", { name: followUpChipName });
@@ -971,7 +975,7 @@ describe("Hero 2 follow-up — asked for real, from the chip row", () => {
     const user = userEvent.setup();
     renderApp();
 
-    await tap(user, HERO_CHIP_LABEL[HeroId.HERO_2]);
+    await tap(user, t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
     expect(cards()).toHaveLength(3);
 
     await tap(user, followUpChipName);
@@ -994,7 +998,7 @@ describe("Hero 2 follow-up — asked for real, from the chip row", () => {
 
     // Not offered at the baseline; offered once the hero is answered.
     expect(followUpChips()).toHaveLength(0);
-    await tap(user, HERO_CHIP_LABEL[HeroId.HERO_2]);
+    await tap(user, t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
     expect(followUpChips()).not.toHaveLength(0);
 
     await tap(user, followUpChipName);
@@ -1004,7 +1008,7 @@ describe("Hero 2 follow-up — asked for real, from the chip row", () => {
     // The hero's own chip is always offered, sharpened or not.
     expect(
       screen.queryAllByRole("button", {
-        name: HERO_CHIP_LABEL[HeroId.HERO_2],
+        name: t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]),
       }),
     ).not.toHaveLength(0);
   });
@@ -1012,7 +1016,7 @@ describe("Hero 2 follow-up — asked for real, from the chip row", () => {
   it("restates neither the chip label nor a keyword set of its own", () => {
     // Criterion 1 is satisfied by NOT being reimplemented: the hero renders,
     // it does not decide whether it was asked for.
-    expect(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_2]).toBe(
+    expect(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_2])).toBe(
       "Which fixtures are driving the drop?",
     );
     for (const source of SOURCES) {

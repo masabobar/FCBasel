@@ -167,6 +167,14 @@ still returns the view to the top"), `motion.test.tsx`, `root.test.tsx`, `dead-e
 
 ### KL-4 — Borders and hairlines measure 1.10-1.24:1 and will wash out on a projector
 
+> **PARTIALLY RETIRED (2026-09-11, US-048).** The app-bar edge is no longer one of these. Review
+> asked for more of the club's red, and `top-bar`'s bottom border was the right home for it: it is
+> chrome, it spans the full width, and it was one of the faintest readings here. Re-measured on the
+> served page: **`#d3010c` on `#f1f4f9`, 2px, 5.04:1** — up from **1.12:1** on the same ground.
+> **Everything below still stands** for tile borders, chart grid, the donut track and the hairlines,
+> because `--color-border` itself was not touched — moving a token VALUE is still US-003's change,
+> not a QA story's. The reasoning below is why those remain acceptable.
+
 **What (US-044, Chrome on the served page, full script at 1920×1080):** `--color-border` **1.24:1** on
 white and **1.12:1** on the `--color-surface` canvas · `--color-line` hairlines and chart grid
 **1.13:1** · donut track **1.10:1** · the navy band's borders **1.57:1**. Text holds up — primary

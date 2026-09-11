@@ -7,8 +7,9 @@ import {
   TABULAR_NUMERALS_CLASS,
   varianceDirection,
 } from "../../lib/format";
+import { useT } from "../../lib/i18n/context";
 import {
-  VARIANCE_DIRECTION_LABEL,
+  VARIANCE_DIRECTION_LABEL_KEY,
   VarianceDirection,
   VarianceJudgement,
 } from "../../lib/repositories/enums";
@@ -151,6 +152,7 @@ export function DeltaChip({
   suffix,
   className,
 }: DeltaChipProps) {
+  const t = useT();
   const direction = varianceDirection(value);
   const Arrow = DIRECTION_ICON[direction];
 
@@ -181,7 +183,9 @@ export function DeltaChip({
       {/* The arrow is decorative, so the direction is stated in words here.
           Colour reaches no screen reader at all; this is the one carrier that
           is never lost. */}
-      <span className="sr-only">{VARIANCE_DIRECTION_LABEL[direction]}</span>
+      <span className="sr-only">
+        {t(VARIANCE_DIRECTION_LABEL_KEY[direction])}
+      </span>
     </span>
   );
 }

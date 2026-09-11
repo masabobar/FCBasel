@@ -12,6 +12,7 @@
  * and stay correct when the fixtures are replaced by a database.
  */
 
+import { type Translator } from "../i18n";
 import { DepartmentType, KitVariant, VarianceJudgement } from "./enums";
 import {
   type AttendanceSummary,
@@ -24,7 +25,9 @@ import {
   type HomeMatch,
   type KitUnits,
   type MonthlyRevenue,
+  type SeriesValues,
   type SpendDriver,
+  type TranslatableSeries,
 } from "./types";
 
 /** How the club is written in a scoreline. */
@@ -70,7 +73,7 @@ export interface SeriesTotals {
  * webshop headline figure - reading a stored total would let the number and
  * its own chart disagree.
  */
-export function seriesTotals(series: ComparisonSeries): SeriesTotals {
+export function seriesTotals(series: SeriesValues): SeriesTotals {
   const current = sum(series.current);
   const previous = sum(series.previous);
   return {
@@ -314,11 +317,37 @@ export function fixtureTotals(
   return seriesTotals(fixtureSeries(fixtures));
 }
 
-/** The monthly chart: one point per month, July to June. */
+/**
+ * The monthly chart: one point per month, July to June.
+ *
+ * IT TAKES THE TRANSLATOR, IT DOES NOT IMPORT ONE (US-049). The axis is twelve
+ * translated month names, and this module is a pure, React-free library that a
+ * test calls with plain data - so the caller injects `t` (Dependency
+ * Inversion, `.claude/rules/code-quality.md`) rather than this file reaching
+ * for a locale it has no business knowing about.
+ */
 export function monthlySeries(
   months: readonly MonthlyRevenue[],
+  t: Translator,
 ): ComparisonSeries {
-  return yearOnYear(months, (month) => month.label);
+  return yearOnYear(months, (month) => t(month.labelKey));
+}
+
+/**
+ * Resolve a fixture's KEYED axis into the display strings a chart draws.
+ *
+ * The one place `TranslatableSeries` becomes `ComparisonSeries`, so the band's
+ * chart, its legend and its tooltip cannot end up translated three ways.
+ */
+export function resolveSeries(
+  series: TranslatableSeries,
+  t: Translator,
+): ComparisonSeries {
+  return {
+    labels: series.labelKeys.map((key) => t(key)),
+    current: series.current,
+    previous: series.previous,
+  };
 }
 
 /**
@@ -329,7 +358,12 @@ export function monthlySeries(
  * highest-grossing. Each series states that in its own `scopeLabel`.
  */
 export function monthlyTotals(months: readonly MonthlyRevenue[]): SeriesTotals {
-  return seriesTotals(monthlySeries(months));
+  // The axis is irrelevant to a total, so no translator is needed: the sums
+  // read `current` and `previous` off the rows directly.
+  return seriesTotals({
+    current: months.map((month) => month.current),
+    previous: months.map((month) => month.previous),
+  });
 }
 
 /** One fixture's year-on-year loss, as a POSITIVE amount of CHF thousands. */

@@ -53,24 +53,24 @@ import {
   hBarMax,
   hBarPercent,
 } from "../../app/components/charts/h-bars";
-import { FOLLOW_UP_CHIP_HINT } from "../../app/components/chrome/suggestion-chips";
+import { FOLLOW_UP_CHIP_HINT_KEY } from "../../app/components/chrome/suggestion-chips";
 import {
-  HERO_3_FOLLOW_UP_TITLE,
-  HERO_3_TILE_TITLES,
+  HERO_3_FOLLOW_UP_TITLE_KEY,
+  HERO_3_TILE_TITLE_KEY,
 } from "../../app/components/heroes/hero-3";
 import {
-  FOLLOW_UP_DIVIDER_LABEL,
+  FOLLOW_UP_DIVIDER_LABEL_KEY,
   tileDelayMs,
 } from "../../app/components/heroes/hero-section";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
 import {
-  DRIVER_TOTAL_LABEL,
+  DRIVER_TOTAL_LABEL_KEY,
   driverTotal as driverTotalOnScreen,
 } from "../../app/components/tiles/driver-tile";
-import { RECOMMENDATION_LABEL } from "../../app/components/tiles/recommendation-panel";
+import { RECOMMENDATION_LABEL_KEY } from "../../app/components/tiles/recommendation-panel";
 import {
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
 } from "../../app/lib/dashboard/chips";
 import {
   InsightPhase,
@@ -107,6 +107,8 @@ import {
 } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
+import { DEPARTMENT_LABEL_KEY } from "../../app/lib/repositories/enums";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -217,7 +219,8 @@ function panel(): HTMLElement | null {
 /** The beat's card — the driver tile, the third tile of this section. */
 function driverTile(): HTMLElement {
   const tile = cards().find(
-    (card) => card.querySelector("h3")?.textContent === HERO_3_FOLLOW_UP_TITLE,
+    (card) =>
+      card.querySelector("h3")?.textContent === t(HERO_3_FOLLOW_UP_TITLE_KEY),
   );
   if (!tile) throw new Error("the Marketing driver tile is not on screen");
   return tile;
@@ -303,9 +306,9 @@ describe("Hero 3 follow-up — the section GROWS, it does not multiply", () => {
     renderSections();
 
     expect(cardTitles()).toEqual([
-      HERO_3_TILE_TITLES.table,
-      HERO_3_TILE_TITLES.overall,
-      HERO_3_FOLLOW_UP_TITLE,
+      t(HERO_3_TILE_TITLE_KEY.table),
+      t(HERO_3_TILE_TITLE_KEY.overall),
+      t(HERO_3_FOLLOW_UP_TITLE_KEY),
     ]);
   });
 
@@ -333,7 +336,7 @@ describe("Hero 3 follow-up — the section GROWS, it does not multiply", () => {
     expect(slots("section-head", section())).toHaveLength(1);
     expect(
       within(section()).getByRole("heading", { level: 2 }),
-    ).toHaveTextContent(HERO_CHIP_LABEL[HeroId.HERO_3]);
+    ).toHaveTextContent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
   });
 
   it("shows nothing of the beat while the phase is still PRIMARY", () => {
@@ -342,7 +345,7 @@ describe("Hero 3 follow-up — the section GROWS, it does not multiply", () => {
     expect(divider()).toBeNull();
     expect(panel()).toBeNull();
     expect(cards()).toHaveLength(2);
-    expect(section().textContent).not.toContain(HERO_3_FOLLOW_UP_TITLE);
+    expect(section().textContent).not.toContain(t(HERO_3_FOLLOW_UP_TITLE_KEY));
   });
 
   it("continues the section's ONE cascade rather than starting a second", () => {
@@ -373,7 +376,7 @@ describe("Hero 3 follow-up — the beat opens on the SHARED divider", () => {
 
     expect(slots("follow-up-divider", section())).toHaveLength(1);
     expect(slot("follow-up-divider-label", divider()!)).toHaveTextContent(
-      FOLLOW_UP_DIVIDER_LABEL,
+      t(FOLLOW_UP_DIVIDER_LABEL_KEY),
     );
     expect(slot("follow-up-divider-rule", divider()!)!.className).toContain(
       "bg-gold",
@@ -436,9 +439,9 @@ describe("Hero 3 follow-up — what is driving Marketing (criterion 2)", () => {
     renderSections();
 
     expect(driverTile().querySelector("h3")).toHaveTextContent(
-      HERO_3_FOLLOW_UP_TITLE,
+      t(HERO_3_FOLLOW_UP_TITLE_KEY),
     );
-    expect(HERO_3_FOLLOW_UP_TITLE).toBe("What's driving Marketing");
+    expect(t(HERO_3_FOLLOW_UP_TITLE_KEY)).toBe("What's driving Marketing");
     expect(slot("card-subtitle", driverTile())!.textContent).toContain(
       "biggest first",
     );
@@ -450,11 +453,13 @@ describe("Hero 3 follow-up — what is driving Marketing (criterion 2)", () => {
     // The title names Marketing because the question does; the department it
     // names is the one `departmentsNeedingAttention` picks from the figures.
     expect(
-      FLAGGED.name.startsWith(HERO_3_FOLLOW_UP_TITLE.split(" ").pop()!),
+      t(DEPARTMENT_LABEL_KEY[FLAGGED.key]).startsWith(
+        t(HERO_3_FOLLOW_UP_TITLE_KEY).split(" ").pop()!,
+      ),
     ).toBe(true);
     expect(
-      departmentsNeedingAttention(DEPARTMENTS).map((one) => one.name),
-    ).toEqual([FLAGGED.name]);
+      departmentsNeedingAttention(DEPARTMENTS).map((one) => one.key),
+    ).toEqual([FLAGGED.key]);
   });
 
   it("renders the three drivers, biggest slice of the overspend first", () => {
@@ -471,7 +476,7 @@ describe("Hero 3 follow-up — what is driving Marketing (criterion 2)", () => {
     renderSections();
 
     expect(driverValues()).toEqual(
-      DRIVERS.map((driver) => [driver.name, money(driver.amount)]),
+      DRIVERS.map((driver) => [t(driver.labelKey), money(driver.amount)]),
     );
   });
 
@@ -482,9 +487,11 @@ describe("Hero 3 follow-up — what is driving Marketing (criterion 2)", () => {
     // retainer is the third row and is what makes the arithmetic close. Both
     // are true at once, and the row must not be dropped to match the prose.
     const retainer = DRIVERS[2]!;
-    expect(FOLLOW_UP.narrative.toLowerCase()).not.toContain("retainer");
-    expect(FOLLOW_UP.narrative.toLowerCase()).not.toContain("agency");
-    expect(driverValues().map(([name]) => name)).toContain(retainer.name);
+    expect(t(FOLLOW_UP.narrativeKey).toLowerCase()).not.toContain("retainer");
+    expect(t(FOLLOW_UP.narrativeKey).toLowerCase()).not.toContain("agency");
+    expect(driverValues().map(([name]) => name)).toContain(
+      t(retainer.labelKey),
+    );
     // And the two the prose DOES name are 390 of the 410 — "concentrated".
     expect(DRIVERS[0]!.amount + DRIVERS[1]!.amount).toBe(390);
     expect(driverTotal(DRIVERS)).toBe(410);
@@ -500,7 +507,7 @@ describe("Hero 3 follow-up — what is driving Marketing (criterion 2)", () => {
     const paidSocial = driverValues()[1]!;
     expect(paidSocial[1]).toBe(money(DRIVERS[1]!.amount));
     expect(paidSocial[1]).not.toContain("18");
-    expect(FOLLOW_UP.narrative).toContain("rose 18%");
+    expect(t(FOLLOW_UP.narrativeKey)).toContain("rose 18%");
     expect(JSON.stringify(DRIVERS)).not.toContain("18");
   });
 
@@ -558,7 +565,9 @@ describe("Hero 3 follow-up — the drivers explain the WHOLE overspend", () => {
     expect(slot("card-action", driverTile())).toContainElement(badge);
     expect(badge.textContent).toContain(signedMoney(driverTotal(DRIVERS)));
     expect(badge.textContent).toContain("+CHF 410k");
-    expect(slot("delta-suffix", badge)!.textContent).toBe(DRIVER_TOTAL_LABEL);
+    expect(slot("delta-suffix", badge)!.textContent).toBe(
+      t(DRIVER_TOTAL_LABEL_KEY),
+    );
   });
 
   /**
@@ -598,7 +607,10 @@ describe("Hero 3 follow-up — the drivers explain the WHOLE overspend", () => {
     expect(totalBadge()!.textContent).toContain(money(total));
     expect(
       driverTotalOnScreen(
-        DRIVERS.map((driver) => ({ name: driver.name, value: driver.amount })),
+        DRIVERS.map((driver) => ({
+          name: t(driver.labelKey),
+          value: driver.amount,
+        })),
       ),
     ).toBe(total);
   });
@@ -609,9 +621,9 @@ describe("Hero 3 follow-up — the drivers explain the WHOLE overspend", () => {
     // The proof it is not a literal: move a driver and the badge follows.
     const edited = DRIVERS.map((driver, index) =>
       index === 0
-        ? { name: driver.name, value: 40 }
+        ? { name: t(driver.labelKey), value: 40 }
         : {
-            name: driver.name,
+            name: t(driver.labelKey),
             value: driver.amount,
           },
     );
@@ -644,13 +656,13 @@ describe("Hero 3 follow-up — the drivers explain the WHOLE overspend", () => {
     // Turn the cost centre into a revenue department and the same +410 becomes
     // FAVOURABLE — the badge follows the data, with no component edit.
     const asRevenue = DEPARTMENTS.map((department) =>
-      department.name === FLAGGED.name
+      department.key === FLAGGED.key
         ? { ...department, type: "REVENUE" as const }
         : department,
     );
 
     const flagged = departmentsNeedingAttention(asRevenue)[0]!;
-    expect(flagged.name).toBe(FLAGGED.name);
+    expect(flagged.key).toBe(FLAGGED.key);
     expect(flagged.judgement).toBe(VarianceJudgement.FAVOURABLE);
   });
 });
@@ -734,7 +746,7 @@ describe("Hero 3 follow-up — the advice is NOT a data tile (criterion 2)", () 
     const aside = panel()!;
     expect(aside.tagName).toBe("ASIDE");
     expect(aside).toHaveAttribute("data-variant", "recommendation");
-    expect(aside).toHaveAccessibleName(RECOMMENDATION_LABEL);
+    expect(aside).toHaveAccessibleName(t(RECOMMENDATION_LABEL_KEY));
     // Not counted among the tiles, and it carries no tile heading.
     expect(cards()).not.toContain(aside);
     expect(aside.querySelector("h3")).toBeNull();
@@ -759,9 +771,9 @@ describe("Hero 3 follow-up — the advice is NOT a data tile (criterion 2)", () 
     renderSections();
 
     expect(slot("recommendation-label", panel()!)).toHaveTextContent(
-      RECOMMENDATION_LABEL,
+      t(RECOMMENDATION_LABEL_KEY),
     );
-    expect(RECOMMENDATION_LABEL).toBe("Recommendation");
+    expect(t(RECOMMENDATION_LABEL_KEY)).toBe("Recommendation");
     // The GOLD variant, because this copy ends in an explicit recommendation —
     // unlike Hero 2's beat, which interprets and is navy.
     expect(panel()!.className).toContain("bg-gold/10");
@@ -815,7 +827,7 @@ describe("Hero 3 follow-up — the narrative is the contract (criterion 3)", () 
 
     const rendered = narrativeBody().textContent!;
     expect(bytes(rendered)).toBe(bytes(AUTHORED));
-    expect(bytes(FOLLOW_UP.narrative)).toBe(bytes(AUTHORED));
+    expect(bytes(t(FOLLOW_UP.narrativeKey))).toBe(bytes(AUTHORED));
     expect(rendered).toBe(AUTHORED);
     expect(rendered).toHaveLength(AUTHORED.length);
     expect(rendered).toHaveLength(468);
@@ -824,28 +836,28 @@ describe("Hero 3 follow-up — the narrative is the contract (criterion 3)", () 
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two copies inside this repository could drift together; the signed-off
     // document cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(FOLLOW_UP.narrative);
+    expect(BACKLOG).toContain(t(FOLLOW_UP.narrativeKey));
     expect(BACKLOG).toContain(AUTHORED);
   });
 
   it("is plain ASCII — no smart quote, no em dash, no minus glyph", () => {
-    for (const character of FOLLOW_UP.narrative) {
+    for (const character of t(FOLLOW_UP.narrativeKey)) {
       expect(character.codePointAt(0)!).toBeLessThan(0x80);
     }
-    expect(FOLLOW_UP.narrative).not.toMatch(/[‘’“”–—−]/u);
+    expect(t(FOLLOW_UP.narrativeKey)).not.toMatch(/[‘’“”–—−]/u);
   });
 
   it('pins the apostrophe in "Marketing\'s" to an ASCII 0x27', () => {
-    const index = FOLLOW_UP.narrative.indexOf("Marketing's");
+    const index = t(FOLLOW_UP.narrativeKey).indexOf("Marketing's");
     expect(index).toBe(0);
-    expect(FOLLOW_UP.narrative.codePointAt(index + "Marketing".length)).toBe(
-      0x27,
-    );
-    expect(FOLLOW_UP.narrative.split("'")).toHaveLength(2);
+    expect(
+      t(FOLLOW_UP.narrativeKey).codePointAt(index + "Marketing".length),
+    ).toBe(0x27);
+    expect(t(FOLLOW_UP.narrativeKey).split("'")).toHaveLength(2);
   });
 
   it("pins every hyphen in the sentence to an ASCII 0x2d", () => {
-    const narrative = FOLLOW_UP.narrative;
+    const narrative = t(FOLLOW_UP.narrativeKey);
 
     // The two compounds and the spaced hyphen before the conversion clause.
     for (const fragment of [
@@ -873,14 +885,14 @@ describe("Hero 3 follow-up — the narrative is the contract (criterion 3)", () 
     renderSections();
 
     const body = narrativeBody();
-    expect(body.textContent).toBe(FOLLOW_UP.narrative);
+    expect(body.textContent).toBe(t(FOLLOW_UP.narrativeKey));
     expect(body.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
     expect(body.querySelector("*")).toBeNull();
   });
 
   it("exists nowhere in the component layer — it is rendered FROM the dataset", () => {
     for (const source of SOURCES) {
-      expect(source.code).not.toContain(FOLLOW_UP.narrative);
+      expect(source.code).not.toContain(t(FOLLOW_UP.narrativeKey));
       for (const fragment of [
         "overspend is concentrated",
         "match activations ran about",
@@ -900,9 +912,13 @@ describe("Hero 3 follow-up — the narrative is the contract (criterion 3)", () 
     // The CHF 240k, the CHF 150k and the two conversion percentages in the
     // prose are the figures on the tile, not numbers written into a sentence.
     const [activations, paidSocial] = driverValues();
-    expect(FOLLOW_UP.narrative).toContain(`about ${activations![1]} over plan`);
-    expect(FOLLOW_UP.narrative).toContain(`about ${paidSocial![1]} to the`);
-    expect(FOLLOW_UP.narrative).toContain(
+    expect(t(FOLLOW_UP.narrativeKey)).toContain(
+      `about ${activations![1]} over plan`,
+    );
+    expect(t(FOLLOW_UP.narrativeKey)).toContain(
+      `about ${paidSocial![1]} to the`,
+    );
+    expect(t(FOLLOW_UP.narrativeKey)).toContain(
       `landed at ${formatPercent(CONVERSION.actualPercent)} against a ` +
         `${formatPercent(CONVERSION.planPercent)} plan`,
     );
@@ -916,7 +932,7 @@ describe("Hero 3 follow-up — every figure comes from the dataset", () => {
     expect(Object.keys(FOLLOW_UP)).toEqual([
       "drivers",
       "conversion",
-      "narrative",
+      "narrativeKey",
     ]);
     expect(DRIVERS.map((driver) => driver.amount)).toEqual([240, 150, 20]);
     expect(CONVERSION).toEqual({ actualPercent: 2.2, planPercent: 2.6 });
@@ -962,7 +978,7 @@ describe("Hero 3 follow-up — every figure comes from the dataset", () => {
   it("names no driver in code — the row labels are the dataset's own", () => {
     for (const driver of DRIVERS) {
       for (const source of SOURCES) {
-        expect(source.code).not.toContain(driver.name);
+        expect(source.code).not.toContain(t(driver.labelKey));
       }
     }
   });
@@ -987,7 +1003,7 @@ describe("Hero 3 follow-up — reduced motion renders the final state", () => {
     renderSections(SHARPENED, { settled: false });
 
     expect(driverValues()).toEqual(
-      DRIVERS.map((driver) => [driver.name, money(driver.amount)]),
+      DRIVERS.map((driver) => [t(driver.labelKey), money(driver.amount)]),
     );
   });
 
@@ -1015,7 +1031,7 @@ describe("Hero 3 follow-up — reduced motion renders the final state", () => {
     expect(conversionFigures()!.textContent).toContain(
       formatPercent(CONVERSION.actualPercent),
     );
-    expect(narrativeBody().textContent).toBe(FOLLOW_UP.narrative);
+    expect(narrativeBody().textContent).toBe(t(FOLLOW_UP.narrativeKey));
   });
 });
 
@@ -1038,7 +1054,7 @@ function renderApp() {
 
 /** US-029's visually-hidden "Follow-up:" hint is part of the chip's name. */
 function followUpChipName(heroId: HeroId): string {
-  return `${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[heroId]}`;
+  return `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[heroId])}`;
 }
 
 async function tap(user: UserEvent, label: string) {
@@ -1051,7 +1067,7 @@ describe("Hero 3 follow-up — asked for real, from the chip row", () => {
     const user = userEvent.setup();
     renderApp();
 
-    await tap(user, HERO_CHIP_LABEL[HeroId.HERO_3]);
+    await tap(user, t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
     expect(cards()).toHaveLength(2);
 
     await tap(user, followUpChipName(HeroId.HERO_3));
@@ -1078,7 +1094,7 @@ describe("Hero 3 follow-up — asked for real, from the chip row", () => {
       });
 
     expect(chips()).toHaveLength(0);
-    await tap(user, HERO_CHIP_LABEL[HeroId.HERO_3]);
+    await tap(user, t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
     expect(chips()).not.toHaveLength(0);
 
     await tap(user, followUpChipName(HeroId.HERO_3));
@@ -1087,7 +1103,7 @@ describe("Hero 3 follow-up — asked for real, from the chip row", () => {
     expect(chips()).toHaveLength(0);
     expect(
       screen.queryAllByRole("button", {
-        name: HERO_CHIP_LABEL[HeroId.HERO_3],
+        name: t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]),
       }),
     ).not.toHaveLength(0);
   });
@@ -1095,7 +1111,7 @@ describe("Hero 3 follow-up — asked for real, from the chip row", () => {
   it("restates neither the chip label nor a keyword set of its own", () => {
     // Criterion 1 is satisfied by NOT being reimplemented: the hero renders,
     // it does not decide whether it was asked for.
-    expect(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_3]).toBe(
+    expect(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_3])).toBe(
       "Why is Marketing over budget & behind target?",
     );
     for (const source of SOURCES) {
@@ -1124,7 +1140,7 @@ describe("the demo script — three heroes, three follow-ups, one session", () =
       expect(slots("insight-section")).toHaveLength(0);
 
       for (const heroId of HERO_IDS) {
-        await tap(user, HERO_CHIP_LABEL[heroId]);
+        await tap(user, t(HERO_CHIP_LABEL_KEY[heroId]));
         await tap(user, followUpChipName(heroId));
       }
 
@@ -1142,8 +1158,12 @@ describe("the demo script — three heroes, three follow-ups, one session", () =
 
       // Every narrative on screen, primary and beat, all six verbatim.
       for (const hero of [HEROES.hero1, HEROES.hero2, HEROES.hero3]) {
-        expect(document.body.textContent).toContain(hero.primary.narrative);
-        expect(document.body.textContent).toContain(hero.followUp.narrative);
+        expect(document.body.textContent).toContain(
+          t(hero.primary.narrativeKey),
+        );
+        expect(document.body.textContent).toContain(
+          t(hero.followUp.narrativeKey),
+        );
       }
 
       // NOT ONE STAND-IN ANYWHERE, which is what closes Phase 3b.
@@ -1163,7 +1183,7 @@ describe("the demo script — three heroes, three follow-ups, one session", () =
       renderApp();
 
       for (const heroId of HERO_IDS) {
-        await tap(user, HERO_CHIP_LABEL[heroId]);
+        await tap(user, t(HERO_CHIP_LABEL_KEY[heroId]));
         await tap(user, followUpChipName(heroId));
       }
 
@@ -1214,9 +1234,9 @@ describe("Hero 3 follow-up — composition, not invention", () => {
       /salary|salaries|wage|bonus|headcount|fte\b|employee|payroll/i,
     );
     for (const [name] of driverValues()) {
-      expect(DRIVERS.map((driver) => driver.name)).toContain(name);
+      expect(DRIVERS.map((driver) => t(driver.labelKey))).toContain(name);
     }
-    expect(FOLLOW_UP.narrative).not.toMatch(
+    expect(t(FOLLOW_UP.narrativeKey)).not.toMatch(
       /salary|salaries|wage|bonus|headcount|payroll/i,
     );
   });

@@ -25,18 +25,18 @@ import { resolve } from "node:path";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
+import { PROMPT_INPUT_LABEL_KEY } from "../../app/components/chrome/prompt-bar";
 import {
   CHIP_KIND_CLASS,
-  CHIP_ROW_LABEL,
-  FOLLOW_UP_CHIP_HINT,
+  CHIP_ROW_LABEL_KEY,
+  FOLLOW_UP_CHIP_HINT_KEY,
   SuggestionChips,
 } from "../../app/components/chrome/suggestion-chips";
 import { CHIP_SURFACE_CLASS } from "../../app/components/controls/segmented";
 import {
   ChipKind,
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
   HERO_CHIPS,
   suggestionChips,
   type SuggestionChip,
@@ -53,6 +53,7 @@ import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
 
 /**
  * The component's source with comments stripped. Several checks below are about
@@ -100,7 +101,7 @@ function chipsOfKind(kind: string): HTMLButtonElement[] {
 }
 
 function heroLabels(): string[] {
-  return HERO_IDS.map((heroId) => HERO_CHIP_LABEL[heroId]);
+  return HERO_IDS.map((heroId) => t(HERO_CHIP_LABEL_KEY[heroId]));
 }
 
 function renderRow(chips: readonly SuggestionChip[], onSelect = vi.fn()) {
@@ -125,7 +126,7 @@ describe("SuggestionChips — the row", () => {
     // is checked as the tail of the button's content rather than the whole.
     expect(chipTexts().slice(0, 3)).toEqual(heroLabels());
     expect(chipTexts()[3]).toBe(
-      `${FOLLOW_UP_CHIP_HINT}${FOLLOW_UP_CHIP_LABEL[HeroId.HERO_3]}`,
+      `${t(FOLLOW_UP_CHIP_HINT_KEY)}${t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_3])}`,
     );
 
     for (const chip of chipButtons()) {
@@ -139,14 +140,14 @@ describe("SuggestionChips — the row", () => {
     renderRow(HERO_CHIPS);
 
     expect(
-      screen.getByRole("group", { name: CHIP_ROW_LABEL }),
+      screen.getByRole("group", { name: t(CHIP_ROW_LABEL_KEY) }),
     ).toBeInTheDocument();
   });
 
   it("wraps rather than overflowing, because a label is never clipped", () => {
     renderRow(suggestionChips(withHeroShown(NO_SECTIONS, HeroId.HERO_3)));
 
-    const row = screen.getByRole("group", { name: CHIP_ROW_LABEL });
+    const row = screen.getByRole("group", { name: t(CHIP_ROW_LABEL_KEY) });
     expect(row).toHaveClass("flex-wrap");
     // A nowrap chip wider than a 390px viewport would push the row past the
     // shell, which clips sideways overflow — the label's end would be lost.
@@ -158,7 +159,7 @@ describe("SuggestionChips — the row", () => {
 
     expect(chipButtons()).toHaveLength(0);
     expect(
-      screen.queryByRole("group", { name: CHIP_ROW_LABEL }),
+      screen.queryByRole("group", { name: t(CHIP_ROW_LABEL_KEY) }),
     ).not.toBeInTheDocument();
   });
 });
@@ -176,7 +177,7 @@ describe("SuggestionChips — a tap hands back the chip, not its text", () => {
     expect(onSelect).toHaveBeenCalledWith({
       heroId: HeroId.HERO_2,
       kind: ChipKind.HERO,
-      label: HERO_CHIP_LABEL[HeroId.HERO_2],
+      labelKey: HERO_CHIP_LABEL_KEY[HeroId.HERO_2],
     });
   });
 
@@ -190,7 +191,7 @@ describe("SuggestionChips — a tap hands back the chip, not its text", () => {
     expect(onSelect).toHaveBeenCalledWith({
       heroId: HeroId.HERO_1,
       kind: ChipKind.FOLLOW_UP,
-      label: FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1],
+      labelKey: FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1],
     });
   });
 
@@ -232,7 +233,7 @@ describe("SuggestionChips — accessibility", () => {
     const followUp = chipsOfKind(ChipKind.FOLLOW_UP)[0]!;
 
     expect(followUp.querySelector(".sr-only")?.textContent).toBe(
-      FOLLOW_UP_CHIP_HINT,
+      t(FOLLOW_UP_CHIP_HINT_KEY),
     );
     // Plus the trend glyph the reference build gives it, decorative because
     // the hidden text already carries the meaning.
@@ -242,7 +243,7 @@ describe("SuggestionChips — accessibility", () => {
     );
     expect(
       screen.getByRole("button", {
-        name: `${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[HeroId.HERO_2]}`,
+        name: `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_2])}`,
       }),
     ).toBe(followUp);
   });
@@ -430,10 +431,10 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
 
     expect(chipTexts()).toEqual(heroLabels());
     expect(document.querySelector('[data-slot="prompt-bar"]')).toContainElement(
-      screen.getByRole("group", { name: CHIP_ROW_LABEL }),
+      screen.getByRole("group", { name: t(CHIP_ROW_LABEL_KEY) }),
     );
     // Above the field, which is the row US-028 left for them.
-    const row = screen.getByRole("group", { name: CHIP_ROW_LABEL });
+    const row = screen.getByRole("group", { name: t(CHIP_ROW_LABEL_KEY) });
     const form = document.querySelector('[data-slot="prompt-form"]')!;
     expect(
       row.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -448,7 +449,7 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
     expect(sectionCount()).toBe(1);
     // The typed field is untouched: a chip is not a submitted question.
     expect(
-      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) }),
     ).toHaveValue("");
   });
 
@@ -459,14 +460,18 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
 
     expect(chipButtons()).toHaveLength(4);
     expect(chipsOfKind(ChipKind.HERO)).toHaveLength(3);
-    expect(chipTexts()[3]).toContain(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]);
+    expect(chipTexts()[3]).toContain(
+      t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]),
+    );
   });
 
   it("removes the follow-up chip once that follow-up has been shown", async () => {
     renderApp();
 
     await tap(heroLabels()[0]!);
-    await tap(`${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]}`);
+    await tap(
+      `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1])}`,
+    );
 
     expect(chipTexts()).toEqual(heroLabels());
     // The answer was sharpened in place, not appended: one section, phase
@@ -481,10 +486,12 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
     renderApp();
 
     for (const heroId of HERO_IDS) {
-      await tap(HERO_CHIP_LABEL[heroId]);
+      await tap(t(HERO_CHIP_LABEL_KEY[heroId]));
       expect(chipTexts().slice(0, 3)).toEqual(heroLabels());
 
-      await tap(`${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[heroId]}`);
+      await tap(
+        `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[heroId])}`,
+      );
       expect(chipTexts().slice(0, 3)).toEqual(heroLabels());
     }
 
@@ -515,7 +522,9 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
     renderApp();
 
     await tap(heroLabels()[2]!);
-    await tap(`${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[HeroId.HERO_3]}`);
+    await tap(
+      `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_3])}`,
+    );
     await tap(heroLabels()[1]!);
 
     await tap("Reset");

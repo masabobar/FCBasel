@@ -7,6 +7,8 @@ import {
   type SuggestionChip,
   type SuggestionChips as SuggestionChipList,
 } from "../../lib/dashboard/chips";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { CHIP_SURFACE_CLASS } from "../controls/segmented";
 
 /**
@@ -61,13 +63,13 @@ import { CHIP_SURFACE_CLASS } from "../controls/segmented";
 /* ------------------------------------------------------------- STRINGS -- */
 
 /** The row's accessible name, so the chips are reachable as a group. */
-export const CHIP_ROW_LABEL = "Suggested questions";
+export const CHIP_ROW_LABEL_KEY: TranslationKey = "chips.rowLabel";
 
 /**
  * Prefixed into a follow-up chip's accessible name, visually hidden. It is what
  * the gold tint and the trend glyph say to everyone else.
  */
-export const FOLLOW_UP_CHIP_HINT = "Follow-up:";
+export const FOLLOW_UP_CHIP_HINT_KEY: TranslationKey = "chips.followUpHint";
 
 /* ------------------------------------------------------------ VARIANTS -- */
 
@@ -113,6 +115,8 @@ export function SuggestionChips({
   onSelect,
   className,
 }: SuggestionChipsProps) {
+  const t = useT();
+
   // No chips is not a state this product reaches — the three hero chips are
   // always derived — but an empty row must not leave an empty group in the
   // accessibility tree if it ever is.
@@ -122,7 +126,7 @@ export function SuggestionChips({
     <div
       data-slot="suggestion-chips"
       role="group"
-      aria-label={CHIP_ROW_LABEL}
+      aria-label={t(CHIP_ROW_LABEL_KEY)}
       className={cn("flex flex-wrap gap-2", className)}
     >
       {chips.map((chip) => (
@@ -145,10 +149,10 @@ export function SuggestionChips({
                 aria-hidden="true"
                 className="shrink-0"
               />
-              <span className="sr-only">{FOLLOW_UP_CHIP_HINT}</span>
+              <span className="sr-only">{t(FOLLOW_UP_CHIP_HINT_KEY)}</span>
             </>
           )}
-          {chip.label}
+          {t(chip.labelKey)}
         </button>
       ))}
     </div>

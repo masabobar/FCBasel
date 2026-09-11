@@ -27,17 +27,22 @@
  *   - No salary and no named-individual performance data appears in this file.
  */
 
+import { type TranslationKey } from "../i18n";
 import {
   type Clock,
   monthsElapsedThisYear,
-  recentMonthLabels,
+  recentMonthKeys,
   systemClock,
 } from "../calendar";
 import {
-  PARTNER_ROLE_LABEL,
-  PERIOD_LABEL,
+  MONTH_LABEL_KEY,
+  PARTNER_ROLE_LABEL_KEY,
+  PERIOD_LABEL_KEY,
   PartnerRole,
   PeriodKey,
+  ProductKey,
+  WEEK_KEYS,
+  WEEK_LABEL_KEY,
 } from "../repositories/enums";
 import {
   type BaselinePeriod,
@@ -67,8 +72,15 @@ type BaselinePeriodKey = (typeof BASELINE_PERIOD_KEYS)[number];
 /** St. Jakob-Park usable capacity, quoted in the UI as "~38,000". */
 const HOME_CAPACITY = 38_000;
 
-/** Weekly x-axis for the two single-month periods. */
-const WEEK_LABELS = ["W1", "W2", "W3", "W4"];
+/** Weekly x-axis for the two single-month periods, as translation keys. */
+const WEEK_LABEL_KEYS: readonly TranslationKey[] = WEEK_KEYS.map(
+  (week) => WEEK_LABEL_KEY[week],
+);
+
+/** The rolling month axis, as translation keys - see `../calendar.ts`. */
+function recentMonthLabelKeys(now: Date, count: number): TranslationKey[] {
+  return recentMonthKeys(now, count).map((month) => MONTH_LABEL_KEY[month]);
+}
 
 /** Webshop revenue in CHF, by week. Written once, referenced twice. */
 const THIS_MONTH_WEEKLY = [38_200, 41_600, 33_900, 34_500];
@@ -127,9 +139,9 @@ function buildPeriods(now: Date): BaselinePeriod[] {
   return [
     {
       key: PeriodKey.THIS_MONTH,
-      label: PERIOD_LABEL[PeriodKey.THIS_MONTH],
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.THIS_MONTH],
       webshop: {
-        labels: WEEK_LABELS,
+        labelKeys: WEEK_LABEL_KEYS,
         current: THIS_MONTH_WEEKLY,
         previous: LAST_MONTH_WEEKLY,
       },
@@ -142,9 +154,9 @@ function buildPeriods(now: Date): BaselinePeriod[] {
     },
     {
       key: PeriodKey.LAST_MONTH,
-      label: PERIOD_LABEL[PeriodKey.LAST_MONTH],
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.LAST_MONTH],
       webshop: {
-        labels: WEEK_LABELS,
+        labelKeys: WEEK_LABEL_KEYS,
         current: LAST_MONTH_WEEKLY,
         previous: MONTH_BEFORE_LAST_WEEKLY,
       },
@@ -157,9 +169,12 @@ function buildPeriods(now: Date): BaselinePeriod[] {
     },
     {
       key: PeriodKey.LAST_3_MONTHS,
-      label: PERIOD_LABEL[PeriodKey.LAST_3_MONTHS],
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.LAST_3_MONTHS],
       webshop: {
-        labels: recentMonthLabels(now, QUARTER_END_MONTH - QUARTER_START_MONTH),
+        labelKeys: recentMonthLabelKeys(
+          now,
+          QUARTER_END_MONTH - QUARTER_START_MONTH,
+        ),
         current: MONTHLY_CURRENT.slice(QUARTER_START_MONTH, QUARTER_END_MONTH),
         previous: MONTHLY_PREVIOUS.slice(
           QUARTER_START_MONTH,
@@ -175,9 +190,9 @@ function buildPeriods(now: Date): BaselinePeriod[] {
     },
     {
       key: PeriodKey.YEAR_TO_DATE,
-      label: PERIOD_LABEL[PeriodKey.YEAR_TO_DATE],
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.YEAR_TO_DATE],
       webshop: {
-        labels: recentMonthLabels(now, monthsSoFar),
+        labelKeys: recentMonthLabelKeys(now, monthsSoFar),
         current: MONTHLY_CURRENT.slice(0, monthsSoFar),
         previous: MONTHLY_PREVIOUS.slice(0, monthsSoFar),
       },
@@ -206,29 +221,17 @@ const LAST_HOME_MATCH: HomeMatch = {
 /* --------------------------------------------------------- TOP PRODUCTS -- */
 
 /**
- * Product names are verbatim from the Reference Guide, inner quotes included:
- * the cap is marketed as `Cap "Rotblau"` and the quotes are part of the name.
- */
-const PRODUCT = {
-  HOME_SHIRT: "Home shirt 26/27",
-  HOME_SCARF: "Home scarf",
-  AWAY_SHIRT: "Away shirt 26/27",
-  CAP_ROTBLAU: 'Cap "Rotblau"',
-  THIRD_SHIRT: "3rd shirt 26/27",
-} as const;
-
-/**
  * Units sold per product per period, ordered best-selling first as the table
  * renders them. Keying units by period rather than by array position keeps a
  * product and its numbers on one line - and makes a misaligned column
  * impossible.
  */
 const PRODUCT_SALES: readonly {
-  product: string;
+  product: ProductKey;
   units: Record<BaselinePeriodKey, number>;
 }[] = [
   {
-    product: PRODUCT.HOME_SHIRT,
+    product: ProductKey.HOME_SHIRT,
     units: {
       THIS_MONTH: 1_840,
       LAST_MONTH: 1_620,
@@ -237,7 +240,7 @@ const PRODUCT_SALES: readonly {
     },
   },
   {
-    product: PRODUCT.HOME_SCARF,
+    product: ProductKey.HOME_SCARF,
     units: {
       THIS_MONTH: 1_210,
       LAST_MONTH: 1_450,
@@ -246,7 +249,7 @@ const PRODUCT_SALES: readonly {
     },
   },
   {
-    product: PRODUCT.AWAY_SHIRT,
+    product: ProductKey.AWAY_SHIRT,
     units: {
       THIS_MONTH: 940,
       LAST_MONTH: 880,
@@ -255,7 +258,7 @@ const PRODUCT_SALES: readonly {
     },
   },
   {
-    product: PRODUCT.CAP_ROTBLAU,
+    product: ProductKey.CAP_ROTBLAU,
     units: {
       THIS_MONTH: 720,
       LAST_MONTH: 690,
@@ -264,7 +267,7 @@ const PRODUCT_SALES: readonly {
     },
   },
   {
-    product: PRODUCT.THIRD_SHIRT,
+    product: ProductKey.THIRD_SHIRT,
     units: {
       THIS_MONTH: 510,
       LAST_MONTH: 470,
@@ -277,7 +280,7 @@ const PRODUCT_SALES: readonly {
 const TOP_PRODUCT_PERIODS: readonly TopProductsPeriod[] =
   BASELINE_PERIOD_KEYS.map((key) => ({
     key,
-    label: PERIOD_LABEL[key],
+    labelKey: PERIOD_LABEL_KEY[key],
     rows: PRODUCT_SALES.map((sales) => ({
       product: sales.product,
       units: sales.units[key],
@@ -306,31 +309,31 @@ const PARTNERS: readonly Partner[] = [
   {
     name: "Bitpanda",
     role: PartnerRole.MAIN_SHIRT_SPONSOR,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.MAIN_SHIRT_SPONSOR],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.MAIN_SHIRT_SPONSOR],
     brandColor: "#0A9D8E",
   },
   {
     name: "Macron",
     role: PartnerRole.KIT_MANUFACTURER,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.KIT_MANUFACTURER],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.KIT_MANUFACTURER],
     brandColor: "#D3010C",
   },
   {
     name: "Allianz",
     role: PartnerRole.OFFICIAL_PARTNER,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.OFFICIAL_PARTNER],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.OFFICIAL_PARTNER],
     brandColor: "#004093",
   },
   {
     name: "Sunrise",
     role: PartnerRole.TELECOM_PARTNER,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.TELECOM_PARTNER],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.TELECOM_PARTNER],
     brandColor: "#E4002B",
   },
   {
     name: "Feldschlösschen",
     role: PartnerRole.BEVERAGE_PARTNER,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.BEVERAGE_PARTNER],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.BEVERAGE_PARTNER],
     brandColor: "#B8960B",
   },
   {
@@ -338,7 +341,7 @@ const PARTNERS: readonly Partner[] = [
     // Reference Guide shortens it to "Hoffmann" so the tile does not truncate.
     name: "Hoffmann",
     role: PartnerRole.MOBILITY_PARTNER,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.MOBILITY_PARTNER],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.MOBILITY_PARTNER],
     brandColor: "#0E2356",
   },
 ];

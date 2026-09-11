@@ -42,10 +42,10 @@ import {
 } from "../../app/components/charts/grouped-bars";
 import {
   Hero2Body,
-  HERO_2_TILE_TITLES,
+  HERO_2_TILE_TITLE_KEY,
 } from "../../app/components/heroes/hero-2";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
-import { HERO_CHIP_LABEL } from "../../app/lib/dashboard/chips";
+import { HERO_CHIP_LABEL_KEY } from "../../app/lib/dashboard/chips";
 import {
   InsightPhase,
   type InsightSections as SectionList,
@@ -80,6 +80,7 @@ import {
   stubMatchMedia,
   type FrameStub,
 } from "./support/motion-harness";
+import { t } from "./support/i18n";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -312,21 +313,23 @@ describe("Hero 2 — the head states the question and its answer", () => {
     renderSections();
 
     const heading = within(section()).getByRole("heading", { level: 2 });
-    expect(heading).toHaveTextContent(HERO_CHIP_LABEL[HeroId.HERO_2]);
-    expect(HERO_CHIP_LABEL[HeroId.HERO_2]).toBe(
+    expect(heading).toHaveTextContent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
+    expect(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2])).toBe(
       "Ticket revenue, this year vs last",
     );
     // Imported, never retyped — one string for the chip and the heading it
     // answers.
     expect(code("app/components/heroes/hero-2.tsx")).toContain(
-      "HERO_CHIP_LABEL[HeroId.HERO_2]",
+      "t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2])",
     );
   });
 
   it("labels the section by that heading, so the canvas stays walkable", () => {
     renderSections();
 
-    expect(section()).toHaveAccessibleName(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    expect(section()).toHaveAccessibleName(
+      t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]),
+    );
   });
 
   it("states the narrative BEFORE any chart or tile", () => {
@@ -393,7 +396,7 @@ describe("Hero 2 — the narrative is the contract (criterion 4)", () => {
 
     const rendered = slot("section-narrative", section())!.textContent!;
     expect(bytes(rendered)).toBe(bytes(AUTHORED));
-    expect(bytes(PRIMARY.narrative)).toBe(bytes(AUTHORED));
+    expect(bytes(t(PRIMARY.narrativeKey))).toBe(bytes(AUTHORED));
     expect(rendered).toHaveLength(AUTHORED.length);
     expect(AUTHORED).toHaveLength(229);
   });
@@ -401,25 +404,25 @@ describe("Hero 2 — the narrative is the contract (criterion 4)", () => {
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two copies inside this repository could drift together; the signed-off
     // document cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(PRIMARY.narrative);
+    expect(BACKLOG).toContain(t(PRIMARY.narrativeKey));
   });
 
   it("is plain ASCII — no smart quote, no em dash, no minus glyph", () => {
-    for (const character of PRIMARY.narrative) {
+    for (const character of t(PRIMARY.narrativeKey)) {
       expect(character.codePointAt(0)!).toBeLessThan(0x80);
     }
-    expect(PRIMARY.narrative).not.toMatch(/[‘’“”–—−]/u);
+    expect(t(PRIMARY.narrativeKey)).not.toMatch(/[‘’“”–—−]/u);
   });
 
   it("pins both signs to an ASCII hyphen, 0x2d", () => {
     // The two figures the room reads off this sentence. A minus glyph or an en
     // dash here would not match the tiles below, which format with U+002D.
     for (const fragment of ["(-0.6%)", "-CHF 150k"]) {
-      expect(PRIMARY.narrative).toContain(fragment);
-      const index = PRIMARY.narrative.indexOf(fragment);
-      expect(PRIMARY.narrative.codePointAt(index + fragment.indexOf("-"))).toBe(
-        0x2d,
-      );
+      expect(t(PRIMARY.narrativeKey)).toContain(fragment);
+      const index = t(PRIMARY.narrativeKey).indexOf(fragment);
+      expect(
+        t(PRIMARY.narrativeKey).codePointAt(index + fragment.indexOf("-")),
+      ).toBe(0x2d);
     }
   });
 
@@ -427,7 +430,7 @@ describe("Hero 2 — the narrative is the contract (criterion 4)", () => {
     renderSections();
 
     const line = slot("section-narrative", section())!;
-    expect(line.textContent).toBe(PRIMARY.narrative);
+    expect(line.textContent).toBe(t(PRIMARY.narrativeKey));
     expect(line.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
     // No copy of the sentence exists in the component layer at all.
     for (const source of SOURCES) {
@@ -440,11 +443,11 @@ describe("Hero 2 — the narrative is the contract (criterion 4)", () => {
     // The -0.6% and the -CHF 150k are DERIVED from the same eight pairs the
     // bars plot, so the sentence and the charts under it cannot disagree.
     expect(formatSignedPercent(TOTALS.deltaPercent)).toBe("-0.6%");
-    expect(PRIMARY.narrative).toContain("(-0.6%)");
+    expect(t(PRIMARY.narrativeKey)).toContain("(-0.6%)");
 
     const fcz = FIXTURES.find((fixture) => fixture.opponent === "FCZ")!;
     expect(signedMoney(fcz.current - fcz.previous)).toBe("-CHF 150k");
-    expect(PRIMARY.narrative).toContain("-CHF 150k");
+    expect(t(PRIMARY.narrativeKey)).toContain("-CHF 150k");
   });
 
   it("names the six clubs the fixtures actually moved for", () => {
@@ -453,11 +456,11 @@ describe("Hero 2 — the narrative is the contract (criterion 4)", () => {
 
     for (const club of ["YB", "Servette", "St. Gallen"]) {
       expect(up.map((one) => one.opponent)).toContain(club);
-      expect(PRIMARY.narrative).toContain(club);
+      expect(t(PRIMARY.narrativeKey)).toContain(club);
     }
     for (const club of ["FCZ", "Lugano", "Sion"]) {
       expect(down.map((one) => one.opponent)).toContain(club);
-      expect(PRIMARY.narrative).toContain(club);
+      expect(t(PRIMARY.narrativeKey)).toContain(club);
     }
   });
 });
@@ -475,9 +478,9 @@ describe("Hero 2 — three visuals, in the defined order", () => {
     renderSections();
 
     expect(cardTitles()).toEqual([
-      HERO_2_TILE_TITLES.fixtures,
-      HERO_2_TILE_TITLES.totals,
-      HERO_2_TILE_TITLES.months,
+      t(HERO_2_TILE_TITLE_KEY.fixtures),
+      t(HERO_2_TILE_TITLE_KEY.totals),
+      t(HERO_2_TILE_TITLE_KEY.months),
     ]);
     expect(cardTitles()[0]).toBe(
       "Matchday ticket revenue by fixture (CHF 000)",
@@ -559,13 +562,16 @@ describe("Hero 2 — the fixture chart (criterion 2, first tile)", () => {
       slots("grouped-bar-legend-item", section()).map(
         (item) => item.textContent,
       ),
-    ).toEqual([PRIMARY.previousSeason.label, PRIMARY.currentSeason.label]);
+    ).toEqual([
+      t(PRIMARY.previousSeason.labelKey),
+      t(PRIMARY.currentSeason.labelKey),
+    ]);
   });
 
   it("scopes the tile to the eight highest-grossing home fixtures", () => {
     renderSections();
 
-    expect(subtitleOf(0)).toBe(PRIMARY.fixtures.scopeLabel);
+    expect(subtitleOf(0)).toBe(t(PRIMARY.fixtures.scopeLabelKey));
     expect(subtitleOf(0).toLowerCase()).toContain(
       "eight highest-grossing home fixtures",
     );
@@ -609,10 +615,10 @@ describe("Hero 2 — the fixture chart (criterion 2, first tile)", () => {
 
     expect(slot("fixture-tooltip-name", tooltip)).toHaveTextContent("FCZ");
     expect(tooltip).toHaveTextContent(
-      `${PRIMARY.previousSeason.label} ${money(1_390)}`,
+      `${t(PRIMARY.previousSeason.labelKey)} ${money(1_390)}`,
     );
     expect(tooltip).toHaveTextContent(
-      `${PRIMARY.currentSeason.label} ${money(1_240)}`,
+      `${t(PRIMARY.currentSeason.labelKey)} ${money(1_240)}`,
     );
     expect(tooltip).toHaveTextContent(signedMoney(-150));
     expect(tooltip).toHaveAttribute("role", "status");
@@ -638,7 +644,7 @@ describe("Hero 2 — the totals tile (criterion 2, second tile)", () => {
     );
     expect(slot("kpi-value", cards()[1]!)!.textContent).toBe("CHF 7.83M");
     expect(slot("kpi-subtitle", cards()[1]!)).toHaveTextContent(
-      `${PRIMARY.currentSeason.label} vs ${PRIMARY.previousSeason.label}`,
+      `${t(PRIMARY.currentSeason.labelKey)} vs ${t(PRIMARY.previousSeason.labelKey)}`,
     );
   });
 
@@ -662,7 +668,10 @@ describe("Hero 2 — the totals tile (criterion 2, second tile)", () => {
     expect(bars).toHaveLength(2);
     expect(
       bars.map((one) => slot("compare-bar-label", one)!.textContent),
-    ).toEqual([PRIMARY.previousSeason.label, PRIMARY.currentSeason.label]);
+    ).toEqual([
+      t(PRIMARY.previousSeason.labelKey),
+      t(PRIMARY.currentSeason.labelKey),
+    ]);
     expect(
       bars.map((one) => slot("compare-bar-value", one)!.textContent),
     ).toEqual([moneyMillions(TOTALS.previous), moneyMillions(TOTALS.current)]);
@@ -698,7 +707,9 @@ describe("Hero 2 — the totals tile (criterion 2, second tile)", () => {
     const change = slot("totals-change", cards()[1]!)!;
     expect(change).toHaveTextContent(signedMoney(TOTALS.delta));
     expect(change).toHaveTextContent("-CHF 50k");
-    expect(change).toHaveTextContent(`vs ${PRIMARY.previousSeason.label}`);
+    expect(change).toHaveTextContent(
+      `vs ${t(PRIMARY.previousSeason.labelKey)}`,
+    );
     expect(slot("delta-chip", change)).toHaveAttribute(
       "data-direction",
       VarianceDirection.DOWN,
@@ -708,7 +719,7 @@ describe("Hero 2 — the totals tile (criterion 2, second tile)", () => {
   it("scopes the totals to the fixtures they total", () => {
     renderSections();
 
-    expect(subtitleOf(1)).toBe(PRIMARY.fixtures.scopeLabel);
+    expect(subtitleOf(1)).toBe(t(PRIMARY.fixtures.scopeLabelKey));
   });
 });
 
@@ -719,26 +730,27 @@ describe("Hero 2 — the monthly chart (criterion 3)", () => {
     expect(MONTHS).toHaveLength(12);
     expect(
       slots("line-chart-axis-label", section()).map((node) => node.textContent),
-    ).toEqual(MONTHS.map((month) => month.label));
-    expect(MONTHS.map((month) => month.label).slice(0, 2)).toEqual([
+    ).toEqual(MONTHS.map((month) => t(month.labelKey)));
+    expect(MONTHS.map((month) => t(month.labelKey)).slice(0, 2)).toEqual([
       "Jul",
       "Aug",
     ]);
-    expect(MONTHS[11]!.label).toBe("Jun");
+    expect(t(MONTHS[11]!.labelKey)).toBe("Jun");
   });
 
   it("draws both seasons, with the CURRENT one filled", () => {
     renderSections();
 
     expect(slots("line-chart-line", section())).toHaveLength(2);
-    expect(lineFor(PRIMARY.previousSeason.label)).not.toBeNull();
-    expect(lineFor(PRIMARY.currentSeason.label)).not.toBeNull();
+    expect(lineFor(t(PRIMARY.previousSeason.labelKey))).not.toBeNull();
+    expect(lineFor(t(PRIMARY.currentSeason.labelKey))).not.toBeNull();
     // Exactly one area, and it belongs to the season being asked about.
     const areas = slots("line-chart-area", section());
     expect(areas).toHaveLength(1);
     expect(
-      areas[0]!.compareDocumentPosition(lineFor(PRIMARY.currentSeason.label)) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
+      areas[0]!.compareDocumentPosition(
+        lineFor(t(PRIMARY.currentSeason.labelKey)),
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     // Neither season is dashed: both are real, measured seasons.
     for (const line of slots("line-chart-line", section())) {
@@ -751,7 +763,10 @@ describe("Hero 2 — the monthly chart (criterion 3)", () => {
 
     expect(
       slots("line-chart-legend-item", section()).map((one) => one.textContent),
-    ).toEqual([PRIMARY.previousSeason.label, PRIMARY.currentSeason.label]);
+    ).toEqual([
+      t(PRIMARY.previousSeason.labelKey),
+      t(PRIMARY.currentSeason.labelKey),
+    ]);
   });
 
   it("shows BOTH seasons' figures on hover, with their unit", () => {
@@ -760,10 +775,10 @@ describe("Hero 2 — the monthly chart (criterion 3)", () => {
     hoverMonth(2);
 
     const heading = slot("line-chart-tooltip-heading", section())!;
-    expect(heading).toHaveTextContent(MONTHS[2]!.label);
+    expect(heading).toHaveTextContent(t(MONTHS[2]!.labelKey));
     expect(tooltipRows()).toEqual([
-      `${PRIMARY.previousSeason.label} ${money(MONTHS[2]!.previous)}`,
-      `${PRIMARY.currentSeason.label} ${money(MONTHS[2]!.current)}`,
+      `${t(PRIMARY.previousSeason.labelKey)} ${money(MONTHS[2]!.previous)}`,
+      `${t(PRIMARY.currentSeason.labelKey)} ${money(MONTHS[2]!.current)}`,
     ]);
     expect(tooltipRows()[0]).toContain("CHF 1’180k");
     expect(tooltipRows()[1]).toContain("CHF 1’240k");
@@ -779,9 +794,11 @@ describe("Hero 2 — two scopes, both stated (the scope-label trap)", () => {
     const subtitles = cards().map(
       (card) => slot("card-subtitle", card)!.textContent,
     );
-    expect(subtitles[0]).toBe(PRIMARY.fixtures.scopeLabel);
-    expect(subtitles[2]).toBe(PRIMARY.monthly.scopeLabel);
-    expect(PRIMARY.fixtures.scopeLabel).not.toBe(PRIMARY.monthly.scopeLabel);
+    expect(subtitles[0]).toBe(t(PRIMARY.fixtures.scopeLabelKey));
+    expect(subtitles[2]).toBe(t(PRIMARY.monthly.scopeLabelKey));
+    expect(t(PRIMARY.fixtures.scopeLabelKey)).not.toBe(
+      t(PRIMARY.monthly.scopeLabelKey),
+    );
   });
 
   it("says which scope each chart is at, in words the room can read", () => {
@@ -815,10 +832,10 @@ describe("Hero 2 — two scopes, both stated (the scope-label trap)", () => {
       expect(source.code).not.toContain("season-ticket");
     }
     expect(code("app/components/heroes/hero-2.tsx")).toContain(
-      "fixtures.scopeLabel",
+      "t(fixtures.scopeLabelKey)",
     );
     expect(code("app/components/heroes/hero-2.tsx")).toContain(
-      "monthly.scopeLabel",
+      "t(monthly.scopeLabelKey)",
     );
   });
 });
@@ -1033,9 +1050,9 @@ describe("Hero 2 — asking twice refreshes the section in place", () => {
     expect(slots("insight-section")).toHaveLength(1);
     expect(cards()).toHaveLength(3);
     expect(cardTitles()).toEqual([
-      HERO_2_TILE_TITLES.fixtures,
-      HERO_2_TILE_TITLES.totals,
-      HERO_2_TILE_TITLES.months,
+      t(HERO_2_TILE_TITLE_KEY.fixtures),
+      t(HERO_2_TILE_TITLE_KEY.totals),
+      t(HERO_2_TILE_TITLE_KEY.months),
     ]);
     expect(slot("kpi-value", cards()[1]!)!.textContent).toBe("CHF 7.83M");
   });
@@ -1118,9 +1135,9 @@ describe("Hero 2 — reduced motion shows the final state, not a frozen one", ()
     );
 
     expect(cardTitles()).toEqual([
-      HERO_2_TILE_TITLES.fixtures,
-      HERO_2_TILE_TITLES.totals,
-      HERO_2_TILE_TITLES.months,
+      t(HERO_2_TILE_TITLE_KEY.fixtures),
+      t(HERO_2_TILE_TITLE_KEY.totals),
+      t(HERO_2_TILE_TITLE_KEY.months),
     ]);
   });
 });
@@ -1140,10 +1157,12 @@ describe("Hero2Body — the section body, mounted directly", () => {
     settle(frames);
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-      HERO_CHIP_LABEL[HeroId.HERO_2],
+      t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]),
     );
     expect(slots("card")).toHaveLength(3);
-    expect(slot("section-narrative")).toHaveTextContent(PRIMARY.narrative);
+    expect(slot("section-narrative")).toHaveTextContent(
+      t(PRIMARY.narrativeKey),
+    );
   });
 
   it("reads the dataset through the root loader, not from a fixture of its own", () => {

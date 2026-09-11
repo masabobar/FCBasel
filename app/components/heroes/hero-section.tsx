@@ -1,6 +1,8 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 import { cn } from "../../lib/cn";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { type InsightSection } from "../../lib/dashboard/sections";
 import { scrollRevealedIntoView, viewTransitionName } from "../../lib/motion";
 import { type HeroId } from "../../lib/repositories/enums";
@@ -85,7 +87,8 @@ export function sectionLabelId(heroId: HeroId): string {
  * second question was asked and this is its answer" — not narrative copy, so
  * it belongs to the frame rather than to any hero's dataset.
  */
-export const FOLLOW_UP_DIVIDER_LABEL = "Follow-up";
+export const FOLLOW_UP_DIVIDER_LABEL_KEY: TranslationKey =
+  "tiles.followUpDivider";
 
 /**
  * The rule's thickness. The tile accent is 3px across the top of a card and the
@@ -127,6 +130,8 @@ export function FollowUpDivider({
   delayMs?: number;
   className?: string;
 }) {
+  const t = useT();
+
   return (
     <div
       data-slot="follow-up-divider"
@@ -143,7 +148,7 @@ export function FollowUpDivider({
         data-slot="follow-up-divider-label"
         className="tile-title shrink-0 text-accent-follow-up"
       >
-        {FOLLOW_UP_DIVIDER_LABEL}
+        {t(FOLLOW_UP_DIVIDER_LABEL_KEY)}
       </span>
       {/* Decorative: the word beside it already announces the beat. */}
       <span

@@ -26,13 +26,18 @@ import {
 import { type Clock } from "../../app/lib/calendar";
 import { createMockBaselineRepository } from "../../app/lib/mock/baseline";
 import {
-  GREETING,
+  GREETING_KEY,
   personaGreeting,
-  WORKSPACE_LABEL,
+  WORKSPACE_LABEL_KEY,
 } from "../../app/lib/persona";
 import { seriesTotals, trendEndingAt } from "../../app/lib/repositories/derive";
-import { PERIOD_LABEL, PeriodKey } from "../../app/lib/repositories/enums";
+import {
+  PERIOD_LABEL_KEY,
+  PRODUCT_LABEL_KEY,
+  PeriodKey,
+} from "../../app/lib/repositories/enums";
 import { type BaselineRepository } from "../../app/lib/repositories/types";
+import { de, t } from "./support/i18n";
 
 /** September 2026 — nine months elapsed, so the trend window is full. */
 const SEPTEMBER: Clock = () => new Date(2026, 8, 9);
@@ -58,9 +63,11 @@ describe("loadBaseline — periods", () => {
   it("labels the period and the comparison from the enum, not from copy", async () => {
     const data = await loadBaseline(repository());
 
-    expect(data.webshop.periodLabel).toBe(PERIOD_LABEL[BASELINE_PERIOD]);
-    expect(data.webshop.comparisonLabel).toBe(
-      PERIOD_LABEL[BASELINE_COMPARISON_PERIOD],
+    expect(t(data.webshop.periodLabelKey)).toBe(
+      t(PERIOD_LABEL_KEY[BASELINE_PERIOD]),
+    );
+    expect(t(data.webshop.comparisonLabelKey)).toBe(
+      t(PERIOD_LABEL_KEY[BASELINE_COMPARISON_PERIOD]),
     );
   });
 });
@@ -196,7 +203,9 @@ describe("loadBaseline — top products", () => {
     const baseline = data.topProducts.find(
       (period) => period.key === BASELINE_PERIOD,
     );
-    const names = baseline!.rows.map((row) => row.product);
+    const names = baseline!.rows.map((row) =>
+      t(PRODUCT_LABEL_KEY[row.product]),
+    );
 
     expect(names).toContain("Home shirt 26/27");
     expect(names).toContain('Cap "Rotblau"');
@@ -225,7 +234,7 @@ describe("loadBaseline — the hero band (US-016)", () => {
       expect(Object.keys(period).sort()).toEqual([
         "attendance",
         "key",
-        "label",
+        "labelKey",
         "webshop",
       ]);
     }
@@ -245,18 +254,25 @@ describe("loadBaseline — the hero band (US-016)", () => {
       () => new Date(2026, 8, 9, 20),
     );
 
-    expect(morning.band.greeting).toBe(
-      personaGreeting(new Date(2026, 8, 9, 9)),
+    // The loader carries the KEY, not the sentence (US-049) — the hour is a
+    // server fact, the language is not.
+    expect(morning.band.greeting).toBe(GREETING_KEY.MORNING);
+    expect(afternoon.band.greeting).toBe(GREETING_KEY.AFTERNOON);
+    expect(evening.band.greeting).toBe(GREETING_KEY.EVENING);
+    expect(personaGreeting(t, morning.band.greeting)).toBe(
+      "Good morning, Sales & Marketing",
     );
-    expect(morning.band.greeting).toContain(GREETING.MORNING);
-    expect(afternoon.band.greeting).toContain(GREETING.AFTERNOON);
-    expect(evening.band.greeting).toContain(GREETING.EVENING);
+    expect(personaGreeting(de, evening.band.greeting)).toBe(
+      "Guten Abend, Vertrieb & Marketing",
+    );
   });
 
   it("names the workspace, never an individual", async () => {
     const data = await loadBaseline(repository());
 
-    expect(data.band.greeting).toContain(WORKSPACE_LABEL);
+    expect(personaGreeting(t, data.band.greeting)).toContain(
+      t(WORKSPACE_LABEL_KEY),
+    );
   });
 });
 
@@ -271,7 +287,7 @@ describe("loadBaseline — partners", () => {
     expect(data.partners).toEqual(partners);
     expect(data.partners).toHaveLength(6);
     for (const partner of data.partners) {
-      expect(partner.roleLabel).not.toBe("");
+      expect(t(partner.roleLabelKey)).not.toBe("");
       expect(partner.brandColor).toMatch(/^#[0-9A-Fa-f]{6}$/);
     }
   });

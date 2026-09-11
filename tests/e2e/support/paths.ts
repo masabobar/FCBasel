@@ -220,6 +220,28 @@ export async function askTyped(page: Page, question: string): Promise<void> {
   await field.press("Enter");
 }
 
+/**
+ * Put the interface back into English (US-049).
+ *
+ * WHY THE SWEEP NEEDS THIS. `sweepRing` activates EVERY tab stop, and two of
+ * them are the language toggle's. From the moment it presses DE, every helper
+ * in this file that finds a control by its English name — `pressReset`,
+ * `tapChip`, `askTyped` — is looking for a word that is no longer on screen.
+ * Restoring the language after each stop keeps the sweep measuring the product
+ * rather than the toggle, and the toggle itself is still activated and still
+ * asserted safe like any other stop.
+ */
+export async function restoreEnglish(page: Page): Promise<void> {
+  const english = page.locator(
+    '[data-slot="language-option"][data-locale="en"]',
+  );
+
+  if ((await english.getAttribute("data-selected")) === "true") return;
+
+  await english.click();
+  await page.waitForTimeout(150);
+}
+
 /** Press Reset and let the clear settle. */
 export async function pressReset(page: Page): Promise<void> {
   await page.getByRole("button", { name: RESET_LABEL }).click();

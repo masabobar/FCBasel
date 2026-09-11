@@ -16,9 +16,11 @@ import {
   varianceJudgement,
 } from "../../app/lib/repositories/derive";
 import {
-  DEPARTMENT_TYPE_LABEL,
+  DEPARTMENT_LABEL_KEY,
+  DEPARTMENT_TYPE_LABEL_KEY,
+  DepartmentKey,
   DepartmentType,
-  VARIANCE_JUDGEMENT_LABEL,
+  VARIANCE_JUDGEMENT_LABEL_KEY,
   VarianceJudgement,
 } from "../../app/lib/repositories/enums";
 import { hero3Repository } from "../../app/lib/repositories/index.server";
@@ -26,17 +28,45 @@ import {
   type Department,
   type Hero3Repository,
 } from "../../app/lib/repositories/types";
+import { t } from "./support/i18n";
 
 const repository: Hero3Repository = createMockHero3Repository();
 
-const MARKETING = "Marketing & Communications";
-const MERCHANDISING = "Merchandising (Fanshop)";
-const SPONSORING = "Sponsoring & Partnerships";
+/**
+ * Departments are addressed by KEY since US-049: the identifier is stable
+ * across languages, and the NAME is a dictionary entry the tile resolves.
+ */
+const MARKETING = DepartmentKey.MARKETING_COMMUNICATIONS;
+const MERCHANDISING = DepartmentKey.MERCHANDISING;
+const SPONSORING = DepartmentKey.SPONSORING_PARTNERSHIPS;
 
-async function byName(name: string): Promise<Department> {
-  const department = await repository.department(name);
-  expect(department).not.toBeNull();
-  return department!;
+function departmentName(key: DepartmentKey): string {
+  return t(DEPARTMENT_LABEL_KEY[key]);
+}
+
+/** A department row, as a fixture builds one. */
+function department(
+  key: DepartmentKey,
+  type: DepartmentType,
+  budget: number,
+  actual: number,
+  targetPercent: number,
+): Department {
+  return {
+    key,
+    labelKey: DEPARTMENT_LABEL_KEY[key],
+    type,
+    typeLabelKey: DEPARTMENT_TYPE_LABEL_KEY[type],
+    budget,
+    actual,
+    targetPercent,
+  };
+}
+
+async function byKey(key: DepartmentKey): Promise<Department> {
+  const found = await repository.department(key);
+  expect(found).not.toBeNull();
+  return found!;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -44,54 +74,30 @@ async function byName(name: string): Promise<Department> {
 describe("Build Specification Hero 3 departments", () => {
   it("lists the six departments, each tagged Revenue or Cost", async () => {
     expect(await repository.departments()).toEqual([
-      {
-        name: SPONSORING,
-        type: DepartmentType.REVENUE,
-        typeLabel: "Revenue",
-        budget: 21_000,
-        actual: 21_840,
-        targetPercent: 104,
-      },
-      {
-        name: "Ticketing",
-        type: DepartmentType.REVENUE,
-        typeLabel: "Revenue",
-        budget: 24_000,
-        actual: 24_360,
-        targetPercent: 102,
-      },
-      {
-        name: "Hospitality",
-        type: DepartmentType.REVENUE,
-        typeLabel: "Revenue",
-        budget: 7_200,
-        actual: 6_840,
-        targetPercent: 95,
-      },
-      {
-        name: MERCHANDISING,
-        type: DepartmentType.REVENUE,
-        typeLabel: "Revenue",
-        budget: 9_800,
-        actual: 9_050,
-        targetPercent: 92,
-      },
-      {
-        name: "Events",
-        type: DepartmentType.REVENUE,
-        typeLabel: "Revenue",
-        budget: 3_600,
-        actual: 3_780,
-        targetPercent: 105,
-      },
-      {
-        name: MARKETING,
-        type: DepartmentType.COST,
-        typeLabel: "Cost",
-        budget: 3_400,
-        actual: 3_810,
-        targetPercent: 84,
-      },
+      department(SPONSORING, DepartmentType.REVENUE, 21_000, 21_840, 104),
+      department(
+        DepartmentKey.TICKETING,
+        DepartmentType.REVENUE,
+        24_000,
+        24_360,
+        102,
+      ),
+      department(
+        DepartmentKey.HOSPITALITY,
+        DepartmentType.REVENUE,
+        7_200,
+        6_840,
+        95,
+      ),
+      department(MERCHANDISING, DepartmentType.REVENUE, 9_800, 9_050, 92),
+      department(
+        DepartmentKey.EVENTS,
+        DepartmentType.REVENUE,
+        3_600,
+        3_780,
+        105,
+      ),
+      department(MARKETING, DepartmentType.COST, 3_400, 3_810, 84),
     ]);
   });
 
@@ -103,22 +109,29 @@ describe("Build Specification Hero 3 departments", () => {
 
     expect(departments).toHaveLength(6);
     expect(costCentres).toHaveLength(1);
-    expect(costCentres[0]?.name).toBe(MARKETING);
+    expect(costCentres[0]?.key).toBe(MARKETING);
   });
 
   it("labels every type from the shared enum", async () => {
     for (const department of await repository.departments()) {
-      expect(department.typeLabel).toBe(DEPARTMENT_TYPE_LABEL[department.type]);
+      expect(t(department.typeLabelKey)).toBe(
+        t(DEPARTMENT_TYPE_LABEL_KEY[department.type]),
+      );
     }
-    expect(DEPARTMENT_TYPE_LABEL).toEqual({ REVENUE: "Revenue", COST: "Cost" });
+    expect({
+      REVENUE: t(DEPARTMENT_TYPE_LABEL_KEY[DepartmentType.REVENUE]),
+      COST: t(DEPARTMENT_TYPE_LABEL_KEY[DepartmentType.COST]),
+    }).toEqual({ REVENUE: "Revenue", COST: "Cost" });
   });
 
-  it("returns one department by name, and null for one it does not show", async () => {
-    expect(await byName("Ticketing")).toMatchObject({
+  it("returns one department by key, and null for one it does not show", async () => {
+    expect(await byKey(DepartmentKey.TICKETING)).toMatchObject({
       budget: 24_000,
       actual: 24_360,
       targetPercent: 102,
     });
+    // @ts-expect-error — "Academy" is not a DepartmentKey, which is exactly
+    // the protection keying the lookup buys.
     expect(await repository.department("Academy")).toBeNull();
   });
 
@@ -220,8 +233,8 @@ describe("derived totals and the headline variance", () => {
   });
 
   it("pins the two variances the narrative quotes", async () => {
-    const merchandising = await byName(MERCHANDISING);
-    const marketing = await byName(MARKETING);
+    const merchandising = await byKey(MERCHANDISING);
+    const marketing = await byKey(MARKETING);
 
     // -7.65% -> -7.7, quoted as "7.7% under"; +12.06% -> +12.1, quoted as "12% over".
     expect(departmentVariance(merchandising)).toBe(-750);
@@ -233,29 +246,28 @@ describe("derived totals and the headline variance", () => {
   it("pins the remaining four variances", async () => {
     const variances = new Map(
       (await repository.departments()).map((department) => [
-        department.name,
+        department.key,
         departmentVariance(department),
       ]),
     );
 
     expect(variances.get(SPONSORING)).toBe(840);
-    expect(variances.get("Ticketing")).toBe(360);
-    expect(variances.get("Hospitality")).toBe(-360);
-    expect(variances.get("Events")).toBe(180);
+    expect(variances.get(DepartmentKey.TICKETING)).toBe(360);
+    expect(variances.get(DepartmentKey.HOSPITALITY)).toBe(-360);
+    expect(variances.get(DepartmentKey.EVENTS)).toBe(180);
   });
 });
 
 /* ------------------------------------------------------------------------ */
 
 describe("Revenue versus Cost decides what a variance MEANS", () => {
-  const revenue: Department = {
-    name: "Test revenue",
-    type: DepartmentType.REVENUE,
-    typeLabel: "Revenue",
-    budget: 1_000,
-    actual: 1_000,
-    targetPercent: 100,
-  };
+  const revenue: Department = department(
+    DepartmentKey.EVENTS,
+    DepartmentType.REVENUE,
+    1_000,
+    1_000,
+    100,
+  );
   const cost: Department = { ...revenue, type: DepartmentType.COST };
 
   it("judges a revenue department above budget FAVOURABLE", () => {
@@ -288,16 +300,18 @@ describe("Revenue versus Cost decides what a variance MEANS", () => {
   });
 
   it("judges Marketing's +410 ADVERSE even though the number is positive", async () => {
-    const marketing = departmentPerformance(await byName(MARKETING));
+    const marketing = departmentPerformance(await byKey(MARKETING));
 
     expect(marketing.variance).toBeGreaterThan(0);
     expect(marketing.overBudget).toBe(true);
     expect(marketing.judgement).toBe(VarianceJudgement.ADVERSE);
-    expect(VARIANCE_JUDGEMENT_LABEL[marketing.judgement]).toBe("Adverse");
+    expect(t(VARIANCE_JUDGEMENT_LABEL_KEY[marketing.judgement])).toBe(
+      "Adverse",
+    );
   });
 
   it("judges Sponsoring's +840 FAVOURABLE - the same sign, the other reading", async () => {
-    const sponsoring = departmentPerformance(await byName(SPONSORING));
+    const sponsoring = departmentPerformance(await byKey(SPONSORING));
 
     expect(sponsoring.variance).toBeGreaterThan(0);
     expect(sponsoring.judgement).toBe(VarianceJudgement.FAVOURABLE);
@@ -312,7 +326,7 @@ describe("Revenue versus Cost decides what a variance MEANS", () => {
 
     // This is the trap the tag exists to close: colouring by sign alone paints
     // the club's one problem department as a success.
-    expect(misread.map((row) => row.name)).toEqual([MARKETING]);
+    expect(misread.map((row) => row.key)).toEqual([MARKETING]);
   });
 
   it("gives every row a judgement, so no consumer has to infer one", async () => {
@@ -325,13 +339,13 @@ describe("Revenue versus Cost decides what a variance MEANS", () => {
     expect(
       rows
         .filter((row) => row.judgement === VarianceJudgement.FAVOURABLE)
-        .map((row) => row.name),
-    ).toEqual([SPONSORING, "Ticketing", "Events"]);
+        .map((row) => row.key),
+    ).toEqual([SPONSORING, DepartmentKey.TICKETING, DepartmentKey.EVENTS]);
     expect(
       rows
         .filter((row) => row.judgement === VarianceJudgement.ADVERSE)
-        .map((row) => row.name),
-    ).toEqual(["Hospitality", MERCHANDISING, MARKETING]);
+        .map((row) => row.key),
+    ).toEqual([DepartmentKey.HOSPITALITY, MERCHANDISING, MARKETING]);
   });
 });
 
@@ -342,7 +356,7 @@ describe("the one department both over budget and behind target", () => {
     const flagged = departmentsNeedingAttention(await repository.departments());
 
     expect(flagged).toHaveLength(1);
-    expect(flagged[0]?.name).toBe(MARKETING);
+    expect(flagged[0]?.key).toBe(MARKETING);
     expect(flagged[0]?.overBudget).toBe(true);
     expect(flagged[0]?.behindTarget).toBe(true);
   });
@@ -363,25 +377,21 @@ describe("the one department both over budget and behind target", () => {
 
     // Neither half of the conjunction is rare on its own - which is why the
     // narrative's claim is about the two together.
-    expect(rows.filter((row) => row.overBudget).map((row) => row.name)).toEqual(
-      [SPONSORING, "Ticketing", "Events", MARKETING],
-    );
+    expect(rows.filter((row) => row.overBudget).map((row) => row.key)).toEqual([
+      SPONSORING,
+      DepartmentKey.TICKETING,
+      DepartmentKey.EVENTS,
+      MARKETING,
+    ]);
     expect(
-      rows.filter((row) => row.behindTarget).map((row) => row.name),
-    ).toEqual(["Hospitality", MERCHANDISING, MARKETING]);
+      rows.filter((row) => row.behindTarget).map((row) => row.key),
+    ).toEqual([DepartmentKey.HOSPITALITY, MERCHANDISING, MARKETING]);
   });
 
   it("flags nothing when every department is on plan", () => {
     expect(
       departmentsNeedingAttention([
-        {
-          name: "Events",
-          type: DepartmentType.REVENUE,
-          typeLabel: "Revenue",
-          budget: 100,
-          actual: 120,
-          targetPercent: 105,
-        },
+        department(DepartmentKey.EVENTS, DepartmentType.REVENUE, 100, 120, 105),
       ]),
     ).toEqual([]);
     expect(departmentTotals([])).toEqual({
@@ -401,10 +411,10 @@ describe("the departments that hit their own outcome target", () => {
     // (US-038), so it can never claim a department the table shows as short.
     const onTarget = departmentsOnTarget(await repository.departments());
 
-    expect(onTarget.map((row) => row.name)).toEqual([
+    expect(onTarget.map((row) => row.key)).toEqual([
       SPONSORING,
-      "Ticketing",
-      "Events",
+      DepartmentKey.TICKETING,
+      DepartmentKey.EVENTS,
     ]);
     for (const row of onTarget) {
       expect(row.targetPercent).toBeGreaterThanOrEqual(ON_TARGET_PERCENT);
@@ -417,9 +427,11 @@ describe("the departments that hit their own outcome target", () => {
     // being behind target is a fact, and Hospitality is behind it.
     const onTarget = departmentsOnTarget(await repository.departments());
 
-    expect(onTarget.map((row) => row.name)).not.toContain("Hospitality");
-    expect(onTarget.map((row) => row.name)).not.toContain(MERCHANDISING);
-    expect(onTarget.map((row) => row.name)).not.toContain(MARKETING);
+    expect(onTarget.map((row) => row.key)).not.toContain(
+      DepartmentKey.HOSPITALITY,
+    );
+    expect(onTarget.map((row) => row.key)).not.toContain(MERCHANDISING);
+    expect(onTarget.map((row) => row.key)).not.toContain(MARKETING);
   });
 
   it("is the exact complement of the departments behind target", async () => {
@@ -439,7 +451,12 @@ describe("the Marketing follow-up", () => {
   it("names the three spend drivers, in CHF thousands over plan", async () => {
     const hero = await repository.hero();
 
-    expect(hero.followUp.drivers).toEqual([
+    expect(
+      hero.followUp.drivers.map((driver) => ({
+        name: t(driver.labelKey),
+        amount: driver.amount,
+      })),
+    ).toEqual([
       { name: "Match activations", amount: 240 },
       { name: "Paid social", amount: 150 },
       { name: "Agency retainer", amount: 20 },
@@ -448,7 +465,7 @@ describe("the Marketing follow-up", () => {
 
   it("reconciles the drivers with Marketing's derived overspend", async () => {
     const hero = await repository.hero();
-    const marketing = await byName(MARKETING);
+    const marketing = await byKey(MARKETING);
 
     expect(driverTotal(hero.followUp.drivers)).toBe(240 + 150 + 20);
     expect(driverTotal(hero.followUp.drivers)).toBe(
@@ -492,7 +509,7 @@ describe("the Marketing follow-up", () => {
     expect(Object.keys(hero.followUp).sort()).toEqual([
       "conversion",
       "drivers",
-      "narrative",
+      "narrativeKey",
     ]);
     expect(JSON.stringify(hero.followUp.drivers)).not.toContain("Marketing");
   });
@@ -504,7 +521,7 @@ describe("the scope is labelled, not left to be inferred", () => {
   it("states the full-year departmental scope on the tile", async () => {
     const { primary } = await repository.hero();
 
-    expect(primary.scopeLabel).toBe(
+    expect(t(primary.scopeLabelKey)).toBe(
       "Full-year departmental totals, budget against actual; Ticketing includes the season-ticket base, so it exceeds the sum of Hero 2's shown fixtures",
     );
   });
@@ -512,13 +529,13 @@ describe("the scope is labelled, not left to be inferred", () => {
   it("names the season-ticket inclusion, which is what reconciles the heroes", async () => {
     const { primary } = await repository.hero();
 
-    expect(primary.scopeLabel).toMatch(/season-ticket base/);
-    expect(primary.scopeLabel).toMatch(/full-year/i);
-    expect(primary.scopeLabel).toMatch(/includes/);
+    expect(t(primary.scopeLabelKey)).toMatch(/season-ticket base/);
+    expect(t(primary.scopeLabelKey)).toMatch(/full-year/i);
+    expect(t(primary.scopeLabelKey)).toMatch(/includes/);
   });
 
   it("explains why Ticketing here exceeds Hero 2's eight fixtures", async () => {
-    const ticketing = await byName("Ticketing");
+    const ticketing = await byKey(DepartmentKey.TICKETING);
 
     // 24,360 against Hero 2's 7,830. Intentional: this figure includes the
     // season-ticket base that Hero 2 excludes, and the label above is the only
@@ -539,44 +556,48 @@ describe("verbatim narratives", () => {
   it("carries the primary narrative character for character", async () => {
     const hero = await repository.hero();
 
-    expect(hero.primary.narrative).toBe(PRIMARY);
-    expect(hero.primary.narrative).toHaveLength(270);
+    expect(t(hero.primary.narrativeKey)).toBe(PRIMARY);
+    expect(t(hero.primary.narrativeKey)).toHaveLength(270);
   });
 
   it("carries the follow-up narrative character for character", async () => {
     const hero = await repository.hero();
 
-    expect(hero.followUp.narrative).toBe(FOLLOW_UP);
-    expect(hero.followUp.narrative).toHaveLength(468);
+    expect(t(hero.followUp.narrativeKey)).toBe(FOLLOW_UP);
+    expect(t(hero.followUp.narrativeKey)).toHaveLength(468);
   });
 
   it("quotes figures the data actually holds", async () => {
     const hero = await repository.hero();
-    const merchandising = await byName(MERCHANDISING);
-    const marketing = await byName(MARKETING);
+    const merchandising = await byKey(MERCHANDISING);
+    const marketing = await byKey(MARKETING);
     const flagged = departmentsNeedingAttention(hero.primary.departments);
 
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${Math.abs(departmentVariancePercent(merchandising))}% under`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${Math.round(departmentVariancePercent(marketing))}% over`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${marketing.targetPercent}% of its outcome target`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       "the only department both over budget and behind target",
     );
     expect(flagged).toHaveLength(1);
-    expect(hero.primary.narrative).toContain(flagged[0]!.name);
+    expect(t(hero.primary.narrativeKey)).toContain(
+      departmentName(flagged[0]!.key),
+    );
 
     const [activations, paidSocial] = hero.followUp.drivers;
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `CHF ${activations?.amount}k over plan`,
     );
-    expect(hero.followUp.narrative).toContain(`CHF ${paidSocial?.amount}k`);
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
+      `CHF ${paidSocial?.amount}k`,
+    );
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `${hero.followUp.conversion.actualPercent}% against a ${hero.followUp.conversion.planPercent}% plan`,
     );
   });
@@ -584,7 +605,10 @@ describe("verbatim narratives", () => {
   it("stays ASCII: hyphens only, no typographic dashes or quotes", async () => {
     const hero = await repository.hero();
 
-    for (const narrative of [hero.primary.narrative, hero.followUp.narrative]) {
+    for (const narrative of [
+      t(hero.primary.narrativeKey),
+      t(hero.followUp.narrativeKey),
+    ]) {
       expect(narrative).not.toMatch(/[–—]/);
       expect(narrative).toMatch(/^[\x20-\x7E]*$/);
     }
@@ -619,7 +643,10 @@ describe("dataset hygiene", () => {
    */
   async function everyDataString(): Promise<string[]> {
     const hero = await repository.hero();
-    const narratives = [hero.primary.narrative, hero.followUp.narrative];
+    const narratives = [
+      t(hero.primary.narrativeKey),
+      t(hero.followUp.narrativeKey),
+    ];
     return (await everyString()).filter((value) => !narratives.includes(value));
   }
 
@@ -676,7 +703,7 @@ describe("server-side repository selection", () => {
     expect(totals.variancePercent).toBe(1);
     expect(
       departmentsNeedingAttention(departments).map(
-        (department) => department.name,
+        (department) => department.key,
       ),
     ).toEqual([MARKETING]);
     expect(await hero3Repository.department(MARKETING)).not.toBeNull();

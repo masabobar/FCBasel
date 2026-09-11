@@ -11,9 +11,9 @@ import {
   kitUnitsTotal,
 } from "../../app/lib/repositories/derive";
 import {
-  KIT_VARIANT_LABEL,
+  KIT_VARIANT_LABEL_KEY,
   KitVariant,
-  PERIOD_LABEL,
+  PERIOD_LABEL_KEY,
   PeriodKey,
 } from "../../app/lib/repositories/enums";
 import { hero1Repository } from "../../app/lib/repositories/index.server";
@@ -21,6 +21,7 @@ import {
   type Hero1Period,
   type Hero1Repository,
 } from "../../app/lib/repositories/types";
+import { t } from "./support/i18n";
 
 const repository: Hero1Repository = createMockHero1Repository();
 
@@ -100,7 +101,7 @@ describe("Build Specification Hero 1 figures", () => {
   it("states the scope the figures cover", async () => {
     const hero = await repository.hero();
 
-    expect(hero.primary.scopeLabel).toBe("Season-to-date merchandising");
+    expect(t(hero.primary.scopeLabelKey)).toBe("Season-to-date merchandising");
   });
 });
 
@@ -117,19 +118,19 @@ describe("derived kit revenue and shares", () => {
     expect(kitRevenueRows(season)).toEqual([
       {
         variant: KitVariant.HOME,
-        label: "Home",
+        labelKey: KIT_VARIANT_LABEL_KEY[KitVariant.HOME],
         units: 22_400,
         revenue: 2_217_600,
       },
       {
         variant: KitVariant.AWAY,
-        label: "Away",
+        labelKey: KIT_VARIANT_LABEL_KEY[KitVariant.AWAY],
         units: 10_300,
         revenue: 1_019_700,
       },
       {
         variant: KitVariant.THIRD,
-        label: "3rd",
+        labelKey: KIT_VARIANT_LABEL_KEY[KitVariant.THIRD],
         units: 5_800,
         revenue: 574_200,
       },
@@ -184,7 +185,7 @@ describe("derived kit revenue and shares", () => {
   it("returns a zero share rather than dividing by zero", () => {
     const empty: Hero1Period = {
       key: PeriodKey.SEASON_TO_DATE,
-      label: "Season to date",
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.SEASON_TO_DATE],
       kits: [],
       badgeTotal: 0,
       printedNames: [],
@@ -198,8 +199,14 @@ describe("derived kit revenue and shares", () => {
   it("returns a zero Home share when no Home kit is listed", () => {
     const awayOnly: Hero1Period = {
       key: PeriodKey.SEASON_TO_DATE,
-      label: "Season to date",
-      kits: [{ variant: KitVariant.AWAY, label: "Away", units: 100 }],
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.SEASON_TO_DATE],
+      kits: [
+        {
+          variant: KitVariant.AWAY,
+          labelKey: KIT_VARIANT_LABEL_KEY[KitVariant.AWAY],
+          units: 100,
+        },
+      ],
       badgeTotal: 0,
       printedNames: [],
     };
@@ -269,7 +276,7 @@ describe("Hero 1 periods", () => {
       PeriodKey.LAST_MONTH,
       PeriodKey.THIS_MONTH,
     ]);
-    expect(periods.map((period) => period.label)).toEqual([
+    expect(periods.map((period) => t(period.labelKey))).toEqual([
       "Season to date",
       "Last 3 months",
       "Last month",
@@ -280,8 +287,8 @@ describe("Hero 1 periods", () => {
   it('says "Current month" where the baseline band says "This month"', async () => {
     const currentMonth = await periodFor(PeriodKey.THIS_MONTH);
 
-    expect(currentMonth.label).toBe("Current month");
-    expect(PERIOD_LABEL[PeriodKey.THIS_MONTH]).toBe("This month");
+    expect(t(currentMonth.labelKey)).toBe("Current month");
+    expect(t(PERIOD_LABEL_KEY[PeriodKey.THIS_MONTH])).toBe("This month");
   });
 
   it("takes every other label from the shared enum", async () => {
@@ -289,7 +296,7 @@ describe("Hero 1 periods", () => {
 
     for (const period of periods) {
       if (period.key !== PeriodKey.THIS_MONTH) {
-        expect(period.label).toBe(PERIOD_LABEL[period.key]);
+        expect(t(period.labelKey)).toBe(t(PERIOD_LABEL_KEY[period.key]));
       }
     }
   });
@@ -305,7 +312,7 @@ describe("Hero 1 periods", () => {
         KitVariant.THIRD,
       ]);
       for (const kit of period.kits) {
-        expect(kit.label).toBe(KIT_VARIANT_LABEL[kit.variant]);
+        expect(t(kit.labelKey)).toBe(t(KIT_VARIANT_LABEL_KEY[kit.variant]));
       }
       expect(period.printedNames.map((entry) => entry.name)).toEqual([
         "Shaqiri",
@@ -357,15 +364,15 @@ describe("verbatim narratives", () => {
   it("carries the primary narrative character for character", async () => {
     const hero = await repository.hero();
 
-    expect(hero.primary.narrative).toBe(PRIMARY);
-    expect(hero.primary.narrative).toHaveLength(214);
+    expect(t(hero.primary.narrativeKey)).toBe(PRIMARY);
+    expect(t(hero.primary.narrativeKey)).toHaveLength(214);
   });
 
   it("carries the follow-up narrative character for character", async () => {
     const hero = await repository.hero();
 
-    expect(hero.followUp.narrative).toBe(FOLLOW_UP);
-    expect(hero.followUp.narrative).toHaveLength(245);
+    expect(t(hero.followUp.narrativeKey)).toBe(FOLLOW_UP);
+    expect(t(hero.followUp.narrativeKey)).toHaveLength(245);
   });
 
   it("quotes figures the data actually holds", async () => {
@@ -376,13 +383,13 @@ describe("verbatim narratives", () => {
     );
 
     // Every number spoken in the copy is derived from the dataset beneath it.
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${Math.round(homeKitShare(season) * 100)}% of shirt sales`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `about ${Math.round(badgeShare(season) * 100)}% of shirts`,
     );
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `up ${trend.get("Sunrise")}% over the last three drops`,
     );
   });
@@ -390,7 +397,10 @@ describe("verbatim narratives", () => {
   it("stays ASCII: hyphens only, no typographic dashes or quotes", async () => {
     const hero = await repository.hero();
 
-    for (const narrative of [hero.primary.narrative, hero.followUp.narrative]) {
+    for (const narrative of [
+      t(hero.primary.narrativeKey),
+      t(hero.followUp.narrativeKey),
+    ]) {
       expect(narrative).not.toMatch(/[–—]/);
       expect(narrative).toMatch(/^[\x20-\x7E]*$/);
     }
@@ -448,7 +458,7 @@ describe("dataset hygiene", () => {
       const printed = period.printedNames.map((entry) => entry.name);
       for (const name of squad) {
         expect(printed).toContain(name);
-        expect(period.kits.map((kit) => kit.label)).not.toContain(name);
+        expect(period.kits.map((kit) => t(kit.labelKey))).not.toContain(name);
       }
     }
     for (const name of squad) {

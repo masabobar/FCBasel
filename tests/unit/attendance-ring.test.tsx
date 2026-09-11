@@ -23,7 +23,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   AttendanceRing,
   RING_GLOW_CLASS,
-  RING_LABEL,
+  RING_LABEL_KEY,
   RING_RADIUS,
   RING_SIZE,
   RING_STROKE_WIDTH,
@@ -41,6 +41,7 @@ import {
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { t } from "./support/i18n";
 
 const RING_CODE = readFileSync(
   resolve(process.cwd(), "app/components/charts/attendance-ring.tsx"),
@@ -211,7 +212,7 @@ describe("AttendanceRing — the centre figure", () => {
       formatNumber(ATTENDANCE.average),
     );
     expect(slot("attendance-ring-caption")).toHaveTextContent(
-      RING_LABEL.average,
+      t(RING_LABEL_KEY.average),
     );
   });
 
@@ -259,7 +260,7 @@ describe("AttendanceRing — hover swaps the centre and lights the arc", () => {
       formatSharePercent(SHARE),
     );
     expect(slot("attendance-ring-caption")).toHaveTextContent(
-      RING_LABEL.capacity,
+      t(RING_LABEL_KEY.capacity),
     );
 
     fireEvent.mouseLeave(ring);
@@ -268,7 +269,7 @@ describe("AttendanceRing — hover swaps the centre and lights the arc", () => {
       formatNumber(ATTENDANCE.average),
     );
     expect(slot("attendance-ring-caption")).toHaveTextContent(
-      RING_LABEL.average,
+      t(RING_LABEL_KEY.average),
     );
   });
 

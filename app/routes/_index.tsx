@@ -3,10 +3,19 @@ import { type ShouldRevalidateFunction } from "react-router";
 import { BaselineRow } from "../components/dashboard/baseline-row";
 import { HeroBand } from "../components/dashboard/hero-band";
 import { loadBaseline } from "../lib/dashboard/baseline";
-import { WORKSPACE_LABEL } from "../lib/persona";
+import { useT } from "../lib/i18n/context";
+import { WORKSPACE_LABEL_KEY } from "../lib/persona";
 import { baselineRepository } from "../lib/repositories/index.server";
 import type { Route } from "./+types/_index";
 
+/**
+ * The browser-tab title.
+ *
+ * NOT TRANSLATED, and deliberately so: `meta` runs on the server, before the
+ * presenter has chosen a language, and the product's name is a proper noun
+ * that reads the same in both. `app.documentTitle` holds the same string in
+ * both dictionaries so the one rendered name still has a home there.
+ */
 export function meta() {
   return [{ title: "FC Basel Intelligence Platform" }];
 }
@@ -66,9 +75,13 @@ export const shouldRevalidate: ShouldRevalidateFunction = () => false;
  * inside a section) hang off a proper document outline.
  */
 export default function Index({ loaderData }: Route.ComponentProps) {
+  const t = useT();
+
   return (
     <>
-      <h1 className="sr-only">{WORKSPACE_LABEL} dashboard</h1>
+      <h1 className="sr-only">
+        {t("app.dashboardHeading", { workspace: t(WORKSPACE_LABEL_KEY) })}
+      </h1>
       {/* The band is ONE full-width grid item above the row, and the row does
           not know it exists (US-016 is first in the cut order — removing these
           two lines removes the band and nothing else). */}

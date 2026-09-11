@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "../../lib/cn";
 import { formatNumber } from "../../lib/format";
+import { useT } from "../../lib/i18n/context";
 import { type Partner } from "../../lib/repositories/types";
 import { Card, type CardProps } from "./card";
 
@@ -106,6 +107,8 @@ export interface PartnerCardProps {
 
 /** One partner: the monogram plate, the name, and the role tag under it. */
 export function PartnerCard({ partner, className }: PartnerCardProps) {
+  const t = useT();
+
   return (
     <li
       data-slot="partner-card"
@@ -127,13 +130,13 @@ export function PartnerCard({ partner, className }: PartnerCardProps) {
         >
           {partner.name}
         </span>
-        {/* The role tag. `roleLabel` travels on the datum, so the wording lives
-            in `PARTNER_ROLE_LABEL` and never in a component. */}
+        {/* The role tag. `roleLabelKey` travels on the datum, so the wording lives
+            in `PARTNER_ROLE_LABEL_KEY` and never in a component. */}
         <span
           data-slot="partner-role"
           className="block text-caption text-muted"
         >
-          {partner.roleLabel}
+          {t(partner.roleLabelKey)}
         </span>
       </span>
     </li>
@@ -187,10 +190,17 @@ export function PartnersTile({
   delayMs,
   className,
 }: PartnersTileProps) {
+  const t = useT();
+
   return (
     <Card
       title={title}
-      subtitle={period ?? `${formatNumber(partners.length)} active`}
+      subtitle={
+        period ??
+        t("baseline.partnersActive", {
+          count: formatNumber(partners.length),
+        })
+      }
       headingLevel={headingLevel}
       icon={icon}
       action={action}

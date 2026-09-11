@@ -7,13 +7,14 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PROMPT_BAR_CLEARANCE_CLASS } from "../../app/components/chrome/app-shell";
-import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
+import { PROMPT_INPUT_LABEL_KEY } from "../../app/components/chrome/prompt-bar";
 import { InsightPhase } from "../../app/lib/dashboard/sections";
 import { HeroId } from "../../app/lib/repositories/enums";
 import App, { Layout, shouldRevalidate } from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { settleThinkingBeat } from "./support/thinking-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
 
 const ROOT_SOURCE = readFileSync(
   resolve(process.cwd(), "app/root.tsx"),
@@ -215,7 +216,7 @@ describe("App", () => {
     // canvas, so an answer joins the same grid instead of replacing the view.
     expect(ROOT_SOURCE).toMatch(/useDashboard\(\)/);
     expect(ROOT_SOURCE).toMatch(
-      /<InsightSections sections=\{sections\} heroes=\{loaderData\} focus=\{focus\} \/>/,
+      /<InsightSections\s+sections=\{sections\}\s+heroes=\{loaderData\}\s+focus=\{focus\}\s*\/>/,
     );
     expect(ROOT_SOURCE.indexOf("<Outlet />")).toBeLessThan(
       ROOT_SOURCE.indexOf("<InsightSections"),
@@ -281,14 +282,16 @@ describe("App", () => {
     const user = userEvent.setup();
     renderApp();
 
-    const input = screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL });
+    const input = screen.getByRole("textbox", {
+      name: t(PROMPT_INPUT_LABEL_KEY),
+    });
     await user.type(input, "kit sales");
     expect(input).toHaveValue("kit sales");
 
     await user.click(screen.getByRole("button", { name: "Reset" }));
 
     expect(
-      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) }),
     ).toHaveValue("");
   });
 
@@ -309,7 +312,7 @@ describe("App", () => {
     renderApp();
 
     await user.type(
-      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) }),
       "how are shirts selling{Enter}",
     );
     await settleThinkingBeat();
@@ -327,7 +330,7 @@ describe("App", () => {
     renderApp();
 
     await user.type(
-      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) }),
       "shirt ticket budget{Enter}",
     );
     await settleThinkingBeat();
@@ -340,7 +343,9 @@ describe("App", () => {
   it("sharpens the section in place when a follow-up is typed", async () => {
     const user = userEvent.setup();
     renderApp();
-    const input = screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL });
+    const input = screen.getByRole("textbox", {
+      name: t(PROMPT_INPUT_LABEL_KEY),
+    });
 
     await user.type(input, "department budgets{Enter}");
     await settleThinkingBeat();
@@ -365,7 +370,7 @@ describe("App", () => {
     renderApp();
 
     await user.type(
-      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) }),
       "show me player injuries{Enter}",
     );
 
@@ -388,7 +393,7 @@ describe("App", () => {
     renderApp();
 
     await user.type(
-      screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL }),
+      screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) }),
       '<img src=x onerror="alert(1)">{Enter}',
     );
 

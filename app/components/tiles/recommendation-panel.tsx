@@ -3,6 +3,8 @@ import type { ComponentType, ReactNode } from "react";
 
 import { cn } from "../../lib/cn";
 import { useUid } from "../../lib/hooks/use-motion";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { CARD_ACCENTS, CardCaption, TILE_ENTER_CLASS } from "./card";
 
 /**
@@ -46,10 +48,10 @@ import { CARD_ACCENTS, CardCaption, TILE_ENTER_CLASS } from "./card";
 /* -------------------------------------------------------------- VARIANTS -- */
 
 /** The eyebrow above the advice. An affordance, not narrative copy. */
-export const RECOMMENDATION_LABEL = "Recommendation";
+export const RECOMMENDATION_LABEL_KEY: TranslationKey = "tiles.recommendation";
 
 /** The eyebrow of the interpretation variant. Also structural, not copy. */
-export const NARRATIVE_LABEL = "What this means";
+export const NARRATIVE_LABEL_KEY: TranslationKey = "tiles.narrativeLabel";
 
 /**
  * The two follow-up panels the three heroes need.
@@ -67,7 +69,7 @@ export const NARRATIVE_LABEL = "What this means";
  */
 export const RECOMMENDATION_VARIANTS = {
   recommendation: {
-    label: RECOMMENDATION_LABEL,
+    labelKey: RECOMMENDATION_LABEL_KEY,
     /** `CARD_ACCENTS.gold` — gold stays spelled once, in `card.tsx`. */
     accent: "gold",
     surface: "border-gold/45 bg-gold/10",
@@ -76,7 +78,7 @@ export const RECOMMENDATION_VARIANTS = {
     icon: Lightbulb,
   },
   narrative: {
-    label: NARRATIVE_LABEL,
+    labelKey: NARRATIVE_LABEL_KEY,
     accent: "navy",
     surface: "border-border bg-surface",
     glyph: "text-navy",
@@ -85,7 +87,7 @@ export const RECOMMENDATION_VARIANTS = {
 } as const satisfies Record<
   string,
   {
-    label: string;
+    labelKey: TranslationKey;
     accent: keyof typeof CARD_ACCENTS;
     surface: string;
     glyph: string;
@@ -140,6 +142,7 @@ export function RecommendationPanel({
   const style = RECOMMENDATION_VARIANTS[variant];
   const Icon = style.icon;
   // The panel is a region, so it needs a name; the eyebrow is that name.
+  const t = useT();
   const labelId = `${useUid("recommendation")}-label`;
 
   return (
@@ -185,7 +188,7 @@ export function RecommendationPanel({
               data-slot="recommendation-label"
               className={cn("tile-title", style.glyph)}
             >
-              {label ?? style.label}
+              {label ?? t(style.labelKey)}
             </p>
             {/* Verbatim. No formatter, no clamp, no transformation. */}
             <p data-slot="recommendation-body" className="mt-1.5">

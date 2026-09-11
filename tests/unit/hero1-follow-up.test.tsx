@@ -43,19 +43,19 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { hBarMax, hBarPercent } from "../../app/components/charts/h-bars";
 import {
-  HERO_1_FOLLOW_UP_TITLE,
-  HERO_1_TILE_TITLES,
+  HERO_1_FOLLOW_UP_TITLE_KEY,
+  HERO_1_TILE_TITLE_KEY,
 } from "../../app/components/heroes/hero-1";
 import {
-  FOLLOW_UP_DIVIDER_LABEL,
+  FOLLOW_UP_DIVIDER_LABEL_KEY,
   tileDelayMs,
 } from "../../app/components/heroes/hero-section";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
-import { FOLLOW_UP_CHIP_HINT } from "../../app/components/chrome/suggestion-chips";
-import { RECOMMENDATION_LABEL } from "../../app/components/tiles/recommendation-panel";
+import { FOLLOW_UP_CHIP_HINT_KEY } from "../../app/components/chrome/suggestion-chips";
+import { RECOMMENDATION_LABEL_KEY } from "../../app/components/tiles/recommendation-panel";
 import {
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
 } from "../../app/lib/dashboard/chips";
 import {
   InsightPhase,
@@ -76,6 +76,7 @@ import {
 } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -160,7 +161,8 @@ function panel(): HTMLElement | null {
 /** The follow-up's card — the driver tile, which is the LAST card in the beat. */
 function trendTile(): HTMLElement {
   const tile = cards().find(
-    (card) => card.querySelector("h3")?.textContent === HERO_1_FOLLOW_UP_TITLE,
+    (card) =>
+      card.querySelector("h3")?.textContent === t(HERO_1_FOLLOW_UP_TITLE_KEY),
   );
   if (!tile) throw new Error("the badge-trend tile is not on screen");
   return tile;
@@ -226,10 +228,10 @@ describe("Hero 1 follow-up — the section GROWS, it does not multiply", () => {
     expect(
       cards().map((card) => card.querySelector("h3")!.textContent),
     ).toEqual([
-      `${HERO_1_TILE_TITLES.kits} (${PRIMARY.periods[0]!.label.toLowerCase()})`,
-      HERO_1_TILE_TITLES.badges,
-      HERO_1_TILE_TITLES.names,
-      HERO_1_FOLLOW_UP_TITLE,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(PRIMARY.periods[0]!.labelKey).toLowerCase()})`,
+      t(HERO_1_TILE_TITLE_KEY.badges),
+      t(HERO_1_TILE_TITLE_KEY.names),
+      t(HERO_1_FOLLOW_UP_TITLE_KEY),
     ]);
   });
 
@@ -242,7 +244,7 @@ describe("Hero 1 follow-up — the section GROWS, it does not multiply", () => {
     expect(slots("section-head", section())).toHaveLength(1);
     expect(
       within(section()).getByRole("heading", { level: 2 }),
-    ).toHaveTextContent(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    ).toHaveTextContent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
   });
 
   it("shows nothing of the beat while the phase is still PRIMARY", () => {
@@ -251,7 +253,7 @@ describe("Hero 1 follow-up — the section GROWS, it does not multiply", () => {
     expect(divider()).toBeNull();
     expect(panel()).toBeNull();
     expect(cards()).toHaveLength(3);
-    expect(section().textContent).not.toContain(HERO_1_FOLLOW_UP_TITLE);
+    expect(section().textContent).not.toContain(t(HERO_1_FOLLOW_UP_TITLE_KEY));
   });
 
   it("continues the section's ONE cascade rather than starting a second", () => {
@@ -271,9 +273,9 @@ describe("Hero 1 follow-up — a gold divider separates the beat (criterion 2)",
 
     expect(divider()).not.toBeNull();
     expect(slot("follow-up-divider-label", divider()!)).toHaveTextContent(
-      FOLLOW_UP_DIVIDER_LABEL,
+      t(FOLLOW_UP_DIVIDER_LABEL_KEY),
     );
-    expect(FOLLOW_UP_DIVIDER_LABEL).toBe("Follow-up");
+    expect(t(FOLLOW_UP_DIVIDER_LABEL_KEY)).toBe("Follow-up");
   });
 
   it("SEPARATES: every primary tile before it, every follow-up element after", () => {
@@ -350,7 +352,9 @@ describe("Hero 1 follow-up — the badge trend (criterion 3)", () => {
     expect(trendTile().querySelector("h3")).toHaveTextContent(
       "Badge selection trend (last 3 drops)",
     );
-    expect(HERO_1_FOLLOW_UP_TITLE).toBe("Badge selection trend (last 3 drops)");
+    expect(t(HERO_1_FOLLOW_UP_TITLE_KEY)).toBe(
+      "Badge selection trend (last 3 drops)",
+    );
   });
 
   it("shows the four sponsors with their signed percentages", () => {
@@ -482,7 +486,7 @@ describe("Hero 1 follow-up — the recommendation panel (criterion 3)", () => {
   it("is announced as 'Recommendation' — the advice, named", () => {
     renderSections();
 
-    expect(panel()).toHaveAccessibleName(RECOMMENDATION_LABEL);
+    expect(panel()).toHaveAccessibleName(t(RECOMMENDATION_LABEL_KEY));
     expect(slot("recommendation-label", panel()!)).toHaveTextContent(
       "Recommendation",
     );
@@ -534,7 +538,7 @@ describe("Hero 1 follow-up — the narrative is the contract (criterion 4)", () 
 
     const rendered = slot("recommendation-body", panel()!)!.textContent!;
     expect(bytes(rendered)).toBe(bytes(AUTHORED));
-    expect(bytes(FOLLOW_UP.narrative)).toBe(bytes(AUTHORED));
+    expect(bytes(t(FOLLOW_UP.narrativeKey))).toBe(bytes(AUTHORED));
     expect(rendered).toBe(AUTHORED);
     expect(rendered).toHaveLength(AUTHORED.length);
   });
@@ -542,34 +546,34 @@ describe("Hero 1 follow-up — the narrative is the contract (criterion 4)", () 
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two copies inside this repository could drift together; the signed-off
     // document cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(FOLLOW_UP.narrative);
+    expect(BACKLOG).toContain(t(FOLLOW_UP.narrativeKey));
     expect(BACKLOG).toContain(AUTHORED);
   });
 
   it("is plain ASCII — no smart quote, no em dash, no minus glyph", () => {
-    for (const character of FOLLOW_UP.narrative) {
+    for (const character of t(FOLLOW_UP.narrativeKey)) {
       expect(character.codePointAt(0)!).toBeLessThan(0x80);
     }
-    expect(FOLLOW_UP.narrative).not.toMatch(/[‘’“”–—−]/u);
+    expect(t(FOLLOW_UP.narrativeKey)).not.toMatch(/[‘’“”–—−]/u);
   });
 
   it("pins the hyphen in 'fastest - up' to an ASCII 0x2d", () => {
     // The single most likely silent corruption in this sentence: a spaced
     // hyphen is exactly what an editor turns into an en dash.
-    const index = FOLLOW_UP.narrative.indexOf("-");
-    expect(FOLLOW_UP.narrative.slice(index - 8, index + 4)).toBe(
+    const index = t(FOLLOW_UP.narrativeKey).indexOf("-");
+    expect(t(FOLLOW_UP.narrativeKey).slice(index - 8, index + 4)).toBe(
       "fastest - up",
     );
-    expect(FOLLOW_UP.narrative.codePointAt(index)).toBe(0x2d);
+    expect(t(FOLLOW_UP.narrativeKey).codePointAt(index)).toBe(0x2d);
     // And it is the ONLY hyphen in the sentence.
-    expect(FOLLOW_UP.narrative.split("-")).toHaveLength(2);
+    expect(t(FOLLOW_UP.narrativeKey).split("-")).toHaveLength(2);
   });
 
   it("is never assembled, truncated or transformed on the way to the screen", () => {
     renderSections();
 
     const body = slot("recommendation-body", panel()!)!;
-    expect(body.textContent).toBe(FOLLOW_UP.narrative);
+    expect(body.textContent).toBe(t(FOLLOW_UP.narrativeKey));
     expect(body.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
     expect(body.querySelector("*")).toBeNull();
   });
@@ -588,7 +592,9 @@ describe("Hero 1 follow-up — the narrative is the contract (criterion 4)", () 
       (entry) => entry.sponsor === "Sunrise",
     )!;
     expect(sunrise.deltaPercent).toBe(38);
-    expect(FOLLOW_UP.narrative).toContain("up 38% over the last three drops");
+    expect(t(FOLLOW_UP.narrativeKey)).toContain(
+      "up 38% over the last three drops",
+    );
     renderSections();
     expect(trendRows()[1]![1]).toBe(formatSignedPercent(sunrise.deltaPercent));
   });
@@ -667,7 +673,7 @@ describe("Hero 1 follow-up — reduced motion renders the final state", () => {
 
     expect(divider()).not.toBeNull();
     expect(slot("recommendation-body", panel()!)!.textContent).toBe(
-      FOLLOW_UP.narrative,
+      t(FOLLOW_UP.narrativeKey),
     );
   });
 });
@@ -695,9 +701,9 @@ describe("Hero 1 follow-up — asked for real, from the chip row", () => {
    * "Follow-up:" hint, so a screen-reader user hears WHICH kind of prompt it
    * is. Named here rather than spelled out at each call site.
    */
-  const followUpChipName = `${FOLLOW_UP_CHIP_HINT} ${
-    FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]
-  }`;
+  const followUpChipName = `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(
+    FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1],
+  )}`;
 
   function followUpChips(): HTMLElement[] {
     return screen.queryAllByRole("button", { name: followUpChipName });
@@ -712,7 +718,7 @@ describe("Hero 1 follow-up — asked for real, from the chip row", () => {
     const user = userEvent.setup();
     renderApp();
 
-    await tap(user, HERO_CHIP_LABEL[HeroId.HERO_1]);
+    await tap(user, t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     expect(cards()).toHaveLength(3);
 
     await tap(user, followUpChipName);
@@ -735,7 +741,7 @@ describe("Hero 1 follow-up — asked for real, from the chip row", () => {
 
     // Not offered at the baseline; offered once the hero is answered.
     expect(followUpChips()).toHaveLength(0);
-    await tap(user, HERO_CHIP_LABEL[HeroId.HERO_1]);
+    await tap(user, t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     expect(followUpChips()).not.toHaveLength(0);
 
     await tap(user, followUpChipName);
@@ -745,7 +751,7 @@ describe("Hero 1 follow-up — asked for real, from the chip row", () => {
     // The hero's own chip is always offered, sharpened or not.
     expect(
       screen.queryAllByRole("button", {
-        name: HERO_CHIP_LABEL[HeroId.HERO_1],
+        name: t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]),
       }),
     ).not.toHaveLength(0);
   });
@@ -753,7 +759,7 @@ describe("Hero 1 follow-up — asked for real, from the chip row", () => {
   it("restates neither the chip label nor a keyword set of its own", () => {
     // Criteria 1 is satisfied by NOT being reimplemented: the hero renders, it
     // does not decide whether it was asked for.
-    expect(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]).toBe(
+    expect(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1])).toBe(
       "Which badge should we push next?",
     );
     for (const source of SOURCES) {

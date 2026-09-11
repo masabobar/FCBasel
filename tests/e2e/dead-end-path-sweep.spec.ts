@@ -28,6 +28,7 @@ import {
   pressReset,
   readCanvas,
   readStorage,
+  restoreEnglish,
   SETTLE_MS,
   tabRing,
   TIE_BREAKS,
@@ -573,6 +574,11 @@ test.describe("keyboard-only traversal", () => {
       await page.keyboard.press("Space");
       await page.waitForTimeout(SETTLE_MS);
       await expectAlive(page, `${label}: Space on ${who}`);
+
+      // If the stop WAS the language toggle, the screen is now in German and
+      // every name-based helper below would be hunting a word that left with
+      // it. The stop was still pressed and still asserted safe.
+      await restoreEnglish(page);
 
       const after = await readCanvas(page);
       if (

@@ -16,6 +16,15 @@
  * no socket, loads no embedding and imports no matching library. Plain string
  * work only, and a source scan in the suite keeps it that way.
  *
+ * IT MATCHES IN BOTH LANGUAGES (US-049). The demo can be given in German, and
+ * a presenter who switches the interface and then types English keywords - or
+ * the reverse - must still be answered. So each intent carries ONE keyword set
+ * holding both vocabularies rather than a set per locale: the matcher never
+ * reads the selected locale, there is no language to get wrong, and a mixed
+ * question ("Trikot sales") resolves like any other. The German words were
+ * chosen so none of them is a substring of an English one, which is what keeps
+ * every score in `tests/unit/intent-matching.test.ts` unchanged.
+ *
  * THE ALGORITHM IS A FAITHFUL PORT of the approved reference build, kept
  * behaviour-for-behaviour so the demo is predictable:
  *
@@ -202,12 +211,22 @@ export const INTENTS: readonly IntentDefinition[] = [
       "printed",
       "name",
       "names",
+      // German
+      "verkauf",
+      "verkäuf",
+      "heim",
+      "auswärts",
+      "gedruckt",
+      "namen",
+      "ausführung",
+      "abzeichen",
+      "fanshop",
     ],
   },
   {
     heroId: HeroId.HERO_2,
     kind: ChipKind.HERO,
-    strong: ["ticket", "tickets", "matchday", "gate"],
+    strong: ["ticket", "tickets", "matchday", "gate", "spieltag", "eintritt"],
     weak: [
       "revenue",
       "last year",
@@ -222,6 +241,16 @@ export const INTENTS: readonly IntentDefinition[] = [
       "fcz",
       "match",
       "matches",
+      // German
+      "einnahmen",
+      "umsatz",
+      "saison",
+      "letztes jahr",
+      "dieses jahr",
+      "vorjahr",
+      "spiel",
+      "vergleich",
+      "zuschauer",
     ],
   },
   {
@@ -234,6 +263,9 @@ export const INTENTS: readonly IntentDefinition[] = [
       "departments",
       "actuals",
       "actual",
+      // German
+      "abteilung",
+      "abteilungen",
     ],
     weak: [
       "variance",
@@ -244,25 +276,77 @@ export const INTENTS: readonly IntentDefinition[] = [
       "target",
       "achieved",
       "performance",
+      // German
+      "abweichung",
+      "ausgaben",
+      "kosten",
+      "ertrag",
+      "ziel",
+      "über",
+      "unter",
+      "ist-wert",
+      "soll",
     ],
   },
   {
     heroId: HeroId.HERO_1,
     kind: ChipKind.FOLLOW_UP,
     strong: ["badge", "sponsor"],
-    weak: ["push", "promote", "next", "drop", "recommend", "which", "what"],
+    weak: [
+      "push",
+      "promote",
+      "next",
+      "drop",
+      "recommend",
+      "which",
+      "what",
+      // German
+      "welche",
+      "nächst",
+      "empfehl",
+      "bewerben",
+    ],
   },
   {
     heroId: HeroId.HERO_2,
     kind: ChipKind.FOLLOW_UP,
-    strong: ["fixtures", "matches", "fixture"],
-    weak: ["driving", "drop", "down", "decline", "why", "which", "lower"],
+    strong: ["fixtures", "matches", "fixture", "spiele", "partien"],
+    weak: [
+      "driving",
+      "drop",
+      "down",
+      "decline",
+      "why",
+      "which",
+      "lower",
+      // German
+      "rückgang",
+      "treiben",
+      "warum",
+      "welche",
+      "weniger",
+    ],
   },
   {
     heroId: HeroId.HERO_3,
     kind: ChipKind.FOLLOW_UP,
     strong: ["marketing"],
-    weak: ["why", "over", "budget", "behind", "target", "explain", "driving"],
+    weak: [
+      "why",
+      "over",
+      "budget",
+      "behind",
+      "target",
+      "explain",
+      "driving",
+      // German
+      "warum",
+      "über",
+      "hinter",
+      "ziel",
+      "erklär",
+      "treiben",
+    ],
   },
 ];
 

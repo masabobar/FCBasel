@@ -20,9 +20,13 @@ import {
   formatSharePercent,
 } from "../../lib/format";
 import { useUid } from "../../lib/hooks/use-motion";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
+import { personaGreeting } from "../../lib/persona";
 import {
   attendanceChangePercent,
   attendanceShare,
+  resolveSeries,
   scoreline,
   seriesTotals,
 } from "../../lib/repositories/derive";
@@ -73,40 +77,42 @@ import { type HomeMatch } from "../../lib/repositories/types";
 /* ------------------------------------------------------------------ COPY -- */
 
 /** The band's two section labels. Copy, not data. */
-export const HERO_BAND_LABELS = {
-  webshop: "Webshop revenue",
-  attendance: "Home attendance",
-} as const;
+export const HERO_BAND_LABEL_KEY = {
+  webshop: "band.webshop",
+  attendance: "band.attendance",
+} as const satisfies Record<string, TranslationKey>;
 
 /** The line under the greeting. It says what the band is and what to do next. */
-export const HERO_BAND_SUBTITLE =
-  "Your commercial overview. Ask a question below to expand it.";
+export const HERO_BAND_SUBTITLE_KEY: TranslationKey = "band.subtitle";
 
 /**
  * The comparison series' name, in the legend and in the hover tooltip. The
  * CURRENT series is named by the dataset's own period label, so only this one
  * is copy.
  */
-export const PREVIOUS_SERIES_NAME = "Previous";
+export const PREVIOUS_SERIES_NAME_KEY: TranslationKey = "band.previousSeries";
 
 /**
  * The filter's accessible name. It is named for what it DRIVES, because the
  * dashboard shows a second period filter (Top Products') at the same time.
  */
-export const HERO_BAND_PERIOD_LABEL = "Period for webshop and attendance";
+export const HERO_BAND_PERIOD_LABEL_KEY: TranslationKey = "band.periodLabel";
 
 /** Reads `+5.1% vs previous` beside the ring. */
-const COMPARISON_TEXT = "vs previous";
+const COMPARISON_TEXT_KEY: TranslationKey = "band.comparison";
 
 /** Reads `2 home matches` — pluralised, since a period can hold one. */
-const HOME_MATCH_TEXT = { one: "home match", many: "home matches" } as const;
+const HOME_MATCH_TEXT_KEY = {
+  one: "band.homeMatchOne",
+  many: "band.homeMatchMany",
+} as const satisfies Record<string, TranslationKey>;
 
 /** Reads `76% of ~38’000`, quoting the capacity as the Guide quotes it. */
-const OF_PREFIX = "of";
+const OF_PREFIX_KEY: TranslationKey = "band.of";
 const APPROX_PREFIX = "~";
 
 /** Reads `Latest: FCB 2-1 Sion`. The scoreline itself comes from `derive.ts`. */
-const LATEST_PREFIX = "Latest:";
+const LATEST_PREFIX_KEY: TranslationKey = "band.latestPrefix";
 
 /* -------------------------------------------------------------- GEOMETRY -- */
 
@@ -156,6 +162,7 @@ export function HeroBand({
    * widgets, rather than inside either of them — which is what makes a single
    * press move both.
    */
+  const t = useT();
   const [periodKey, setPeriodKey] = useState<PeriodKey>(BASELINE_PERIOD);
   const uid = useUid("hero-band");
 
@@ -165,6 +172,10 @@ export function HeroBand({
   if (!period) return null;
 
   const totals = seriesTotals(period.webshop);
+  // The axis is keyed in the dataset, because the loader runs on the server
+  // and cannot know the language — see `TranslatableSeries`.
+  const webshop = resolveSeries(period.webshop, t);
+  const periodLabel = t(period.labelKey);
   const { attendance } = period;
   const greetingId = `${uid}-greeting`;
 
@@ -176,14 +187,14 @@ export function HeroBand({
    */
   const series: readonly LineSeries[] = [
     {
-      name: PREVIOUS_SERIES_NAME,
-      values: period.webshop.previous,
+      name: t(PREVIOUS_SERIES_NAME_KEY),
+      values: webshop.previous,
       color: "white",
       dash: true,
     },
     {
-      name: period.label,
-      values: period.webshop.current,
+      name: periodLabel,
+      values: webshop.current,
       color: "gold",
       area: true,
     },
@@ -214,13 +225,13 @@ export function HeroBand({
               data-slot="hero-band-greeting"
               className="text-kpi leading-tight font-bold text-bg"
             >
-              {greeting}
+              {personaGreeting(t, greeting)}
             </h2>
             <p
               data-slot="hero-band-subtitle"
               className="mt-1 text-caption text-bg/60"
             >
-              {HERO_BAND_SUBTITLE}
+              {t(HERO_BAND_SUBTITLE_KEY)}
             </p>
           </div>
 
@@ -231,7 +242,7 @@ export function HeroBand({
             value={period.key}
             onChange={setPeriodKey}
             variant="dark"
-            label={HERO_BAND_PERIOD_LABEL}
+            label={t(HERO_BAND_PERIOD_LABEL_KEY)}
           />
         </div>
 
@@ -240,7 +251,7 @@ export function HeroBand({
             <div className="mb-1 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h3 className="tile-title text-bg/60">
-                  {HERO_BAND_LABELS.webshop}
+                  {t(HERO_BAND_LABEL_KEY.webshop)}
                 </h3>
                 {/* Summed from the plotted array on every render — see the note
                     on this file. `onDark` also forces the chip's light variant,
@@ -262,13 +273,13 @@ export function HeroBand({
                 filter change (US-025's entrance is a first-paint effect). */}
             <LineChart
               key={period.key}
-              xs={period.webshop.labels}
+              xs={webshop.labels}
               series={series}
               format={formatMoney}
               height={BAND_CHART_HEIGHT}
               dark
               legend={false}
-              label={`${HERO_BAND_LABELS.webshop}, ${period.label}`}
+              label={`${t(HERO_BAND_LABEL_KEY.webshop)}, ${periodLabel}`}
             />
           </div>
 
@@ -277,7 +288,7 @@ export function HeroBand({
 
             <div className="min-w-0">
               <h3 className="tile-title text-bg/60">
-                {HERO_BAND_LABELS.attendance}
+                {t(HERO_BAND_LABEL_KEY.attendance)}
               </h3>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 <DeltaChip
@@ -285,7 +296,7 @@ export function HeroBand({
                   variant="light"
                 />
                 <span className="text-caption text-bg/60">
-                  {COMPARISON_TEXT}
+                  {t(COMPARISON_TEXT_KEY)}
                 </span>
               </div>
               <div
@@ -293,21 +304,21 @@ export function HeroBand({
                 className="mt-2 space-y-0.5 text-caption text-bg/70"
               >
                 <div>
-                  {`${formatNumber(attendance.matches)} ${
+                  {`${formatNumber(attendance.matches)} ${t(
                     attendance.matches === 1
-                      ? HOME_MATCH_TEXT.one
-                      : HOME_MATCH_TEXT.many
-                  }`}
+                      ? HOME_MATCH_TEXT_KEY.one
+                      : HOME_MATCH_TEXT_KEY.many,
+                  )}`}
                 </div>
                 <div>
                   {`${formatSharePercent(
                     attendanceShare(attendance),
-                  )} ${OF_PREFIX} ${APPROX_PREFIX}${formatNumber(
+                  )} ${t(OF_PREFIX_KEY)} ${APPROX_PREFIX}${formatNumber(
                     attendance.capacity,
                   )}`}
                 </div>
                 {/* Rendered by `derive.ts`, never assembled here. */}
-                <div className="text-bg/50">{`${LATEST_PREFIX} ${scoreline(latest)}`}</div>
+                <div className="text-bg/50">{`${t(LATEST_PREFIX_KEY)} ${scoreline(latest)}`}</div>
               </div>
             </div>
           </div>

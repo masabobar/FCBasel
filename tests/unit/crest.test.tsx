@@ -5,9 +5,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   Crest,
-  CREST_LABEL,
+  CREST_LABEL_KEY,
   CREST_SRC,
 } from "../../app/components/chrome/crest";
+import { t } from "./support/i18n";
 
 const PUBLIC_CREST = resolve(__dirname, "../../public/fcb-crest.png");
 
@@ -20,16 +21,17 @@ describe("Crest", () => {
   it("exposes an accessible name", () => {
     render(<Crest />);
 
-    expect(screen.getByRole("img", { name: CREST_LABEL })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: t(CREST_LABEL_KEY) }),
+    ).toBeInTheDocument();
   });
 
   it("points at the self-hosted asset by a root-relative path", () => {
     render(<Crest />);
 
-    expect(screen.getByRole("img", { name: CREST_LABEL })).toHaveAttribute(
-      "src",
-      "/fcb-crest.png",
-    );
+    expect(
+      screen.getByRole("img", { name: t(CREST_LABEL_KEY) }),
+    ).toHaveAttribute("src", "/fcb-crest.png");
   });
 
   // The whole point of US-004: a hotlink to the club CDN would break the demo
@@ -42,7 +44,7 @@ describe("Crest", () => {
 
   it("renders at the 32px app-bar height by default", () => {
     render(<Crest />);
-    const crest = screen.getByRole("img", { name: CREST_LABEL });
+    const crest = screen.getByRole("img", { name: t(CREST_LABEL_KEY) });
 
     expect(crest).toHaveAttribute("height", "32");
     expect(crest).toHaveAttribute("width", "30");
@@ -50,7 +52,7 @@ describe("Crest", () => {
 
   it("scales width with height so the box keeps the asset's aspect ratio", () => {
     render(<Crest size={64} />);
-    const crest = screen.getByRole("img", { name: CREST_LABEL });
+    const crest = screen.getByRole("img", { name: t(CREST_LABEL_KEY) });
 
     expect(crest).toHaveAttribute("height", "64");
     expect(crest).toHaveAttribute("width", "60");
@@ -59,7 +61,7 @@ describe("Crest", () => {
   it("forwards a className", () => {
     render(<Crest className="shrink-0" />);
 
-    expect(screen.getByRole("img", { name: CREST_LABEL })).toHaveClass(
+    expect(screen.getByRole("img", { name: t(CREST_LABEL_KEY) })).toHaveClass(
       "shrink-0",
     );
   });

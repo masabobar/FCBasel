@@ -20,6 +20,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   AUTH_REALM,
   MAX_FAILED_ATTEMPTS,
+  PUBLIC_PATHS,
   basicAuth,
   createAttemptLimiter,
   credentialsMatch,
@@ -252,10 +253,11 @@ function run(
   middleware: ReturnType<typeof basicAuth>,
   authorization?: string,
   ip = "1.2.3.4",
+  path = "/",
 ) {
   const res = fakeResponse();
   const next = vi.fn();
-  middleware({ ip, headers: { authorization } }, res, next);
+  middleware({ ip, path, headers: { authorization } }, res, next);
   return { res, next };
 }
 
@@ -351,6 +353,62 @@ describe("basicAuth middleware — the status matrix", () => {
 
     expect(serialised).not.toMatch(/attacker-name|attacker-password/);
     expect(serialised).not.toMatch(/Basic |s3cret/);
+  });
+
+  /**
+   * THE ONE EXEMPTION, and the tests that keep it at one.
+   *
+   * A browser fetches the tab icon from its own chrome, without the credential
+   * the authenticated page holds, so behind the gate the crest fell back to a
+   * generic globe in production while showing correctly on localhost.
+   */
+  it("serves the favicon with no credential, so the tab keeps the crest", () => {
+    const { res, next } = run(
+      basicAuth(EXPECTED),
+      undefined,
+      "1.2.3.4",
+      "/favicon.ico",
+    );
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.statusCode).toBeNull();
+  });
+
+  it("serves it even to a client that is locked out", () => {
+    // The icon is fetched on every page load; a lockout must not be able to
+    // strip the crest from the tab.
+    const middleware = basicAuth(EXPECTED);
+    for (let i = 0; i < MAX_FAILED_ATTEMPTS; i += 1) {
+      run(middleware, header("fcb", "wrong"));
+    }
+
+    expect(run(middleware, header("fcb", "wrong")).res.statusCode).toBe(429);
+
+    const { next } = run(middleware, undefined, "1.2.3.4", "/favicon.ico");
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["the document", "/"],
+    ["the bundle that carries the figures", "/assets/entry.client-abc123.js"],
+    [
+      "the crest, which the authenticated page requests itself",
+      "/fcb-crest.png",
+    ],
+    ["a path merely containing the icon's name", "/assets/favicon.ico"],
+    ["a traversal aimed at it", "/../favicon.ico"],
+  ])("still guards %s", (_label, path) => {
+    const { res, next } = run(basicAuth(EXPECTED), undefined, "1.2.3.4", path);
+
+    expect(next).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("keeps the exemption list at exactly one entry", () => {
+    // Anything added here is public to the whole internet, forever. The list is
+    // asserted rather than described so widening it is a deliberate act that
+    // fails a test first.
+    expect([...PUBLIC_PATHS]).toEqual(["/favicon.ico"]);
   });
 
   it("writes no response body containing the expected credential", () => {

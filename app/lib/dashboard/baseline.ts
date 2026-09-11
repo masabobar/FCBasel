@@ -30,8 +30,9 @@
  */
 
 import { type Clock, systemClock } from "../calendar";
-import { personaGreeting } from "../persona";
-import { PERIOD_LABEL, PeriodKey } from "../repositories/enums";
+import { type TranslationKey } from "../i18n";
+import { type GreetingKey, greetingKeyFor } from "../persona";
+import { PERIOD_LABEL_KEY, PeriodKey } from "../repositories/enums";
 import { seriesTotals, trendEndingAt } from "../repositories/derive";
 import {
   type BaselinePeriod,
@@ -90,9 +91,9 @@ export const SPARKLINE_POINTS = 6;
 /** The webshop tile's figures. Nothing here is stored; all of it is derived. */
 export interface WebshopHeadline {
   /** `This month` — the period label from the dataset, never a literal. */
-  readonly periodLabel: string;
+  readonly periodLabelKey: TranslationKey;
   /** `Last month` — what the delta compares against. */
-  readonly comparisonLabel: string;
+  readonly comparisonLabelKey: TranslationKey;
   /** Revenue in CHF, the SUM of the period's current series. */
   readonly total: number;
   /** Movement on the comparison series, signed, to one decimal. */
@@ -119,10 +120,11 @@ export interface WebshopHeadline {
  */
 export interface HeroBandData {
   /**
-   * `Good morning, Sales & Marketing` — resolved from the loader's clock, so
-   * the server and the browser cannot disagree about the hour.
+   * WHICH greeting the loader's clock called for, so the server and the
+   * browser cannot disagree about the hour — and, since it is a key rather
+   * than a sentence, so the band can say it in either language (US-049).
    */
-  readonly greeting: string;
+  readonly greeting: GreetingKey;
   /** The selectable periods, in display order. Four in the seeded dataset. */
   readonly periods: readonly BaselinePeriod[];
 }
@@ -205,10 +207,10 @@ export async function loadBaseline(
   const totals = seriesTotals(baselinePeriod.webshop);
 
   return {
-    band: { greeting: personaGreeting(clock()), periods },
+    band: { greeting: greetingKeyFor(clock()), periods },
     webshop: {
-      periodLabel: baselinePeriod.label,
-      comparisonLabel: PERIOD_LABEL[BASELINE_COMPARISON_PERIOD],
+      periodLabelKey: baselinePeriod.labelKey,
+      comparisonLabelKey: PERIOD_LABEL_KEY[BASELINE_COMPARISON_PERIOD],
       total: totals.current,
       deltaPercent: totals.deltaPercent,
       // Ends on the headline figure above, not on whatever the year-to-date

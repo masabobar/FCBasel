@@ -5,7 +5,7 @@ import { DeltaChip } from "../tiles/delta-chip";
 import { DriverTile } from "../tiles/driver-tile";
 import { KpiTile } from "../tiles/kpi-tile";
 import { RecommendationPanel } from "../tiles/recommendation-panel";
-import { HERO_CHIP_LABEL } from "../../lib/dashboard/chips";
+import { HERO_CHIP_LABEL_KEY } from "../../lib/dashboard/chips";
 import {
   InsightPhase,
   type InsightSection,
@@ -19,6 +19,8 @@ import {
   formatSignedNumber,
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { fixtureDeclines, fixtureTotals } from "../../lib/repositories/derive";
 import { HeroId } from "../../lib/repositories/enums";
 import {
@@ -119,20 +121,20 @@ import {
 /* ------------------------------------------------------------------ COPY -- */
 
 /** The three tile titles, in render order. */
-export const HERO_2_TILE_TITLES = {
+export const HERO_2_TILE_TITLE_KEY = {
   /**
    * `(CHF 000)` is the acceptance criteria's own wording, and it is load-
    * bearing rather than decoration: the gutter scale and the eight delta chips
    * are bare magnitudes in CHF thousands, and this is where they get their
    * unit. See the units note above.
    */
-  fixtures: "Matchday ticket revenue by fixture (CHF 000)",
-  totals: "Ticket revenue, year on year",
-  months: "Ticket revenue by month",
-} as const;
+  fixtures: "hero2.fixturesTitle",
+  totals: "hero2.totalsTitle",
+  months: "hero2.monthsTitle",
+} as const satisfies Record<string, TranslationKey>;
 
 /** Reads `Season 26/27 vs Season 25/26` under the headline figure. */
-const VERSUS_WORD = "vs";
+const VERSUS_WORD_KEY: TranslationKey = "hero2.versus";
 
 /**
  * The follow-up tile's title — what the beat's bars are a list OF.
@@ -141,15 +143,14 @@ const VERSUS_WORD = "vs";
  * not count it. How many fixtures fell and by how much is
  * `fixtureDeclines`' answer, and it is never restated in a string.
  */
-export const HERO_2_FOLLOW_UP_TITLE = "Fixtures driving the drop";
+export const HERO_2_FOLLOW_UP_TITLE_KEY: TranslationKey = "hero2.followUpTitle";
 
 /**
  * The scope line under that title. It states the ORDER, because the order is
  * the tile's claim: biggest decline first, which is what makes the top row the
  * fixture to talk about in the room.
  */
-const DECLINE_SUBTITLE =
-  "Year-on-year fall per fixture · ranked by size of decline";
+const DECLINE_SUBTITLE_KEY: TranslationKey = "hero2.declineSubtitle";
 
 /**
  * THE ONE-LINE ATTENDANCE NOTE (criterion 3), under the bars.
@@ -165,7 +166,7 @@ const DECLINE_SUBTITLE =
  * that clause and fails if it reappears here. It also carries no figure, so
  * nothing in it can drift from the fixtures.
  */
-const ATTENDANCE_NOTE = "Every fixture here fell on attendance, not on price.";
+const ATTENDANCE_NOTE_KEY: TranslationKey = "hero2.attendanceNote";
 
 /* -------------------------------------------------------------- GEOMETRY -- */
 
@@ -235,7 +236,14 @@ export interface Hero2BodyProps {
 }
 
 export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
+  const t = useT();
   const { previousSeason, currentSeason, fixtures, monthly } = primary;
+
+  // Both season names, resolved once: they appear in a legend, two axes, a
+  // subtitle and a change line, and one resolution keeps the five identical.
+  const previousSeasonLabel = t(previousSeason.labelKey);
+  const currentSeasonLabel = t(currentSeason.labelKey);
+  const versus = t(VERSUS_WORD_KEY);
 
   // The chart's own shape: the fixture IS the pair's identity, so the bars
   // reconcile by opponent rather than by position.
@@ -259,21 +267,21 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
         id={sectionLabelId(HeroId.HERO_2)}
         // The chip's own label, imported rather than retyped, so the question
         // in the row above and the answer's heading are one string (US-029).
-        label={HERO_CHIP_LABEL[HeroId.HERO_2]}
+        label={t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2])}
         // Verbatim, straight from the dataset. Never assembled here.
-        narrative={primary.narrative}
+        narrative={t(primary.narrativeKey)}
         // No `scope`: the two charts are at different scopes and each states
         // its own. See the scope note at the top of this file.
       />
 
       <GroupedBarTile
-        title={HERO_2_TILE_TITLES.fixtures}
+        title={t(HERO_2_TILE_TITLE_KEY.fixtures)}
         // THE NARROWER SCOPE, from the dataset: eight highest-grossing home
         // fixtures, matchday revenue only.
-        period={fixtures.scopeLabel}
+        period={t(fixtures.scopeLabelKey)}
         groups={groups}
-        previousLabel={previousSeason.label}
-        currentLabel={currentSeason.label}
+        previousLabel={previousSeasonLabel}
+        currentLabel={currentSeasonLabel}
         // The gutter scale, in the thousands the title declares.
         format={formatNumber}
         // The eight chips: `+130`, `-150`. Signed, so the direction is in the
@@ -297,14 +305,14 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
                 data-season="previous"
                 className={TABULAR_NUMERALS_CLASS}
               >
-                {`${previousSeason.label} ${money(group.previous)}`}
+                {`${previousSeasonLabel} ${money(group.previous)}`}
               </div>
               <div
                 data-slot="fixture-tooltip-season"
                 data-season="current"
                 className={TABULAR_NUMERALS_CLASS}
               >
-                {`${currentSeason.label} ${money(group.current)}`}
+                {`${currentSeasonLabel} ${money(group.current)}`}
               </div>
               {/* The chart's own movement, not a second subtraction here. */}
               <DeltaChip
@@ -316,22 +324,22 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
             </>
           );
         }}
-        label={HERO_2_TILE_TITLES.fixtures}
+        label={HERO_2_TILE_TITLE_KEY.fixtures}
         isNew
         delayMs={tileDelayMs(0)}
         className={FIXTURE_TILE_SPAN}
       />
 
       <KpiTile
-        title={HERO_2_TILE_TITLES.totals}
+        title={t(HERO_2_TILE_TITLE_KEY.totals)}
         // The totals total the FIXTURES, so they carry the fixture scope.
-        period={fixtures.scopeLabel}
+        period={t(fixtures.scopeLabelKey)}
         value={totals.current}
         format={moneyMillions}
         // Negative token, explicit sign and a DOWN arrow — three carriers, so
         // the movement survives a projector that washes the colour out.
         delta={{ value: totals.deltaPercent }}
-        subtitle={`${currentSeason.label} ${VERSUS_WORD} ${previousSeason.label}`}
+        subtitle={`${currentSeasonLabel} ${versus} ${previousSeasonLabel}`}
         isNew
         delayMs={tileDelayMs(1)}
         className={TOTALS_TILE_SPAN}
@@ -343,11 +351,11 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
           format={moneyMillions}
           rows={[
             {
-              name: previousSeason.label,
+              name: previousSeasonLabel,
               value: totals.previous,
               series: "navy",
             },
-            { name: currentSeason.label, value: totals.current, series: "red" },
+            { name: currentSeasonLabel, value: totals.current, series: "red" },
           ]}
         />
 
@@ -358,24 +366,24 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
           className="mt-4 flex items-center gap-2 border-t border-line pt-3 text-caption text-muted"
         >
           <DeltaChip value={totals.delta} format={signedMoney} />
-          {`${VERSUS_WORD} ${previousSeason.label}`}
+          {`${versus} ${previousSeasonLabel}`}
         </div>
       </KpiTile>
 
       <LineChartTile
-        title={HERO_2_TILE_TITLES.months}
+        title={t(HERO_2_TILE_TITLE_KEY.months)}
         // THE BROADER SCOPE, from the dataset: ALL home fixtures per month.
         // This is why the twelve points sum to more than the total above.
-        period={monthly.scopeLabel}
-        xs={monthly.months.map((month) => month.label)}
+        period={t(monthly.scopeLabelKey)}
+        xs={monthly.months.map((month) => t(month.labelKey))}
         series={[
           {
-            name: previousSeason.label,
+            name: previousSeasonLabel,
             values: monthly.months.map((month) => month.previous),
             color: "navy",
           },
           {
-            name: currentSeason.label,
+            name: currentSeasonLabel,
             values: monthly.months.map((month) => month.current),
             color: "red",
             // The season being asked about is the filled one.
@@ -384,7 +392,7 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
         ]}
         format={money}
         height={MONTHLY_CHART_HEIGHT}
-        label={HERO_2_TILE_TITLES.months}
+        label={t(HERO_2_TILE_TITLE_KEY.months)}
         isNew
         delayMs={tileDelayMs(2)}
         className={MONTHLY_TILE_SPAN}
@@ -400,8 +408,8 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
           <FollowUpDivider isNew delayMs={tileDelayMs(3)} />
 
           <DriverTile
-            title={HERO_2_FOLLOW_UP_TITLE}
-            period={DECLINE_SUBTITLE}
+            title={t(HERO_2_FOLLOW_UP_TITLE_KEY)}
+            period={t(DECLINE_SUBTITLE_KEY)}
             // DERIVED, from the eight pairs the chart above plots: the four
             // fixtures that fell, each as the SIZE of its fall. There is no
             // stored list of declines to read instead.
@@ -424,7 +432,7 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
             // from the rows above it. No literal is passed and no judgement is
             // needed: a decline's sign IS its meaning.
             showTotal
-            note={ATTENDANCE_NOTE}
+            note={t(ATTENDANCE_NOTE_KEY)}
             isNew
             delayMs={tileDelayMs(4)}
             className={FOLLOW_UP_TILE_SPAN}
@@ -443,7 +451,7 @@ export function Hero2Body({ primary, followUp, phase }: Hero2BodyProps) {
             delayMs={tileDelayMs(5)}
             className={FOLLOW_UP_TILE_SPAN}
           >
-            {followUp.narrative}
+            {t(followUp.narrativeKey)}
           </RecommendationPanel>
         </>
       )}

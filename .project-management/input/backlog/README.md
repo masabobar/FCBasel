@@ -85,7 +85,7 @@ timing polish, brand QA.
 ### [Phase 5: Post-Plan Demo Extras](phase-5-demo-extras.md)
 **Goal:** Requests that arrived after the 45-story plan closed. Optional by the specification, not
 required by it.
-**Stories:** 2 | **Points:** 5 | **Status:** ✅ Completed (2/2)
+**Stories:** 4 | **Points:** 11 | **Status:** ✅ Completed (4/4)
 
 ### [Future — The Discovery Scope](future.md)
 **Goal:** What is deliberately staged and must be scoped by the Discovery. **Out of prototype scope.**

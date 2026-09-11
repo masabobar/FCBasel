@@ -50,11 +50,11 @@ import {
   monthlyTotals,
 } from "../../app/lib/repositories/derive";
 import {
-  DEPARTMENT_TYPE_LABEL,
-  KIT_VARIANT_LABEL,
-  MONTH_LABEL,
+  DEPARTMENT_TYPE_LABEL_KEY,
+  KIT_VARIANT_LABEL_KEY,
+  MONTH_LABEL_KEY,
   PeriodKey,
-  SEASON_LABEL,
+  SEASON_LABEL_KEY,
 } from "../../app/lib/repositories/enums";
 import {
   hero1Repository,
@@ -62,10 +62,12 @@ import {
   hero3Repository,
 } from "../../app/lib/repositories/index.server";
 import type { Department, Hero1Period } from "../../app/lib/repositories/types";
+import { de, t } from "./support/i18n";
+import { DepartmentKey } from "../../app/lib/repositories/enums";
 
-const MARKETING = "Marketing & Communications";
-const MERCHANDISING = "Merchandising (Fanshop)";
-const TICKETING = "Ticketing";
+const MARKETING = DepartmentKey.MARKETING_COMMUNICATIONS;
+const MERCHANDISING = DepartmentKey.MERCHANDISING;
+const TICKETING = DepartmentKey.TICKETING;
 
 /* --------------------------------------------------------------- HELPERS -- */
 
@@ -77,10 +79,10 @@ async function seasonToDate(): Promise<Hero1Period> {
   return period;
 }
 
-async function department(name: string): Promise<Department> {
-  const found = await hero3Repository.department(name);
+async function department(key: DepartmentKey): Promise<Department> {
+  const found = await hero3Repository.department(key);
   if (found === null) {
-    throw new Error(`Hero 3 must seed the ${name} department`);
+    throw new Error(`Hero 3 must seed the ${key} department`);
   }
   return found;
 }
@@ -293,11 +295,13 @@ describe("Hero 2 reconciles with itself", () => {
   it("labels both scopes, which is what makes the two totals both correct", async () => {
     const { primary } = await hero2Repository.hero();
 
-    expect(primary.fixtures.scopeLabel).toMatch(/eight highest-grossing/i);
-    expect(primary.monthly.scopeLabel).toMatch(/all home fixtures/i);
+    expect(t(primary.fixtures.scopeLabelKey)).toMatch(
+      /eight highest-grossing/i,
+    );
+    expect(t(primary.monthly.scopeLabelKey)).toMatch(/all home fixtures/i);
     for (const label of [
-      primary.fixtures.scopeLabel,
-      primary.monthly.scopeLabel,
+      t(primary.fixtures.scopeLabelKey),
+      t(primary.monthly.scopeLabelKey),
     ]) {
       expect(label).toMatch(/excluding the season-ticket base/);
     }
@@ -371,7 +375,7 @@ describe("Hero 3 reconciles with itself", () => {
     const departments = await hero3Repository.departments();
     const flagged = departmentsNeedingAttention(departments);
 
-    expect(flagged.map((row) => row.name)).toEqual([MARKETING]);
+    expect(flagged.map((row) => row.key)).toEqual([MARKETING]);
     for (const row of departmentPerformanceRows(departments)) {
       expect(row.needsAttention).toBe(row.overBudget && row.behindTarget);
     }
@@ -448,9 +452,9 @@ describe("the heroes reconcile with each other", () => {
     expect(fixtures.current).toBe(7_830);
     expect(ticketing.actual).toBeGreaterThan(fixtures.current);
 
-    expect(hero3.primary.scopeLabel).toMatch(/season-ticket base/);
-    expect(hero3.primary.scopeLabel).toMatch(/includes/);
-    expect(hero2.primary.fixtures.scopeLabel).toMatch(
+    expect(t(hero3.primary.scopeLabelKey)).toMatch(/season-ticket base/);
+    expect(t(hero3.primary.scopeLabelKey)).toMatch(/includes/);
+    expect(t(hero2.primary.fixtures.scopeLabelKey)).toMatch(
       /excluding the season-ticket base/,
     );
   });
@@ -484,10 +488,10 @@ describe("the heroes reconcile with each other", () => {
     const hero2 = await hero2Repository.hero();
     const hero3 = await hero3Repository.hero();
     const labels = [
-      hero1.primary.scopeLabel,
-      hero2.primary.fixtures.scopeLabel,
-      hero2.primary.monthly.scopeLabel,
-      hero3.primary.scopeLabel,
+      t(hero1.primary.scopeLabelKey),
+      t(hero2.primary.fixtures.scopeLabelKey),
+      t(hero2.primary.monthly.scopeLabelKey),
+      t(hero3.primary.scopeLabelKey),
     ];
 
     for (const label of labels) {
@@ -518,10 +522,10 @@ describe("a figure that appears twice is stored once and referenced", () => {
       "currentSeason",
       "fixtures",
       "monthly",
-      "narrative",
+      "narrativeKey",
       "previousSeason",
     ]);
-    expect(Object.keys(followUp)).toEqual(["narrative"]);
+    expect(Object.keys(followUp)).toEqual(["narrativeKey"]);
   });
 
   it("stores no revenue, share or badge segment on Hero 1", async () => {
@@ -532,11 +536,15 @@ describe("a figure that appears twice is stored once and referenced", () => {
         "badgeTotal",
         "key",
         "kits",
-        "label",
+        "labelKey",
         "printedNames",
       ]);
       for (const kit of period.kits) {
-        expect(Object.keys(kit).sort()).toEqual(["label", "units", "variant"]);
+        expect(Object.keys(kit).sort()).toEqual([
+          "labelKey",
+          "units",
+          "variant",
+        ]);
       }
     }
     // The shirt price lives in `derive.ts` and nowhere else.
@@ -550,17 +558,18 @@ describe("a figure that appears twice is stored once and referenced", () => {
       expect(Object.keys(entry).sort()).toEqual([
         "actual",
         "budget",
-        "name",
+        "key",
+        "labelKey",
         "targetPercent",
         "type",
-        "typeLabel",
+        "typeLabelKey",
       ]);
     }
     expect(Object.keys(primary).sort()).toEqual([
       "blendedTargetPercent",
       "departments",
-      "narrative",
-      "scopeLabel",
+      "narrativeKey",
+      "scopeLabelKey",
     ]);
   });
 
@@ -571,20 +580,22 @@ describe("a figure that appears twice is stored once and referenced", () => {
 
     for (const period of hero1.primary.periods) {
       for (const kit of period.kits) {
-        expect(kit.label).toBe(KIT_VARIANT_LABEL[kit.variant]);
+        expect(t(kit.labelKey)).toBe(t(KIT_VARIANT_LABEL_KEY[kit.variant]));
       }
     }
-    expect(hero2.primary.previousSeason.label).toBe(
-      SEASON_LABEL[hero2.primary.previousSeason.key],
+    expect(t(hero2.primary.previousSeason.labelKey)).toBe(
+      t(SEASON_LABEL_KEY[hero2.primary.previousSeason.key]),
     );
-    expect(hero2.primary.currentSeason.label).toBe(
-      SEASON_LABEL[hero2.primary.currentSeason.key],
+    expect(t(hero2.primary.currentSeason.labelKey)).toBe(
+      t(SEASON_LABEL_KEY[hero2.primary.currentSeason.key]),
     );
     for (const month of hero2.primary.monthly.months) {
-      expect(month.label).toBe(MONTH_LABEL[month.month]);
+      expect(t(month.labelKey)).toBe(t(MONTH_LABEL_KEY[month.month]));
     }
     for (const entry of hero3.primary.departments) {
-      expect(entry.typeLabel).toBe(DEPARTMENT_TYPE_LABEL[entry.type]);
+      expect(t(entry.typeLabelKey)).toBe(
+        t(DEPARTMENT_TYPE_LABEL_KEY[entry.type]),
+      );
     }
   });
 
@@ -595,22 +606,21 @@ describe("a figure that appears twice is stored once and referenced", () => {
       hero3Repository.hero(),
     ]);
 
+    // Since US-049 the datasets hold no copy at all — narratives and scope
+    // lines are translation KEYS — so the rule has no exceptions left: no
+    // serialised string may carry a currency or a grouped figure, and the
+    // resolved copy is checked separately below.
     for (const hero of heroes) {
-      const narratives = JSON.stringify(hero).match(/"[^"]*"/g) ?? [];
-      const copy = new Set(
-        [
-          hero.primary.narrative,
-          hero.followUp.narrative,
-          ...("scopeLabel" in hero.primary ? [hero.primary.scopeLabel] : []),
-        ].map((value) => JSON.stringify(value)),
-      );
-
-      for (const value of narratives) {
-        if (copy.has(value)) {
-          continue;
-        }
+      for (const value of JSON.stringify(hero).match(/"[^"]*"/g) ?? []) {
         expect(value).not.toMatch(/CHF/);
         expect(value).not.toMatch(/\d[,’]\d{3}/);
+      }
+
+      // And the copy those keys resolve to is prose in both languages, which
+      // is exactly where a formatted figure IS allowed to appear.
+      for (const resolve of [t, de]) {
+        expect(resolve(hero.primary.narrativeKey).length).toBeGreaterThan(40);
+        expect(resolve(hero.followUp.narrativeKey).length).toBeGreaterThan(40);
       }
     }
   });
@@ -623,18 +633,20 @@ describe("every figure a narrative quotes is reachable from the data", () => {
     const hero = await hero1Repository.hero();
     const period = await seasonToDate();
 
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${formatSharePercent(homeKitShare(period))} of shirt sales`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `about ${formatSharePercent(badgeShare(period))} of shirts`,
     );
     // The most-printed sponsor and the most-printed name are positions in the
     // data, not names typed into the copy a second time.
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       hero.primary.badgeSplit[0]!.sponsor,
     );
-    expect(hero.primary.narrative).toContain(period.printedNames[0]!.name);
+    expect(t(hero.primary.narrativeKey)).toContain(
+      period.printedNames[0]!.name,
+    );
     expect(
       [...hero.primary.badgeSplit].sort((a, b) => b.percent - a.percent)[0]!
         .sponsor,
@@ -650,10 +662,10 @@ describe("every figure a narrative quotes is reachable from the data", () => {
       (left, right) => right.deltaPercent - left.deltaPercent,
     )[0]!;
 
-    expect(followUp.narrative).toContain(`up ${fastest.deltaPercent}%`);
-    expect(followUp.narrative).toContain(fastest.sponsor);
+    expect(t(followUp.narrativeKey)).toContain(`up ${fastest.deltaPercent}%`);
+    expect(t(followUp.narrativeKey)).toContain(fastest.sponsor);
     // "Bitpanda already leads badge selection" - the largest split share.
-    expect(followUp.narrative).toContain(
+    expect(t(followUp.narrativeKey)).toContain(
       `${primary.badgeSplit[0]!.sponsor} already leads`,
     );
     for (const entry of followUp.trend) {
@@ -669,10 +681,10 @@ describe("every figure a narrative quotes is reachable from the data", () => {
     const totals = fixtureTotals(fixtures);
     const biggest = fixtureDeclines(fixtures)[0]!;
 
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `(${formatSignedPercent(totals.deltaPercent)})`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${biggest.opponent} match is the single biggest drop, ${formatMoneyCompact(
         chfFromThousands(-biggest.drop),
       )}`,
@@ -687,11 +699,11 @@ describe("every figure a narrative quotes is reachable from the data", () => {
 
     for (const named of ["YB", "Servette", "St. Gallen"]) {
       expect(gainers).toContain(named);
-      expect(hero.primary.narrative).toContain(named);
+      expect(t(hero.primary.narrativeKey)).toContain(named);
     }
     for (const named of ["FCZ", "Lugano", "Sion"]) {
       expect(fallers).toContain(named);
-      expect(hero.primary.narrative).toContain(named);
+      expect(t(hero.primary.narrativeKey)).toContain(named);
     }
   });
 
@@ -699,19 +711,19 @@ describe("every figure a narrative quotes is reachable from the data", () => {
     const hero = await hero2Repository.hero();
     const declines = fixtureDeclines(await hero2Repository.fixtures());
 
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `${declines[0]!.opponent} (${formatMoneyCompact(
         chfFromThousands(-declines[0]!.drop),
       )})`,
     );
     for (const decline of declines.slice(1)) {
-      expect(hero.followUp.narrative).toContain(
+      expect(t(hero.followUp.narrativeKey)).toContain(
         `${decline.opponent} (-${decline.drop}k)`,
       );
     }
     // The order the copy reads them in is the order the derivation produces.
     const positions = declines.map((decline) =>
-      hero.followUp.narrative.indexOf(decline.opponent),
+      t(hero.followUp.narrativeKey).indexOf(decline.opponent),
     );
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
   });
@@ -721,22 +733,22 @@ describe("every figure a narrative quotes is reachable from the data", () => {
     const merchandising = await department(MERCHANDISING);
     const marketing = await department(MARKETING);
 
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${Math.abs(departmentVariancePercent(merchandising))}% under`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${Math.round(departmentVariancePercent(marketing))}% over`,
     );
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(
       `${marketing.targetPercent}% of its outcome target`,
     );
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `CHF ${hero.followUp.drivers[0]!.amount}k over plan`,
     );
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `CHF ${hero.followUp.drivers[1]!.amount}k`,
     );
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `${hero.followUp.conversion.actualPercent}% against a ${hero.followUp.conversion.planPercent}% plan`,
     );
   });
@@ -818,12 +830,12 @@ describe("every figure a narrative quotes is reachable from the data", () => {
     // The expected count keeps the sweep honest: a regex that stopped matching
     // would pass silently, so each narrative states how many figures it quotes.
     const cases: readonly [string, string, Set<number>, number][] = [
-      ["hero1.primary", hero1.primary.narrative, hero1Figures, 2],
-      ["hero1.followUp", hero1.followUp.narrative, hero1Figures, 1],
-      ["hero2.primary", hero2.primary.narrative, hero2Figures, 2],
-      ["hero2.followUp", hero2.followUp.narrative, hero2Figures, 5],
-      ["hero3.primary", hero3.primary.narrative, hero3Figures, 3],
-      ["hero3.followUp", hero3.followUp.narrative, hero3Figures, 5],
+      ["hero1.primary", t(hero1.primary.narrativeKey), hero1Figures, 2],
+      ["hero1.followUp", t(hero1.followUp.narrativeKey), hero1Figures, 1],
+      ["hero2.primary", t(hero2.primary.narrativeKey), hero2Figures, 2],
+      ["hero2.followUp", t(hero2.followUp.narrativeKey), hero2Figures, 5],
+      ["hero3.primary", t(hero3.primary.narrativeKey), hero3Figures, 3],
+      ["hero3.followUp", t(hero3.followUp.narrativeKey), hero3Figures, 5],
     ];
 
     for (const [name, narrative, figures, expected] of cases) {

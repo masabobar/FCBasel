@@ -34,11 +34,11 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   Hero1Body,
   HERO_1_PERIOD,
-  HERO_1_PERIOD_LABEL,
-  HERO_1_TILE_TITLES,
+  HERO_1_PERIOD_LABEL_KEY,
+  HERO_1_TILE_TITLE_KEY,
 } from "../../app/components/heroes/hero-1";
 import { InsightSections } from "../../app/components/heroes/insight-sections";
-import { HERO_CHIP_LABEL } from "../../app/lib/dashboard/chips";
+import { HERO_CHIP_LABEL_KEY } from "../../app/lib/dashboard/chips";
 import {
   InsightPhase,
   type InsightSections as SectionList,
@@ -79,6 +79,7 @@ import {
   stubMatchMedia,
 } from "./support/motion-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -253,30 +254,32 @@ describe("Hero 1 — the head states the question and its answer", () => {
     renderSections();
 
     const heading = within(section()).getByRole("heading", { level: 2 });
-    expect(heading).toHaveTextContent(HERO_CHIP_LABEL[HeroId.HERO_1]);
-    expect(HERO_CHIP_LABEL[HeroId.HERO_1]).toBe(
+    expect(heading).toHaveTextContent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
+    expect(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1])).toBe(
       "Shirt sales by kit & sponsor badges",
     );
     // The label is imported, never retyped — one string for the chip and the
     // heading it answers.
     expect(code("app/components/heroes/hero-1.tsx")).toContain(
-      "HERO_CHIP_LABEL[HeroId.HERO_1]",
+      "t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1])",
     );
   });
 
   it("labels the section by that heading, so the canvas stays walkable", () => {
     renderSections();
 
-    expect(section()).toHaveAccessibleName(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    expect(section()).toHaveAccessibleName(
+      t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]),
+    );
   });
 
   it("surfaces the dataset's own scope label", () => {
     renderSections();
 
     expect(slot("section-scope", section())).toHaveTextContent(
-      PRIMARY.scopeLabel,
+      t(PRIMARY.scopeLabelKey),
     );
-    expect(PRIMARY.scopeLabel).toBe("Season-to-date merchandising");
+    expect(t(PRIMARY.scopeLabelKey)).toBe("Season-to-date merchandising");
   });
 
   it("states the narrative BEFORE any chart or tile", () => {
@@ -324,26 +327,26 @@ describe("Hero 1 — the narrative is the contract (criterion 4)", () => {
 
     const rendered = slot("section-narrative", section())!.textContent!;
     expect(bytes(rendered)).toBe(bytes(AUTHORED));
-    expect(bytes(PRIMARY.narrative)).toBe(bytes(AUTHORED));
+    expect(bytes(t(PRIMARY.narrativeKey))).toBe(bytes(AUTHORED));
     expect(rendered).toHaveLength(AUTHORED.length);
   });
 
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two copies inside this repository could drift together; the signed-off
     // document cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(PRIMARY.narrative);
+    expect(BACKLOG).toContain(t(PRIMARY.narrativeKey));
   });
 
   it("is plain ASCII — no smart quote, no em dash, no minus glyph", () => {
-    for (const character of PRIMARY.narrative) {
+    for (const character of t(PRIMARY.narrativeKey)) {
       expect(character.codePointAt(0)!).toBeLessThan(0x80);
     }
-    expect(PRIMARY.narrative).not.toMatch(/[‘’“”–—−]/u);
+    expect(t(PRIMARY.narrativeKey)).not.toMatch(/[‘’“”–—−]/u);
     // The one hyphen in the sentence is an ASCII 0x2d.
-    expect(PRIMARY.narrative).toContain("flock-printing");
-    expect(PRIMARY.narrative.codePointAt(PRIMARY.narrative.indexOf("-"))).toBe(
-      0x2d,
-    );
+    expect(t(PRIMARY.narrativeKey)).toContain("flock-printing");
+    expect(
+      t(PRIMARY.narrativeKey).codePointAt(t(PRIMARY.narrativeKey).indexOf("-")),
+    ).toBe(0x2d);
   });
 
   it("is never assembled, truncated or transformed on the way to the screen", () => {
@@ -352,7 +355,7 @@ describe("Hero 1 — the narrative is the contract (criterion 4)", () => {
     // Rendered whole: the section variant of the caption strip does not
     // truncate, because truncating a verbatim narrative deletes the answer.
     const line = slot("section-narrative", section())!;
-    expect(line.textContent).toBe(PRIMARY.narrative);
+    expect(line.textContent).toBe(t(PRIMARY.narrativeKey));
     expect(line.className).not.toMatch(/truncate|line-clamp|text-ellipsis/);
     // No copy of the sentence exists in the component layer at all.
     for (const source of SOURCES) {
@@ -365,8 +368,8 @@ describe("Hero 1 — the narrative is the contract (criterion 4)", () => {
     // sentence and the charts under it cannot disagree.
     expect(formatSharePercent(homeKitShare(SEASON))).toBe("58%");
     expect(formatSharePercent(badgeShare(SEASON))).toBe("8%");
-    expect(PRIMARY.narrative).toContain("58% of shirt sales");
-    expect(PRIMARY.narrative).toContain("about 8% of shirts");
+    expect(t(PRIMARY.narrativeKey)).toContain("58% of shirt sales");
+    expect(t(PRIMARY.narrativeKey)).toContain("about 8% of shirts");
   });
 });
 
@@ -384,9 +387,9 @@ describe("Hero 1 — three tiles, in the defined order (criterion 3)", () => {
 
     const titles = cards().map((card) => card.querySelector("h3")!.textContent);
     expect(titles).toEqual([
-      `${HERO_1_TILE_TITLES.kits} (${SEASON.label.toLowerCase()})`,
-      HERO_1_TILE_TITLES.badges,
-      HERO_1_TILE_TITLES.names,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(SEASON.labelKey).toLowerCase()})`,
+      t(HERO_1_TILE_TITLE_KEY.badges),
+      t(HERO_1_TILE_TITLE_KEY.names),
     ]);
     expect(titles[0]).toBe("Shirt sales by kit (season to date)");
     expect(titles[1]).toBe("Sponsor badges printed");
@@ -407,7 +410,7 @@ describe("Hero 1 — three tiles, in the defined order (criterion 3)", () => {
   it("plots Home 22'400, Away 10'300 and 3rd 5'800 units", () => {
     renderSections();
 
-    expect(barNames()).toEqual(SEASON.kits.map((kit) => kit.label));
+    expect(barNames()).toEqual(SEASON.kits.map((kit) => t(kit.labelKey)));
     expect(barNames()).toEqual(["Home", "Away", "3rd"]);
     expect(barValues()).toEqual(
       SEASON.kits.map((kit) => formatNumber(kit.units)),
@@ -529,7 +532,7 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
 
     expect(
       slots("segmented-option", section()).map((one) => one.textContent),
-    ).toEqual(PRIMARY.periods.map((period) => period.label));
+    ).toEqual(PRIMARY.periods.map((period) => t(period.labelKey)));
     expect(
       slots("segmented-option", section()).map((one) => one.textContent),
     ).toEqual([
@@ -544,7 +547,10 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
     renderSections();
 
     expect(HERO_1_PERIOD).toBe(PeriodKey.SEASON_TO_DATE);
-    expect(periodOption(SEASON.label)).toHaveAttribute("aria-checked", "true");
+    expect(periodOption(t(SEASON.labelKey))).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
   });
 
   it("names the control for what it drives", () => {
@@ -552,7 +558,7 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
 
     expect(
       within(section()).getByRole("radiogroup", {
-        name: HERO_1_PERIOD_LABEL,
+        name: t(HERO_1_PERIOD_LABEL_KEY),
       }),
     ).toBe(slot("segmented", section()));
   });
@@ -568,7 +574,7 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
       SEASON.printedNames.map((printed) => formatNumber(printed.units)),
     );
 
-    pressPeriod(frames, LAST_3_MONTHS.label);
+    pressPeriod(frames, t(LAST_3_MONTHS.labelKey));
 
     // ONE press, three tiles — none of them left on the old period.
     expect(barValues()).toEqual(
@@ -583,10 +589,10 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
   it("moves the scope lines and the tile title with the figures", () => {
     const { frames } = renderSections();
 
-    pressPeriod(frames, LAST_3_MONTHS.label);
+    pressPeriod(frames, t(LAST_3_MONTHS.labelKey));
 
     expect(cards()[0]!.querySelector("h3")).toHaveTextContent(
-      `${HERO_1_TILE_TITLES.kits} (${LAST_3_MONTHS.label.toLowerCase()})`,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(LAST_3_MONTHS.labelKey).toLowerCase()})`,
     );
     expect(slot("card-subtitle", cards()[0]!)!.textContent).toBe(
       `${formatNumber(kitUnitsTotal(LAST_3_MONTHS))} shirts · ${formatMoneyMillions(
@@ -603,20 +609,23 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
   it("keeps the highlight and the tiles on the same period", () => {
     const { frames } = renderSections();
 
-    pressPeriod(frames, LAST_3_MONTHS.label);
+    pressPeriod(frames, t(LAST_3_MONTHS.labelKey));
 
-    expect(periodOption(LAST_3_MONTHS.label)).toHaveAttribute(
+    expect(periodOption(t(LAST_3_MONTHS.labelKey))).toHaveAttribute(
       "aria-checked",
       "true",
     );
-    expect(periodOption(SEASON.label)).toHaveAttribute("aria-checked", "false");
+    expect(periodOption(t(SEASON.labelKey))).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
   });
 
   it("renders every period the dataset carries, not just the pinned one", () => {
     const { frames } = renderSections();
 
     for (const period of PRIMARY.periods) {
-      pressPeriod(frames, period.label);
+      pressPeriod(frames, t(period.labelKey));
 
       expect(barValues()).toEqual(
         period.kits.map((kit) => formatNumber(kit.units)),
@@ -633,7 +642,7 @@ describe("Hero 1 — the badge segments sum EXACTLY to the centre figure", () =>
     const { frames } = renderSections();
 
     for (const period of PRIMARY.periods) {
-      pressPeriod(frames, period.label);
+      pressPeriod(frames, t(period.labelKey));
 
       const shown = legendValues().map((text) =>
         Number(text.replace(/\D/g, "")),
@@ -688,18 +697,22 @@ describe("Hero 1 — kit revenue and the home share are derived", () => {
         "badgeTotal",
         "key",
         "kits",
-        "label",
+        "labelKey",
         "printedNames",
       ]);
       for (const kit of period.kits) {
-        expect(Object.keys(kit).sort()).toEqual(["label", "units", "variant"]);
+        expect(Object.keys(kit).sort()).toEqual([
+          "labelKey",
+          "units",
+          "variant",
+        ]);
       }
     }
     expect(Object.keys(PRIMARY).sort()).toEqual([
       "badgeSplit",
-      "narrative",
+      "narrativeKey",
       "periods",
-      "scopeLabel",
+      "scopeLabelKey",
     ]);
   });
 
@@ -759,7 +772,9 @@ describe("Hero 1 — a bar's hover reads units, share and revenue", () => {
     const tooltip = hoverKit("Home");
     const home = kitRevenueRows(SEASON)[0]!;
 
-    expect(slot("kit-tooltip-name", tooltip)).toHaveTextContent(home.label);
+    expect(slot("kit-tooltip-name", tooltip)).toHaveTextContent(
+      t(home.labelKey),
+    );
     expect(slot("kit-tooltip-units", tooltip)!.textContent).toBe(
       `${formatNumber(home.units)} shirts`,
     );
@@ -778,7 +793,7 @@ describe("Hero 1 — a bar's hover reads units, share and revenue", () => {
     renderSections();
 
     for (const kit of kitRevenueRows(SEASON)) {
-      const tooltip = hoverKit(kit.label);
+      const tooltip = hoverKit(t(kit.labelKey));
       expect(tooltip.textContent).toContain(formatNumber(kit.units));
       expect(tooltip.textContent).toContain(formatMoney(kit.revenue));
       expect(tooltip.textContent).toContain(
@@ -802,7 +817,7 @@ describe("Hero 1 — a bar's hover reads units, share and revenue", () => {
       (node) => node.getAttribute("data-name") === "Home",
     )!;
 
-    fireEvent.click(periodOption(LAST_3_MONTHS.label));
+    fireEvent.click(periodOption(t(LAST_3_MONTHS.labelKey)));
     frames.advance();
     frames.advance();
 
@@ -856,7 +871,7 @@ describe("Hero 1 — reduced motion renders the final state", () => {
     stubMatchMedia(true);
     const { frames } = renderSections(undefined, { settled: false });
 
-    pressPeriod(frames, LAST_3_MONTHS.label);
+    pressPeriod(frames, t(LAST_3_MONTHS.labelKey));
 
     expect(barValues()).toEqual(
       LAST_3_MONTHS.kits.map((kit) => formatNumber(kit.units)),
@@ -885,7 +900,7 @@ describe("Hero 1 — asking twice refreshes in place", () => {
 
   it("re-opens on the pinned period, because the refresh remounts it", () => {
     const { frames, rerender } = renderSections();
-    pressPeriod(frames, LAST_3_MONTHS.label);
+    pressPeriod(frames, t(LAST_3_MONTHS.labelKey));
     expect(donutCentre()).toBe(formatNumber(LAST_3_MONTHS.badgeTotal));
 
     rerender(
@@ -901,7 +916,10 @@ describe("Hero 1 — asking twice refreshes in place", () => {
     settle(frames);
 
     expect(slots("insight-section")).toHaveLength(1);
-    expect(periodOption(SEASON.label)).toHaveAttribute("aria-checked", "true");
+    expect(periodOption(t(SEASON.labelKey))).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
     expect(donutCentre()).toBe(formatNumber(SEASON.badgeTotal));
   });
 });
@@ -930,7 +948,7 @@ describe("Hero 1 — a dataset that cannot answer degrades rather than lying", (
     );
     expect(
       slots("segmented-option").find(
-        (option) => option.textContent === narrowed[0]!.label,
+        (option) => option.textContent === t(narrowed[0]!.labelKey),
       ),
     ).toHaveAttribute("aria-checked", "true");
   });
@@ -969,7 +987,7 @@ describe("Hero 1 — asked for real, from the chip row", () => {
   async function tapHeroChip(user: UserEvent) {
     await user.click(
       screen.getAllByRole("button", {
-        name: HERO_CHIP_LABEL[HeroId.HERO_1],
+        name: t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]),
       })[0]!,
     );
     await settleThinkingBeat();
@@ -983,7 +1001,7 @@ describe("Hero 1 — asked for real, from the chip row", () => {
 
     expect(section()).toHaveAttribute("data-hero-id", HeroId.HERO_1);
     expect(slot("section-narrative", section())!.textContent).toBe(
-      PRIMARY.narrative,
+      t(PRIMARY.narrativeKey),
     );
     expect(cards()).toHaveLength(3);
     // The baseline is still there: the dashboard GREW, it did not clear.
@@ -1002,9 +1020,9 @@ describe("Hero 1 — asked for real, from the chip row", () => {
     expect(
       cards().map((card) => card.querySelector("h3")!.textContent),
     ).toEqual([
-      `${HERO_1_TILE_TITLES.kits} (${SEASON.label.toLowerCase()})`,
-      HERO_1_TILE_TITLES.badges,
-      HERO_1_TILE_TITLES.names,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(SEASON.labelKey).toLowerCase()})`,
+      t(HERO_1_TILE_TITLE_KEY.badges),
+      t(HERO_1_TILE_TITLE_KEY.names),
     ]);
   });
 });

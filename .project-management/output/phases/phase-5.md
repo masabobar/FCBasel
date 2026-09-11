@@ -1,7 +1,7 @@
 # Phase 5: Post-Plan Demo Extras
 
-**Duration:** 2026-09-11 (~2 AI-hours)
-**Status:** ✅ Completed (2/2 · 5/5 pts)
+**Duration:** 2026-09-11 (~6.5 AI-hours)
+**Status:** ✅ Completed (4/4 · 11/11 pts)
 **Started:** 2026-09-11
 **Target Completion:** 2026-09-11
 **Actual Completion:** 2026-09-11
@@ -20,14 +20,17 @@ functionality"*, and it closed complete at 6/6.
 
 ## Epics in This Phase
 
-### Epic 9: E9 — Post-Plan Demo Extras (5 story points)
+### Epic 9: E9 — Post-Plan Demo Extras (11 story points)
 
-**Priority:** P0 · **Status:** ✅ Completed (2/2) · **Dependencies:** US-001, US-012, US-044
+**Priority:** P0 · **Status:** ✅ Completed (4/4) · **Dependencies:** US-001, US-012, US-029,
+US-030, US-044
 
 | Story | Title | Pts | Pri | Status |
 |---|---|---:|---|---|
 | US-046 | Cosmetic sign-in gate | 2 | P2 | ✅ Done |
 | US-047 | Deployment access gate (HTTP Basic) | 3 | **P0** | ✅ Done |
+| US-048 | Club red on the app-bar rule | 1 | P2 | ✅ Done |
+| US-049 | German language pass (EN / DE, via JSON keys) | 5 | P1 | ✅ Done |
 
 ---
 
@@ -118,9 +121,50 @@ never a live credential -- across both shapes.
 production gate does not put a credential prompt in front of 64 cases that exist to measure the
 dashboard. Same file, same build, same middleware; the gate is covered at its own boundary instead.
 
+**ONE EXEMPTION, FOUND IN PRODUCTION AND NOT BY A TEST.** The deployed tab showed a generic globe
+while localhost showed the crest. Cause: a browser fetches the tab icon from its own chrome, and that
+fetch does NOT carry the Basic credential the authenticated page already holds -- `GET /favicon.ico`
+took a **401** and the browser gave up. `PUBLIC_PATHS` now exempts that one path, checked **before**
+the attempt limiter so a lockout can never strip the crest from the tab. **Safe and deliberately
+narrow:** the file is 1,742 bytes derived from the club's public crest, and the `WWW-Authenticate`
+realm already announces the club's name to anyone who requests the site at all. **`/fcb-crest.png`
+and `/assets/*` are NOT exempt** -- the page requests those itself and is authenticated by then, and
+the bundle carries the seeded figures. Verified on a real gated server: favicon **200 `image/x-icon`**
+with no credential, document / crest / bundle all still **401**, document with the credential **200**.
+A test pins the list at exactly one entry, so widening it fails first.
+
 **Dependency gate: `pnpm audit` clean, no advisories.** `express` and `@react-router/express` were
 already in the tree transitively at the same versions, so they were promoted to direct dependencies
 with **no new code downloaded**. `@react-router/serve` was removed as genuinely dead.
+
+### US-048 — Club red on the app-bar rule (1 pt) · 2026-09-11 · ✅ Done
+
+**Review feedback:** *"FCB colour scheme (especially the red) could be used a bit more."* Acted on in
+one place, chosen for a reason rather than sprinkled.
+
+**THE CONSTRAINT THAT PICKED THE PLACE.** `--color-red` is ALSO `varianceNegative`
+(`app/lib/tokens.ts`), so the same hex already means "unfavourable" inside every variance chip.
+Adding red beside data would compete with that reading. The app bar's bottom border is the opposite
+case: full-width, above every screen state, and unmistakably chrome. **The gold allowlist was not
+touched, and `red-vivid` stays where US-044 pinned it** — the empty-state badge, its only home.
+
+**IT ALSO RETIRED A RECORDED LIMITATION.** That edge was `--color-border`, which US-044 measured at
+**1.12:1** on the surface canvas and filed as KL-4 (washes out on a projector). Re-measured on the
+served page after the change: **`#d3010c` on `#f1f4f9`, 2px border, 5.04:1.** So the brand change and
+the legibility fix are the same line. KL-4 is amended, not deleted -- tile borders, chart grid, the
+donut track and the hairlines are all still in it, because the TOKEN VALUE was not touched (that
+remains US-003's change, not a QA story's).
+
+**Height is unchanged at 56px.** Tailwind's preflight sets `box-sizing: border-box`, so 1px → 2px is
+drawn inside the bar and US-040's eleven-viewport sizing measurements still hold.
+
+**DELIBERATELY NOT CHANGED — the connection-status dot.** It is the obvious next place to put red and
+it would be wrong: a red dot beside "Connected · 11 systems" reads as offline in every interface
+convention, and this demo's whole claim is that those systems are connected.
+
+**Verified:** brand-fidelity's 13 Chrome cases pass with `border-bottom-color@top-bar` now appearing
+in the colour inventory as a token red; the contrast suite asserts floors, so it fails anything
+FAINTER and this improvement cannot silently regress.
 
 ---
 
@@ -142,15 +186,53 @@ standalone decorative screen with `/` left open carries none of this.
 **Demo consequence to know before the room:** the run-of-show now opens with sign-in
 (`demo` / `fcb2026`), and a mid-demo reload needs it again.
 
+### US-049 — German language pass (5 pts) · 2026-09-11 · ✅ Done
+
+**Requested after the plan closed: the club is German-speaking and the demo may be given in
+German.** Every rendered word moved into two JSON dictionaries
+(`app/lib/i18n/locales/en.json` + `de.json`) behind a ~90-line in-house layer, and the app bar
+gained an EN / DE toggle. English stays the default.
+
+**It was not a copy change, and that is the story of the work.** The datasets held display text, so
+the fix reached the data layer:
+
+- enum label maps became `*_LABEL_KEY`; fixtures carry `labelKey` / `scopeLabelKey` /
+  `narrativeKey`, never a sentence;
+- **departments, products and spend drivers became enums** (`DepartmentKey`, `ProductKey`,
+  `SpendDriverKey`), because a row keyed by its NAME is a row keyed by something that changes with
+  the language — `Hero3Repository.department()` now takes a key;
+- the loader carries a greeting KEY and month KEYS (`app/lib/calendar.ts` stopped calling
+  `toLocaleString`): the hour is a server fact, the language is client state;
+- `derive.ts` takes the translator as a PARAMETER (`monthlySeries(months, t)`), so the pure layer
+  stays free of React and of the locale.
+
+**No dependency was added.** Two languages need no plural rules, no namespace loading and no
+detection; an i18next package that fetched a locale at runtime would have put a request into a demo
+whose whole guarantee is that it makes none. `tests/e2e/language-pass.spec.ts` measures exactly
+that: switching language issues **zero requests**, and all three heroes answer in German with the
+network severed.
+
+**Key parity is a type error.** `DICTIONARIES` is `Record<Locale, typeof en>`, so a key added in
+English and forgotten in German fails `pnpm typecheck`; `tests/unit/i18n-dictionary.test.ts` closes
+the reverse direction and the house rules — no em or en dash (US-044 sweeps for one), **no `ß`**
+(Swiss German), Swiss digit grouping (`3'200`, never `3,200`).
+
+**The matcher answers both languages** from ONE keyword set and never reads the locale, so
+"Trikotverkäufe" and a mixed "Trikot sales" both resolve — and every English score is unchanged,
+which the suite pins.
+
+**Memory-only, like the sign-in gate.** No cookie, no storage, no `Accept-Language`; a reload
+returns to English. `<html lang>` is corrected on switch so a screen reader follows the copy.
+
 ---
 
 ## Phase Metrics
 
-- **Completed Story Points:** 5 / 5 · **Stories:** 2 / 2
-- **Tests:** 2297 / 2297 unit (57 files) + **64 / 64 Chrome (13.2m)** · **Commits:** 2
+- **Completed Story Points:** 11 / 11 · **Stories:** 4 / 4
+- **Tests:** 2340 / 2340 unit (59 files) + 3 / 3 new Chrome cases for the German pass · **Commits:** 2
 
 ---
 
 **Created:** 2026-09-11 · **Last Updated:** 2026-09-11
-**Phase Status:** ✅ Completed (2/2 · 5/5 pts)
+**Phase Status:** ✅ Completed (4/4 · 11/11 pts)
 **Previous:** [Phase 4](phase-4.md) · **Backlog:** [Master Index](../../input/backlog/README.md)

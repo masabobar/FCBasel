@@ -11,9 +11,16 @@ import {
   PROMPT_BAR_CLEARANCE_CLASS,
 } from "../../app/components/chrome/app-shell";
 import { INERT_NAV_ITEMS } from "../../app/components/chrome/sidebar";
-import { CONNECTION_STATUS_TEXT } from "../../app/components/chrome/top-bar";
-import { CREST_LABEL } from "../../app/components/chrome/crest";
-import { AVATAR_INITIALS, WORKSPACE_LABEL } from "../../app/lib/persona";
+import {
+  CONNECTED_SYSTEM_COUNT,
+  CONNECTION_STATUS_KEY,
+} from "../../app/components/chrome/top-bar";
+import { CREST_LABEL_KEY } from "../../app/components/chrome/crest";
+import {
+  AVATAR_INITIALS_KEY,
+  WORKSPACE_LABEL_KEY,
+} from "../../app/lib/persona";
+import { t } from "./support/i18n";
 
 const SHELL_SOURCE = readFileSync(
   resolve(__dirname, "../../app/components/chrome/app-shell.tsx"),
@@ -60,17 +67,26 @@ describe("AppShell — composition", () => {
   it("shows the crest, the workspace label, the status and the avatar", () => {
     renderShell();
 
-    expect(screen.getByRole("img", { name: CREST_LABEL })).toBeInTheDocument();
-    expect(screen.getByText(WORKSPACE_LABEL)).toBeInTheDocument();
-    expect(screen.getByText(CONNECTION_STATUS_TEXT)).toBeInTheDocument();
-    expect(screen.getByText(AVATAR_INITIALS)).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: t(CREST_LABEL_KEY) }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(t(WORKSPACE_LABEL_KEY))).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        t(CONNECTION_STATUS_KEY, { count: CONNECTED_SYSTEM_COUNT }),
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(t(AVATAR_INITIALS_KEY))).toBeInTheDocument();
   });
 
   it("carries the dimmed placeholder items and only the one real link", () => {
     renderShell();
 
-    for (const { label } of INERT_NAV_ITEMS) {
-      expect(screen.getByText(label)).toHaveAttribute("aria-disabled", "true");
+    for (const { labelKey } of INERT_NAV_ITEMS) {
+      expect(screen.getByText(t(labelKey))).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
     }
     expect(screen.getAllByRole("link")).toHaveLength(1);
   });

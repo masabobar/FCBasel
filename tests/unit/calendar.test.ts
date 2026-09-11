@@ -1,11 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  monthLabel,
+  monthKeyAt,
   monthsElapsedThisYear,
-  recentMonthLabels,
+  recentMonthKeys,
   systemClock,
 } from "../../app/lib/calendar";
+import { MONTH_LABEL_KEY } from "../../app/lib/repositories/enums";
+import { de, t } from "./support/i18n";
+
+/**
+ * The helpers return month KEYS (US-049) — the language is chosen in the
+ * browser, long after this runs. Every assertion below therefore resolves the
+ * key the way the band does, so it still pins the month a presenter SEES.
+ */
+function monthLabel(now: Date, monthsBack: number): string {
+  return t(MONTH_LABEL_KEY[monthKeyAt(now, monthsBack)]);
+}
+
+function recentMonthLabels(now: Date, count: number): string[] {
+  return recentMonthKeys(now, count).map((key) => t(MONTH_LABEL_KEY[key]));
+}
 
 /**
  * Every assertion here injects a fixed date. Nothing in this file may depend on
@@ -70,6 +85,22 @@ describe("recentMonthLabels", () => {
   it("returns nothing for a non-positive count", () => {
     expect(recentMonthLabels(SEPTEMBER_2026, 0)).toEqual([]);
     expect(recentMonthLabels(SEPTEMBER_2026, -3)).toEqual([]);
+  });
+});
+
+describe("the rolling axis in German", () => {
+  it("names the same months in the other language", () => {
+    expect(
+      recentMonthKeys(DECEMBER_2026, 3).map((key) => de(MONTH_LABEL_KEY[key])),
+    ).toEqual(["Okt", "Nov", "Dez"]);
+  });
+
+  it("returns keys, never words — the loader cannot know the language", () => {
+    expect(recentMonthKeys(SEPTEMBER_2026, 3)).toEqual([
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+    ]);
   });
 });
 

@@ -1,16 +1,27 @@
 /**
- * Calendar helpers for date-derived chart labels.
+ * Calendar helpers for date-derived chart axes.
  *
  * Two of the baseline periods ("Last 3 months" and "Year to date") take their
- * x-axis labels from the CURRENT DATE rather than from a hardcoded list, so a
- * demo given in November does not still say "Jul Aug Sep". The Reference
+ * x-axis from the CURRENT DATE rather than from a hardcoded list, so a demo
+ * given in November does not still say "Jul Aug Sep". The Reference
  * Implementation Guide does this with `new Date()` read inline; here the date
  * arrives through an injectable {@link Clock} instead, so tests pin a fixed
  * "now" and never depend on the wall clock.
  *
- * Nothing here touches the network or a timezone database beyond the platform
- * `Intl` data: the prototype must run with the network disconnected.
+ * IT RETURNS KEYS, NOT MONTH NAMES (US-049). This module used to call
+ * `toLocaleString` with the locale pinned to `"en"`, which was correct while
+ * the product was English-only and became wrong the moment it was not: the
+ * axis is built in the route's LOADER, on the server, and the language is
+ * client state the server cannot know. So the rolling window is returned as
+ * {@link MonthKey} values and the band resolves them with its own `t` -
+ * `MONTH_LABEL_KEY` in `./repositories/enums.ts` is the one place a month is
+ * named, for the seeded season axis and this rolling one alike.
+ *
+ * Nothing here touches the network, the platform `Intl` data or a timezone
+ * database: the prototype must run with the network disconnected.
  */
+
+import { MONTH_KEYS, type MonthKey } from "./repositories/enums";
 
 /** A source of the current time. Injected so date-derived output is testable. */
 export type Clock = () => Date;
@@ -18,26 +29,21 @@ export type Clock = () => Date;
 /** The default clock. Production code uses this; tests pass their own. */
 export const systemClock: Clock = () => new Date();
 
-/**
- * Labels are English-only by project decision (no i18n in this prototype), so
- * the locale is pinned rather than read from the environment - otherwise the
- * same build would render "Sep" for one viewer and "Sept." for another.
- */
-const LABEL_LOCALE = "en";
-
-/** Short month name `monthsBack` months before `now`, e.g. `"Sep"`. */
-export function monthLabel(now: Date, monthsBack: number): string {
+/** The month `monthsBack` months before `now`, as a key. */
+export function monthKeyAt(now: Date, monthsBack: number): MonthKey {
   const month = new Date(now.getFullYear(), now.getMonth() - monthsBack, 1);
-  return month.toLocaleString(LABEL_LOCALE, { month: "short" });
+  // `MONTH_KEYS` is in calendar order, so `getMonth()` indexes it directly.
+  // The index is always 0-11, so the non-null assertion cannot fire.
+  return MONTH_KEYS[month.getMonth()]!;
 }
 
 /**
- * The last `count` short month names, oldest first, ending with the month of
- * `now`. `recentMonthLabels(new Date(2026, 8, 9), 3)` is `["Jul", "Aug", "Sep"]`.
+ * The last `count` months, oldest first, ending with the month of `now`.
+ * `recentMonthKeys(new Date(2026, 8, 9), 3)` is `[JULY, AUGUST, SEPTEMBER]`.
  */
-export function recentMonthLabels(now: Date, count: number): string[] {
+export function recentMonthKeys(now: Date, count: number): MonthKey[] {
   return Array.from({ length: Math.max(count, 0) }, (_unused, index) =>
-    monthLabel(now, count - 1 - index),
+    monthKeyAt(now, count - 1 - index),
   );
 }
 

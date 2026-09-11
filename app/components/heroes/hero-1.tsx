@@ -6,7 +6,7 @@ import { VBarTile } from "../charts/v-bars";
 import { Segmented } from "../controls/segmented";
 import { DriverTile } from "../tiles/driver-tile";
 import { RecommendationPanel } from "../tiles/recommendation-panel";
-import { HERO_CHIP_LABEL } from "../../lib/dashboard/chips";
+import { HERO_CHIP_LABEL_KEY } from "../../lib/dashboard/chips";
 import {
   InsightPhase,
   type InsightSection,
@@ -19,6 +19,8 @@ import {
   formatSignedPercent,
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
+import { type TranslationKey, type Translator } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import {
   badgeShare,
   kitRevenueRows,
@@ -101,34 +103,33 @@ import {
 /* ------------------------------------------------------------------ COPY -- */
 
 /** The three tile titles, in render order. */
-export const HERO_1_TILE_TITLES = {
-  kits: "Shirt sales by kit",
-  badges: "Sponsor badges printed",
-  names: "Top printed names",
-} as const;
+export const HERO_1_TILE_TITLE_KEY = {
+  kits: "hero1.kitsTitle",
+  badges: "hero1.badgesTitle",
+  names: "hero1.namesTitle",
+} as const satisfies Record<string, TranslationKey>;
 
 /**
  * The filter's accessible name. Named for what it DRIVES, because the dashboard
  * can show three period filters at once — the band's, Top Products' and this
  * one.
  */
-export const HERO_1_PERIOD_LABEL =
-  "Period for shirt sales, sponsor badges and printed names";
+export const HERO_1_PERIOD_LABEL_KEY: TranslationKey = "hero1.periodLabel";
 
 /** Units the kit figures are counted in, in a subtitle and in a tooltip. */
-const SHIRTS_WORD = "shirts";
+const SHIRTS_WORD_KEY: TranslationKey = "hero1.shirtsWord";
 
 /** Reads `8% of units` under the ring — the badge share, as a share of shirts. */
-const OF_UNITS_TEXT = "of units";
+const OF_UNITS_TEXT_KEY: TranslationKey = "hero1.ofUnits";
 
 /** Reads `~8%`, quoting the badge share as the Reference Guide quotes it. */
 const APPROX_PREFIX = "~";
 
 /** Reads `58% of shirt sales` in a bar's hover box. */
-const OF_SALES_TEXT = "of shirt sales";
+const OF_SALES_TEXT_KEY: TranslationKey = "hero1.ofSales";
 
 /** What the printed-names list counts. Copy, not a figure. */
-const NAMES_SUBTITLE = "Shirts sold with a name printed";
+const NAMES_SUBTITLE_KEY: TranslationKey = "hero1.namesSubtitle";
 
 /** Separates the two halves of a card's scope line. */
 const SCOPE_SEPARATOR = " · ";
@@ -140,7 +141,7 @@ const SCOPE_SEPARATOR = " · ";
  * derive: the trend entries carry one movement each and nothing in the dataset
  * counts drops, so this is copy in the same sense the tile titles above are.
  */
-export const HERO_1_FOLLOW_UP_TITLE = "Badge selection trend (last 3 drops)";
+export const HERO_1_FOLLOW_UP_TITLE_KEY: TranslationKey = "hero1.followUpTitle";
 
 /**
  * The scope line under that title, and the reason the tile does NOT re-rank.
@@ -153,8 +154,7 @@ export const HERO_1_FOLLOW_UP_TITLE = "Badge selection trend (last 3 drops)";
  * two orders agree, so this line cannot start describing an order the dataset
  * has stopped having.
  */
-const TREND_SUBTITLE =
-  "Change per sponsor · ordered by current badge selection";
+const TREND_SUBTITLE_KEY: TranslationKey = "hero1.trendSubtitle";
 
 /* -------------------------------------------------------------- GEOMETRY -- */
 
@@ -188,6 +188,8 @@ export interface Hero1BodyProps {
 }
 
 export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
+  const t = useT();
+
   /**
    * THE ONE PIECE OF PERIOD STATE IN THIS SECTION. Held above all three tiles,
    * which is what makes a single press move every one of them.
@@ -203,6 +205,8 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
   if (!shown) return null;
 
   const kits = kitRevenueRows(shown);
+  const periodLabel = t(shown.labelKey);
+  const shirtsWord = t(SHIRTS_WORD_KEY);
 
   return (
     <>
@@ -210,10 +214,10 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
         id={sectionLabelId(HeroId.HERO_1)}
         // The chip's own label, imported rather than retyped, so the question
         // in the row above and the answer's heading are one string (US-029).
-        label={HERO_CHIP_LABEL[HeroId.HERO_1]}
+        label={t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1])}
         // Verbatim, straight from the dataset. Never assembled here.
-        narrative={primary.narrative}
-        scope={primary.scopeLabel}
+        narrative={t(primary.narrativeKey)}
+        scope={t(primary.scopeLabelKey)}
         control={
           <Segmented
             // The options ARE the period entries — `SegmentedOption` is the
@@ -222,15 +226,18 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
             options={primary.periods}
             value={shown.key}
             onChange={setPeriodKey}
-            label={HERO_1_PERIOD_LABEL}
+            label={t(HERO_1_PERIOD_LABEL_KEY)}
           />
         }
       />
 
       <VBarTile
-        title={kitTileTitle(shown)}
-        period={kitScopeLine(shown)}
-        bars={kits.map((kit) => ({ name: kit.label, value: kit.units }))}
+        title={kitTileTitle(t, periodLabel)}
+        period={kitScopeLine(t, shown)}
+        bars={kits.map((kit) => ({
+          name: t(kit.labelKey),
+          value: kit.units,
+        }))}
         // Units, share and revenue in one box — criterion 6. The share is
         // `derive.ts`'s division, not a second one written here.
         tooltip={(index) => {
@@ -240,13 +247,13 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
           return (
             <>
               <div data-slot="kit-tooltip-name" className="mb-0.5 font-bold">
-                {kit.label}
+                {t(kit.labelKey)}
               </div>
               <div
                 data-slot="kit-tooltip-units"
                 className={TABULAR_NUMERALS_CLASS}
               >
-                {`${formatNumber(kit.units)} ${SHIRTS_WORD}`}
+                {`${formatNumber(kit.units)} ${shirtsWord}`}
               </div>
               <div
                 data-slot="kit-tooltip-share"
@@ -254,7 +261,7 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
               >
                 {`${formatSharePercent(
                   kitUnitsShare(shown, kit.variant),
-                )} ${OF_SALES_TEXT}`}
+                )} ${t(OF_SALES_TEXT_KEY)}`}
               </div>
               <div
                 data-slot="kit-tooltip-revenue"
@@ -265,30 +272,30 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
             </>
           );
         }}
-        label={`${HERO_1_TILE_TITLES.kits}, ${shown.label}`}
+        label={`${t(HERO_1_TILE_TITLE_KEY.kits)}, ${periodLabel}`}
         isNew
         delayMs={tileDelayMs(0)}
         className={TILE_SPAN}
       />
 
       <DonutTile
-        title={HERO_1_TILE_TITLES.badges}
-        period={badgeScopeLine(shown)}
+        title={t(HERO_1_TILE_TITLE_KEY.badges)}
+        period={badgeScopeLine(t, shown)}
         // The total and the FIXED split; `DonutTile` runs `badgeSegments`
         // itself, so the rounding correction that makes the four segments sum
         // exactly to the centre figure happens once, in `derive.ts`.
         total={shown.badgeTotal}
         split={primary.badgeSplit}
-        centreLabel={SHIRTS_WORD}
-        label={`${HERO_1_TILE_TITLES.badges}, ${shown.label}`}
+        centreLabel={shirtsWord}
+        label={`${t(HERO_1_TILE_TITLE_KEY.badges)}, ${periodLabel}`}
         isNew
         delayMs={tileDelayMs(1)}
         className={TILE_SPAN}
       />
 
       <HBarTile
-        title={HERO_1_TILE_TITLES.names}
-        period={NAMES_SUBTITLE}
+        title={t(HERO_1_TILE_TITLE_KEY.names)}
+        period={t(NAMES_SUBTITLE_KEY)}
         rows={shown.printedNames.map((printed) => ({
           name: printed.name,
           value: printed.units,
@@ -310,8 +317,8 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
           <FollowUpDivider isNew delayMs={tileDelayMs(3)} />
 
           <DriverTile
-            title={HERO_1_FOLLOW_UP_TITLE}
-            period={TREND_SUBTITLE}
+            title={t(HERO_1_FOLLOW_UP_TITLE_KEY)}
+            period={t(TREND_SUBTITLE_KEY)}
             // The trend entries ARE the rows — one movement per sponsor, signed
             // in the dataset. Nothing is computed and nothing is retyped.
             rows={followUp.trend.map((entry) => ({
@@ -351,7 +358,7 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
             delayMs={tileDelayMs(5)}
             className={TILE_SPAN}
           >
-            {followUp.narrative}
+            {t(followUp.narrativeKey)}
           </RecommendationPanel>
         </>
       )}
@@ -368,22 +375,24 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
  * is what the room sees; press the filter and the title follows the figures
  * instead of claiming a scope the bars no longer show.
  */
-function kitTileTitle(period: Hero1Period): string {
-  return `${HERO_1_TILE_TITLES.kits} (${period.label.toLowerCase()})`;
+function kitTileTitle(t: Translator, periodLabel: string): string {
+  return `${t(HERO_1_TILE_TITLE_KEY.kits)} (${periodLabel.toLowerCase()})`;
 }
 
 /** `38’500 shirts · CHF 3.81M` — both figures derived, neither stored. */
-function kitScopeLine(period: Hero1Period): string {
+function kitScopeLine(t: Translator, period: Hero1Period): string {
   return [
-    `${formatNumber(kitUnitsTotal(period))} ${SHIRTS_WORD}`,
+    `${formatNumber(kitUnitsTotal(period))} ${t(SHIRTS_WORD_KEY)}`,
     formatMoneyMillions(kitRevenueTotal(period)),
   ].join(SCOPE_SEPARATOR);
 }
 
 /** `3’080 shirts · ~8% of units` — the badge share is derived from the units. */
-function badgeScopeLine(period: Hero1Period): string {
+function badgeScopeLine(t: Translator, period: Hero1Period): string {
   return [
-    `${formatNumber(period.badgeTotal)} ${SHIRTS_WORD}`,
-    `${APPROX_PREFIX}${formatSharePercent(badgeShare(period))} ${OF_UNITS_TEXT}`,
+    `${formatNumber(period.badgeTotal)} ${t(SHIRTS_WORD_KEY)}`,
+    `${APPROX_PREFIX}${formatSharePercent(badgeShare(period))} ${t(
+      OF_UNITS_TEXT_KEY,
+    )}`,
   ].join(SCOPE_SEPARATOR);
 }

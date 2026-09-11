@@ -9,6 +9,8 @@ import {
 } from "react";
 
 import { cn } from "../../lib/cn";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 
 /**
  * The persistent prompt bar — the one place a question enters this product, and
@@ -84,16 +86,16 @@ import { cn } from "../../lib/cn";
  * because the placeholder is the visible affordance and a placeholder is not a
  * label.
  */
-export const PROMPT_INPUT_LABEL = "Ask a question about the club";
+export const PROMPT_INPUT_LABEL_KEY: TranslationKey = "prompt.inputLabel";
 
 /** The send button's accessible name. Its glyph is decorative. */
-export const SEND_BUTTON_LABEL = "Send question";
+export const SEND_BUTTON_LABEL_KEY: TranslationKey = "prompt.sendLabel";
 
 /** The search landmark's name, so the bar is reachable as a region. */
-export const PROMPT_FORM_LABEL = "Ask the intelligence platform";
+export const PROMPT_FORM_LABEL_KEY: TranslationKey = "prompt.formLabel";
 
 /** Visible prompt text. Guidance only, never the accessible name. */
-export const PROMPT_PLACEHOLDER = "Ask anything about the club's performance";
+export const PROMPT_PLACEHOLDER_KEY: TranslationKey = "prompt.placeholder";
 
 /* ------------------------------------------------------------ GEOMETRY -- */
 
@@ -172,6 +174,7 @@ export function PromptBar({
   children,
   className,
 }: PromptBarProps) {
+  const t = useT();
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
@@ -253,12 +256,12 @@ export function PromptBar({
         <form
           data-slot="prompt-form"
           role="search"
-          aria-label={PROMPT_FORM_LABEL}
+          aria-label={t(PROMPT_FORM_LABEL_KEY)}
           aria-busy={busy}
           onSubmit={handleSubmit}
         >
           <label htmlFor={inputId} className="sr-only">
-            {PROMPT_INPUT_LABEL}
+            {t(PROMPT_INPUT_LABEL_KEY)}
           </label>
 
           <div
@@ -281,7 +284,7 @@ export function PromptBar({
               autoComplete="off"
               value={value}
               disabled={busy}
-              placeholder={PROMPT_PLACEHOLDER}
+              placeholder={t(PROMPT_PLACEHOLDER_KEY)}
               onChange={handleChange}
               // No border and no outline of its own: the field around it draws
               // both. Removing the outline is only safe BECAUSE the focus ring
@@ -292,7 +295,7 @@ export function PromptBar({
             <button
               type="submit"
               data-slot="prompt-send"
-              aria-label={SEND_BUTTON_LABEL}
+              aria-label={t(SEND_BUTTON_LABEL_KEY)}
               disabled={busy}
               className="grid h-8 w-8 shrink-0 place-items-center rounded-pill bg-navy text-bg disabled:opacity-50"
             >

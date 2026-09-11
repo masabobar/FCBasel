@@ -19,6 +19,7 @@ import { selectChip, suggestionChips } from "./lib/dashboard/chips";
 import { loadHeroes } from "./lib/dashboard/heroes";
 import { askQuestion } from "./lib/dashboard/intents";
 import { CanvasPanel, useCanvasPanel } from "./lib/dashboard/use-canvas-panel";
+import { I18nProvider, useLocaleState } from "./lib/i18n/context";
 import { useDashboard } from "./lib/dashboard/use-dashboard";
 import { useThinking } from "./lib/dashboard/use-thinking";
 import { disableScrollRestoration } from "./lib/motion";
@@ -78,6 +79,14 @@ export function links(): Route.LinkDescriptors {
  */
 export function Layout({ children }: { children: ReactNode }) {
   return (
+    /*
+     * `en` is the language the DOCUMENT is rendered in, and it is correct at
+     * that moment: a fresh session starts in English (`DEFAULT_LOCALE`) and
+     * the server cannot know a preference nobody has expressed — nothing is
+     * persisted, by `constraints.md` §2. Switching to German corrects the
+     * attribute in place, from `useLocaleState`'s effect, so a screen reader
+     * follows the copy rather than reading German with an English voice.
+     */
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
@@ -218,6 +227,17 @@ export const shouldRevalidate: ShouldRevalidateFunction = () => false;
 export default function App({
   loaderData,
 }: Pick<Route.ComponentProps, "loaderData">) {
+  /**
+   * THE SESSION'S LANGUAGE (US-049), owned here for the same reason the
+   * session's answers are: it is above both halves of the screen — the app
+   * bar's toggle sets it, and every tile on the canvas reads it.
+   *
+   * MEMORY-ONLY, like everything else in this demo. No cookie, no storage, no
+   * `Accept-Language`; a reload returns to English exactly as it returns to
+   * the baseline dashboard.
+   */
+  const [locale, setLocale] = useLocaleState();
+
   const dashboard = useDashboard();
   const { sections, focus, generation, reset } = dashboard;
   const { beat, busy, actions } = useThinking(dashboard);
@@ -265,36 +285,46 @@ export default function App({
   // product, and showing them behind a sign-in would be the pretence US-012's
   // inert placeholders were written to avoid.
   if (!signedIn) {
-    return <LoginScreen onSignIn={() => setSignedIn(true)} />;
+    return (
+      <I18nProvider locale={locale} setLocale={setLocale}>
+        <LoginScreen onSignIn={() => setSignedIn(true)} />
+      </I18nProvider>
+    );
   }
 
   return (
-    <AppShell
-      onReset={reset}
-      promptBar={
-        <PromptBar
-          key={generation}
-          busy={busy}
-          onSubmit={(question) => {
-            // The matcher's own return value is the fallback's trigger: a
-            // `null` raises the panel, a match clears it.
-            canvas.record(askQuestion(question, actions));
-          }}
-        >
-          <SuggestionChips
-            chips={suggestionChips(sections)}
-            onSelect={(chip) => selectChip(chip, actions)}
-          />
-        </PromptBar>
-      }
-    >
-      <Outlet />
-      <InsightSections sections={sections} heroes={loaderData} focus={focus} />
-      {beat && <ThinkingPanel beat={beat} />}
-      {canvas.panel === CanvasPanel.FALLBACK && (
-        <FallbackPanel onSelect={(chip) => selectChip(chip, actions)} />
-      )}
-      {canvas.panel === CanvasPanel.EMPTY && <EmptyStatePanel />}
-    </AppShell>
+    <I18nProvider locale={locale} setLocale={setLocale}>
+      <AppShell
+        onReset={reset}
+        promptBar={
+          <PromptBar
+            key={generation}
+            busy={busy}
+            onSubmit={(question) => {
+              // The matcher's own return value is the fallback's trigger: a
+              // `null` raises the panel, a match clears it.
+              canvas.record(askQuestion(question, actions));
+            }}
+          >
+            <SuggestionChips
+              chips={suggestionChips(sections)}
+              onSelect={(chip) => selectChip(chip, actions)}
+            />
+          </PromptBar>
+        }
+      >
+        <Outlet />
+        <InsightSections
+          sections={sections}
+          heroes={loaderData}
+          focus={focus}
+        />
+        {beat && <ThinkingPanel beat={beat} />}
+        {canvas.panel === CanvasPanel.FALLBACK && (
+          <FallbackPanel onSelect={(chip) => selectChip(chip, actions)} />
+        )}
+        {canvas.panel === CanvasPanel.EMPTY && <EmptyStatePanel />}
+      </AppShell>
+    </I18nProvider>
   );
 }

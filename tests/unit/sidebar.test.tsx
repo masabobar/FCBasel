@@ -10,6 +10,7 @@ import {
   INERT_NAV_ITEMS,
   Sidebar,
 } from "../../app/components/chrome/sidebar";
+import { t } from "./support/i18n";
 
 const SIDEBAR_SOURCE = readFileSync(
   resolve(__dirname, "../../app/components/chrome/sidebar.tsx"),
@@ -76,8 +77,8 @@ describe("Sidebar — structure", () => {
 
     const rows = screen.getAllByRole("listitem");
     expect(rows.map((row) => row.textContent)).toEqual([
-      ACTIVE_NAV_ITEM.label,
-      ...INERT_NAV_ITEMS.map((item) => item.label),
+      t(ACTIVE_NAV_ITEM.labelKey),
+      ...INERT_NAV_ITEMS.map((item) => t(item.labelKey)),
     ]);
   });
 });
@@ -111,8 +112,8 @@ describe("Sidebar — the placeholder items are inert", () => {
     renderSidebar();
 
     expect(inertItems()).toHaveLength(INERT_NAV_ITEMS.length);
-    for (const { label } of INERT_NAV_ITEMS) {
-      expect(screen.getByText(label)).toBeInTheDocument();
+    for (const { labelKey } of INERT_NAV_ITEMS) {
+      expect(screen.getByText(t(labelKey))).toBeInTheDocument();
     }
   });
 

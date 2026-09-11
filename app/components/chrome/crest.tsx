@@ -12,11 +12,19 @@
  * at a tenth of the bytes.
  */
 
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
+
 /** Root-relative path of the committed crest. Never an absolute URL. */
 export const CREST_SRC = "/fcb-crest.png";
 
-/** Accessible name of the crest. The club's full registered name. */
-export const CREST_LABEL = "FC Basel 1893";
+/**
+ * Accessible name of the crest. The club's full registered name, which is a
+ * proper noun and therefore the same string in both languages - it goes
+ * through the dictionary anyway (US-049) so that every rendered word has
+ * exactly one home.
+ */
+export const CREST_LABEL_KEY: TranslationKey = "crest.label";
 
 /** Intrinsic pixel dimensions of the committed asset. */
 const CREST_ASPECT_RATIO = 120 / 128;
@@ -36,10 +44,12 @@ interface CrestProps {
  * decodes and the app bar never shifts.
  */
 export function Crest({ size = DEFAULT_CREST_HEIGHT, className }: CrestProps) {
+  const t = useT();
+
   return (
     <img
       src={CREST_SRC}
-      alt={CREST_LABEL}
+      alt={t(CREST_LABEL_KEY)}
       width={Math.round(size * CREST_ASPECT_RATIO)}
       height={size}
       className={className}

@@ -8,6 +8,8 @@ import {
 import { Link } from "react-router";
 
 import { cn } from "../../lib/cn";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 
 /**
  * The navy left sidebar.
@@ -33,22 +35,23 @@ import { cn } from "../../lib/cn";
  */
 
 interface NavItem {
-  label: string;
+  /** The row's wording, in both languages (US-049). */
+  labelKey: TranslationKey;
   /** Decorative glyph; the label carries the meaning. */
   icon: LucideIcon;
 }
 
 /** The one real destination. `/` is the prototype's only route. */
 export const ACTIVE_NAV_ITEM: NavItem = {
-  label: "Dashboard",
+  labelKey: "nav.dashboard",
   icon: LayoutDashboard,
 };
 
 /** Dimmed, non-interactive placeholders. Never routes. */
 export const INERT_NAV_ITEMS: readonly NavItem[] = [
-  { label: "Reports", icon: FileText },
-  { label: "Data Sources", icon: Database },
-  { label: "Settings", icon: Settings },
+  { labelKey: "nav.reports", icon: FileText },
+  { labelKey: "nav.dataSources", icon: Database },
+  { labelKey: "nav.settings", icon: Settings },
 ];
 
 /**
@@ -77,6 +80,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const t = useT();
   const ActiveIcon = ACTIVE_NAV_ITEM.icon;
 
   return (
@@ -91,7 +95,7 @@ export function Sidebar({ className }: SidebarProps) {
         className,
       )}
     >
-      <nav aria-label="Workspace">
+      <nav aria-label={t("nav.landmark")}>
         <ul role="list" className="flex flex-col gap-1 px-3">
           <li>
             <Link
@@ -104,12 +108,12 @@ export function Sidebar({ className }: SidebarProps) {
               )}
             >
               <ActiveIcon size={ICON_SIZE} aria-hidden="true" />
-              {ACTIVE_NAV_ITEM.label}
+              {t(ACTIVE_NAV_ITEM.labelKey)}
             </Link>
           </li>
 
-          {INERT_NAV_ITEMS.map(({ label, icon: Icon }) => (
-            <li key={label}>
+          {INERT_NAV_ITEMS.map(({ labelKey, icon: Icon }) => (
+            <li key={labelKey}>
               {/*
                * Inert placeholder. A `<span>` on purpose: no href, no handler,
                * no focus, no hover. Do not turn this into a link or a button.
@@ -124,7 +128,7 @@ export function Sidebar({ className }: SidebarProps) {
                 )}
               >
                 <Icon size={ICON_SIZE} aria-hidden="true" />
-                {label}
+                {t(labelKey)}
               </span>
             </li>
           ))}

@@ -9,7 +9,15 @@
  *
  * A later dataset story that needs a new period or partner role extends the
  * object HERE. Do not declare a competing key set inside a fixture file.
+ *
+ * LABELS ARE TRANSLATION KEYS, NOT TEXT. Every `*_LABEL_KEY` map below points
+ * at `app/lib/i18n/locales/*.json`, where both languages live side by side
+ * (US-049). The maps are what stops a display string being typed into a
+ * fixture: a key resolves through `t()` at render time, so the same dataset
+ * renders "Last 3 months" or "Letzte 3 Monate" without a second dataset.
  */
+
+import { type TranslationKey } from "../i18n";
 
 /* ------------------------------------------------------------- PERIODS -- */
 
@@ -34,12 +42,12 @@ export type PeriodKey = (typeof PeriodKey)[keyof typeof PeriodKey];
  * month"), which is exactly why `label` is a field on the period object rather
  * than being looked up at render time.
  */
-export const PERIOD_LABEL: Record<PeriodKey, string> = {
-  [PeriodKey.THIS_MONTH]: "This month",
-  [PeriodKey.LAST_MONTH]: "Last month",
-  [PeriodKey.LAST_3_MONTHS]: "Last 3 months",
-  [PeriodKey.YEAR_TO_DATE]: "Year to date",
-  [PeriodKey.SEASON_TO_DATE]: "Season to date",
+export const PERIOD_LABEL_KEY: Record<PeriodKey, TranslationKey> = {
+  [PeriodKey.THIS_MONTH]: "enum.period.THIS_MONTH",
+  [PeriodKey.LAST_MONTH]: "enum.period.LAST_MONTH",
+  [PeriodKey.LAST_3_MONTHS]: "enum.period.LAST_3_MONTHS",
+  [PeriodKey.YEAR_TO_DATE]: "enum.period.YEAR_TO_DATE",
+  [PeriodKey.SEASON_TO_DATE]: "enum.period.SEASON_TO_DATE",
 };
 
 /* ------------------------------------------------------------ KIT VARIANTS -- */
@@ -58,10 +66,10 @@ export const KitVariant = {
 export type KitVariant = (typeof KitVariant)[keyof typeof KitVariant];
 
 /** How each kit is named on a chart axis or in a table row. */
-export const KIT_VARIANT_LABEL: Record<KitVariant, string> = {
-  [KitVariant.HOME]: "Home",
-  [KitVariant.AWAY]: "Away",
-  [KitVariant.THIRD]: "3rd",
+export const KIT_VARIANT_LABEL_KEY: Record<KitVariant, TranslationKey> = {
+  [KitVariant.HOME]: "enum.kit.HOME",
+  [KitVariant.AWAY]: "enum.kit.AWAY",
+  [KitVariant.THIRD]: "enum.kit.THIRD",
 };
 
 /* -------------------------------------------------------------- SEASONS -- */
@@ -83,9 +91,9 @@ export const SeasonKey = {
 export type SeasonKey = (typeof SeasonKey)[keyof typeof SeasonKey];
 
 /** How a season is named in a chart legend. */
-export const SEASON_LABEL: Record<SeasonKey, string> = {
-  [SeasonKey.SEASON_25_26]: "Season 25/26",
-  [SeasonKey.SEASON_26_27]: "Season 26/27",
+export const SEASON_LABEL_KEY: Record<SeasonKey, TranslationKey> = {
+  [SeasonKey.SEASON_25_26]: "enum.season.SEASON_25_26",
+  [SeasonKey.SEASON_26_27]: "enum.season.SEASON_26_27",
 };
 
 /* --------------------------------------------------------------- MONTHS -- */
@@ -118,19 +126,71 @@ export const MonthKey = {
 export type MonthKey = (typeof MonthKey)[keyof typeof MonthKey];
 
 /** Short month name for a chart axis, matching the baseline band's `"Sep"`. */
-export const MONTH_LABEL: Record<MonthKey, string> = {
-  [MonthKey.JANUARY]: "Jan",
-  [MonthKey.FEBRUARY]: "Feb",
-  [MonthKey.MARCH]: "Mar",
-  [MonthKey.APRIL]: "Apr",
-  [MonthKey.MAY]: "May",
-  [MonthKey.JUNE]: "Jun",
-  [MonthKey.JULY]: "Jul",
-  [MonthKey.AUGUST]: "Aug",
-  [MonthKey.SEPTEMBER]: "Sep",
-  [MonthKey.OCTOBER]: "Oct",
-  [MonthKey.NOVEMBER]: "Nov",
-  [MonthKey.DECEMBER]: "Dec",
+export const MONTH_LABEL_KEY: Record<MonthKey, TranslationKey> = {
+  [MonthKey.JANUARY]: "enum.month.JANUARY",
+  [MonthKey.FEBRUARY]: "enum.month.FEBRUARY",
+  [MonthKey.MARCH]: "enum.month.MARCH",
+  [MonthKey.APRIL]: "enum.month.APRIL",
+  [MonthKey.MAY]: "enum.month.MAY",
+  [MonthKey.JUNE]: "enum.month.JUNE",
+  [MonthKey.JULY]: "enum.month.JULY",
+  [MonthKey.AUGUST]: "enum.month.AUGUST",
+  [MonthKey.SEPTEMBER]: "enum.month.SEPTEMBER",
+  [MonthKey.OCTOBER]: "enum.month.OCTOBER",
+  [MonthKey.NOVEMBER]: "enum.month.NOVEMBER",
+  [MonthKey.DECEMBER]: "enum.month.DECEMBER",
+};
+
+/**
+ * The months in CALENDAR order, January first, so a date's `getMonth()` indexes
+ * straight into it. `app/lib/calendar.ts` derives the baseline band's rolling
+ * axis this way rather than calling `toLocaleString`, which would have to be
+ * told a locale the SERVER cannot know (the language is client state).
+ */
+export const MONTH_KEYS: readonly MonthKey[] = [
+  MonthKey.JANUARY,
+  MonthKey.FEBRUARY,
+  MonthKey.MARCH,
+  MonthKey.APRIL,
+  MonthKey.MAY,
+  MonthKey.JUNE,
+  MonthKey.JULY,
+  MonthKey.AUGUST,
+  MonthKey.SEPTEMBER,
+  MonthKey.OCTOBER,
+  MonthKey.NOVEMBER,
+  MonthKey.DECEMBER,
+];
+
+/* ---------------------------------------------------------------- WEEKS -- */
+
+/**
+ * The four weeks of a single-month axis. A label like `W1` is the same word in
+ * both languages, but it is still a RENDERED string, so it lives in the
+ * dictionary with everything else rather than as a literal in a fixture.
+ */
+export const WeekKey = {
+  W1: "W1",
+  W2: "W2",
+  W3: "W3",
+  W4: "W4",
+} as const;
+
+export type WeekKey = (typeof WeekKey)[keyof typeof WeekKey];
+
+/** The four weeks, in axis order. */
+export const WEEK_KEYS: readonly WeekKey[] = [
+  WeekKey.W1,
+  WeekKey.W2,
+  WeekKey.W3,
+  WeekKey.W4,
+];
+
+export const WEEK_LABEL_KEY: Record<WeekKey, TranslationKey> = {
+  [WeekKey.W1]: "enum.week.W1",
+  [WeekKey.W2]: "enum.week.W2",
+  [WeekKey.W3]: "enum.week.W3",
+  [WeekKey.W4]: "enum.week.W4",
 };
 
 /* ----------------------------------------------------- DEPARTMENT TYPE -- */
@@ -155,10 +215,11 @@ export type DepartmentType =
   (typeof DepartmentType)[keyof typeof DepartmentType];
 
 /** The tag shown against a department name in the Hero 3 table. */
-export const DEPARTMENT_TYPE_LABEL: Record<DepartmentType, string> = {
-  [DepartmentType.REVENUE]: "Revenue",
-  [DepartmentType.COST]: "Cost",
-};
+export const DEPARTMENT_TYPE_LABEL_KEY: Record<DepartmentType, TranslationKey> =
+  {
+    [DepartmentType.REVENUE]: "enum.departmentType.REVENUE",
+    [DepartmentType.COST]: "enum.departmentType.COST",
+  };
 
 /* --------------------------------------------------- VARIANCE JUDGEMENT -- */
 
@@ -184,10 +245,13 @@ export type VarianceJudgement =
   (typeof VarianceJudgement)[keyof typeof VarianceJudgement];
 
 /** How a judgement is worded when a tile spells it out rather than colouring it. */
-export const VARIANCE_JUDGEMENT_LABEL: Record<VarianceJudgement, string> = {
-  [VarianceJudgement.FAVOURABLE]: "Favourable",
-  [VarianceJudgement.ADVERSE]: "Adverse",
-  [VarianceJudgement.NEUTRAL]: "On budget",
+export const VARIANCE_JUDGEMENT_LABEL_KEY: Record<
+  VarianceJudgement,
+  TranslationKey
+> = {
+  [VarianceJudgement.FAVOURABLE]: "enum.varianceJudgement.FAVOURABLE",
+  [VarianceJudgement.ADVERSE]: "enum.varianceJudgement.ADVERSE",
+  [VarianceJudgement.NEUTRAL]: "enum.varianceJudgement.NEUTRAL",
 };
 
 /* --------------------------------------------------- VARIANCE DIRECTION -- */
@@ -215,10 +279,13 @@ export type VarianceDirection =
   (typeof VarianceDirection)[keyof typeof VarianceDirection];
 
 /** Accessible wording for the arrow, so the direction is not visual only. */
-export const VARIANCE_DIRECTION_LABEL: Record<VarianceDirection, string> = {
-  [VarianceDirection.UP]: "up",
-  [VarianceDirection.DOWN]: "down",
-  [VarianceDirection.FLAT]: "unchanged",
+export const VARIANCE_DIRECTION_LABEL_KEY: Record<
+  VarianceDirection,
+  TranslationKey
+> = {
+  [VarianceDirection.UP]: "enum.varianceDirection.UP",
+  [VarianceDirection.DOWN]: "enum.varianceDirection.DOWN",
+  [VarianceDirection.FLAT]: "enum.varianceDirection.FLAT",
 };
 
 /* ------------------------------------------------------- PARTNER ROLES -- */
@@ -236,13 +303,92 @@ export const PartnerRole = {
 export type PartnerRole = (typeof PartnerRole)[keyof typeof PartnerRole];
 
 /** The tag shown under a partner name on the "Active partners" tile. */
-export const PARTNER_ROLE_LABEL: Record<PartnerRole, string> = {
-  [PartnerRole.MAIN_SHIRT_SPONSOR]: "Main shirt sponsor",
-  [PartnerRole.KIT_MANUFACTURER]: "Kit manufacturer",
-  [PartnerRole.OFFICIAL_PARTNER]: "Official partner",
-  [PartnerRole.TELECOM_PARTNER]: "Telecom partner",
-  [PartnerRole.BEVERAGE_PARTNER]: "Beverage partner",
-  [PartnerRole.MOBILITY_PARTNER]: "Mobility partner",
+export const PARTNER_ROLE_LABEL_KEY: Record<PartnerRole, TranslationKey> = {
+  [PartnerRole.MAIN_SHIRT_SPONSOR]: "enum.partnerRole.MAIN_SHIRT_SPONSOR",
+  [PartnerRole.KIT_MANUFACTURER]: "enum.partnerRole.KIT_MANUFACTURER",
+  [PartnerRole.OFFICIAL_PARTNER]: "enum.partnerRole.OFFICIAL_PARTNER",
+  [PartnerRole.TELECOM_PARTNER]: "enum.partnerRole.TELECOM_PARTNER",
+  [PartnerRole.BEVERAGE_PARTNER]: "enum.partnerRole.BEVERAGE_PARTNER",
+  [PartnerRole.MOBILITY_PARTNER]: "enum.partnerRole.MOBILITY_PARTNER",
+};
+
+/* ------------------------------------------------------------- PRODUCTS -- */
+
+/**
+ * The merchandise lines the Top Products tile ranks.
+ *
+ * They became an enum with US-049: a product NAME is display text, and display
+ * text in two languages cannot live on a fixture row. The identifier is what
+ * the fixture stores and what the table keys its rows by; the name comes from
+ * the dictionary.
+ */
+export const ProductKey = {
+  HOME_SHIRT: "HOME_SHIRT",
+  HOME_SCARF: "HOME_SCARF",
+  AWAY_SHIRT: "AWAY_SHIRT",
+  CAP_ROTBLAU: "CAP_ROTBLAU",
+  THIRD_SHIRT: "THIRD_SHIRT",
+} as const;
+
+export type ProductKey = (typeof ProductKey)[keyof typeof ProductKey];
+
+/** Product names. `Cap "Rotblau"` keeps its inner quotes in both languages. */
+export const PRODUCT_LABEL_KEY: Record<ProductKey, TranslationKey> = {
+  [ProductKey.HOME_SHIRT]: "enum.product.HOME_SHIRT",
+  [ProductKey.HOME_SCARF]: "enum.product.HOME_SCARF",
+  [ProductKey.AWAY_SHIRT]: "enum.product.AWAY_SHIRT",
+  [ProductKey.CAP_ROTBLAU]: "enum.product.CAP_ROTBLAU",
+  [ProductKey.THIRD_SHIRT]: "enum.product.THIRD_SHIRT",
+};
+
+/* ---------------------------------------------------------- DEPARTMENTS -- */
+
+/**
+ * The six departments of the Hero 3 table.
+ *
+ * The identifier is also the LOOKUP KEY of `Hero3Repository.department()`:
+ * looking a row up by its display name would have meant looking it up by a
+ * string that changes with the language.
+ */
+export const DepartmentKey = {
+  SPONSORING_PARTNERSHIPS: "SPONSORING_PARTNERSHIPS",
+  TICKETING: "TICKETING",
+  HOSPITALITY: "HOSPITALITY",
+  MERCHANDISING: "MERCHANDISING",
+  EVENTS: "EVENTS",
+  MARKETING_COMMUNICATIONS: "MARKETING_COMMUNICATIONS",
+} as const;
+
+export type DepartmentKey = (typeof DepartmentKey)[keyof typeof DepartmentKey];
+
+/** Department names, as Finance names them. */
+export const DEPARTMENT_LABEL_KEY: Record<DepartmentKey, TranslationKey> = {
+  [DepartmentKey.SPONSORING_PARTNERSHIPS]:
+    "enum.department.SPONSORING_PARTNERSHIPS",
+  [DepartmentKey.TICKETING]: "enum.department.TICKETING",
+  [DepartmentKey.HOSPITALITY]: "enum.department.HOSPITALITY",
+  [DepartmentKey.MERCHANDISING]: "enum.department.MERCHANDISING",
+  [DepartmentKey.EVENTS]: "enum.department.EVENTS",
+  [DepartmentKey.MARKETING_COMMUNICATIONS]:
+    "enum.department.MARKETING_COMMUNICATIONS",
+};
+
+/* -------------------------------------------------------- SPEND DRIVERS -- */
+
+/** Where Marketing's overspend went - the three bars of the follow-up tile. */
+export const SpendDriverKey = {
+  MATCH_ACTIVATIONS: "MATCH_ACTIVATIONS",
+  PAID_SOCIAL: "PAID_SOCIAL",
+  AGENCY_RETAINER: "AGENCY_RETAINER",
+} as const;
+
+export type SpendDriverKey =
+  (typeof SpendDriverKey)[keyof typeof SpendDriverKey];
+
+export const SPEND_DRIVER_LABEL_KEY: Record<SpendDriverKey, TranslationKey> = {
+  [SpendDriverKey.MATCH_ACTIVATIONS]: "enum.spendDriver.MATCH_ACTIVATIONS",
+  [SpendDriverKey.PAID_SOCIAL]: "enum.spendDriver.PAID_SOCIAL",
+  [SpendDriverKey.AGENCY_RETAINER]: "enum.spendDriver.AGENCY_RETAINER",
 };
 
 /* -------------------------------------------------------------- HEROES -- */

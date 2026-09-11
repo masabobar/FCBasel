@@ -10,7 +10,7 @@ import {
   type HBarDatum,
 } from "../../app/components/charts/h-bars";
 import {
-  DRIVER_TOTAL_LABEL,
+  DRIVER_TOTAL_LABEL_KEY,
   DriverTile,
   DriverTotalBadge,
   driverTotal,
@@ -38,6 +38,8 @@ import {
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { t } from "./support/i18n";
+import { DepartmentKey } from "../../app/lib/repositories/enums";
 
 /**
  * US-023 — the driver / breakdown tile.
@@ -85,13 +87,13 @@ const DECLINES: readonly HBarDatum[] = FIXTURES.filter(
 
 /** US-039 — where Marketing's overspend went. Positive money. */
 const DRIVERS: readonly HBarDatum[] = hero3.followUp.drivers.map((driver) => ({
-  name: driver.name,
+  name: t(driver.labelKey),
   value: chfFromThousands(driver.amount),
 }));
 
 /** The Marketing row, whose variance the drivers must add up to. */
 const MARKETING = hero3.primary.departments.find(
-  (department) => department.name === "Marketing & Communications",
+  (department) => department.key === DepartmentKey.MARKETING_COMMUNICATIONS,
 )!;
 
 const ATTENDANCE_NOTE =
@@ -328,7 +330,9 @@ describe("DriverTile — the action-slot badge, derived from the rows", () => {
 
     const chip = actionChip()!;
     expect(chip.textContent).toContain("-CHF 400k");
-    expect(slot("delta-suffix", chip)!.textContent).toBe(DRIVER_TOTAL_LABEL);
+    expect(slot("delta-suffix", chip)!.textContent).toBe(
+      t(DRIVER_TOTAL_LABEL_KEY),
+    );
     // Sign, arrow and word — never colour alone.
     expect(chip.dataset.direction).toBe("DOWN");
     expect(chip.textContent).toContain("down");

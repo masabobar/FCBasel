@@ -10,6 +10,8 @@ import {
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
 import { useGrow } from "../../lib/hooks/use-motion";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import {
   type DepartmentPerformance,
   departmentTotals,
@@ -57,7 +59,7 @@ import { DeltaChip } from "./delta-chip";
  * ──────────────────────
  *   1. FIGURES ARE IN CHF MILLIONS, and the tile says so. "CHF 000" was wrong
  *      on this table: the fix is {@link formatMillions} plus the
- *      {@link MILLIONS_NOTE} subtitle, which is not a prop and cannot be
+ *      {@link MILLIONS_NOTE_KEY} subtitle, which is not a prop and cannot be
  *      switched off. No thousands figure and no "000" note may come back.
  *   2. THE NUMERIC HEADERS ARE RIGHT-ALIGNED, "% of target" INCLUDED — its
  *      header sat left of its bar-and-percentage content and was reported.
@@ -87,7 +89,7 @@ import { DeltaChip } from "./delta-chip";
  * readable — which means a caller must not be able to omit it. It is the
  * corrected wording: the table used to be quoted in "CHF 000".
  */
-export const MILLIONS_NOTE = "figures in CHF millions";
+export const MILLIONS_NOTE_KEY: TranslationKey = "tiles.millionsNote";
 
 /** Divider between a caller's scope line and the note above. */
 export const SUBTITLE_SEPARATOR = "·";
@@ -96,7 +98,7 @@ export const SUBTITLE_SEPARATOR = "·";
  * The table's accessible name. A screen-reader user meets the table without
  * the card header around it, so the scale is repeated here rather than assumed.
  */
-export const TABLE_CAPTION = `Departmental budget against actual, ${MILLIONS_NOTE}`;
+export const TABLE_CAPTION_KEY: TranslationKey = "tiles.tableCaption";
 
 /* -------------------------------------------------------------- COLUMNS -- */
 
@@ -106,8 +108,8 @@ export type DepartmentColumnKey =
 
 export interface DepartmentColumn {
   readonly key: DepartmentColumnKey;
-  /** Header text, exactly as the acceptance criteria word it. */
-  readonly label: string;
+  /** Header text, exactly as the acceptance criteria word it, per language. */
+  readonly labelKey: TranslationKey;
   /**
    * Whether the column holds FIGURES. It decides the alignment of the header
    * and of every cell under it through {@link columnAlignClass} — one flag,
@@ -125,12 +127,16 @@ export interface DepartmentColumn {
  * that is exactly the misalignment this flag fixes.
  */
 export const DEPARTMENT_COLUMNS: readonly DepartmentColumn[] = [
-  { key: "name", label: "Department", numeric: false },
-  { key: "type", label: "Type", numeric: false },
-  { key: "budget", label: "Budget", numeric: true },
-  { key: "actual", label: "Actual", numeric: true },
-  { key: "variance", label: "Variance", numeric: true },
-  { key: "targetPercent", label: "% of target", numeric: true },
+  { key: "name", labelKey: "tiles.column.name", numeric: false },
+  { key: "type", labelKey: "tiles.column.type", numeric: false },
+  { key: "budget", labelKey: "tiles.column.budget", numeric: true },
+  { key: "actual", labelKey: "tiles.column.actual", numeric: true },
+  { key: "variance", labelKey: "tiles.column.variance", numeric: true },
+  {
+    key: "targetPercent",
+    labelKey: "tiles.column.targetPercent",
+    numeric: true,
+  },
 ];
 
 /** Alignment of a figure column — header and cell alike. */
@@ -185,10 +191,10 @@ export const TargetMark = {
 export type TargetMark = (typeof TargetMark)[keyof typeof TargetMark];
 
 /** How a mark is worded, since colour reaches no screen reader. */
-export const TARGET_MARK_LABEL: Record<TargetMark, string> = {
-  [TargetMark.HIT]: "on target",
-  [TargetMark.NEAR]: "near target",
-  [TargetMark.BEHIND]: "behind target",
+export const TARGET_MARK_LABEL_KEY: Record<TargetMark, TranslationKey> = {
+  [TargetMark.HIT]: "tiles.targetMark.HIT",
+  [TargetMark.NEAR]: "tiles.targetMark.NEAR",
+  [TargetMark.BEHIND]: "tiles.targetMark.BEHIND",
 };
 
 /**
@@ -276,10 +282,10 @@ export const ROW_HOVER_CLASS =
 export const FLAGGED_ROW_CLASS = "bg-accent-target-hit/10";
 
 /** What the flag means, in words, for anyone who cannot see the tint. */
-export const FLAG_LABEL = "Over budget and behind target";
+export const FLAG_LABEL_KEY: TranslationKey = "tiles.flagLabel";
 
 /** The total row's label. */
-export const TOTAL_LABEL = "Total";
+export const TOTAL_LABEL_KEY: TranslationKey = "tiles.total";
 
 /* --------------------------------------------------------- TYPE TAG CHIP -- */
 
@@ -301,19 +307,22 @@ export interface DepartmentTypeTagProps {
   /** The department's type — the key, for the colour. */
   type: DepartmentType;
   /**
-   * How that type is worded. Travels on the datum (`Department.typeLabel`, from
-   * `DEPARTMENT_TYPE_LABEL`), so the wording is never spelled in a component.
+   * How that type is worded. Travels on the datum (`Department.typeLabelKey`,
+   * from `DEPARTMENT_TYPE_LABEL_KEY`), so the wording is never spelled in a
+   * component and exists in both languages.
    */
-  label: string;
+  labelKey: TranslationKey;
   className?: string;
 }
 
 /** The small revenue / cost chip beside a department name. */
 export function DepartmentTypeTag({
   type,
-  label,
+  labelKey,
   className,
 }: DepartmentTypeTagProps) {
+  const t = useT();
+
   return (
     <span
       data-slot="department-type-tag"
@@ -324,7 +333,7 @@ export function DepartmentTypeTag({
         className,
       )}
     >
-      {label}
+      {t(labelKey)}
     </span>
   );
 }
@@ -353,6 +362,7 @@ export function DepartmentTarget({
   delayMs = 0,
   className,
 }: DepartmentTargetProps) {
+  const t = useT();
   const grown = useGrow();
   const mark = targetMark(percent);
   const dotClass = TARGET_MARK_DOT_CLASS[mark];
@@ -377,7 +387,7 @@ export function DepartmentTarget({
               className={cn("h-2 w-2 rounded-pill", dotClass)}
             />
             {/* The mark is a coloured shape; this is the same news in words. */}
-            <span className="sr-only">{TARGET_MARK_LABEL[mark]}</span>
+            <span className="sr-only">{t(TARGET_MARK_LABEL_KEY[mark])}</span>
           </>
         )}
       </span>
@@ -430,12 +440,13 @@ export interface DepartmentRowProps {
  * number.
  */
 export function DepartmentRow({ row, delayMs = 0 }: DepartmentRowProps) {
+  const t = useT();
   const flagged = row.needsAttention;
 
   return (
     <tr
       data-slot="department-row"
-      data-department={row.name}
+      data-department={row.key}
       // The judgement as data, so a test — and the eventual e2e pass — can
       // assert the reading without sampling a colour off a pixel.
       data-judgement={row.judgement}
@@ -456,7 +467,7 @@ export function DepartmentRow({ row, delayMs = 0 }: DepartmentRowProps) {
         )}
       >
         <span className="inline-flex items-start gap-1.5">
-          <span>{row.name}</span>
+          <span>{t(row.labelKey)}</span>
           {flagged && (
             <span
               data-slot="department-flag"
@@ -464,14 +475,14 @@ export function DepartmentRow({ row, delayMs = 0 }: DepartmentRowProps) {
             >
               <TriangleAlert aria-hidden="true" size={FLAG_ICON_SIZE} />
               {/* The tint and the icon are visual; this is the reason. */}
-              <span className="sr-only">{FLAG_LABEL}</span>
+              <span className="sr-only">{t(FLAG_LABEL_KEY)}</span>
             </span>
           )}
         </span>
       </th>
 
       <td data-column="type" className={cn(CELL_CLASS, TEXT_ALIGN_CLASS)}>
-        <DepartmentTypeTag type={row.type} label={row.typeLabel} />
+        <DepartmentTypeTag type={row.type} labelKey={row.typeLabelKey} />
       </td>
 
       <td
@@ -564,6 +575,7 @@ export function DepartmentTable({
   blendedTargetPercent,
   className,
 }: DepartmentTableProps) {
+  const t = useT();
   const totals = departmentTotals(rows);
 
   return (
@@ -574,7 +586,9 @@ export function DepartmentTable({
       className={cn("overflow-x-auto", className)}
     >
       <table data-slot="department-table" className="w-full border-collapse">
-        <caption className="sr-only">{TABLE_CAPTION}</caption>
+        <caption className="sr-only">
+          {t(TABLE_CAPTION_KEY, { note: t(MILLIONS_NOTE_KEY) })}
+        </caption>
 
         <thead>
           <tr data-slot="department-header-row">
@@ -591,7 +605,7 @@ export function DepartmentTable({
                   columnAlignClass(column),
                 )}
               >
-                {column.label}
+                {t(column.labelKey)}
               </th>
             ))}
           </tr>
@@ -603,7 +617,7 @@ export function DepartmentTable({
             // row rather than rewriting a different department's figures into
             // it — and each target bar keeps its own transition.
             <DepartmentRow
-              key={row.name}
+              key={row.key}
               row={row}
               delayMs={index * ROW_STAGGER_MS}
             />
@@ -620,7 +634,7 @@ export function DepartmentTable({
               data-column="name"
               className={cn(CELL_CLASS, TEXT_ALIGN_CLASS, "text-body")}
             >
-              {TOTAL_LABEL}
+              {t(TOTAL_LABEL_KEY)}
             </th>
 
             {/* The club is neither a revenue department nor a cost centre, so
@@ -723,7 +737,7 @@ export interface DepartmentTableTileProps
 /**
  * `Card` + `DepartmentTable`.
  *
- * The subtitle always ends in {@link MILLIONS_NOTE}. A caller's scope line is
+ * The subtitle always ends in {@link MILLIONS_NOTE_KEY}. A caller's scope line is
  * prefixed to it, never substituted for it — the corrected scale note is part
  * of the tile, not something a hero has to remember.
  */
@@ -741,6 +755,8 @@ export function DepartmentTableTile({
   delayMs,
   className,
 }: DepartmentTableTileProps) {
+  const t = useT();
+
   return (
     <Card
       title={title}
@@ -751,7 +767,9 @@ export function DepartmentTableTile({
               {period} {SUBTITLE_SEPARATOR}{" "}
             </>
           )}
-          <span data-slot="department-millions-note">{MILLIONS_NOTE}</span>
+          <span data-slot="department-millions-note">
+            {t(MILLIONS_NOTE_KEY)}
+          </span>
         </span>
       }
       headingLevel={headingLevel}

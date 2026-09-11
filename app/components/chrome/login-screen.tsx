@@ -3,10 +3,10 @@ import { useId, useState, type FormEvent } from "react";
 import { cn } from "../../lib/cn";
 import {
   DEMO_CREDENTIALS,
-  SIGN_IN_ERROR,
+  SIGN_IN_ERROR_KEY,
   opensDemo,
 } from "../../lib/demo-access";
-import { WORKSPACE_LABEL } from "../../lib/persona";
+import { useT } from "../../lib/i18n/context";
 import { Crest } from "./crest";
 
 /**
@@ -62,6 +62,7 @@ export interface LoginScreenProps {
 }
 
 export function LoginScreen({ onSignIn, className }: LoginScreenProps) {
+  const t = useT();
   const usernameId = useId();
   const passwordId = useId();
   const errorId = useId();
@@ -89,16 +90,21 @@ export function LoginScreen({ onSignIn, className }: LoginScreenProps) {
       <div data-slot="login-card" className={CARD_CLASS}>
         <div className="mb-6 flex items-center gap-3">
           <Crest size={40} />
-          <div>
-            <p className="tile-title">Intelligence Platform</p>
-            <p className="text-[13px] text-muted">{WORKSPACE_LABEL}</p>
-          </div>
+          {/*
+           * NO WORKSPACE LABEL HERE, and the omission is deliberate (review,
+           * 2026-09-11). "Sales & Marketing" is who you are once you are
+           * INSIDE — the app bar states it above the dashboard it describes.
+           * On the door it answered a question nobody had asked yet and made
+           * the card read as two headings stacked. The crest and the product
+           * name are the whole of what a front door needs.
+           */}
+          <p className="tile-title">{t("login.title")}</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="mb-4">
             <label className={LABEL_CLASS} htmlFor={usernameId}>
-              Username
+              {t("login.username")}
             </label>
             <input
               id={usernameId}
@@ -117,7 +123,7 @@ export function LoginScreen({ onSignIn, className }: LoginScreenProps) {
 
           <div className="mb-4">
             <label className={LABEL_CLASS} htmlFor={passwordId}>
-              Password
+              {t("login.password")}
             </label>
             <input
               id={passwordId}
@@ -147,7 +153,7 @@ export function LoginScreen({ onSignIn, className }: LoginScreenProps) {
               data-slot="login-error"
               className="mb-4 text-[13px] text-neg"
             >
-              {SIGN_IN_ERROR}
+              {t(SIGN_IN_ERROR_KEY)}
             </p>
           )}
 
@@ -156,7 +162,7 @@ export function LoginScreen({ onSignIn, className }: LoginScreenProps) {
             data-slot="login-submit"
             className="duration-fast w-full rounded-badge bg-navy px-4 py-2 font-semibold text-white transition-colors hover:bg-navy-light"
           >
-            Sign in
+            {t("login.submit")}
           </button>
         </form>
 
@@ -170,7 +176,7 @@ export function LoginScreen({ onSignIn, className }: LoginScreenProps) {
           data-slot="login-hint"
           className="mt-6 border-t border-border pt-4 text-[13px] text-muted"
         >
-          Demo access:{" "}
+          {t("login.hintPrefix")}{" "}
           <strong className="text-text">{DEMO_CREDENTIALS.username}</strong> /{" "}
           <strong className="text-text">{DEMO_CREDENTIALS.password}</strong>
         </p>

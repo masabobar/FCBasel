@@ -55,6 +55,7 @@ import { useDashboard } from "../../app/lib/dashboard/use-dashboard";
 import { createMockBaselineRepository } from "../../app/lib/mock/baseline";
 import { HeroId } from "../../app/lib/repositories/enums";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
+import { t } from "./support/i18n";
 
 const ROOT_SOURCE = readFileSync(
   resolve(process.cwd(), "app/root.tsx"),
@@ -121,7 +122,7 @@ describe("the baseline is the load state", () => {
   it("shows the four tiles before a question is asked", () => {
     renderHarness();
 
-    expect(tileTitles()).toEqual([...BASELINE_TILE_ORDER]);
+    expect(tileTitles()).toEqual(BASELINE_TILE_ORDER.map((key) => t(key)));
     expect(sectionCount()).toBe(0);
   });
 
@@ -142,7 +143,7 @@ describe("a question ADDS to the baseline", () => {
     await user.click(screen.getByRole("button", { name: "ask hero 2" }));
 
     expect(sectionCount()).toBe(2);
-    expect(tileTitles()).toEqual([...BASELINE_TILE_ORDER]);
+    expect(tileTitles()).toEqual(BASELINE_TILE_ORDER.map((key) => t(key)));
   });
 
   it("inserts them BELOW the baseline row, on the same canvas", async () => {
@@ -182,7 +183,7 @@ describe("Reset restores exactly the four baseline tiles", () => {
     await askThenReset();
 
     expect(sectionCount()).toBe(0);
-    expect(tileTitles()).toEqual([...BASELINE_TILE_ORDER]);
+    expect(tileTitles()).toEqual(BASELINE_TILE_ORDER.map((key) => t(key)));
   });
 
   it("leaves exactly four tiles — no duplicate and no survivor", async () => {
@@ -216,7 +217,7 @@ describe("Reset restores exactly the four baseline tiles", () => {
     await user.click(reset);
 
     expect(sectionCount()).toBe(0);
-    expect(tileTitles()).toEqual([...BASELINE_TILE_ORDER]);
+    expect(tileTitles()).toEqual(BASELINE_TILE_ORDER.map((key) => t(key)));
   });
 
   it("returns the canvas to the DOM it had on load", async () => {

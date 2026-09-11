@@ -6,6 +6,7 @@ import {
   sourceChipDelayMs,
   type ThinkingBeat,
 } from "../../lib/dashboard/thinking";
+import { useI18n } from "../../lib/i18n/context";
 import { MOTION_CLASS, scrollRevealedIntoView } from "../../lib/motion";
 
 /**
@@ -99,6 +100,7 @@ export interface ThinkingPanelProps {
 }
 
 export function ThinkingPanel({ beat, className }: ThinkingPanelProps) {
+  const { t, tList } = useI18n();
   const element = useRef<HTMLDivElement>(null);
 
   /**
@@ -142,14 +144,14 @@ export function ThinkingPanel({ beat, className }: ThinkingPanelProps) {
         <div className="min-w-0">
           {/* Verbatim, and the whole of what is announced. */}
           <p data-slot="thinking-message" className="font-semibold text-navy">
-            {beat.message}
+            {t(beat.messageKey)}
           </p>
 
           <div
             data-slot="thinking-sources"
             className="mt-1.5 flex flex-wrap gap-1.5"
           >
-            {beat.sources.map((source, index) => (
+            {tList(beat.sourcesKey).map((source, index) => (
               <span
                 key={source}
                 data-slot="thinking-source"

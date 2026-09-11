@@ -94,12 +94,36 @@ is fine — see US-028 for the behaviour that must be preserved.
 
 ## Internationalization
 
-**Not used — English only.** No i18n library is installed and `I18N-RULES.md` does not exist, so
-`/execute-work` performs no translation-key check.
+**English and German, in-house, no library** (US-049). The prototype ships two dictionaries —
+`app/lib/i18n/locales/en.json` and `de.json` — behind a ~90-line translation layer
+(`app/lib/i18n/`) and a two-option toggle in the app bar. **No i18next package is installed**, and
+the entries in the "Deliberately not installed" list below still hold: two languages, no plural
+rules, no namespace loading and no locale detection need a dependency, and a library that fetches
+anything at runtime would weaken the offline guarantee (`constraints.md` §3).
 
-Neither client document requests multi-language support: the prototype has one persona, one Basel
-boardroom audience, a one-week deadline, and every narrative string is hand-authored persuasion copy
-that must render **verbatim**. Conventions are British English, currency CHF throughout.
+**Why it was added.** FC Basel is a German-speaking club; the demo may be given in German to the
+club's own people. The English pass remains the rehearsed one and stays the default
+(`DEFAULT_LOCALE`), with German a single press away.
+
+**Rules the layer enforces:**
+
+- Every rendered word is a KEY. No display string lives in a component or a fixture; the
+  `SCREAMING_SNAKE_CASE` enums (`app/lib/repositories/enums.ts`) carry `*_LABEL_KEY` maps, and the
+  datasets carry `labelKey` / `scopeLabelKey` / `narrativeKey`.
+- The English dictionary is the type. `DICTIONARIES` is `Record<Locale, typeof en>`, so a key
+  missing from German fails `pnpm typecheck`; `tests/unit/i18n-dictionary.test.ts` closes the
+  reverse direction and the house rules (no em/en dash, no `ß` — Swiss German, Swiss digit
+  grouping).
+- **Narratives stay verbatim** in both languages: the English is the approved reference copy and
+  the German is a translation of that same copy, edited only alongside the figures it quotes.
+- The locale is **memory-only** React state (`constraints.md` §2): no cookie, no storage, no
+  `Accept-Language`. A reload returns to English, exactly as it returns to the baseline dashboard.
+- The intent matcher holds BOTH vocabularies in one keyword set, so a typed German question
+  resolves without the matcher ever reading the locale.
+
+`I18N-RULES.md` does not exist, so `/execute-work` performs no project-level translation-key check;
+the typecheck and the dictionary suite are that check. Conventions are British English in the
+English pass, Swiss German (`ss`, never `ß`) in the German pass, currency CHF throughout.
 
 ## UI & Styling
 

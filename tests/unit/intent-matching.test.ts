@@ -39,8 +39,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   ChipKind,
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
 } from "../../app/lib/dashboard/chips";
 import {
   askQuestion,
@@ -55,6 +55,7 @@ import {
   WEAK_KEYWORD_SCORE,
 } from "../../app/lib/dashboard/intents";
 import { HERO_IDS, HeroId } from "../../app/lib/repositories/enums";
+import { de, t } from "./support/i18n";
 
 /** The module's source, comments stripped — several checks are about absence. */
 const INTENTS_CODE = readFileSync(
@@ -103,8 +104,12 @@ function followMatch(heroId: HeroId) {
  * should be added here too — the two properties then cover it for free.
  */
 const CORPUS: readonly string[] = [
-  ...Object.values(HERO_CHIP_LABEL),
-  ...Object.values(FOLLOW_UP_CHIP_LABEL),
+  // Both languages of every prepared prompt: a presenter who switches the
+  // interface types German words, and the matcher answers either (US-049).
+  ...Object.values(HERO_CHIP_LABEL_KEY).map((key) => t(key)),
+  ...Object.values(FOLLOW_UP_CHIP_LABEL_KEY).map((key) => t(key)),
+  ...Object.values(HERO_CHIP_LABEL_KEY).map((key) => de(key)),
+  ...Object.values(FOLLOW_UP_CHIP_LABEL_KEY).map((key) => de(key)),
   "kit sales",
   "how are shirts selling",
   "trikot",
@@ -579,7 +584,7 @@ describe("the three canonical prompts resolve to their own hero", () => {
 
   for (const heroId of HERO_IDS) {
     it(`resolves the ${heroId} chip label to ${heroId}, not its follow-up`, () => {
-      const question = HERO_CHIP_LABEL[heroId];
+      const question = t(HERO_CHIP_LABEL_KEY[heroId]);
       const { primary, follow: followScore } = EXPECTED_SCORES[heroId];
 
       expect(matchIntent(question)).toEqual(heroMatch(heroId));
@@ -591,7 +596,7 @@ describe("the three canonical prompts resolve to their own hero", () => {
 
   it("beats the follow-up by at least 3 points on every canonical prompt", () => {
     for (const heroId of HERO_IDS) {
-      const question = HERO_CHIP_LABEL[heroId];
+      const question = t(HERO_CHIP_LABEL_KEY[heroId]);
       const margin =
         scoreIntent(question, hero(heroId)) -
         scoreIntent(question, follow(heroId));
@@ -601,19 +606,102 @@ describe("the three canonical prompts resolve to their own hero", () => {
   });
 });
 
+/* ------------------------------------------------------------ GERMAN -- */
+
+describe("a question typed in German resolves like one typed in English", () => {
+  /**
+   * US-049 — the demo can be given in German, and the presenter can ignore
+   * the chips there too. The keyword set holds BOTH vocabularies (there is no
+   * per-locale matcher and the matcher never reads the locale), so these are
+   * the same six properties the English blocks assert, in the other language.
+   */
+  it("resolves each German chip label to its own hero", () => {
+    for (const heroId of HERO_IDS) {
+      expect(matchIntent(de(HERO_CHIP_LABEL_KEY[heroId]))).toEqual(
+        heroMatch(heroId),
+      );
+    }
+  });
+
+  it("resolves each German follow-up label to that hero's follow-up", () => {
+    for (const heroId of HERO_IDS) {
+      expect(matchIntent(de(FOLLOW_UP_CHIP_LABEL_KEY[heroId]))).toEqual(
+        followMatch(heroId),
+      );
+    }
+  });
+
+  it("tolerates the phrasings a presenter actually types", () => {
+    const CASES: readonly [string, HeroId][] = [
+      ["Trikotverkäufe", HeroId.HERO_1],
+      ["wie laufen die Trikots", HeroId.HERO_1],
+      ["Ticketeinnahmen dieses Jahr", HeroId.HERO_2],
+      ["Einnahmen aus Tickets im Vergleich zum Vorjahr", HeroId.HERO_2],
+      ["Abteilungsbudgets", HeroId.HERO_3],
+      ["Wie sehen die Budgets der Abteilungen aus?", HeroId.HERO_3],
+    ];
+
+    for (const [question, heroId] of CASES) {
+      expect(matchIntent(question), question).toEqual(heroMatch(heroId));
+    }
+  });
+
+  it("reaches the follow-ups from German wording too", () => {
+    const CASES: readonly [string, HeroId][] = [
+      ["Welches Badge sollen wir pushen?", HeroId.HERO_1],
+      ["Welche Spiele treiben den Rückgang?", HeroId.HERO_2],
+      ["Warum ist Marketing über Budget?", HeroId.HERO_3],
+    ];
+
+    for (const [question, heroId] of CASES) {
+      expect(matchIntent(question), question).toEqual(followMatch(heroId));
+    }
+  });
+
+  it("answers a mixed-language question rather than falling through", () => {
+    // A presenter switching mid-demo types whichever word comes first.
+    expect(matchIntent("Trikot sales")).toEqual(heroMatch(HeroId.HERO_1));
+    expect(matchIntent("ticket Einnahmen")).toEqual(heroMatch(HeroId.HERO_2));
+  });
+
+  it("still falls through on German that names nothing prepared", () => {
+    for (const question of [
+      "Wie viele Mitarbeitende haben wir?",
+      "Wann ist das nächste Auswärtsspiel?",
+      "Guten Tag",
+    ]) {
+      expect(matchIntent(question), question).toBeNull();
+    }
+  });
+
+  it("changed no English score — the German words are new, not broader", () => {
+    // The German vocabulary was chosen so none of it is a substring of an
+    // English word; these are the canonical scores from the block above.
+    expect(
+      scoreIntent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]), hero(HeroId.HERO_1)),
+    ).toBe(8);
+    expect(
+      scoreIntent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]), hero(HeroId.HERO_2)),
+    ).toBe(4);
+    expect(
+      scoreIntent(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]), hero(HeroId.HERO_3)),
+    ).toBe(10);
+  });
+});
+
 /* --------------------------------------------------------- FOLLOW-UPS -- */
 
 describe("the three follow-up phrasings resolve to the follow-up", () => {
   it("resolves each follow-up chip label to that hero's follow-up", () => {
     for (const heroId of HERO_IDS) {
-      expect(matchIntent(FOLLOW_UP_CHIP_LABEL[heroId])).toEqual(
+      expect(matchIntent(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]))).toEqual(
         followMatch(heroId),
       );
     }
   });
 
   it('resolves "Which badge should we push next?" to Hero 1\'s follow-up', () => {
-    const question = FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1];
+    const question = t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]);
 
     expect(question).toBe("Which badge should we push next?");
     expect(matchIntent(question)).toEqual(followMatch(HeroId.HERO_1));
@@ -622,7 +710,7 @@ describe("the three follow-up phrasings resolve to the follow-up", () => {
   });
 
   it('resolves "Which fixtures are driving the drop?" to Hero 2\'s follow-up', () => {
-    const question = FOLLOW_UP_CHIP_LABEL[HeroId.HERO_2];
+    const question = t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_2]);
 
     expect(question).toBe("Which fixtures are driving the drop?");
     expect(matchIntent(question)).toEqual(followMatch(HeroId.HERO_2));
@@ -631,7 +719,7 @@ describe("the three follow-up phrasings resolve to the follow-up", () => {
   });
 
   it("resolves the Marketing follow-up label to Hero 3's follow-up", () => {
-    const question = FOLLOW_UP_CHIP_LABEL[HeroId.HERO_3];
+    const question = t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_3]);
 
     expect(matchIntent(question)).toEqual(followMatch(HeroId.HERO_3));
     expect(scoreIntent(question, follow(HeroId.HERO_3))).toBe(7);

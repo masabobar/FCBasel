@@ -1,3 +1,4 @@
+import { type TranslationKey, type TranslationListKey } from "../i18n";
 import { HeroId } from "../repositories/enums";
 import { ChipKind } from "./chips";
 
@@ -13,9 +14,10 @@ import { ChipKind } from "./chips";
  * that way. The Reference Guide is explicit — *"the thinking delay is fake
  * latency, not a query. Keep it — it is what makes the result feel earned."*
  *
- * WHY THE COPY SAYS "QUERYING". The messages below are the reference build's,
- * verbatim, and they are deliberate stagecraft copy rather than a claim about
- * what the prototype does: the presenter is showing what the finished platform
+ * WHY THE COPY SAYS "QUERYING". The messages are the reference build's,
+ * verbatim in English and translated for German (US-049 — the words live in
+ * `app/lib/i18n/locales/*.json` and this file holds the keys), and they are
+ * deliberate stagecraft copy rather than a claim about what the prototype does: the presenter is showing what the finished platform
  * WOULD do, and every word here was approved as part of that script. They are
  * rendered exactly as written — never re-cased, never truncated, never
  * assembled from fragments (which is also why they are whole sentences in the
@@ -114,10 +116,10 @@ export function sourceChipDelayMs(index: number): number {
 
 /** What the panel says while one flow is "running". */
 export interface ThinkingBeat {
-  /** The per-flow message, rendered verbatim. */
-  readonly message: string;
+  /** The per-flow message, resolved through `t()` and rendered verbatim. */
+  readonly messageKey: TranslationKey;
   /** The data sources that light up one by one, in order. */
-  readonly sources: readonly string[];
+  readonly sourcesKey: TranslationListKey;
 }
 
 /**
@@ -132,30 +134,30 @@ export interface ThinkingBeat {
 export const THINKING_BEATS: Record<ChipKind, Record<HeroId, ThinkingBeat>> = {
   [ChipKind.HERO]: {
     [HeroId.HERO_1]: {
-      message: "Querying Merchandising, Webshop and flock-printing",
-      sources: ["Merchandising", "Webshop", "Flock-printing"],
+      messageKey: "thinking.hero.HERO_1.message",
+      sourcesKey: "thinking.hero.HERO_1.sources",
     },
     [HeroId.HERO_2]: {
-      message: "Querying Ticketing and matchday records",
-      sources: ["Ticketing", "Matchday records"],
+      messageKey: "thinking.hero.HERO_2.message",
+      sourcesKey: "thinking.hero.HERO_2.sources",
     },
     [HeroId.HERO_3]: {
-      message: "Querying Finance and departmental budgets",
-      sources: ["Finance", "Departmental budgets"],
+      messageKey: "thinking.hero.HERO_3.message",
+      sourcesKey: "thinking.hero.HERO_3.sources",
     },
   },
   [ChipKind.FOLLOW_UP]: {
     [HeroId.HERO_1]: {
-      message: "Analysing badge selection trends",
-      sources: ["Badge selection history"],
+      messageKey: "thinking.followUp.HERO_1.message",
+      sourcesKey: "thinking.followUp.HERO_1.sources",
     },
     [HeroId.HERO_2]: {
-      message: "Breaking down fixture performance",
-      sources: ["Fixture attendance"],
+      messageKey: "thinking.followUp.HERO_2.message",
+      sourcesKey: "thinking.followUp.HERO_2.sources",
     },
     [HeroId.HERO_3]: {
-      message: "Tracing Marketing spend and outcomes",
-      sources: ["Marketing spend", "Webshop conversion"],
+      messageKey: "thinking.followUp.HERO_3.message",
+      sourcesKey: "thinking.followUp.HERO_3.sources",
     },
   },
 };

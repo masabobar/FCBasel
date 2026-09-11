@@ -33,11 +33,11 @@ import { ringGeometry } from "../../app/components/charts/attendance-ring";
 import { LINE_SERIES_COLORS } from "../../app/components/charts/line-chart";
 import {
   BAND_CHART_HEIGHT,
-  HERO_BAND_LABELS,
-  HERO_BAND_PERIOD_LABEL,
-  HERO_BAND_SUBTITLE,
+  HERO_BAND_LABEL_KEY,
+  HERO_BAND_PERIOD_LABEL_KEY,
+  HERO_BAND_SUBTITLE_KEY,
   HeroBand,
-  PREVIOUS_SERIES_NAME,
+  PREVIOUS_SERIES_NAME_KEY,
 } from "../../app/components/dashboard/hero-band";
 import { type Clock } from "../../app/lib/calendar";
 import {
@@ -53,7 +53,7 @@ import {
 } from "../../app/lib/format";
 import { COUNT_UP_DURATION_MS } from "../../app/lib/hooks/use-motion";
 import { createMockBaselineRepository } from "../../app/lib/mock/baseline";
-import { WORKSPACE_LABEL } from "../../app/lib/persona";
+import { WORKSPACE_LABEL_KEY } from "../../app/lib/persona";
 import {
   attendanceChangePercent,
   attendanceShare,
@@ -67,6 +67,9 @@ import {
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { t } from "./support/i18n";
+import { type TranslationKey } from "../../app/lib/i18n";
+import { personaGreeting } from "../../app/lib/persona";
 
 /* --------------------------------------------------------------- SOURCE -- */
 
@@ -157,20 +160,34 @@ afterEach(() => {
 
 /* ------------------------------------------------------------ THE BAND --- */
 
+/** The band resolves its keyed axis with `t`; so does this suite. */
+function bandLabels(period: {
+  webshop: { labelKeys: readonly TranslationKey[] };
+}): string[] {
+  return period.webshop.labelKeys.map((key) => t(key));
+}
+
 describe("HeroBand — the greeting band above the row", () => {
   it("greets the persona with the string the loader resolved", () => {
     renderBand();
 
-    expect(slot("hero-band-greeting")).toHaveTextContent(DATA.band.greeting);
+    expect(slot("hero-band-greeting")).toHaveTextContent(
+      personaGreeting(t, DATA.band.greeting),
+    );
     expect(
-      screen.getByRole("heading", { level: 2, name: DATA.band.greeting }),
+      screen.getByRole("heading", {
+        level: 2,
+        name: personaGreeting(t, DATA.band.greeting),
+      }),
     ).toBeInTheDocument();
   });
 
   it("names the workspace and no individual", () => {
     renderBand();
 
-    expect(slot("hero-band-greeting")).toHaveTextContent(WORKSPACE_LABEL);
+    expect(slot("hero-band-greeting")).toHaveTextContent(
+      t(WORKSPACE_LABEL_KEY),
+    );
     for (const source of SOURCES) {
       expect(source.code).not.toMatch(/Shaqiri|Sow|Metinho|Daniliuc/);
     }
@@ -179,7 +196,9 @@ describe("HeroBand — the greeting band above the row", () => {
   it("says what the band is and what to do next", () => {
     renderBand();
 
-    expect(slot("hero-band-subtitle")).toHaveTextContent(HERO_BAND_SUBTITLE);
+    expect(slot("hero-band-subtitle")).toHaveTextContent(
+      t(HERO_BAND_SUBTITLE_KEY),
+    );
   });
 
   it("labels the section by its greeting, for a screen reader walking it", () => {
@@ -228,7 +247,7 @@ describe("HeroBand — the greeting band above the row", () => {
     );
 
     expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
-      withoutBaseline[0]!.label,
+      t(withoutBaseline[0]!.labelKey),
     );
   });
 });
@@ -241,7 +260,10 @@ describe("HeroBand — one control drives the chart AND the ring", () => {
 
     const groups = screen.getAllByRole("radiogroup");
     expect(groups).toHaveLength(1);
-    expect(groups[0]).toHaveAttribute("aria-label", HERO_BAND_PERIOD_LABEL);
+    expect(groups[0]).toHaveAttribute(
+      "aria-label",
+      t(HERO_BAND_PERIOD_LABEL_KEY),
+    );
     // Dark, because it sits on the navy band rather than on a white card.
     expect(groups[0]).toHaveAttribute("data-variant", "dark");
   });
@@ -251,10 +273,10 @@ describe("HeroBand — one control drives the chart AND the ring", () => {
 
     expect(
       slots("segmented-option").map((option) => option.textContent),
-    ).toEqual(PERIODS.map((period) => period.label));
+    ).toEqual(PERIODS.map((period) => t(period.labelKey)));
     expect(PERIODS).toHaveLength(4);
     expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
-      FIRST.label,
+      t(FIRST.labelKey),
     );
   });
 
@@ -268,7 +290,7 @@ describe("HeroBand — one control drives the chart AND the ring", () => {
       "stroke-dasharray",
     );
 
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
     frames.advance(COUNT_UP_DURATION_MS);
     frames.advance(COUNT_UP_DURATION_MS);
 
@@ -284,7 +306,7 @@ describe("HeroBand — one control drives the chart AND the ring", () => {
     ).not.toBe(ringBefore);
     // … and both are describing the period the control says is selected.
     expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
-      NEXT.label,
+      t(NEXT.labelKey),
     );
   });
 
@@ -292,7 +314,7 @@ describe("HeroBand — one control drives the chart AND the ring", () => {
     const user = userEvent.setup();
     const { frames } = renderBand();
 
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
     frames.advance(COUNT_UP_DURATION_MS);
     frames.advance(COUNT_UP_DURATION_MS);
 
@@ -322,13 +344,13 @@ describe("HeroBand — one control drives the chart AND the ring", () => {
     const user = userEvent.setup();
     const { frames } = renderBand();
 
-    await user.click(screen.getByRole("radio", { name: FIRST.label }));
+    await user.click(screen.getByRole("radio", { name: t(FIRST.labelKey) }));
     await user.keyboard("{ArrowRight}");
     frames.advance(COUNT_UP_DURATION_MS);
     frames.advance(COUNT_UP_DURATION_MS);
 
     expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
-      NEXT.label,
+      t(NEXT.labelKey),
     );
     expect(slot("attendance-ring-value")).toHaveTextContent(
       formatNumber(NEXT.attendance.average),
@@ -343,8 +365,11 @@ describe("HeroBand — the webshop chart", () => {
     renderBand();
 
     expect(slots("line-chart-line")).toHaveLength(2);
-    expect(line("solid")).toHaveAttribute("data-series", FIRST.label);
-    expect(line("dash")).toHaveAttribute("data-series", PREVIOUS_SERIES_NAME);
+    expect(line("solid")).toHaveAttribute("data-series", t(FIRST.labelKey));
+    expect(line("dash")).toHaveAttribute(
+      "data-series",
+      t(PREVIOUS_SERIES_NAME_KEY),
+    );
   });
 
   it("draws the current period as a GOLD line with an area fill", () => {
@@ -376,8 +401,8 @@ describe("HeroBand — the webshop chart", () => {
       (item) => item.textContent,
     );
     expect(slots("line-chart-legend")).toHaveLength(1);
-    expect(items).toContain(FIRST.label);
-    expect(items).toContain(PREVIOUS_SERIES_NAME);
+    expect(items).toContain(t(FIRST.labelKey));
+    expect(items).toContain(t(PREVIOUS_SERIES_NAME_KEY));
     expect(
       slots("line-chart-legend-swatch").map((swatch) =>
         swatch.getAttribute("data-style"),
@@ -399,7 +424,7 @@ describe("HeroBand — the webshop chart", () => {
 
     expect(
       slots("line-chart-axis-label").map((label) => label.textContent),
-    ).toEqual([...FIRST.webshop.labels]);
+    ).toEqual([...bandLabels(FIRST)]);
     expect(slot("line-chart-svg")!.getAttribute("viewBox")).toContain(
       String(BAND_CHART_HEIGHT),
     );
@@ -409,8 +434,10 @@ describe("HeroBand — the webshop chart", () => {
     renderBand();
 
     const plot = slot("line-chart-plot")!;
-    expect(plot.getAttribute("aria-label")).toContain(HERO_BAND_LABELS.webshop);
-    expect(plot.getAttribute("aria-label")).toContain(FIRST.label);
+    expect(plot.getAttribute("aria-label")).toContain(
+      t(HERO_BAND_LABEL_KEY.webshop),
+    );
+    expect(plot.getAttribute("aria-label")).toContain(t(FIRST.labelKey));
   });
 });
 
@@ -443,7 +470,7 @@ describe("HeroBand — hovering the chart", () => {
     expect(rows).toHaveLength(2);
     expect(tooltip).toHaveTextContent(formatMoney(FIRST.webshop.current[0]!));
     expect(tooltip).toHaveTextContent(formatMoney(FIRST.webshop.previous[0]!));
-    expect(tooltip).toHaveTextContent(FIRST.webshop.labels[0]!);
+    expect(tooltip).toHaveTextContent(bandLabels(FIRST)[0]!);
   });
 
   it("clears the guide when the pointer leaves", () => {
@@ -531,7 +558,7 @@ describe("HeroBand — the attendance ring and its stats", () => {
     expect(
       screen.getByRole("heading", {
         level: 3,
-        name: HERO_BAND_LABELS.attendance,
+        name: t(HERO_BAND_LABEL_KEY.attendance),
       }),
     ).toBeInTheDocument();
   });
@@ -548,7 +575,7 @@ describe("HeroBand — a filter change counts, redraws and sweeps", () => {
 
     expect(shownTotal()).toBe(FIRST_TOTALS.current);
 
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
 
     // Before a single frame runs, the OLD figure is still on screen.
     expect(shownTotal()).toBe(FIRST_TOTALS.current);
@@ -573,7 +600,7 @@ describe("HeroBand — a filter change counts, redraws and sweeps", () => {
     const before = line("solid");
     expect(before).toHaveAttribute("stroke-dashoffset", "0");
 
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
 
     // A NEW element, undrawn: `key={period.key}` remounts the chart, which is
     // what replays US-025's stroke draw instead of morphing the old path.
@@ -592,7 +619,7 @@ describe("HeroBand — a filter change counts, redraws and sweeps", () => {
     renderBand();
 
     const arc = slot("attendance-ring-arc")!;
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
 
     // Not re-keyed, deliberately: the ring must transition between two dash
     // pairs, where the chart must start its draw again.
@@ -608,7 +635,7 @@ describe("HeroBand — a filter change counts, redraws and sweeps", () => {
     const user = userEvent.setup();
     const { frames } = renderBand();
 
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
     frames.advance(0);
     frames.advance(COUNT_UP_DURATION_MS / 4);
 
@@ -709,7 +736,7 @@ describe("HeroBand — reduced motion renders the final state everywhere", () =>
     const user = userEvent.setup();
     render(<HeroBand {...DATA.band} latest={DATA.match} />);
 
-    await user.click(screen.getByRole("radio", { name: NEXT.label }));
+    await user.click(screen.getByRole("radio", { name: t(NEXT.labelKey) }));
 
     expect(slot("kpi-value")).toHaveTextContent(
       formatMoney(NEXT_TOTALS.current),

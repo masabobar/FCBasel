@@ -7,6 +7,8 @@ import {
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
 import { useCountUp, useGrow, useUid } from "../../lib/hooks/use-motion";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { badgeSegments } from "../../lib/repositories/derive";
 import { type BadgeSponsorShare } from "../../lib/repositories/types";
 import { cssVariable } from "../../lib/tokens";
@@ -259,10 +261,10 @@ const GRADIENT_END_OPACITY = 0.72;
 /* ---------------------------------------------------------------- COPY -- */
 
 /** What the centre figure means while nothing is hovered. */
-const DEFAULT_CENTRE_LABEL = "total";
+const DEFAULT_CENTRE_LABEL_KEY: TranslationKey = "tiles.donutCentre";
 
 /** The ring group's accessible name, when the caller gives none. */
-const DEFAULT_LABEL = "Share of the total by series";
+const DEFAULT_LABEL_KEY: TranslationKey = "tiles.donutLabel";
 
 /* ---------------------------------------------------------------- RING -- */
 
@@ -305,10 +307,11 @@ export function Donut({
   total,
   split,
   format = formatNumber,
-  centreLabel = DEFAULT_CENTRE_LABEL,
-  label = DEFAULT_LABEL,
+  centreLabel,
+  label,
   className,
 }: DonutProps) {
+  const t = useT();
   // Document-global `url(#…)` ids: Hero 1 puts three charts on one screen.
   const uid = useUid("donut");
   const grown = useGrow();
@@ -337,7 +340,7 @@ export function Donut({
     <div
       data-slot="donut"
       role="group"
-      aria-label={label}
+      aria-label={label ?? t(DEFAULT_LABEL_KEY)}
       className={cn("flex flex-wrap items-center gap-5", className)}
       // Leaving the whole component — or taking focus out of it — drops the
       // highlight. On the wrapper rather than per surface, so sliding from an
@@ -451,7 +454,9 @@ export function Donut({
               data-slot="donut-centre-label"
               className="mt-1 block text-caption text-muted"
             >
-              {hoveredArc ? hoveredArc.name : centreLabel}
+              {hoveredArc
+                ? hoveredArc.name
+                : (centreLabel ?? t(DEFAULT_CENTRE_LABEL_KEY))}
             </span>
           </div>
         </div>

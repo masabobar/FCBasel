@@ -7,12 +7,14 @@ import { describe, expect, it } from "vitest";
 import Index, { loader, meta, shouldRevalidate } from "../../app/routes/_index";
 import {
   BASELINE_TILE_ORDER,
-  TOP_PRODUCTS_PERIOD_LABEL,
+  TOP_PRODUCTS_PERIOD_LABEL_KEY,
 } from "../../app/components/dashboard/baseline-row";
-import { HERO_BAND_PERIOD_LABEL } from "../../app/components/dashboard/hero-band";
+import { HERO_BAND_PERIOD_LABEL_KEY } from "../../app/components/dashboard/hero-band";
 import { type BaselineData } from "../../app/lib/dashboard/baseline";
-import { WORKSPACE_LABEL } from "../../app/lib/persona";
+import { WORKSPACE_LABEL_KEY } from "../../app/lib/persona";
 import { baselineRepository } from "../../app/lib/repositories/index.server";
+import { t } from "./support/i18n";
+import { personaGreeting } from "../../app/lib/persona";
 
 const ROUTE_SOURCE = readFileSync(
   resolve(process.cwd(), "app/routes/_index.tsx"),
@@ -80,7 +82,7 @@ describe("index route — the baseline dashboard", () => {
 
     const heading = screen.getByRole("heading", {
       level: 1,
-      name: `${WORKSPACE_LABEL} dashboard`,
+      name: `${t(WORKSPACE_LABEL_KEY)} dashboard`,
     });
     expect(heading).toBeInTheDocument();
   });
@@ -95,7 +97,7 @@ describe("index route — the baseline dashboard", () => {
     renderRoute();
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      `${WORKSPACE_LABEL} dashboard`,
+      `${t(WORKSPACE_LABEL_KEY)} dashboard`,
     );
   });
 
@@ -110,7 +112,7 @@ describe("index route — the baseline dashboard", () => {
       [...container.querySelectorAll('[data-slot="card"] h2')].map(
         (node) => node.textContent,
       ),
-    ).toEqual([...BASELINE_TILE_ORDER]);
+    ).toEqual(BASELINE_TILE_ORDER.map((key) => t(key)));
   });
 
   it("mounts the hero band ABOVE that row, as one grid item", () => {
@@ -136,7 +138,10 @@ describe("index route — the baseline dashboard", () => {
     renderRoute();
 
     expect(
-      screen.getByRole("heading", { level: 2, name: DATA.band.greeting }),
+      screen.getByRole("heading", {
+        level: 2,
+        name: personaGreeting(t, DATA.band.greeting),
+      }),
     ).toBeInTheDocument();
   });
 
@@ -163,7 +168,10 @@ describe("index route — the two period filters are independent", () => {
       .getAllByRole("radiogroup")
       .map((group) => group.getAttribute("aria-label"));
 
-    expect(names).toEqual([HERO_BAND_PERIOD_LABEL, TOP_PRODUCTS_PERIOD_LABEL]);
+    expect(names).toEqual([
+      t(HERO_BAND_PERIOD_LABEL_KEY),
+      t(TOP_PRODUCTS_PERIOD_LABEL_KEY),
+    ]);
     expect(new Set(names).size).toBe(names.length);
   });
 

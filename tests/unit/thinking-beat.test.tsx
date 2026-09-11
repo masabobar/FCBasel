@@ -36,18 +36,18 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-  PROMPT_INPUT_LABEL,
-  SEND_BUTTON_LABEL,
+  PROMPT_INPUT_LABEL_KEY,
+  SEND_BUTTON_LABEL_KEY,
 } from "../../app/components/chrome/prompt-bar";
-import { FOLLOW_UP_CHIP_HINT } from "../../app/components/chrome/suggestion-chips";
+import { FOLLOW_UP_CHIP_HINT_KEY } from "../../app/components/chrome/suggestion-chips";
 import {
   THINKING_PANEL_CLASS,
   ThinkingPanel,
 } from "../../app/components/heroes/thinking-panel";
 import {
   ChipKind,
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
 } from "../../app/lib/dashboard/chips";
 import { InsightPhase } from "../../app/lib/dashboard/sections";
 import {
@@ -66,6 +66,7 @@ import App from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 import { signIn } from "./support/sign-in";
+import { t, tList } from "./support/i18n";
 
 /* ------------------------------------------------------------- SOURCES -- */
 
@@ -127,7 +128,7 @@ function message(): string | null {
 
 function promptInput(): HTMLInputElement {
   return screen.getByRole("textbox", {
-    name: PROMPT_INPUT_LABEL,
+    name: t(PROMPT_INPUT_LABEL_KEY),
   }) as HTMLInputElement;
 }
 
@@ -194,7 +195,7 @@ function ask(question: string): void {
 }
 
 function followUpChipName(heroId: HeroId): string {
-  return `${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[heroId]}`;
+  return `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[heroId])}`;
 }
 
 afterEach(() => {
@@ -253,13 +254,13 @@ describe("the per-flow copy (US-031 criterion 2)", () => {
   });
 
   it.each(FLOWS)("states the %s message for %s verbatim", (kind, heroId) => {
-    expect(thinkingBeatFor(heroId, kind).message).toBe(
+    expect(t(thinkingBeatFor(heroId, kind).messageKey)).toBe(
       EXPECTED[kind][heroId][0],
     );
   });
 
   it.each(FLOWS)("names the %s sources for %s, in order", (kind, heroId) => {
-    expect([...thinkingBeatFor(heroId, kind).sources]).toEqual(
+    expect([...tList(thinkingBeatFor(heroId, kind).sourcesKey)]).toEqual(
       EXPECTED[kind][heroId][1],
     );
   });
@@ -267,13 +268,15 @@ describe("the per-flow copy (US-031 criterion 2)", () => {
   it.each(FLOWS)(
     "gives %s / %s at least one source to light up",
     (kind, id) => {
-      expect(thinkingBeatFor(id, kind).sources.length).toBeGreaterThan(0);
+      expect(
+        tList(thinkingBeatFor(id, kind).sourcesKey).length,
+      ).toBeGreaterThan(0);
     },
   );
 
   it.each(FLOWS)("keeps %s / %s's sources unique", (kind, heroId) => {
     // The source string is the React key of its chip.
-    const { sources } = thinkingBeatFor(heroId, kind);
+    const sources = tList(thinkingBeatFor(heroId, kind).sourcesKey);
     expect(new Set(sources).size).toBe(sources.length);
   });
 
@@ -281,12 +284,12 @@ describe("the per-flow copy (US-031 criterion 2)", () => {
     // Deliberate stagecraft copy, and the split is deliberate too: a hero names
     // the systems, a follow-up names the analysis over what they returned.
     for (const heroId of HERO_IDS) {
-      expect(thinkingBeatFor(heroId, ChipKind.HERO).message).toMatch(
+      expect(t(thinkingBeatFor(heroId, ChipKind.HERO).messageKey)).toMatch(
         /^Querying /,
       );
-      expect(thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).message).not.toMatch(
-        /^Querying /,
-      );
+      expect(
+        t(thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).messageKey),
+      ).not.toMatch(/^Querying /);
     }
   });
 });
@@ -336,7 +339,7 @@ describe("the source-chip stagger (criterion 2)", () => {
     // A chip still animating when the section arrives would read as a glitch.
     for (const kind of Object.values(ChipKind)) {
       for (const heroId of HERO_IDS) {
-        const { sources } = thinkingBeatFor(heroId, kind);
+        const sources = tList(thinkingBeatFor(heroId, kind).sourcesKey);
         expect(sourceChipDelayMs(sources.length - 1)).toBeLessThan(
           THINKING_DELAY_MS,
         );
@@ -357,14 +360,14 @@ describe("the thinking panel", () => {
   it("states the message verbatim", () => {
     renderPanel();
 
-    expect(message()).toBe(BEAT.message);
+    expect(message()).toBe(t(BEAT.messageKey));
   });
 
   it("renders one chip per source, in order and verbatim", () => {
     renderPanel();
 
     expect(sourceChips().map((chip) => chip.textContent)).toEqual([
-      ...BEAT.sources,
+      ...tList(BEAT.sourcesKey),
     ]);
   });
 
@@ -432,14 +435,14 @@ describe("the thinking panel", () => {
 
     expect(panel()).toHaveAttribute("role", "status");
     expect(panel()).toHaveAttribute("aria-live", "polite");
-    expect(screen.getByRole("status")).toHaveTextContent(BEAT.message);
+    expect(screen.getByRole("status")).toHaveTextContent(t(BEAT.messageKey));
   });
 
   it("keeps the source names inside the announcement", () => {
     // Which systems are being looked at is information, not decoration.
     renderPanel();
 
-    for (const source of BEAT.sources) {
+    for (const source of tList(BEAT.sourcesKey)) {
       expect(screen.getByRole("status")).toHaveTextContent(source);
     }
   });
@@ -535,7 +538,7 @@ describe("reduced motion renders the panel at its final state (criterion 3)", ()
   it("still runs the beat, at ~260ms", () => {
     renderApp({ reducedMotion: true });
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     expect(panel()).not.toBeNull();
 
     advance(REDUCED_THINKING_DELAY_MS - 1);
@@ -552,7 +555,7 @@ describe("reduced motion renders the panel at its final state (criterion 3)", ()
     // still running, so the shortening is real and not a coincidence of setup.
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     advance(REDUCED_THINKING_DELAY_MS);
 
     expect(sections()).toHaveLength(0);
@@ -566,7 +569,7 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
   it("holds the section back until the delay has elapsed", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
 
     // The whole criterion, in three readings of the same clock.
     expect(panel()).not.toBeNull();
@@ -584,7 +587,7 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
   it("never shows the panel beside the answer it stood in for", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
     landBeat();
 
     expect(panels()).toHaveLength(0);
@@ -597,7 +600,7 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
     ask("how are shirts selling");
 
     expect(message()).toBe(
-      thinkingBeatFor(HeroId.HERO_1, ChipKind.HERO).message,
+      t(thinkingBeatFor(HeroId.HERO_1, ChipKind.HERO).messageKey),
     );
     expect(sections()).toHaveLength(0);
 
@@ -608,9 +611,9 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
   it("pauses a re-asked hero too — every successful match beats", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
 
     expect(panel()).not.toBeNull();
     landBeat();
@@ -620,7 +623,7 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
   it("puts the panel last on the canvas, where the answer will appear", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
 
     const grid = document.querySelector('[data-slot="canvas-grid"]')!;
     expect(grid.lastElementChild).toBe(panel());
@@ -643,7 +646,7 @@ describe("the beat comes BEFORE the tiles (criterion 1)", () => {
   it("shows no beat for an empty submit either", () => {
     renderApp();
 
-    tap(SEND_BUTTON_LABEL);
+    tap(t(SEND_BUTTON_LABEL_KEY));
 
     expect(panel()).toBeNull();
     expect(vi.getTimerCount()).toBe(0);
@@ -715,7 +718,7 @@ describe("the seam between the panel and the answer (US-043)", () => {
     renderApp();
     expect(emptyState()).not.toBeNull();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     expect(panel()).not.toBeNull();
     expect(emptyState()).toBeNull();
 
@@ -747,7 +750,7 @@ describe("the seam between the panel and the answer (US-043)", () => {
     stubDeferredViewTransition();
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
     applyDeferredUpdates();
     expect(sections()).toHaveLength(1);
@@ -774,7 +777,7 @@ describe("the seam between the panel and the answer (US-043)", () => {
     stubDeferredViewTransition();
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     expect(panel()).not.toBeNull();
 
     tap(/reset/i);
@@ -794,12 +797,12 @@ describe("the panel a presenter sees, per flow", () => {
   it.each(HERO_IDS)("names %s's systems while its hero runs", (heroId) => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[heroId]);
+    tap(t(HERO_CHIP_LABEL_KEY[heroId]));
 
     const beat = thinkingBeatFor(heroId, ChipKind.HERO);
-    expect(message()).toBe(beat.message);
+    expect(message()).toBe(t(beat.messageKey));
     expect(sourceChips().map((chip) => chip.textContent)).toEqual([
-      ...beat.sources,
+      ...tList(beat.sourcesKey),
     ]);
   });
 
@@ -808,14 +811,14 @@ describe("the panel a presenter sees, per flow", () => {
     (heroId) => {
       renderApp();
 
-      tap(HERO_CHIP_LABEL[heroId]);
+      tap(t(HERO_CHIP_LABEL_KEY[heroId]));
       landBeat();
       tap(followUpChipName(heroId));
 
       const beat = thinkingBeatFor(heroId, ChipKind.FOLLOW_UP);
-      expect(message()).toBe(beat.message);
+      expect(message()).toBe(t(beat.messageKey));
       expect(sourceChips().map((chip) => chip.textContent)).toEqual([
-        ...beat.sources,
+        ...tList(beat.sourcesKey),
       ]);
 
       landBeat();
@@ -834,7 +837,7 @@ describe("the panel a presenter sees, per flow", () => {
     ask("why is marketing high?");
 
     expect(message()).toBe(
-      thinkingBeatFor(HeroId.HERO_3, ChipKind.HERO).message,
+      t(thinkingBeatFor(HeroId.HERO_3, ChipKind.HERO).messageKey),
     );
 
     landBeat();
@@ -856,11 +859,11 @@ describe("the prompt bar is busy for the length of the beat", () => {
   it("closes the field and the send button, then reopens them", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
 
     expect(promptInput()).toBeDisabled();
     expect(
-      screen.getByRole("button", { name: SEND_BUTTON_LABEL }),
+      screen.getByRole("button", { name: t(SEND_BUTTON_LABEL_KEY) }),
     ).toBeDisabled();
     expect(document.querySelector('[data-slot="prompt-form"]')).toHaveAttribute(
       "aria-busy",
@@ -871,7 +874,7 @@ describe("the prompt bar is busy for the length of the beat", () => {
 
     expect(promptInput()).toBeEnabled();
     expect(
-      screen.getByRole("button", { name: SEND_BUTTON_LABEL }),
+      screen.getByRole("button", { name: t(SEND_BUTTON_LABEL_KEY) }),
     ).toBeEnabled();
     expect(document.querySelector('[data-slot="prompt-form"]')).toHaveAttribute(
       "aria-busy",
@@ -893,7 +896,7 @@ describe("the prompt bar is busy for the length of the beat", () => {
     // The field is disabled, so this is the only way a second submit can even
     // be attempted — and US-028's `busy` guard drops it.
     ask("department budgets");
-    tap(SEND_BUTTON_LABEL);
+    tap(t(SEND_BUTTON_LABEL_KEY));
     landBeat(true);
 
     expect(sections()).toHaveLength(1);
@@ -906,13 +909,13 @@ describe("the prompt bar is busy for the length of the beat", () => {
     // means the second tap cannot overlap the first: it supersedes it.
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     advance(400);
-    tap(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
 
     expect(panels()).toHaveLength(1);
     expect(message()).toBe(
-      thinkingBeatFor(HeroId.HERO_2, ChipKind.HERO).message,
+      t(thinkingBeatFor(HeroId.HERO_2, ChipKind.HERO).messageKey),
     );
     expect(vi.getTimerCount()).toBe(1);
 
@@ -925,9 +928,9 @@ describe("the prompt bar is busy for the length of the beat", () => {
   it("shows exactly one thinking indicator at a time", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
-    tap(HERO_CHIP_LABEL[HeroId.HERO_3]);
-    tap(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
 
     expect(panels()).toHaveLength(1);
     expect(vi.getTimerCount()).toBe(1);
@@ -938,7 +941,7 @@ describe("the prompt bar is busy for the length of the beat", () => {
 
 describe("Reset pressed mid-beat (US-015 criterion 4)", () => {
   function askThenReset() {
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     expect(panel()).not.toBeNull();
     expect(vi.getTimerCount()).toBe(1);
 
@@ -983,7 +986,7 @@ describe("Reset pressed mid-beat (US-015 criterion 4)", () => {
     renderApp();
 
     askThenReset();
-    tap(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
 
     expect(panel()).not.toBeNull();
     landBeat();
@@ -995,7 +998,7 @@ describe("Reset pressed mid-beat (US-015 criterion 4)", () => {
   it("cancels a beat that would have SHARPENED a section, too", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_3]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
     landBeat();
     tap(followUpChipName(HeroId.HERO_3));
     tap("Reset");
@@ -1010,7 +1013,7 @@ describe("Reset pressed mid-beat (US-015 criterion 4)", () => {
   it("is stable pressed twice mid-beat", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     tap("Reset");
     tap("Reset");
     advance(THINKING_DELAY_MS * 2);
@@ -1096,7 +1099,13 @@ describe("stagecraft, not a query (criterion 4)", () => {
     const imports = [...CONFIG_CODE.matchAll(/from "([^"]+)"/g)].map(
       (match) => match[1],
     );
-    expect(imports.sort()).toEqual(["../repositories/enums", "./chips"]);
+    // Three now: the two enums, plus the translation KEY TYPES (US-049) —
+    // types only, so the config is still a value with no behaviour behind it.
+    expect(imports.sort()).toEqual([
+      "../i18n",
+      "../repositories/enums",
+      "./chips",
+    ]);
   });
 
   it("adds no dependency — the panel's only package is the icon set", () => {

@@ -9,16 +9,16 @@ import {
   DEPARTMENT_TYPE_TAG_CLASS,
   DepartmentTable,
   DepartmentTableTile,
-  FLAG_LABEL,
+  FLAG_LABEL_KEY,
   FLAGGED_ROW_CLASS,
-  MILLIONS_NOTE,
+  MILLIONS_NOTE_KEY,
   NEAR_TARGET_MIN_PERCENT,
   NUMERIC_ALIGN_CLASS,
   ROW_HOVER_CLASS,
-  TABLE_CAPTION,
+  TABLE_CAPTION_KEY,
   TARGET_BAR_WIDTH_PX,
-  TARGET_MARK_LABEL,
-  TOTAL_LABEL,
+  TARGET_MARK_LABEL_KEY,
+  TOTAL_LABEL_KEY,
   TargetMark,
   columnAlignClass,
   targetBarPercent,
@@ -37,12 +37,18 @@ import {
   departmentPerformanceRows,
   departmentTotals,
 } from "../../app/lib/repositories/derive";
-import { DepartmentType } from "../../app/lib/repositories/enums";
+import {
+  DEPARTMENT_LABEL_KEY,
+  DEPARTMENT_TYPE_LABEL_KEY,
+  DepartmentKey,
+  DepartmentType,
+} from "../../app/lib/repositories/enums";
 import {
   restoreMotionStubs,
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { de, t } from "./support/i18n";
 
 /**
  * US-022 — the department table.
@@ -71,12 +77,25 @@ const ROWS: readonly DepartmentPerformance[] =
 const TOTALS = departmentTotals(DEPARTMENTS);
 const BLENDED = hero3.primary.blendedTargetPercent;
 
-const SPONSORING = "Sponsoring & Partnerships";
-const TICKETING = "Ticketing";
-const HOSPITALITY = "Hospitality";
-const MERCHANDISING = "Merchandising (Fanshop)";
-const EVENTS = "Events";
-const MARKETING = "Marketing & Communications";
+/**
+ * Departments are addressed by KEY since US-049 — `data-department` carries
+ * the identifier, not the name, precisely so a row can be found in either
+ * language. {@link departmentName} is for the assertions that are ABOUT the
+ * displayed words.
+ */
+const SPONSORING = DepartmentKey.SPONSORING_PARTNERSHIPS;
+const TICKETING = DepartmentKey.TICKETING;
+const HOSPITALITY = DepartmentKey.HOSPITALITY;
+const MERCHANDISING = DepartmentKey.MERCHANDISING;
+const EVENTS = DepartmentKey.EVENTS;
+const MARKETING = DepartmentKey.MARKETING_COMMUNICATIONS;
+
+function departmentName(key: DepartmentKey): string {
+  return t(DEPARTMENT_LABEL_KEY[key]);
+}
+
+/** The table's accessible name, composed the way the component composes it. */
+const TABLE_CAPTION = t(TABLE_CAPTION_KEY, { note: t(MILLIONS_NOTE_KEY) });
 
 function slot(name: string, within: ParentNode = document): HTMLElement | null {
   return within.querySelector<HTMLElement>(`[data-slot="${name}"]`);
@@ -155,7 +174,7 @@ afterEach(() => {
 
 describe("DepartmentTable — the six columns and the total row", () => {
   it("declares exactly the six columns the criteria name, in order", () => {
-    expect(DEPARTMENT_COLUMNS.map((column) => column.label)).toEqual([
+    expect(DEPARTMENT_COLUMNS.map((column) => t(column.labelKey))).toEqual([
       "Department",
       "Type",
       "Budget",
@@ -170,7 +189,7 @@ describe("DepartmentTable — the six columns and the total row", () => {
 
     expect(slots("department-header")).toHaveLength(6);
     expect(slots("department-header").map((each) => each.textContent)).toEqual(
-      DEPARTMENT_COLUMNS.map((column) => column.label),
+      DEPARTMENT_COLUMNS.map((column) => t(column.labelKey)),
     );
   });
 
@@ -180,7 +199,7 @@ describe("DepartmentTable — the six columns and the total row", () => {
     expect(slots("department-row")).toHaveLength(DEPARTMENTS.length);
     expect(slots("department-row")).toHaveLength(6);
     expect(slot("department-total-row")).not.toBeNull();
-    expect(slot("department-total-row")).toHaveTextContent(TOTAL_LABEL);
+    expect(slot("department-total-row")).toHaveTextContent(t(TOTAL_LABEL_KEY));
   });
 
   it("fills every column of every row — no silently missing cell", () => {
@@ -188,7 +207,7 @@ describe("DepartmentTable — the six columns and the total row", () => {
 
     for (const each of DEPARTMENTS) {
       for (const column of DEPARTMENT_COLUMNS) {
-        expect(cell(each.name, column.key)).not.toBeNull();
+        expect(cell(each.key, column.key)).not.toBeNull();
       }
     }
   });
@@ -225,9 +244,11 @@ describe("DepartmentTable — the six columns and the total row", () => {
     expect(name.tagName).toBe("TH");
     expect(name).toHaveAttribute("scope", "row");
 
-    expect(screen.getByRole("rowheader", { name: new RegExp(MARKETING) })).toBe(
-      name,
-    );
+    expect(
+      screen.getByRole("rowheader", {
+        name: new RegExp(departmentName(MARKETING)),
+      }),
+    ).toBe(name);
     expect(screen.getAllByRole("columnheader")).toHaveLength(6);
   });
 });
@@ -237,8 +258,8 @@ describe("DepartmentTable — the revenue / cost type tag", () => {
     renderSettled(table());
 
     for (const each of DEPARTMENTS) {
-      const tag = slot("department-type-tag", cell(each.name, "type"))!;
-      expect(tag.textContent).toBe(each.typeLabel);
+      const tag = slot("department-type-tag", cell(each.key, "type"))!;
+      expect(tag.textContent).toBe(t(each.typeLabelKey));
       expect(tag.dataset.type).toBe(each.type);
     }
 
@@ -276,10 +297,10 @@ describe("DepartmentTable — REVIEW DECISION: CHF millions, never '000'", () =>
     expect(cell(MARKETING, "actual").textContent).toBe("3.81");
 
     for (const each of DEPARTMENTS) {
-      expect(cell(each.name, "budget").textContent).toBe(
+      expect(cell(each.key, "budget").textContent).toBe(
         formatMillions(chfFromThousands(each.budget)),
       );
-      expect(cell(each.name, "actual").textContent).toBe(
+      expect(cell(each.key, "actual").textContent).toBe(
         formatMillions(chfFromThousands(each.actual)),
       );
     }
@@ -296,7 +317,7 @@ describe("DepartmentTable — REVIEW DECISION: CHF millions, never '000'", () =>
     const { container } = renderSettled(
       <DepartmentTableTile
         title="Departmental performance"
-        period={hero3.primary.scopeLabel}
+        period={t(hero3.primary.scopeLabelKey)}
         rows={ROWS}
         blendedTargetPercent={BLENDED}
       />,
@@ -316,9 +337,11 @@ describe("DepartmentTable — REVIEW DECISION: CHF millions, never '000'", () =>
       <DepartmentTableTile title="Departmental performance" rows={ROWS} />,
     );
 
-    expect(MILLIONS_NOTE).toBe("figures in CHF millions");
-    expect(slot("department-millions-note")!.textContent).toBe(MILLIONS_NOTE);
-    expect(slot("card-subtitle")).toHaveTextContent(MILLIONS_NOTE);
+    expect(t(MILLIONS_NOTE_KEY)).toBe("figures in CHF millions");
+    expect(slot("department-millions-note")!.textContent).toBe(
+      t(MILLIONS_NOTE_KEY),
+    );
+    expect(slot("card-subtitle")).toHaveTextContent(t(MILLIONS_NOTE_KEY));
   });
 
   it("keeps the note even when a caller passes its own scope line", () => {
@@ -332,13 +355,13 @@ describe("DepartmentTable — REVIEW DECISION: CHF millions, never '000'", () =>
 
     const subtitle = slot("card-subtitle")!;
     expect(subtitle).toHaveTextContent("Full-year departmental totals");
-    expect(subtitle).toHaveTextContent(MILLIONS_NOTE);
+    expect(subtitle).toHaveTextContent(t(MILLIONS_NOTE_KEY));
   });
 
   it("repeats the scale in the table's accessible name", () => {
     renderSettled(table());
 
-    expect(TABLE_CAPTION).toContain(MILLIONS_NOTE);
+    expect(TABLE_CAPTION).toContain(t(MILLIONS_NOTE_KEY));
     expect(TABLE_CAPTION).not.toContain("000");
     expect(screen.getByRole("table", { name: TABLE_CAPTION })).not.toBeNull();
   });
@@ -382,7 +405,7 @@ describe("DepartmentTable — REVIEW DECISION: numeric headers right-aligned", (
 
       expect(header(column.key)).toHaveClass(expected);
       for (const each of DEPARTMENTS) {
-        expect(cell(each.name, column.key)).toHaveClass(expected);
+        expect(cell(each.key, column.key)).toHaveClass(expected);
       }
       expect(totalCell(column.key)).toHaveClass(expected);
     }
@@ -466,8 +489,8 @@ describe("DepartmentTable — THE REVENUE / COST TRAP", () => {
     renderSettled(table());
 
     for (const each of ROWS) {
-      expect(chip(each.name).dataset.judgement).toBe(each.judgement);
-      expect(chip(each.name).textContent).toContain(
+      expect(chip(each.key).dataset.judgement).toBe(each.judgement);
+      expect(chip(each.key).textContent).toContain(
         formatSignedMillions(chfFromThousands(each.variance)),
       );
     }
@@ -483,9 +506,10 @@ describe("DepartmentTable — THE REVENUE / COST TRAP", () => {
     // Same figures as Marketing, spending BELOW plan: favourable, arrow down.
     const underspend = departmentPerformanceRows([
       {
-        name: "Marketing & Communications",
+        key: MARKETING,
+        labelKey: DEPARTMENT_LABEL_KEY[MARKETING],
         type: DepartmentType.COST,
-        typeLabel: "Cost",
+        typeLabelKey: DEPARTMENT_TYPE_LABEL_KEY[DepartmentType.COST],
         budget: 3_400,
         actual: 3_000,
         targetPercent: 84,
@@ -548,20 +572,21 @@ describe("DepartmentTable — the flagged department", () => {
   it("takes the flag from needsAttention, not from the department's name", () => {
     // Marketing is not special-cased: give the flag's conditions to another
     // department and the flag moves. The name never appears in the source.
-    expect(CODE).not.toContain(MARKETING);
+    expect(CODE).not.toContain(departmentName(MARKETING));
     expect(CODE).toMatch(/row\.needsAttention/);
 
     const moved = departmentPerformanceRows([
       {
-        name: HOSPITALITY,
+        key: HOSPITALITY,
+        labelKey: DEPARTMENT_LABEL_KEY[HOSPITALITY],
         type: DepartmentType.REVENUE,
-        typeLabel: "Revenue",
+        typeLabelKey: DEPARTMENT_TYPE_LABEL_KEY[DepartmentType.REVENUE],
         // Over budget AND behind target — the two conditions, on a revenue row.
         budget: 7_200,
         actual: 7_400,
         targetPercent: 95,
       },
-      DEPARTMENTS.find((each) => each.name === EVENTS)!,
+      DEPARTMENTS.find((each) => each.key === EVENTS)!,
     ]);
     renderSettled(<DepartmentTable rows={moved} />);
 
@@ -582,8 +607,8 @@ describe("DepartmentTable — the flagged department", () => {
     expect(flag.querySelector("svg")).not.toBeNull();
     expect(flag.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     // ...and the reason in words, which colour never carries.
-    expect(flag).toHaveTextContent(FLAG_LABEL);
-    expect(FLAG_LABEL).toBe("Over budget and behind target");
+    expect(flag).toHaveTextContent(t(FLAG_LABEL_KEY));
+    expect(t(FLAG_LABEL_KEY)).toBe("Over budget and behind target");
   });
 
   it("uses the follow-up gold, not a hex, for the flag", () => {
@@ -621,7 +646,7 @@ describe("DepartmentTable — the near-target gold band", () => {
     expect(dot).not.toBeNull();
     expect(dot.className).toContain("accent-follow-up");
     expect(slot("department-target-mark", hospitality)).toHaveTextContent(
-      TARGET_MARK_LABEL[TargetMark.NEAR],
+      t(TARGET_MARK_LABEL_KEY[TargetMark.NEAR]),
     );
 
     expect(slot("department-target", merchandising)!.dataset.mark).toBe(
@@ -641,7 +666,7 @@ describe("DepartmentTable — the near-target gold band", () => {
         "accent-target-hit",
       );
       expect(slot("department-target-mark", target)).toHaveTextContent(
-        TARGET_MARK_LABEL[TargetMark.HIT],
+        t(TARGET_MARK_LABEL_KEY[TargetMark.HIT]),
       );
     }
 
@@ -691,7 +716,7 @@ describe("DepartmentTable — the '% of target' bar", () => {
     for (const each of DEPARTMENTS) {
       const percent = slot(
         "department-target-percent",
-        cell(each.name, "targetPercent"),
+        cell(each.key, "targetPercent"),
       )!;
       expect(percent.textContent).toBe(formatPercent(each.targetPercent));
       expect(percent).toHaveClass("tabular-nums");
@@ -800,10 +825,10 @@ describe("DepartmentTable — row hover, keys and long labels", () => {
   it("wraps the two long names instead of truncating or overflowing", () => {
     renderSettled(table());
 
-    for (const name of [MARKETING, MERCHANDISING]) {
-      const label = cell(name, "name");
+    for (const key of [MARKETING, MERCHANDISING]) {
+      const label = cell(key, "name");
 
-      expect(label).toHaveTextContent(name);
+      expect(label).toHaveTextContent(departmentName(key));
       expect(label).toHaveClass("break-words");
       expect(label.className).not.toMatch(
         /truncate|text-ellipsis|line-clamp|overflow-hidden/,
@@ -896,7 +921,7 @@ describe("DepartmentTableTile — the card around the table", () => {
         rows={ROWS}
         blendedTargetPercent={BLENDED}
         action={<span>Season 26/27</span>}
-        caption={hero3.primary.narrative}
+        caption={t(hero3.primary.narrativeKey)}
         isNew
         delayMs={120}
       />,
@@ -921,10 +946,15 @@ describe("department-table.tsx — code discipline", () => {
     expect(CODE).not.toMatch(/toFixed\(|toLocaleString\(|Intl\./);
     // No factor of a thousand: the thousands-to-CHF conversion is format.ts's.
     expect(CODE).not.toMatch(/1_000|1000/);
-    // The currency word appears exactly ONCE, in the scale note — never
-    // pasted in front of a figure.
-    expect(CODE.match(/CHF/g)).toHaveLength(1);
-    expect(CODE).toContain(`"figures in CHF millions"`);
+    // The currency word does not appear in the component AT ALL since
+    // US-049: the scale note is a dictionary entry, in both languages, and
+    // this file holds only its key.
+    expect(CODE).not.toMatch(/CHF/);
+    expect(CODE).toContain(`"tiles.millionsNote"`);
+    expect([t(MILLIONS_NOTE_KEY), de(MILLIONS_NOTE_KEY)]).toEqual([
+      "figures in CHF millions",
+      "Angaben in Mio. CHF",
+    ]);
     expect(CODE).toMatch(/formatMillions\(/);
     expect(CODE).toMatch(/formatSignedMillions\b/);
     expect(CODE).toMatch(/formatPercent\(/);

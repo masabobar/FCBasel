@@ -15,9 +15,10 @@ import {
   type SegmentedOption,
   type SegmentedVariant,
 } from "../../app/components/controls/segmented";
-import { PERIOD_LABEL, PeriodKey } from "../../app/lib/repositories/enums";
+import { PERIOD_LABEL_KEY, PeriodKey } from "../../app/lib/repositories/enums";
 import type { BaselinePeriod } from "../../app/lib/repositories/types";
 import { radius } from "../../app/lib/tokens";
+import { t } from "./support/i18n";
 
 /**
  * The control's source with comments stripped. Several checks below are about
@@ -46,13 +47,22 @@ const CHIP_RULES = (() => {
  * key plus the DEFAULT wording from the label map.
  */
 const BAND_PERIODS: readonly SegmentedOption[] = [
-  { key: PeriodKey.THIS_MONTH, label: PERIOD_LABEL[PeriodKey.THIS_MONTH] },
-  { key: PeriodKey.LAST_MONTH, label: PERIOD_LABEL[PeriodKey.LAST_MONTH] },
+  {
+    key: PeriodKey.THIS_MONTH,
+    labelKey: PERIOD_LABEL_KEY[PeriodKey.THIS_MONTH],
+  },
+  {
+    key: PeriodKey.LAST_MONTH,
+    labelKey: PERIOD_LABEL_KEY[PeriodKey.LAST_MONTH],
+  },
   {
     key: PeriodKey.LAST_3_MONTHS,
-    label: PERIOD_LABEL[PeriodKey.LAST_3_MONTHS],
+    labelKey: PERIOD_LABEL_KEY[PeriodKey.LAST_3_MONTHS],
   },
-  { key: PeriodKey.YEAR_TO_DATE, label: PERIOD_LABEL[PeriodKey.YEAR_TO_DATE] },
+  {
+    key: PeriodKey.YEAR_TO_DATE,
+    labelKey: PERIOD_LABEL_KEY[PeriodKey.YEAR_TO_DATE],
+  },
 ];
 
 function group(): HTMLElement {
@@ -132,8 +142,12 @@ describe("Segmented — the options", () => {
     render(
       <Segmented
         options={[
-          { key: PeriodKey.SEASON_TO_DATE, label: "Season to date" },
-          { key: PeriodKey.THIS_MONTH, label: "Current month" },
+          {
+            key: PeriodKey.SEASON_TO_DATE,
+            labelKey: PERIOD_LABEL_KEY[PeriodKey.SEASON_TO_DATE],
+          },
+          // Hero 1's override: the same key, a different dictionary entry.
+          { key: PeriodKey.THIS_MONTH, labelKey: "enum.period.CURRENT_MONTH" },
         ]}
         value={PeriodKey.THIS_MONTH}
         onChange={vi.fn()}
@@ -646,23 +660,23 @@ describe("Segmented — it reuses PeriodKey", () => {
   it("types its option key as PeriodKey, so an invented period cannot compile", () => {
     const accepted: SegmentedOption = {
       key: PeriodKey.SEASON_TO_DATE,
-      label: "Season to date",
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.SEASON_TO_DATE],
     };
     const rejected: SegmentedOption = {
       // @ts-expect-error — an arbitrary string is not a PeriodKey. This line
       // fails `pnpm typecheck` the moment the option key loosens to `string`.
       key: "LAST_FORTNIGHT",
-      label: "Last fortnight",
+      labelKey: PERIOD_LABEL_KEY[PeriodKey.LAST_MONTH],
     };
 
     expect(accepted.key).toBe(PeriodKey.SEASON_TO_DATE);
-    expect(rejected.label).toBe("Last fortnight");
+    expect(t(rejected.labelKey)).toBe("Last month");
   });
 
   it("takes a repository period array as it stands, with no remapping", () => {
     // `BaselinePeriod` already starts with `{ key, label }` — the hero band
     // hands its periods straight over.
-    const periods: readonly Pick<BaselinePeriod, "key" | "label">[] =
+    const periods: readonly Pick<BaselinePeriod, "key" | "labelKey">[] =
       BAND_PERIODS;
 
     render(

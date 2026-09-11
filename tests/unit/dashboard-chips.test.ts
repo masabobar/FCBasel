@@ -24,8 +24,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   ChipKind,
   chipKey,
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
   HERO_CHIPS,
   selectChip,
   suggestionChips,
@@ -42,6 +42,7 @@ import {
   withHeroShown,
 } from "../../app/lib/dashboard/sections";
 import { HERO_IDS, HeroId } from "../../app/lib/repositories/enums";
+import { de, t } from "./support/i18n";
 
 /**
  * The module's source with comments stripped. Several checks below are about
@@ -57,11 +58,11 @@ const CHIPS_CODE = readFileSync(
   .replace(/\/\/.*$/gm, "");
 
 function labels(sections: InsightSections): string[] {
-  return suggestionChips(sections).map((chip) => chip.label);
+  return suggestionChips(sections).map((chip) => t(chip.labelKey));
 }
 
 function heroLabels(): string[] {
-  return HERO_IDS.map((heroId) => HERO_CHIP_LABEL[heroId]);
+  return HERO_IDS.map((heroId) => t(HERO_CHIP_LABEL_KEY[heroId]));
 }
 
 function section(
@@ -133,8 +134,12 @@ describe("suggestionChips — the follow-up chip lifecycle", () => {
     expect(chips[3]).toEqual({
       heroId: HeroId.HERO_1,
       kind: ChipKind.FOLLOW_UP,
-      label: "Which badge should we push next?",
+      labelKey: FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1],
     });
+    expect(t(chips[3]!.labelKey)).toBe("Which badge should we push next?");
+    expect(de(chips[3]!.labelKey)).toBe(
+      "Welches Badge sollen wir als Nächstes pushen?",
+    );
   });
 
   it("removes that chip once the follow-up has been shown", () => {
@@ -149,10 +154,12 @@ describe("suggestionChips — the follow-up chip lifecycle", () => {
     for (const heroId of HERO_IDS) {
       const chips = suggestionChips([section(heroId, InsightPhase.PRIMARY)]);
 
-      expect(chips[3]?.label).toBe(FOLLOW_UP_CHIP_LABEL[heroId]);
+      expect(t(chips[3]!.labelKey)).toBe(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
     }
 
-    expect(HERO_IDS.map((heroId) => FOLLOW_UP_CHIP_LABEL[heroId])).toEqual([
+    expect(
+      HERO_IDS.map((heroId) => t(FOLLOW_UP_CHIP_LABEL_KEY[heroId])),
+    ).toEqual([
       "Which badge should we push next?",
       "Which fixtures are driving the drop?",
       "Why is Marketing over budget & behind target?",
@@ -167,8 +174,8 @@ describe("suggestionChips — the follow-up chip lifecycle", () => {
 
     expect(labels(sections)).toEqual([
       ...heroLabels(),
-      FOLLOW_UP_CHIP_LABEL[HeroId.HERO_3],
-      FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1],
+      t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_3]),
+      t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]),
     ]);
   });
 
@@ -180,7 +187,7 @@ describe("suggestionChips — the follow-up chip lifecycle", () => {
 
     expect(labels(withFollowUpShown(both, HeroId.HERO_1))).toEqual([
       ...heroLabels(),
-      FOLLOW_UP_CHIP_LABEL[HeroId.HERO_2],
+      t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_2]),
     ]);
   });
 
@@ -208,7 +215,7 @@ describe("suggestionChips — the follow-up chip lifecycle", () => {
 
           const expected = HERO_IDS.filter(
             (_, index) => phases[index] === InsightPhase.PRIMARY,
-          ).map((heroId) => FOLLOW_UP_CHIP_LABEL[heroId]);
+          ).map((heroId) => t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
 
           expect(labels(sections)).toEqual([...heroLabels(), ...expected]);
         }
@@ -300,7 +307,11 @@ describe("selectChip — a tap resolves directly to its mapped intent", () => {
     const spies = actions();
 
     selectChip(
-      { heroId: HeroId.HERO_3, kind: ChipKind.HERO, label: "anything at all" },
+      {
+        heroId: HeroId.HERO_3,
+        kind: ChipKind.HERO,
+        labelKey: HERO_CHIP_LABEL_KEY[HeroId.HERO_1],
+      },
       spies,
     );
 
@@ -352,20 +363,24 @@ describe("the chip module reuses the shared hero enum", () => {
 
   it("labels every hero, so a fourth hero cannot ship without its chips", () => {
     for (const heroId of HERO_IDS) {
-      expect(HERO_CHIP_LABEL[heroId]).toBeTruthy();
-      expect(FOLLOW_UP_CHIP_LABEL[heroId]).toBeTruthy();
+      expect(t(HERO_CHIP_LABEL_KEY[heroId])).toBeTruthy();
+      expect(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId])).toBeTruthy();
     }
-    expect(Object.keys(HERO_CHIP_LABEL)).toHaveLength(HERO_IDS.length);
-    expect(Object.keys(FOLLOW_UP_CHIP_LABEL)).toHaveLength(HERO_IDS.length);
+    expect(Object.keys(HERO_CHIP_LABEL_KEY)).toHaveLength(HERO_IDS.length);
+    expect(Object.keys(FOLLOW_UP_CHIP_LABEL_KEY)).toHaveLength(HERO_IDS.length);
   });
 });
 
 /* ---------------------------------------------------------------- COPY -- */
 
 describe("chip labels — rendered verbatim, so the strings are the contract", () => {
+  // Both languages: the rules below (no em dash, sentence case, length) are
+  // properties of the COPY, so the German pass has to satisfy them too.
   const every = [
-    ...Object.values(HERO_CHIP_LABEL),
-    ...Object.values(FOLLOW_UP_CHIP_LABEL),
+    ...Object.values(HERO_CHIP_LABEL_KEY).map((key) => t(key)),
+    ...Object.values(FOLLOW_UP_CHIP_LABEL_KEY).map((key) => t(key)),
+    ...Object.values(HERO_CHIP_LABEL_KEY).map((key) => de(key)),
+    ...Object.values(FOLLOW_UP_CHIP_LABEL_KEY).map((key) => de(key)),
   ];
 
   it("uses no em or en dash anywhere", () => {

@@ -2,6 +2,8 @@ import { Sparkles } from "lucide-react";
 
 import { cn } from "../../lib/cn";
 import { useUid } from "../../lib/hooks/use-motion";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 
 /**
  * The empty-state panel — what the canvas offers BEFORE any question has been
@@ -54,15 +56,14 @@ import { useUid } from "../../lib/hooks/use-motion";
 /* ------------------------------------------------------------- STRINGS -- */
 
 /** The heading. Bold navy, the panel's accessible name. */
-export const EMPTY_STATE_HEADING = "Your dashboard is ready";
+export const EMPTY_STATE_HEADING_KEY: TranslationKey = "emptyState.heading";
 
 /**
  * The one-line subtext. It names both ways in, in the order they are reachable
  * — the chip row sits directly above the field — and deliberately does not
  * restate the field's own placeholder.
  */
-export const EMPTY_STATE_SUBTEXT =
-  "Tap one of the prepared questions below, or type a question of your own.";
+export const EMPTY_STATE_SUBTEXT_KEY: TranslationKey = "emptyState.subtext";
 
 /* ------------------------------------------------------------ GEOMETRY -- */
 
@@ -94,6 +95,7 @@ export interface EmptyStatePanelProps {
 }
 
 export function EmptyStatePanel({ className }: EmptyStatePanelProps) {
+  const t = useT();
   const headingId = `${useUid("empty-state")}-heading`;
 
   return (
@@ -120,13 +122,13 @@ export function EmptyStatePanel({ className }: EmptyStatePanelProps) {
             data-slot="empty-state-heading"
             className="text-kpi leading-tight font-bold text-navy"
           >
-            {EMPTY_STATE_HEADING}
+            {t(EMPTY_STATE_HEADING_KEY)}
           </h2>
           <p
             data-slot="empty-state-subtext"
             className="mt-1 text-caption text-muted"
           >
-            {EMPTY_STATE_SUBTEXT}
+            {t(EMPTY_STATE_SUBTEXT_KEY)}
           </p>
         </div>
       </div>

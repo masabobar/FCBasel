@@ -23,10 +23,11 @@ import {
 } from "../../app/components/tiles/partner-tile";
 import { createMockBaselineRepository } from "../../app/lib/mock/baseline";
 import {
-  PARTNER_ROLE_LABEL,
+  PARTNER_ROLE_LABEL_KEY,
   PartnerRole,
 } from "../../app/lib/repositories/enums";
 import { type Partner } from "../../app/lib/repositories/types";
+import { t } from "./support/i18n";
 
 const PARTNER_SOURCE = readFileSync(
   resolve(process.cwd(), "app/components/tiles/partner-tile.tsx"),
@@ -110,7 +111,7 @@ describe("PartnerCard — name, role tag and hover lift", () => {
   const partner: Partner = {
     name: "Bitpanda",
     role: PartnerRole.MAIN_SHIRT_SPONSOR,
-    roleLabel: PARTNER_ROLE_LABEL[PartnerRole.MAIN_SHIRT_SPONSOR],
+    roleLabelKey: PARTNER_ROLE_LABEL_KEY[PartnerRole.MAIN_SHIRT_SPONSOR],
     brandColor: "#0A9D8E",
   };
 
@@ -132,7 +133,7 @@ describe("PartnerCard — name, role tag and hover lift", () => {
       </ul>,
     );
 
-    expect(slots("partner-role")[0]!.textContent).toBe(partner.roleLabel);
+    expect(slots("partner-role")[0]!.textContent).toBe(t(partner.roleLabelKey));
     expect(PARTNER_CODE).not.toContain("Main shirt sponsor");
   });
 
@@ -195,7 +196,7 @@ describe("PartnersTile", () => {
 
     expect(slots("partner-monogram")).toHaveLength(PARTNERS.length);
     expect(slots("partner-role").map((node) => node.textContent)).toEqual(
-      PARTNERS.map((partner) => partner.roleLabel),
+      PARTNERS.map((partner) => t(partner.roleLabelKey)),
     );
   });
 

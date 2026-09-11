@@ -15,8 +15,13 @@ import {
   formatNumber,
   formatSharePercent,
 } from "../../lib/format";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { matchCapacityShare, scoreline } from "../../lib/repositories/derive";
-import { type PeriodKey } from "../../lib/repositories/enums";
+import {
+  PRODUCT_LABEL_KEY,
+  type PeriodKey,
+} from "../../lib/repositories/enums";
 
 /**
  * THE BASELINE ROW — the four tiles that are on the canvas before a single
@@ -65,34 +70,34 @@ import { type PeriodKey } from "../../lib/repositories/enums";
  * The row's fixed labels. Copy, not data — these are the names of the tiles,
  * and the only strings in this file that are not read off the dataset.
  */
-export const BASELINE_TILE_TITLES = {
-  webshop: "Webshop revenue",
-  match: "Last home match",
-  topProducts: "Top products",
-  partners: "Active partners",
-} as const;
+export const BASELINE_TILE_TITLE_KEY = {
+  webshop: "baseline.webshop",
+  match: "baseline.match",
+  topProducts: "baseline.topProducts",
+  partners: "baseline.partners",
+} as const satisfies Record<string, TranslationKey>;
 
 /** Tile titles in render order — the acceptance criterion, as a value. */
-export const BASELINE_TILE_ORDER: readonly string[] = [
-  BASELINE_TILE_TITLES.webshop,
-  BASELINE_TILE_TITLES.match,
-  BASELINE_TILE_TITLES.topProducts,
-  BASELINE_TILE_TITLES.partners,
+export const BASELINE_TILE_ORDER: readonly TranslationKey[] = [
+  BASELINE_TILE_TITLE_KEY.webshop,
+  BASELINE_TILE_TITLE_KEY.match,
+  BASELINE_TILE_TITLE_KEY.topProducts,
+  BASELINE_TILE_TITLE_KEY.partners,
 ];
 
 /** Prefix of the webshop tile's comparison line: `vs last month`. */
-const COMPARISON_PREFIX = "vs";
+const COMPARISON_PREFIX_KEY: TranslationKey = "baseline.comparisonPrefix";
 
 /** Capacity is quoted as an approximation, as the Reference Guide quotes it. */
 const APPROX_PREFIX = "~";
 
 /** Reads `of ~38’000 · 76% of capacity`. */
-const OF_PREFIX = "of";
-const CAPACITY_SUFFIX = "of capacity";
+const OF_PREFIX_KEY: TranslationKey = "baseline.of";
+const CAPACITY_SUFFIX_KEY: TranslationKey = "baseline.capacitySuffix";
 const DOT_SEPARATOR = "·";
 
 /** The scope line above the Top Products bars. */
-const UNITS_SOLD = "Units sold";
+const UNITS_SOLD_KEY: TranslationKey = "baseline.unitsSold";
 
 /**
  * The accessible name of Top Products' period filter.
@@ -101,7 +106,8 @@ const UNITS_SOLD = "Units sold";
  * at the same time and "Period" twice on one screen is ambiguous to anyone
  * hearing it rather than seeing it.
  */
-export const TOP_PRODUCTS_PERIOD_LABEL = "Period for top products";
+export const TOP_PRODUCTS_PERIOD_LABEL_KEY: TranslationKey =
+  "baseline.topProductsPeriodLabel";
 
 /* ------------------------------------------------------------ GEOMETRY ---- */
 
@@ -163,6 +169,7 @@ export interface BaselineRowProps {
 }
 
 export function BaselineRow({ data }: BaselineRowProps) {
+  const t = useT();
   const { webshop, match, topProducts, partners } = data;
 
   /**
@@ -186,8 +193,8 @@ export function BaselineRow({ data }: BaselineRowProps) {
     // There is exactly one grid on this screen (`chrome/app-shell.tsx`).
     <>
       <KpiTile
-        title={BASELINE_TILE_TITLES.webshop}
-        period={webshop.periodLabel}
+        title={t(BASELINE_TILE_TITLE_KEY.webshop)}
+        period={t(webshop.periodLabelKey)}
         headingLevel={BASELINE_HEADING_LEVEL}
         icon={<ShoppingBag size={ICON_SIZE} />}
         value={webshop.total}
@@ -195,7 +202,9 @@ export function BaselineRow({ data }: BaselineRowProps) {
         // Both the figure above and this percentage are `seriesTotals` off the
         // same array the sparkline draws — see `lib/dashboard/baseline.ts`.
         delta={{ value: webshop.deltaPercent }}
-        subtitle={`${COMPARISON_PREFIX} ${webshop.comparisonLabel.toLowerCase()}`}
+        subtitle={`${t(COMPARISON_PREFIX_KEY)} ${t(
+          webshop.comparisonLabelKey,
+        ).toLowerCase()}`}
         sparkline={webshop.trend}
         isNew
         delayMs={tileDelayMs(0)}
@@ -203,7 +212,7 @@ export function BaselineRow({ data }: BaselineRowProps) {
       />
 
       <KpiTile
-        title={BASELINE_TILE_TITLES.match}
+        title={t(BASELINE_TILE_TITLE_KEY.match)}
         // House style, rendered by `derive.ts` and never assembled here: a
         // plain hyphen in `FCB 2-1 Sion`, no en dash.
         period={scoreline(match)}
@@ -214,11 +223,11 @@ export function BaselineRow({ data }: BaselineRowProps) {
         // No variance chip: a single fixture has nothing to be compared with.
         // Attendance MOVEMENT is a property of a period, and it belongs to
         // US-016's ring, which reads `attendanceChangePercent`.
-        subtitle={`${OF_PREFIX} ${APPROX_PREFIX}${formatNumber(
+        subtitle={`${t(OF_PREFIX_KEY)} ${APPROX_PREFIX}${formatNumber(
           match.capacity,
         )} ${DOT_SEPARATOR} ${formatSharePercent(
           matchCapacityShare(match),
-        )} ${CAPACITY_SUFFIX}`}
+        )} ${t(CAPACITY_SUFFIX_KEY)}`}
         isNew
         delayMs={tileDelayMs(1)}
         className={KPI_SPAN}
@@ -226,8 +235,10 @@ export function BaselineRow({ data }: BaselineRowProps) {
 
       {products && (
         <HBarTile
-          title={BASELINE_TILE_TITLES.topProducts}
-          period={`${UNITS_SOLD} ${DOT_SEPARATOR} ${products.label}`}
+          title={t(BASELINE_TILE_TITLE_KEY.topProducts)}
+          period={`${t(UNITS_SOLD_KEY)} ${DOT_SEPARATOR} ${t(
+            products.labelKey,
+          )}`}
           headingLevel={BASELINE_HEADING_LEVEL}
           icon={<Package size={ICON_SIZE} />}
           // Club blue, per `H_BAR_SERIES` — Top Products is the blue list. The
@@ -236,7 +247,7 @@ export function BaselineRow({ data }: BaselineRowProps) {
           // to end here.
           series="blue"
           rows={products.rows.map((row) => ({
-            name: row.product,
+            name: t(PRODUCT_LABEL_KEY[row.product]),
             value: row.units,
           }))}
           // The period filter US-013 left this slot empty for. `light`, because
@@ -246,7 +257,7 @@ export function BaselineRow({ data }: BaselineRowProps) {
               options={topProducts}
               value={products.key}
               onChange={setProductsPeriod}
-              label={TOP_PRODUCTS_PERIOD_LABEL}
+              label={t(TOP_PRODUCTS_PERIOD_LABEL_KEY)}
             />
           }
           isNew
@@ -256,7 +267,7 @@ export function BaselineRow({ data }: BaselineRowProps) {
       )}
 
       <PartnersTile
-        title={BASELINE_TILE_TITLES.partners}
+        title={t(BASELINE_TILE_TITLE_KEY.partners)}
         headingLevel={BASELINE_HEADING_LEVEL}
         icon={<Handshake size={ICON_SIZE} />}
         partners={partners}

@@ -1,3 +1,5 @@
+import { type TranslationKey } from "./i18n";
+
 /**
  * The demo sign-in gate — STAGECRAFT, NOT AUTHENTICATION.
  *
@@ -72,5 +74,11 @@ export function opensDemo(username: string, password: string): boolean {
   );
 }
 
-/** What the screen says when {@link opensDemo} returns false. */
-export const SIGN_IN_ERROR = "That is not the demo credential shown above.";
+/**
+ * What the screen says when {@link opensDemo} returns false.
+ *
+ * A KEY, NOT A SENTENCE (US-049). The credential itself is language-neutral
+ * (`demo` / `fcb2026`) but the rejection is copy, so it lives in
+ * `app/lib/i18n/locales/*.json` with the rest of the login screen's words.
+ */
+export const SIGN_IN_ERROR_KEY: TranslationKey = "login.error";

@@ -43,9 +43,9 @@
  */
 
 import {
-  MONTH_LABEL,
+  MONTH_LABEL_KEY,
   MonthKey,
-  SEASON_LABEL,
+  SEASON_LABEL_KEY,
   SeasonKey,
 } from "../repositories/enums";
 import {
@@ -61,12 +61,12 @@ import {
 /** 25/26 is the comparison year, 26/27 the year the headline describes. */
 const PREVIOUS_SEASON: SeasonRef = {
   key: SeasonKey.SEASON_25_26,
-  label: SEASON_LABEL[SeasonKey.SEASON_25_26],
+  labelKey: SEASON_LABEL_KEY[SeasonKey.SEASON_25_26],
 };
 
 const CURRENT_SEASON: SeasonRef = {
   key: SeasonKey.SEASON_26_27,
-  label: SEASON_LABEL[SeasonKey.SEASON_26_27],
+  labelKey: SEASON_LABEL_KEY[SeasonKey.SEASON_26_27],
 };
 
 /* ------------------------------------------------------------- FIXTURES -- */
@@ -122,38 +122,36 @@ const MONTHLY: readonly {
 
 const MONTHLY_REVENUE: readonly MonthlyRevenue[] = MONTHLY.map((entry) => ({
   ...entry,
-  label: MONTH_LABEL[entry.month],
+  labelKey: MONTH_LABEL_KEY[entry.month],
 }));
 
 /* --------------------------------------------------------- SCOPE LABELS -- */
 
 /**
  * What each chart covers, stated on the chart. These two DIFFER because the
- * charts do, and the difference is the whole reason the labels are data.
+ * charts do, and the difference is the whole reason the labels are data. The
+ * wording of each, in both languages, is in `app/lib/i18n/locales/*.json`.
  */
-const FIXTURE_SCOPE_LABEL =
-  "Eight highest-grossing home fixtures, matchday ticket revenue excluding the season-ticket base";
+const FIXTURE_SCOPE_LABEL_KEY = "hero2.scopeLabel.fixtures" as const;
 
-const MONTHLY_SCOPE_LABEL =
-  "All home fixtures per month, matchday ticket revenue excluding the season-ticket base";
+const MONTHLY_SCOPE_LABEL_KEY = "hero2.scopeLabel.monthly" as const;
 
 /* ----------------------------------------------------------- NARRATIVES -- */
 
 /**
- * VERBATIM from the Reference Guide. Every figure it quotes - the -0.6%, the
- * fixtures up and down, the -CHF 150k - is derivable from the fixtures above,
- * and the tests check exactly that.
+ * THE COPY LIVES IN `app/lib/i18n/locales/*.json` (US-049); the dataset stores
+ * the key.
+ *
+ * The English is VERBATIM from the Reference Guide and the German is a
+ * translation of that same approved copy. Every figure the primary quotes -
+ * the -0.6%, the fixtures up and down, the -CHF 150k - is derivable from the
+ * fixtures above, and the tests check exactly that in both languages. The
+ * follow-up's four fixtures are the derived declines; its attendance
+ * explanation is the part of the story no figure in this dataset carries.
  */
-const PRIMARY_NARRATIVE =
-  "Overall matchday ticket revenue is roughly flat year on year (-0.6%), but it varies sharply by fixture: YB, Servette and St. Gallen are up, while FCZ, Lugano and Sion are down. The FCZ match is the single biggest drop, -CHF 150k.";
+const PRIMARY_NARRATIVE_KEY = "hero2.narrative.primary" as const;
 
-/**
- * VERBATIM from the Reference Guide. The four fixtures and their amounts are
- * the derived declines; the attendance explanation is the part of the story no
- * figure in this dataset carries.
- */
-const FOLLOW_UP_NARRATIVE =
-  "Four fixtures account for the decline: FCZ (-CHF 150k), Lugano (-110k), Luzern (-70k) and Sion (-70k). In each, the fall is driven by lower attendance rather than pricing - the FCZ match sold about 3,200 fewer seats year on year, partly a Friday-night kick-off and partly a reduced away allocation. YB, by contrast, sold out both seasons.";
+const FOLLOW_UP_NARRATIVE_KEY = "hero2.narrative.followUp" as const;
 
 /**
  * Hero 2 as one object: the tile and the escalation it opens. Held together so
@@ -165,17 +163,17 @@ const HERO_2: Hero2 = {
     previousSeason: PREVIOUS_SEASON,
     currentSeason: CURRENT_SEASON,
     fixtures: {
-      scopeLabel: FIXTURE_SCOPE_LABEL,
+      scopeLabelKey: FIXTURE_SCOPE_LABEL_KEY,
       fixtures: FIXTURES,
     },
     monthly: {
-      scopeLabel: MONTHLY_SCOPE_LABEL,
+      scopeLabelKey: MONTHLY_SCOPE_LABEL_KEY,
       months: MONTHLY_REVENUE,
     },
-    narrative: PRIMARY_NARRATIVE,
+    narrativeKey: PRIMARY_NARRATIVE_KEY,
   },
   followUp: {
-    narrative: FOLLOW_UP_NARRATIVE,
+    narrativeKey: FOLLOW_UP_NARRATIVE_KEY,
   },
 };
 

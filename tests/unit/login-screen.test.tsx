@@ -21,13 +21,15 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { LoginScreen } from "../../app/components/chrome/login-screen";
-import { CREST_LABEL } from "../../app/components/chrome/crest";
+import { CREST_LABEL_KEY } from "../../app/components/chrome/crest";
 import {
   DEMO_CREDENTIALS,
-  SIGN_IN_ERROR,
+  SIGN_IN_ERROR_KEY,
   opensDemo,
 } from "../../app/lib/demo-access";
-import { WORKSPACE_LABEL } from "../../app/lib/persona";
+import { LOCALES, translatorFor } from "../../app/lib/i18n";
+import { WORKSPACE_LABEL_KEY } from "../../app/lib/persona";
+import { t } from "./support/i18n";
 
 /* ---------------------------------------------------------------- SETUP -- */
 
@@ -115,7 +117,7 @@ describe("a rejection says so and stays usable", () => {
     fillIn(DEMO_CREDENTIALS.username, "not-the-password");
 
     expect(onSignIn).not.toHaveBeenCalled();
-    expect(error()).toHaveTextContent(SIGN_IN_ERROR);
+    expect(error()).toHaveTextContent(t(SIGN_IN_ERROR_KEY));
   });
 
   it("does not sign in on a wrong username", () => {
@@ -173,14 +175,31 @@ describe("a rejection says so and stays usable", () => {
 /* ------------------------------------------------------------ THE FRAME -- */
 
 describe("the screen reads as the club's own front door", () => {
-  it("shows the self-hosted crest and the workspace label", () => {
+  it("shows the self-hosted crest and the product name", () => {
     renderScreen();
 
-    expect(screen.getByAltText(CREST_LABEL)).toHaveAttribute(
+    expect(screen.getByAltText(t(CREST_LABEL_KEY))).toHaveAttribute(
       "src",
       "/fcb-crest.png",
     );
-    expect(screen.getByText(WORKSPACE_LABEL)).toBeInTheDocument();
+    expect(screen.getByText(t("login.title"))).toBeInTheDocument();
+  });
+
+  /**
+   * The workspace label was REMOVED from this card (review, 2026-09-11), so its
+   * absence is asserted rather than left to chance: it is who you are once you
+   * are inside, and the app bar says it there, above the dashboard it
+   * describes. Checked in BOTH languages, since the label is translated
+   * ("Sales & Marketing" / "Vertrieb & Marketing") and a regression in one
+   * dictionary would otherwise pass on the other.
+   */
+  it("does NOT name the workspace on the door", () => {
+    renderScreen();
+
+    for (const locale of LOCALES) {
+      const label = translatorFor(locale)(WORKSPACE_LABEL_KEY);
+      expect(screen.queryByText(label)).toBeNull();
+    }
   });
 
   it("masks the password field", () => {

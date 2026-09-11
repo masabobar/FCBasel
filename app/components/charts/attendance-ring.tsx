@@ -3,6 +3,8 @@ import { useState } from "react";
 import { cn } from "../../lib/cn";
 import { formatNumber, formatSharePercent } from "../../lib/format";
 import { useCountUp, useGrow } from "../../lib/hooks/use-motion";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { attendanceShare } from "../../lib/repositories/derive";
 import { type AttendanceSummary } from "../../lib/repositories/types";
 
@@ -127,15 +129,15 @@ export const RING_GLOW_CLASS = "fcb-ring-glow";
 /* ---------------------------------------------------------------- COPY -- */
 
 /** The two centre labels — what the figure above each of them means. */
-export const RING_LABEL = {
+export const RING_LABEL_KEY = {
   /** Resting: the figure is an average of the period's home fixtures. */
-  average: "avg attendance",
+  average: "tiles.ringAverage",
   /** Hovered: the same reading, as a share of the stadium's capacity. */
-  capacity: "of capacity",
-} as const;
+  capacity: "tiles.ringCapacity",
+} as const satisfies Record<string, TranslationKey>;
 
 /** The group's accessible name. It states both readings, since it shows both. */
-const DEFAULT_LABEL = "Average home attendance against capacity";
+const DEFAULT_LABEL_KEY: TranslationKey = "tiles.attendanceRingLabel";
 
 /* ---------------------------------------------------------------- RING -- */
 
@@ -153,9 +155,10 @@ export interface AttendanceRingProps {
 
 export function AttendanceRing({
   attendance,
-  label = DEFAULT_LABEL,
+  label,
   className,
 }: AttendanceRingProps) {
+  const t = useT();
   const grown = useGrow();
   const counted = useCountUp(attendance.average);
   // The one piece of state the ring owns. The PERIOD is the caller's, because
@@ -173,7 +176,7 @@ export function AttendanceRing({
       // handlers below are the only keys and events it takes part in.
       tabIndex={0}
       role="group"
-      aria-label={label}
+      aria-label={label ?? t(DEFAULT_LABEL_KEY)}
       onMouseEnter={() => setRevealed(true)}
       onMouseLeave={() => setRevealed(false)}
       onFocus={() => setRevealed(true)}
@@ -237,7 +240,7 @@ export function AttendanceRing({
             data-slot="attendance-ring-caption"
             className="mt-1 block text-caption text-bg/60"
           >
-            {revealed ? RING_LABEL.capacity : RING_LABEL.average}
+            {t(revealed ? RING_LABEL_KEY.capacity : RING_LABEL_KEY.average)}
           </span>
         </div>
       </div>

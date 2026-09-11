@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 
 import { formatNumber } from "../../lib/format";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import type { VarianceJudgement } from "../../lib/repositories/enums";
 import {
   HBarTile,
@@ -124,7 +126,7 @@ export function driverTotal(
 }
 
 /** The word after the figure in the badge: `-CHF 400k total`. */
-export const DRIVER_TOTAL_LABEL = "total";
+export const DRIVER_TOTAL_LABEL_KEY: TranslationKey = "tiles.driverTotal";
 
 export interface DriverTotalBadgeProps {
   /** The total itself, from {@link driverTotal}. Signed. */
@@ -141,7 +143,7 @@ export interface DriverTotalBadgeProps {
    * ADVERSE; the declining fixtures need nothing, their sign is the meaning.
    */
   judgement?: VarianceJudgement;
-  /** The trailing word. Defaults to {@link DRIVER_TOTAL_LABEL}. */
+  /** The trailing word. Defaults to {@link DRIVER_TOTAL_LABEL_KEY}. */
   label?: ReactNode;
   className?: string;
 }
@@ -160,15 +162,17 @@ export function DriverTotalBadge({
   total,
   format = formatNumber,
   judgement,
-  label = DRIVER_TOTAL_LABEL,
+  label,
   className,
 }: DriverTotalBadgeProps) {
+  const t = useT();
+
   return (
     <DeltaChip
       value={total}
       format={format}
       judgement={judgement}
-      suffix={label}
+      suffix={label ?? t(DRIVER_TOTAL_LABEL_KEY)}
       className={className}
     />
   );
@@ -206,7 +210,7 @@ export interface DriverTileProps extends Omit<HBarTileProps, "children"> {
    * identically unless a caller deliberately signs one of them.
    */
   totalFormat?: (value: number) => string;
-  /** The badge's trailing word. Defaults to {@link DRIVER_TOTAL_LABEL}. */
+  /** The badge's trailing word. Defaults to {@link DRIVER_TOTAL_LABEL_KEY}. */
   totalLabel?: ReactNode;
   /** The badge's judgement, where the total's sign is not its meaning. */
   totalJudgement?: VarianceJudgement;

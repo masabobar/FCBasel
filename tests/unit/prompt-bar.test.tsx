@@ -29,14 +29,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   PROMPT_BAR_POSITION_CLASS,
   PROMPT_FIELD_CLASS,
-  PROMPT_FORM_LABEL,
-  PROMPT_INPUT_LABEL,
-  PROMPT_PLACEHOLDER,
+  PROMPT_FORM_LABEL_KEY,
+  PROMPT_INPUT_LABEL_KEY,
+  PROMPT_PLACEHOLDER_KEY,
   PromptBar,
-  SEND_BUTTON_LABEL,
+  SEND_BUTTON_LABEL_KEY,
 } from "../../app/components/chrome/prompt-bar";
 import { SIDEBAR_WIDTH_CLASS } from "../../app/components/chrome/sidebar";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
+import { t } from "./support/i18n";
 
 /**
  * The component's source with comments stripped. Several checks below are about
@@ -63,11 +64,11 @@ function field(): HTMLElement {
 }
 
 function input(): HTMLInputElement {
-  return screen.getByRole("textbox", { name: PROMPT_INPUT_LABEL });
+  return screen.getByRole("textbox", { name: t(PROMPT_INPUT_LABEL_KEY) });
 }
 
 function sendButton(): HTMLButtonElement {
-  return screen.getByRole("button", { name: SEND_BUTTON_LABEL });
+  return screen.getByRole("button", { name: t(SEND_BUTTON_LABEL_KEY) });
 }
 
 /** Every element inside the field, the input and the button included. */
@@ -237,15 +238,15 @@ describe("PromptBar — accessibility", () => {
   it("names the input with a real label, not the placeholder", () => {
     render(<PromptBar />);
 
-    expect(input()).toHaveAccessibleName(PROMPT_INPUT_LABEL);
-    expect(input()).toHaveAttribute("placeholder", PROMPT_PLACEHOLDER);
+    expect(input()).toHaveAccessibleName(t(PROMPT_INPUT_LABEL_KEY));
+    expect(input()).toHaveAttribute("placeholder", t(PROMPT_PLACEHOLDER_KEY));
     expect(document.querySelector("label")).toHaveClass("sr-only");
   });
 
   it("names the send button and hides its glyph", () => {
     render(<PromptBar />);
 
-    expect(sendButton()).toHaveAccessibleName(SEND_BUTTON_LABEL);
+    expect(sendButton()).toHaveAccessibleName(t(SEND_BUTTON_LABEL_KEY));
     for (const glyph of field().querySelectorAll("svg")) {
       expect(glyph).toHaveAttribute("aria-hidden", "true");
     }
@@ -254,7 +255,9 @@ describe("PromptBar — accessibility", () => {
   it("exposes the bar as a named search region", () => {
     render(<PromptBar />);
 
-    expect(screen.getByRole("search")).toHaveAccessibleName(PROMPT_FORM_LABEL);
+    expect(screen.getByRole("search")).toHaveAccessibleName(
+      t(PROMPT_FORM_LABEL_KEY),
+    );
   });
 
   it("reports the busy state on the region it applies to", () => {
@@ -543,10 +546,10 @@ describe("PromptBar — reduced motion and token discipline", () => {
 
   it("contains no em dash or en dash in anything it renders", () => {
     for (const copy of [
-      PROMPT_INPUT_LABEL,
-      SEND_BUTTON_LABEL,
-      PROMPT_FORM_LABEL,
-      PROMPT_PLACEHOLDER,
+      t(PROMPT_INPUT_LABEL_KEY),
+      t(SEND_BUTTON_LABEL_KEY),
+      t(PROMPT_FORM_LABEL_KEY),
+      t(PROMPT_PLACEHOLDER_KEY),
     ]) {
       expect(copy).not.toMatch(/[–—]/);
     }

@@ -9,16 +9,25 @@
  *   - every repository method returns a `Promise`, so swapping the in-memory
  *     implementation for a database one is not a signature change;
  *   - numbers are numbers. No pre-formatted "CHF 148,200" strings live in the
- *     data - formatting is US-011's job and happens at render time.
+ *     data - formatting is US-011's job and happens at render time;
+ *   - TEXT IS NOT TEXT EITHER (US-049). No display string lives in the data:
+ *     every label, scope line and narrative is a {@link TranslationKey} into
+ *     `app/lib/i18n/locales/*.json`, so one dataset renders in English or in
+ *     German. The exceptions are PROPER NOUNS that are the same word in both -
+ *     club names (`FCZ`), partner brands (`Bitpanda`) and printed squad names.
  */
 
+import { type TranslationKey } from "../i18n";
 import {
+  type DepartmentKey,
   type DepartmentType,
   type KitVariant,
   type MonthKey,
   type PartnerRole,
   type PeriodKey,
+  type ProductKey,
   type SeasonKey,
+  type SpendDriverKey,
 } from "./enums";
 
 /* ---------------------------------------------------------- PRIMITIVES -- */
@@ -31,13 +40,30 @@ import {
  * rather than failing. `tests/unit/baseline-dataset.test.ts` asserts it for
  * every period, including the date-derived ones.
  */
-export interface ComparisonSeries {
-  /** X-axis labels: week numbers, or short month names derived from today. */
-  readonly labels: readonly string[];
+export interface SeriesValues {
   /** The period being shown. */
   readonly current: readonly number[];
   /** The equivalent earlier period, drawn dashed behind it. */
   readonly previous: readonly number[];
+}
+
+/** A comparison whose x-axis is already display text - what a chart consumes. */
+export interface ComparisonSeries extends SeriesValues {
+  /** X-axis labels: week numbers, month names, or opponents. */
+  readonly labels: readonly string[];
+}
+
+/**
+ * A comparison whose x-axis is still KEYED - what a fixture stores.
+ *
+ * The baseline band's axis is weeks (`W1`) or rolling months (`Sep`), both of
+ * which are translated words; the dataset is built on the SERVER, which cannot
+ * know a language the presenter has not chosen yet. So the fixture carries
+ * keys and the band resolves them with its own `t` - `resolveSeries` in
+ * `./derive.ts` is the one place that conversion happens.
+ */
+export interface TranslatableSeries extends SeriesValues {
+  readonly labelKeys: readonly TranslationKey[];
 }
 
 /** Home attendance for a period, against the stadium's usable capacity. */
@@ -58,9 +84,9 @@ export interface AttendanceSummary {
  */
 export interface BaselinePeriod {
   readonly key: PeriodKey;
-  readonly label: string;
+  readonly labelKey: TranslationKey;
   /** Webshop revenue in CHF. Totals and deltas are DERIVED, never stored. */
-  readonly webshop: ComparisonSeries;
+  readonly webshop: TranslatableSeries;
   readonly attendance: AttendanceSummary;
 }
 
@@ -79,14 +105,14 @@ export interface HomeMatch {
 
 /** Units sold of one product in one period. */
 export interface ProductUnits {
-  readonly product: string;
+  readonly product: ProductKey;
   readonly units: number;
 }
 
 /** The top-products table for one period, already ordered best-selling first. */
 export interface TopProductsPeriod {
   readonly key: PeriodKey;
-  readonly label: string;
+  readonly labelKey: TranslationKey;
   readonly rows: readonly ProductUnits[];
 }
 
@@ -99,9 +125,10 @@ export interface TopProductsPeriod {
  * mistaken for a design token.
  */
 export interface Partner {
+  /** The partner's BRAND. A proper noun - never translated. */
   readonly name: string;
   readonly role: PartnerRole;
-  readonly roleLabel: string;
+  readonly roleLabelKey: TranslationKey;
   readonly brandColor: string;
 }
 
@@ -116,7 +143,7 @@ export interface Partner {
  */
 export interface KitUnits {
   readonly variant: KitVariant;
-  readonly label: string;
+  readonly labelKey: TranslationKey;
   readonly units: number;
 }
 
@@ -150,7 +177,7 @@ export interface BadgeSponsorShare {
  */
 export interface Hero1Period {
   readonly key: PeriodKey;
-  readonly label: string;
+  readonly labelKey: TranslationKey;
   /** Kit units, in display order: Home, Away, 3rd. */
   readonly kits: readonly KitUnits[];
   /** Shirts carrying a sponsor badge. Split by `badgeSegments`. */
@@ -173,18 +200,18 @@ export interface Hero1Primary {
    * (Hero 2 is per-fixture matchday revenue, Hero 3 is full-year departmental
    * totals) and an unlabelled tile reads as an arithmetic bug in the room.
    */
-  readonly scopeLabel: string;
+  readonly scopeLabelKey: TranslationKey;
   readonly periods: readonly Hero1Period[];
   /** The fixed sponsor split behind `badgeTotal`. Percentages sum to 100. */
   readonly badgeSplit: readonly BadgeSponsorShare[];
-  /** Hand-authored copy. Verbatim from the Reference Guide - never paraphrased. */
-  readonly narrative: string;
+  /** Hand-authored copy, in both languages. Never paraphrased in either. */
+  readonly narrativeKey: TranslationKey;
 }
 
 /** The escalation shown when the user asks Hero 1 the follow-up question. */
 export interface Hero1FollowUp {
   readonly trend: readonly BadgeTrendEntry[];
-  readonly narrative: string;
+  readonly narrativeKey: TranslationKey;
 }
 
 /**
@@ -205,7 +232,7 @@ export interface Hero1 {
  */
 export interface SeasonRef {
   readonly key: SeasonKey;
-  readonly label: string;
+  readonly labelKey: TranslationKey;
 }
 
 /**
@@ -227,8 +254,8 @@ export interface FixtureRevenue {
 /** Ticket revenue for one month of the season, in CHF thousands. */
 export interface MonthlyRevenue {
   readonly month: MonthKey;
-  /** Short axis label, e.g. `"Jul"`. */
-  readonly label: string;
+  /** Short axis label, e.g. `"Jul"` / `"Jul"`. */
+  readonly labelKey: TranslationKey;
   readonly previous: number;
   readonly current: number;
 }
@@ -243,13 +270,13 @@ export interface MonthlyRevenue {
  * anyone checking the figures in the room.
  */
 export interface FixtureRevenueSeries {
-  readonly scopeLabel: string;
+  readonly scopeLabelKey: TranslationKey;
   readonly fixtures: readonly FixtureRevenue[];
 }
 
 /** The twelve-month view, July to June, and the scope it covers. */
 export interface MonthlyRevenueSeries {
-  readonly scopeLabel: string;
+  readonly scopeLabelKey: TranslationKey;
   readonly months: readonly MonthlyRevenue[];
 }
 
@@ -261,8 +288,8 @@ export interface Hero2Primary {
   readonly currentSeason: SeasonRef;
   readonly fixtures: FixtureRevenueSeries;
   readonly monthly: MonthlyRevenueSeries;
-  /** Hand-authored copy. Verbatim from the Reference Guide - never paraphrased. */
-  readonly narrative: string;
+  /** Hand-authored copy, in both languages. Never paraphrased in either. */
+  readonly narrativeKey: TranslationKey;
 }
 
 /**
@@ -274,7 +301,7 @@ export interface Hero2Primary {
  * follow-up quoting a decline the chart no longer shows.
  */
 export interface Hero2FollowUp {
-  readonly narrative: string;
+  readonly narrativeKey: TranslationKey;
 }
 
 /** Hero 2 as ONE object - see {@link Hero1} for why the two travel together. */
@@ -303,10 +330,13 @@ export interface Hero2 {
  *     DERIVED in `./derive.ts` (`departmentPerformance`) and never stored.
  */
 export interface Department {
-  readonly name: string;
+  /** The identifier. Stable across languages - this is the lookup key. */
+  readonly key: DepartmentKey;
+  /** The department's name, as Finance names it. */
+  readonly labelKey: TranslationKey;
   /** Earns money or spends it - see {@link DepartmentType}. */
   readonly type: DepartmentType;
-  readonly typeLabel: string;
+  readonly typeLabelKey: TranslationKey;
   /** Full-year budget, CHF thousands. */
   readonly budget: number;
   /** Full-year actual, CHF thousands. */
@@ -320,7 +350,8 @@ export interface Department {
 
 /** One component of Marketing's overspend, CHF thousands. */
 export interface SpendDriver {
-  readonly name: string;
+  readonly key: SpendDriverKey;
+  readonly labelKey: TranslationKey;
   /** Amount above plan, CHF thousands. */
   readonly amount: number;
 }
@@ -344,7 +375,7 @@ export interface Hero3Primary {
    * season-ticket base, so it legitimately exceeds the sum of Hero 2's eight
    * shown fixtures. Intended, not inconsistent - but only if the tile says so.
    */
-  readonly scopeLabel: string;
+  readonly scopeLabelKey: TranslationKey;
   /** The six departments, in the order the table lists them. */
   readonly departments: readonly Department[];
   /**
@@ -358,8 +389,8 @@ export interface Hero3Primary {
    * It sits beside `targetPercent` as the same kind of fact, one level up.
    */
   readonly blendedTargetPercent: number;
-  /** Hand-authored copy. Verbatim from the Reference Guide - never paraphrased. */
-  readonly narrative: string;
+  /** Hand-authored copy, in both languages. Never paraphrased in either. */
+  readonly narrativeKey: TranslationKey;
 }
 
 /**
@@ -375,7 +406,7 @@ export interface Hero3FollowUp {
   readonly drivers: readonly SpendDriver[];
   /** The webshop conversion the paid-social spend was chasing. */
   readonly conversion: ConversionGap;
-  readonly narrative: string;
+  readonly narrativeKey: TranslationKey;
 }
 
 /** Hero 3 as ONE object - see {@link Hero1} for why the two travel together. */
@@ -439,6 +470,6 @@ export interface Hero3Repository {
   hero(): Promise<Hero3>;
   /** The six departments, in the order the table lists them. */
   departments(): Promise<Department[]>;
-  /** One department by name, or `null` when the name is not shown. */
-  department(name: string): Promise<Department | null>;
+  /** One department by key, or `null` when the key is not shown. */
+  department(key: DepartmentKey): Promise<Department | null>;
 }

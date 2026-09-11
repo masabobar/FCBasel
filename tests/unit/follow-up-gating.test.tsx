@@ -44,11 +44,11 @@ import { resolve } from "node:path";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PROMPT_INPUT_LABEL } from "../../app/components/chrome/prompt-bar";
+import { PROMPT_INPUT_LABEL_KEY } from "../../app/components/chrome/prompt-bar";
 import {
   ChipKind,
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
   suggestionChips,
 } from "../../app/lib/dashboard/chips";
 import {
@@ -75,6 +75,7 @@ import App from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 import { signIn } from "./support/sign-in";
+import { t, tList } from "./support/i18n";
 
 /* ------------------------------------------------------------- SOURCES -- */
 
@@ -200,8 +201,8 @@ function rowChips(): HTMLButtonElement[] {
 function chipFor(heroId: HeroId, kind: ChipKind): HTMLButtonElement | null {
   const label =
     kind === ChipKind.FOLLOW_UP
-      ? FOLLOW_UP_CHIP_LABEL[heroId]
-      : HERO_CHIP_LABEL[heroId];
+      ? t(FOLLOW_UP_CHIP_LABEL_KEY[heroId])
+      : t(HERO_CHIP_LABEL_KEY[heroId]);
 
   return (
     rowChips().find(
@@ -231,7 +232,7 @@ function sourceChips(): (string | null)[] {
 
 function promptInput(): HTMLInputElement {
   return screen.getByRole("textbox", {
-    name: PROMPT_INPUT_LABEL,
+    name: t(PROMPT_INPUT_LABEL_KEY),
   }) as HTMLInputElement;
 }
 
@@ -492,7 +493,7 @@ describe("the follow-up phrases resolve as typed follow-ups", () => {
   it.each(HERO_IDS)("matches %s's follow-up, not its hero", (heroId) => {
     // The two-step below is only a test of the GATE if the phrase really
     // resolves to a follow-up. It does, through US-030's scoring.
-    expect(matchIntent(FOLLOW_UP_CHIP_LABEL[heroId])).toEqual({
+    expect(matchIntent(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]))).toEqual({
       heroId,
       kind: ChipKind.FOLLOW_UP,
     });
@@ -510,9 +511,11 @@ describe("a cold typed follow-up renders the parent, then offers the chip (crite
       expect(chipFor(heroId, ChipKind.FOLLOW_UP)).toBeNull();
 
       /* STEP 1 - the follow-up is typed cold, and the PARENT renders. */
-      ask(FOLLOW_UP_CHIP_LABEL[heroId]);
+      ask(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
 
-      expect(message()).toBe(thinkingBeatFor(heroId, ChipKind.HERO).message);
+      expect(message()).toBe(
+        t(thinkingBeatFor(heroId, ChipKind.HERO).messageKey),
+      );
       landBeat();
 
       expect(sections()).toHaveLength(1);
@@ -532,7 +535,7 @@ describe("a cold typed follow-up renders the parent, then offers the chip (crite
       tapChip(heroId, ChipKind.FOLLOW_UP);
 
       expect(message()).toBe(
-        thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).message,
+        t(thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).messageKey),
       );
       landBeat();
 
@@ -551,9 +554,9 @@ describe("a cold typed follow-up renders the parent, then offers the chip (crite
   it("re-typing the same follow-up sharpens rather than repeating the parent", () => {
     renderApp();
 
-    ask(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]);
+    ask(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
-    ask(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]);
+    ask(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
 
     expect(sections()).toHaveLength(1);
@@ -570,7 +573,7 @@ describe("a typed follow-up after its parent resolves straight through (criterio
     (heroId) => {
       renderApp();
 
-      ask(HERO_CHIP_LABEL[heroId]);
+      ask(t(HERO_CHIP_LABEL_KEY[heroId]));
       landBeat();
 
       expect(sections()).toHaveLength(1);
@@ -579,11 +582,11 @@ describe("a typed follow-up after its parent resolves straight through (criterio
         InsightPhase.PRIMARY,
       );
 
-      ask(FOLLOW_UP_CHIP_LABEL[heroId]);
+      ask(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
 
       // Its OWN beat this time, because its own answer is what is arriving.
       expect(message()).toBe(
-        thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).message,
+        t(thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).messageKey),
       );
       landBeat();
 
@@ -602,7 +605,7 @@ describe("any single hero can run start-to-follow-up on its own (criterion 5)", 
   it.each(HERO_IDS)("runs %s with the other two never touched", (heroId) => {
     renderApp();
 
-    ask(HERO_CHIP_LABEL[heroId]);
+    ask(t(HERO_CHIP_LABEL_KEY[heroId]));
     landBeat();
     tapChip(heroId, ChipKind.FOLLOW_UP);
     landBeat();
@@ -625,14 +628,14 @@ describe("any single hero can run start-to-follow-up on its own (criterion 5)", 
   it("gates Hero 1's follow-up while Hero 3 is on screen", () => {
     renderApp();
 
-    ask(HERO_CHIP_LABEL[HeroId.HERO_3]);
+    ask(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
     landBeat();
 
     // Another hero's answer is on the canvas, and it changes nothing here.
-    ask(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]);
+    ask(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]));
 
     expect(message()).toBe(
-      thinkingBeatFor(HeroId.HERO_1, ChipKind.HERO).message,
+      t(thinkingBeatFor(HeroId.HERO_1, ChipKind.HERO).messageKey),
     );
     landBeat();
 
@@ -653,9 +656,9 @@ describe("any single hero can run start-to-follow-up on its own (criterion 5)", 
   it("sharpens one hero without disturbing another's phase", () => {
     renderApp();
 
-    ask(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    ask(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
     landBeat();
-    ask(HERO_CHIP_LABEL[HeroId.HERO_3]);
+    ask(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
     landBeat();
     tapChip(HeroId.HERO_2, ChipKind.FOLLOW_UP);
     landBeat();
@@ -680,7 +683,7 @@ describe("Reset gates every follow-up again", () => {
   it("withdraws the offer and renders the parent again after a Reset", () => {
     renderApp();
 
-    ask(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    ask(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
     expect(chipFor(HeroId.HERO_1, ChipKind.FOLLOW_UP)).not.toBeNull();
 
@@ -693,10 +696,10 @@ describe("Reset gates every follow-up again", () => {
       expect(chipFor(heroId, ChipKind.FOLLOW_UP)).toBeNull();
     }
 
-    ask(FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]);
+    ask(t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1]));
 
     expect(message()).toBe(
-      thinkingBeatFor(HeroId.HERO_1, ChipKind.HERO).message,
+      t(thinkingBeatFor(HeroId.HERO_1, ChipKind.HERO).messageKey),
     );
     landBeat();
 
@@ -714,7 +717,7 @@ describe("a cold follow-up is neither an error nor the fallback (criterion 2)", 
   it.each(HERO_IDS)("answers %s's cold follow-up with an answer", (heroId) => {
     renderApp();
 
-    ask(FOLLOW_UP_CHIP_LABEL[heroId]);
+    ask(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
     landBeat();
 
     // Never nothing: a section is on screen.
@@ -763,14 +766,14 @@ describe("a gated cold follow-up shows the PARENT's thinking message", () => {
       // headline figures.
       renderApp();
 
-      ask(FOLLOW_UP_CHIP_LABEL[heroId]);
+      ask(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
 
       const parent = thinkingBeatFor(heroId, ChipKind.HERO);
       const followUp = thinkingBeatFor(heroId, ChipKind.FOLLOW_UP);
 
-      expect(message()).toBe(parent.message);
-      expect(message()).not.toBe(followUp.message);
-      expect(sourceChips()).toEqual([...parent.sources]);
+      expect(message()).toBe(t(parent.messageKey));
+      expect(message()).not.toBe(t(followUp.messageKey));
+      expect(sourceChips()).toEqual([...tList(parent.sourcesKey)]);
     },
   );
 
@@ -779,22 +782,22 @@ describe("a gated cold follow-up shows the PARENT's thinking message", () => {
     (heroId) => {
       renderApp();
 
-      ask(HERO_CHIP_LABEL[heroId]);
+      ask(t(HERO_CHIP_LABEL_KEY[heroId]));
       landBeat();
-      ask(FOLLOW_UP_CHIP_LABEL[heroId]);
+      ask(t(FOLLOW_UP_CHIP_LABEL_KEY[heroId]));
 
       const followUp = thinkingBeatFor(heroId, ChipKind.FOLLOW_UP);
 
-      expect(message()).toBe(followUp.message);
-      expect(sourceChips()).toEqual([...followUp.sources]);
+      expect(message()).toBe(t(followUp.messageKey));
+      expect(sourceChips()).toEqual([...tList(followUp.sourcesKey)]);
     },
   );
 
   it("keeps the two messages distinct for every hero", () => {
     // Otherwise the assertions above would pass on a coincidence.
     for (const heroId of HERO_IDS) {
-      expect(thinkingBeatFor(heroId, ChipKind.HERO).message).not.toBe(
-        thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).message,
+      expect(t(thinkingBeatFor(heroId, ChipKind.HERO).messageKey)).not.toBe(
+        t(thinkingBeatFor(heroId, ChipKind.FOLLOW_UP).messageKey),
       );
     }
   });

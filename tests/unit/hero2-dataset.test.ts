@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { monthLabel } from "../../app/lib/calendar";
+import { monthKeyAt } from "../../app/lib/calendar";
 import { createMockHero2Repository } from "../../app/lib/mock/hero2";
 import {
   declineTotal,
@@ -12,13 +12,14 @@ import {
   percentChange,
 } from "../../app/lib/repositories/derive";
 import {
-  MONTH_LABEL,
+  MONTH_LABEL_KEY,
   MonthKey,
-  SEASON_LABEL,
+  SEASON_LABEL_KEY,
   SeasonKey,
 } from "../../app/lib/repositories/enums";
 import { hero2Repository } from "../../app/lib/repositories/index.server";
 import { type Hero2Repository } from "../../app/lib/repositories/types";
+import { t } from "./support/i18n";
 
 const repository: Hero2Repository = createMockHero2Repository();
 
@@ -43,17 +44,17 @@ describe("Build Specification Hero 2 fixtures", () => {
 
     expect(hero.primary.previousSeason).toEqual({
       key: SeasonKey.SEASON_25_26,
-      label: "Season 25/26",
+      labelKey: SEASON_LABEL_KEY[SeasonKey.SEASON_25_26],
     });
     expect(hero.primary.currentSeason).toEqual({
       key: SeasonKey.SEASON_26_27,
-      label: "Season 26/27",
+      labelKey: SEASON_LABEL_KEY[SeasonKey.SEASON_26_27],
     });
-    expect(hero.primary.previousSeason.label).toBe(
-      SEASON_LABEL[SeasonKey.SEASON_25_26],
+    expect(t(hero.primary.previousSeason.labelKey)).toBe(
+      t(SEASON_LABEL_KEY[SeasonKey.SEASON_25_26]),
     );
-    expect(hero.primary.currentSeason.label).toBe(
-      SEASON_LABEL[SeasonKey.SEASON_26_27],
+    expect(t(hero.primary.currentSeason.labelKey)).toBe(
+      t(SEASON_LABEL_KEY[SeasonKey.SEASON_26_27]),
     );
   });
 
@@ -220,7 +221,7 @@ describe("month-by-month series", () => {
 
   it("labels every month from the shared enum", async () => {
     for (const month of await repository.monthly()) {
-      expect(month.label).toBe(MONTH_LABEL[month.month]);
+      expect(t(month.labelKey)).toBe(t(MONTH_LABEL_KEY[month.month]));
     }
   });
 
@@ -241,17 +242,21 @@ describe("month-by-month series", () => {
     };
 
     for (const month of await repository.monthly()) {
-      expect(month.label).toBe(
-        monthLabel(new Date(2026, monthNumber[month.month], 1), 0),
+      // The season axis and the baseline band's rolling axis name a month
+      // through the SAME key map, so the two spellings cannot drift.
+      expect(month.labelKey).toBe(
+        MONTH_LABEL_KEY[
+          monthKeyAt(new Date(2026, monthNumber[month.month], 1), 0)
+        ],
       );
     }
   });
 
   it("keeps the plotted series aligned with the axis", async () => {
     const months = await repository.monthly();
-    const series = monthlySeries(months);
+    const series = monthlySeries(months, t);
 
-    expect(series.labels).toEqual(months.map((month) => month.label));
+    expect(series.labels).toEqual(months.map((month) => t(month.labelKey)));
     expect(series.current).toHaveLength(series.labels.length);
     expect(series.previous).toHaveLength(series.labels.length);
   });
@@ -263,10 +268,10 @@ describe("the two scopes are labelled, not left to be inferred", () => {
   it("states a scope on each of the two series", async () => {
     const { fixtures, monthly } = (await repository.hero()).primary;
 
-    expect(fixtures.scopeLabel).toBe(
+    expect(t(fixtures.scopeLabelKey)).toBe(
       "Eight highest-grossing home fixtures, matchday ticket revenue excluding the season-ticket base",
     );
-    expect(monthly.scopeLabel).toBe(
+    expect(t(monthly.scopeLabelKey)).toBe(
       "All home fixtures per month, matchday ticket revenue excluding the season-ticket base",
     );
   });
@@ -274,10 +279,10 @@ describe("the two scopes are labelled, not left to be inferred", () => {
   it("gives the two charts DIFFERENT scope labels", async () => {
     const { fixtures, monthly } = (await repository.hero()).primary;
 
-    expect(fixtures.scopeLabel).not.toBe(monthly.scopeLabel);
-    expect(fixtures.scopeLabel).toMatch(/eight/i);
-    expect(monthly.scopeLabel).toMatch(/all home fixtures/i);
-    for (const label of [fixtures.scopeLabel, monthly.scopeLabel]) {
+    expect(t(fixtures.scopeLabelKey)).not.toBe(t(monthly.scopeLabelKey));
+    expect(t(fixtures.scopeLabelKey)).toMatch(/eight/i);
+    expect(t(monthly.scopeLabelKey)).toMatch(/all home fixtures/i);
+    for (const label of [t(fixtures.scopeLabelKey), t(monthly.scopeLabelKey)]) {
       expect(label).toMatch(/season-ticket base/);
     }
   });
@@ -314,15 +319,15 @@ describe("verbatim narratives", () => {
   it("carries the primary narrative character for character", async () => {
     const hero = await repository.hero();
 
-    expect(hero.primary.narrative).toBe(PRIMARY);
-    expect(hero.primary.narrative).toHaveLength(229);
+    expect(t(hero.primary.narrativeKey)).toBe(PRIMARY);
+    expect(t(hero.primary.narrativeKey)).toHaveLength(229);
   });
 
   it("carries the follow-up narrative character for character", async () => {
     const hero = await repository.hero();
 
-    expect(hero.followUp.narrative).toBe(FOLLOW_UP);
-    expect(hero.followUp.narrative).toHaveLength(338);
+    expect(t(hero.followUp.narrativeKey)).toBe(FOLLOW_UP);
+    expect(t(hero.followUp.narrativeKey)).toHaveLength(338);
   });
 
   it("quotes figures the data actually holds", async () => {
@@ -331,14 +336,14 @@ describe("verbatim narratives", () => {
     const totals = fixtureTotals(fixtures);
     const declines = fixtureDeclines(fixtures);
 
-    expect(hero.primary.narrative).toContain(`(${totals.deltaPercent}%)`);
-    expect(hero.primary.narrative).toContain(
+    expect(t(hero.primary.narrativeKey)).toContain(`(${totals.deltaPercent}%)`);
+    expect(t(hero.primary.narrativeKey)).toContain(
       `single biggest drop, -CHF ${declines[0]?.drop}k`,
     );
     for (const decline of declines.slice(1)) {
-      expect(hero.followUp.narrative).toContain(`(-${decline.drop}k)`);
+      expect(t(hero.followUp.narrativeKey)).toContain(`(-${decline.drop}k)`);
     }
-    expect(hero.followUp.narrative).toContain(
+    expect(t(hero.followUp.narrativeKey)).toContain(
       `FCZ (-CHF ${declines[0]?.drop}k)`,
     );
   });
@@ -346,7 +351,10 @@ describe("verbatim narratives", () => {
   it("stays ASCII: hyphens only, no typographic dashes or quotes", async () => {
     const hero = await repository.hero();
 
-    for (const narrative of [hero.primary.narrative, hero.followUp.narrative]) {
+    for (const narrative of [
+      t(hero.primary.narrativeKey),
+      t(hero.followUp.narrativeKey),
+    ]) {
       expect(narrative).not.toMatch(/[–—]/);
       expect(narrative).toMatch(/^[\x20-\x7E]*$/);
     }
@@ -381,7 +389,10 @@ describe("dataset hygiene", () => {
    */
   async function everyDataString(): Promise<string[]> {
     const hero = await repository.hero();
-    const narratives = [hero.primary.narrative, hero.followUp.narrative];
+    const narratives = [
+      t(hero.primary.narrativeKey),
+      t(hero.followUp.narrativeKey),
+    ];
     return (await everyString()).filter((value) => !narratives.includes(value));
   }
 

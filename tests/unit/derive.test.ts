@@ -49,7 +49,7 @@ describe("seriesTotals", () => {
   });
 
   it("handles an empty series without dividing by zero", () => {
-    expect(seriesTotals({ labels: [], current: [], previous: [] })).toEqual({
+    expect(seriesTotals({ current: [], previous: [] })).toEqual({
       current: 0,
       previous: 0,
       delta: 0,

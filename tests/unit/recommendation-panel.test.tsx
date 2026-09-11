@@ -15,8 +15,8 @@ import {
   TILE_ENTER_CLASS,
 } from "../../app/components/tiles/card";
 import {
-  NARRATIVE_LABEL,
-  RECOMMENDATION_LABEL,
+  NARRATIVE_LABEL_KEY,
+  RECOMMENDATION_LABEL_KEY,
   RECOMMENDATION_VARIANTS,
   RecommendationPanel,
 } from "../../app/components/tiles/recommendation-panel";
@@ -27,6 +27,7 @@ import {
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { t } from "./support/i18n";
 
 const PANEL_SOURCE = readFileSync(
   resolve(process.cwd(), "app/components/tiles/recommendation-panel.tsx"),
@@ -104,7 +105,7 @@ describe("RecommendationPanel — visually distinct from a data tile", () => {
 
     expect(panel().tagName).toBe("ASIDE");
     expect(
-      screen.getByRole("complementary", { name: RECOMMENDATION_LABEL }),
+      screen.getByRole("complementary", { name: t(RECOMMENDATION_LABEL_KEY) }),
     ).toBe(panel());
   });
 
@@ -158,7 +159,7 @@ describe("RecommendationPanel — visually distinct from a data tile", () => {
     render(<RecommendationPanel>{VERBATIM}</RecommendationPanel>);
 
     expect(slot("recommendation-label")).toHaveTextContent(
-      RECOMMENDATION_LABEL,
+      t(RECOMMENDATION_LABEL_KEY),
     );
     // The eyebrow names the region, so the label is not decorative text.
     expect(panel().getAttribute("aria-labelledby")).toBe(
@@ -255,7 +256,9 @@ describe("RecommendationPanel — the gold accent, and only here", () => {
     expect(slot("recommendation-accent")).toHaveClass(CARD_ACCENTS.navy);
     expect(slot("recommendation-accent")!.className).not.toMatch(/gold/);
     expect(panel().className).not.toMatch(/gold/);
-    expect(slot("recommendation-label")).toHaveTextContent(NARRATIVE_LABEL);
+    expect(slot("recommendation-label")).toHaveTextContent(
+      t(NARRATIVE_LABEL_KEY),
+    );
   });
 
   it("uses no literal colour value anywhere", () => {
@@ -435,7 +438,7 @@ describe("US-024 — the AI glyph is never announced as content", () => {
     expect(glyph.querySelector("svg")).not.toBeNull();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getByRole("complementary")).toHaveAccessibleName(
-      RECOMMENDATION_LABEL,
+      t(RECOMMENDATION_LABEL_KEY),
     );
   });
 });
@@ -543,7 +546,7 @@ describe("RecommendationPanel — entrance and reduced motion", () => {
     // caption are all present with the animation neutralised.
     expect(slot("recommendation-body")!.textContent).toBe(VERBATIM);
     expect(slot("recommendation-label")).toHaveTextContent(
-      RECOMMENDATION_LABEL,
+      t(RECOMMENDATION_LABEL_KEY),
     );
     expect(slot("recommendation-accent")).not.toBeNull();
     expect(slots("card-caption")).toHaveLength(1);

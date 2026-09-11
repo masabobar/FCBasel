@@ -27,6 +27,29 @@ import { timingSafeEqual } from "node:crypto";
 /** Shown by the browser in its credential dialog. */
 export const AUTH_REALM = "FC Basel Intelligence Platform";
 
+/**
+ * The ONLY paths served without a credential.
+ *
+ * WHY THE FAVICON HAS TO BE HERE. A browser fetches the tab icon from its own
+ * chrome, not from the authenticated page, and that fetch does not carry the
+ * Basic credential the page already holds. Behind the gate it took a 401 and
+ * the tab fell back to a generic globe — the club crest showed locally and was
+ * missing in production, which is exactly the sort of detail a demo is judged
+ * on.
+ *
+ * WHY IT IS SAFE, STATED SO NOBODY WIDENS IT CASUALLY. `public/favicon.ico` is
+ * 1,742 bytes derived from the club's own public crest. It carries no figures,
+ * no dataset, no bundle — and the realm string above already announces the
+ * club's name to anyone who requests the site at all, so this adds no
+ * disclosure that the 401 itself does not.
+ *
+ * KEEP THIS LIST AT ONE ENTRY. `/fcb-crest.png` deliberately is NOT here: it is
+ * requested by the page, which IS authenticated, so it needs no exemption. Any
+ * path added here is public to the whole internet forever; the bundle under
+ * `/assets` carries the seeded FC Basel figures and must never appear.
+ */
+export const PUBLIC_PATHS = new Set(["/favicon.ico"]);
+
 /** Failed attempts allowed per client before a cool-off, per `security-and-auth.md` §2.3. */
 export const MAX_FAILED_ATTEMPTS = 5;
 
@@ -221,6 +244,14 @@ export function basicAuth(expected, options = {}) {
   const log = options.log ?? (() => {});
 
   return function basicAuthMiddleware(req, res, next) {
+    // Checked FIRST, and deliberately before the attempt limiter: the tab icon
+    // is fetched on every page load, and a lockout must never be able to take
+    // the crest off the tab. See PUBLIC_PATHS for why this stays at one entry.
+    if (PUBLIC_PATHS.has(req.path)) {
+      next();
+      return;
+    }
+
     const client = req.ip ?? "unknown";
 
     if (limiter.isLocked(client)) {

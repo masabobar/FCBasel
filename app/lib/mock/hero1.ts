@@ -32,10 +32,11 @@
  *     nothing else - no performance figure, no rating, no salary.
  */
 
+import { type TranslationKey } from "../i18n";
 import {
-  KIT_VARIANT_LABEL,
+  KIT_VARIANT_LABEL_KEY,
   KitVariant,
-  PERIOD_LABEL,
+  PERIOD_LABEL_KEY,
   PeriodKey,
 } from "../repositories/enums";
 import {
@@ -64,11 +65,14 @@ type Hero1PeriodKey = (typeof HERO_1_PERIOD_KEYS)[number];
 
 /**
  * Wording that differs from the default. The current month is "Current month"
- * here where the baseline band says "This month", which is exactly why `label`
- * is a field on the period rather than a render-time lookup.
+ * here where the baseline band says "This month", which is exactly why
+ * `labelKey` is a field on the period rather than a render-time lookup. Both
+ * spellings exist in both languages (`enum.period.CURRENT_MONTH`).
  */
-const PERIOD_LABEL_OVERRIDE: Partial<Record<Hero1PeriodKey, string>> = {
-  [PeriodKey.THIS_MONTH]: "Current month",
+const PERIOD_LABEL_KEY_OVERRIDE: Partial<
+  Record<Hero1PeriodKey, TranslationKey>
+> = {
+  [PeriodKey.THIS_MONTH]: "enum.period.CURRENT_MONTH",
 };
 
 /* ------------------------------------------------------------ KIT SALES -- */
@@ -195,7 +199,7 @@ const PRINTED_NAMES: readonly {
 function kitsFor(key: Hero1PeriodKey): KitUnits[] {
   return KIT_UNITS.map((kit) => ({
     variant: kit.variant,
-    label: KIT_VARIANT_LABEL[kit.variant],
+    labelKey: KIT_VARIANT_LABEL_KEY[kit.variant],
     units: kit.units[key],
   }));
 }
@@ -210,7 +214,7 @@ function printedNamesFor(key: Hero1PeriodKey): PrintedNameUnits[] {
 const HERO_1_PERIODS: readonly Hero1Period[] = HERO_1_PERIOD_KEYS.map(
   (key) => ({
     key,
-    label: PERIOD_LABEL_OVERRIDE[key] ?? PERIOD_LABEL[key],
+    labelKey: PERIOD_LABEL_KEY_OVERRIDE[key] ?? PERIOD_LABEL_KEY[key],
     kits: kitsFor(key),
     badgeTotal: BADGE_TOTAL[key],
     printedNames: printedNamesFor(key),
@@ -220,18 +224,19 @@ const HERO_1_PERIODS: readonly Hero1Period[] = HERO_1_PERIOD_KEYS.map(
 /* ----------------------------------------------------------- NARRATIVES -- */
 
 /**
- * VERBATIM from the Reference Guide. Read aloud in the room, quoting figures
- * that live directly above it. Any edit here must be an edit to the data too.
+ * THE COPY ITSELF LIVES IN `app/lib/i18n/locales/*.json` (US-049); what the
+ * dataset stores is the key.
+ *
+ * Both narratives are still VERBATIM from the Reference Guide in English, and
+ * the German pass is a translation of that same approved copy - read aloud in
+ * the room, quoting figures that live directly above it. Any edit to either
+ * language must be an edit to the data too. Bitpanda's +2 is the
+ * "flat-to-slightly-up" the follow-up describes; Sunrise's +38 is the
+ * recommendation it turns on.
  */
-const PRIMARY_NARRATIVE =
-  "Pulled from Merchandising, Webshop and flock-printing. The Home kit drives 58% of shirt sales; about 8% of shirts carry a sponsor badge, with Bitpanda the most printed; Shaqiri is comfortably the most printed name.";
+const PRIMARY_NARRATIVE_KEY: TranslationKey = "hero1.narrative.primary";
 
-/**
- * VERBATIM from the Reference Guide. Bitpanda's +2 is the "flat-to-slightly-up"
- * the copy describes; Sunrise's +38 is the recommendation it turns on.
- */
-const FOLLOW_UP_NARRATIVE =
-  "Bitpanda already leads badge selection, but Sunrise is growing fastest - up 38% over the last three drops off a smaller base. Recommendation: feature Sunrise in the next drop to convert its momentum, while keeping Bitpanda as the default option.";
+const FOLLOW_UP_NARRATIVE_KEY: TranslationKey = "hero1.narrative.followUp";
 
 /** Badge selection over the last three drops, in percent, signed. */
 const BADGE_TREND = [
@@ -248,14 +253,14 @@ const BADGE_TREND = [
  */
 const HERO_1: Hero1 = {
   primary: {
-    scopeLabel: "Season-to-date merchandising",
+    scopeLabelKey: "hero1.scopeLabel",
     periods: HERO_1_PERIODS,
     badgeSplit: BADGE_SPLIT,
-    narrative: PRIMARY_NARRATIVE,
+    narrativeKey: PRIMARY_NARRATIVE_KEY,
   },
   followUp: {
     trend: BADGE_TREND,
-    narrative: FOLLOW_UP_NARRATIVE,
+    narrativeKey: FOLLOW_UP_NARRATIVE_KEY,
   },
 };
 

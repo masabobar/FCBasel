@@ -3,7 +3,7 @@ import { DepartmentTableTile } from "../tiles/department-table";
 import { DriverTile } from "../tiles/driver-tile";
 import { KpiTile } from "../tiles/kpi-tile";
 import { RecommendationPanel } from "../tiles/recommendation-panel";
-import { HERO_CHIP_LABEL } from "../../lib/dashboard/chips";
+import { HERO_CHIP_LABEL_KEY } from "../../lib/dashboard/chips";
 import {
   InsightPhase,
   type InsightSection,
@@ -17,6 +17,8 @@ import {
   formatSignedMoneyCompact,
   TABULAR_NUMERALS_CLASS,
 } from "../../lib/format";
+import { type TranslationKey, type Translator } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import {
   departmentPerformanceRows,
   departmentsNeedingAttention,
@@ -155,25 +157,25 @@ import {
 /* ------------------------------------------------------------------ COPY -- */
 
 /** The two tile titles, in render order. */
-export const HERO_3_TILE_TITLES = {
+export const HERO_3_TILE_TITLE_KEY = {
   /**
    * The acceptance criteria's wording MINUS its "CHF 000" half — see the units
    * note above. "(full year)" is the scope of the figures and stays; the scale
    * is the tile's own `MILLIONS_NOTE`, appended to the subtitle by US-022's
    * component rather than typed into a title here.
    */
-  table: "Departmental performance (full year)",
-  overall: "Overall, actual against budget",
-} as const;
+  table: "hero3.tableTitle",
+  overall: "hero3.overallTitle",
+} as const satisfies Record<string, TranslationKey>;
 
 /** The line under the overall tile's headline: what the figure is OF. */
-const OVERALL_SUBTITLE = "Actual across all departments";
+const OVERALL_SUBTITLE_KEY: TranslationKey = "hero3.overallSubtitle";
 
 /** The two compare bars' labels — the comparison, in words. */
-export const HERO_3_COMPARE_LABELS = {
-  budget: "Budget",
-  actual: "Actual",
-} as const;
+export const HERO_3_COMPARE_LABEL_KEY = {
+  budget: "hero3.budget",
+  actual: "hero3.actual",
+} as const satisfies Record<string, TranslationKey>;
 
 /**
  * The two-up footer's eyebrows.
@@ -182,13 +184,13 @@ export const HERO_3_COMPARE_LABELS = {
  * `aboveTarget` names a COUNT derived from the rows above it. Both are labels
  * only: neither states how many or how much.
  */
-export const HERO_3_FOOTER_LABELS = {
-  blended: "Blended target",
-  aboveTarget: "Above target",
-} as const;
+export const HERO_3_FOOTER_LABEL_KEY = {
+  blended: "hero3.blendedTarget",
+  aboveTarget: "hero3.aboveTarget",
+} as const satisfies Record<string, TranslationKey>;
 
 /** Reads `3 of 6` — the count, then the field it was counted out of. */
-const OF_WORD = "of";
+const OF_WORD_KEY: TranslationKey = "hero3.of";
 
 /**
  * The follow-up tile's title, as the acceptance criteria pin it.
@@ -201,13 +203,13 @@ const OF_WORD = "of";
  * asserted in `tests/unit/hero3-follow-up.test.tsx`, so the title cannot start
  * interrogating a department the figures have stopped flagging.
  */
-export const HERO_3_FOLLOW_UP_TITLE = "What's driving Marketing";
+export const HERO_3_FOLLOW_UP_TITLE_KEY: TranslationKey = "hero3.followUpTitle";
 
 /**
  * The scope line under that title. It states the ORDER, because the order is
  * the tile's claim: the biggest slice of the overspend first.
  */
-const DRIVER_SUBTITLE = "Overspend against plan per driver · biggest first";
+const DRIVER_SUBTITLE_KEY: TranslationKey = "hero3.driverSubtitle";
 
 /**
  * THE OUTCOME HALF, under the bars: the webshop conversion the paid-social
@@ -224,12 +226,12 @@ const DRIVER_SUBTITLE = "Overspend against plan per driver · biggest first";
  * copy exists in exactly one place. A test scans the component layer for that
  * clause and fails if it reappears here.
  */
-const CONVERSION_PREFIX = "What that money was meant to buy:";
-const CONVERSION_LABEL = "webshop conversion";
+const CONVERSION_PREFIX_KEY: TranslationKey = "hero3.conversionPrefix";
+const CONVERSION_LABEL_KEY: TranslationKey = "hero3.conversionLabel";
 
 /** Reads `2.2% vs 2.6% plan` — the achieved figure against the planned one. */
-const VERSUS_WORD = "vs";
-const PLAN_WORD = "plan";
+const VERSUS_WORD_KEY: TranslationKey = "hero3.versus";
+const PLAN_WORD_KEY: TranslationKey = "hero3.plan";
 
 /* -------------------------------------------------------------- GEOMETRY -- */
 
@@ -291,6 +293,7 @@ export interface Hero3BodyProps {
 }
 
 export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
+  const t = useT();
   const { departments, blendedTargetPercent } = primary;
 
   // DERIVED ROWS, not raw departments: every row arrives carrying the
@@ -319,16 +322,16 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
         id={sectionLabelId(HeroId.HERO_3)}
         // The chip's own label, imported rather than retyped, so the question
         // in the row above and the answer's heading are one string (US-029).
-        label={HERO_CHIP_LABEL[HeroId.HERO_3]}
+        label={t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3])}
         // Verbatim, straight from the dataset. Never assembled here.
-        narrative={primary.narrative}
+        narrative={t(primary.narrativeKey)}
         // ONE scope for both tiles, from the dataset — it is what makes the
         // Ticketing row and Hero 2's fixture total both correct.
-        scope={primary.scopeLabel}
+        scope={t(primary.scopeLabelKey)}
       />
 
       <DepartmentTableTile
-        title={HERO_3_TILE_TITLES.table}
+        title={t(HERO_3_TILE_TITLE_KEY.table)}
         // Six departments plus the total row, each tagged Revenue or Cost,
         // with its variance and its % of target. Marketing is flagged because
         // `needsAttention` says so, not because this file names it.
@@ -343,7 +346,7 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
       />
 
       <KpiTile
-        title={HERO_3_TILE_TITLES.overall}
+        title={t(HERO_3_TILE_TITLE_KEY.overall)}
         // CHF 69.68M, derived from the rows in the table beside it.
         value={totals.actual}
         format={moneyMillions}
@@ -357,7 +360,7 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
           value: totals.variancePercent,
           judgement: VarianceJudgement.NEUTRAL,
         }}
-        subtitle={OVERALL_SUBTITLE}
+        subtitle={t(OVERALL_SUBTITLE_KEY)}
         isNew
         delayMs={tileDelayMs(1)}
         className={OVERALL_TILE_SPAN}
@@ -371,12 +374,12 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
           format={moneyMillions}
           rows={[
             {
-              name: HERO_3_COMPARE_LABELS.budget,
+              name: t(HERO_3_COMPARE_LABEL_KEY.budget),
               value: totals.budget,
               series: "navy",
             },
             {
-              name: HERO_3_COMPARE_LABELS.actual,
+              name: t(HERO_3_COMPARE_LABEL_KEY.actual),
               value: totals.actual,
               series: "blue",
             },
@@ -392,7 +395,9 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
           className="mt-4 grid grid-cols-2 gap-3 border-t border-line pt-3.5"
         >
           <div data-slot="overall-blended">
-            <div className="tile-title">{HERO_3_FOOTER_LABELS.blended}</div>
+            <div className="tile-title">
+              {t(HERO_3_FOOTER_LABEL_KEY.blended)}
+            </div>
             <div
               data-slot="overall-blended-value"
               className={`mt-0.5 text-body font-bold ${TABULAR_NUMERALS_CLASS}`}
@@ -402,14 +407,16 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
           </div>
 
           <div data-slot="overall-above-target">
-            <div className="tile-title">{HERO_3_FOOTER_LABELS.aboveTarget}</div>
+            <div className="tile-title">
+              {t(HERO_3_FOOTER_LABEL_KEY.aboveTarget)}
+            </div>
             <div
               data-slot="overall-above-target-value"
               className={`mt-0.5 text-body font-bold ${TABULAR_NUMERALS_CLASS}`}
             >
               {formatNumber(onTarget.length)}
               <span className="ml-1 font-medium text-muted">
-                {`${OF_WORD} ${formatNumber(rows.length)}`}
+                {`${t(OF_WORD_KEY)} ${formatNumber(rows.length)}`}
               </span>
             </div>
           </div>
@@ -427,12 +434,12 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
           <FollowUpDivider isNew delayMs={tileDelayMs(2)} />
 
           <DriverTile
-            title={HERO_3_FOLLOW_UP_TITLE}
-            period={DRIVER_SUBTITLE}
+            title={t(HERO_3_FOLLOW_UP_TITLE_KEY)}
+            period={t(DRIVER_SUBTITLE_KEY)}
             // The dataset's own drivers ARE the rows — one amount over plan
             // each. Nothing is computed and nothing is retyped.
             rows={followUp.drivers.map((driver) => ({
-              name: driver.name,
+              name: t(driver.labelKey),
               value: driver.amount,
             }))}
             // Every row is money over plan, so one compact composition spells
@@ -462,12 +469,15 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
             // where it went.
             note={
               <>
-                {`${CONVERSION_PREFIX} `}
+                {`${t(CONVERSION_PREFIX_KEY)} `}
                 <span
                   data-slot="conversion-gap"
                   className={`font-semibold text-text ${TABULAR_NUMERALS_CLASS}`}
                 >
-                  {`${CONVERSION_LABEL} ${conversionGap(followUp.conversion)}`}
+                  {`${t(CONVERSION_LABEL_KEY)} ${conversionGap(
+                    t,
+                    followUp.conversion,
+                  )}`}
                 </span>
               </>
             }
@@ -488,7 +498,7 @@ export function Hero3Body({ primary, followUp, phase }: Hero3BodyProps) {
             delayMs={tileDelayMs(4)}
             className={FOLLOW_UP_TILE_SPAN}
           >
-            {followUp.narrative}
+            {t(followUp.narrativeKey)}
           </RecommendationPanel>
         </>
       )}
@@ -542,11 +552,11 @@ function signedMoney(thousands: number): string {
  * dataset's measurement and go through the app's own percentage rule, so
  * neither is rounded here and neither is written here.
  */
-function conversionGap(conversion: ConversionGap): string {
+function conversionGap(t: Translator, conversion: ConversionGap): string {
   return [
     formatPercent(conversion.actualPercent),
-    VERSUS_WORD,
+    t(VERSUS_WORD_KEY),
     formatPercent(conversion.planPercent),
-    PLAN_WORD,
+    t(PLAN_WORD_KEY),
   ].join(" ");
 }

@@ -27,7 +27,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   BASELINE_TILE_ORDER,
   BaselineRow,
-  TOP_PRODUCTS_PERIOD_LABEL,
+  TOP_PRODUCTS_PERIOD_LABEL_KEY,
 } from "../../app/components/dashboard/baseline-row";
 import {
   H_BAR_LABEL_WIDTH_PX,
@@ -59,6 +59,8 @@ import {
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { t } from "./support/i18n";
+import { PRODUCT_LABEL_KEY } from "../../app/lib/repositories/enums";
 
 /* -------------------------------------------------------------- FIXTURE -- */
 
@@ -173,8 +175,8 @@ describe("BaselineRow — exactly four tiles, in the specified order", () => {
       .map((card) => card.querySelector("h2"))
       .map((heading) => heading?.textContent);
 
-    expect(titles).toEqual([...BASELINE_TILE_ORDER]);
-    expect(BASELINE_TILE_ORDER).toEqual([
+    expect(titles).toEqual(BASELINE_TILE_ORDER.map((key) => t(key)));
+    expect(BASELINE_TILE_ORDER.map((key) => t(key))).toEqual([
       "Webshop revenue",
       "Last home match",
       "Top products",
@@ -258,7 +260,7 @@ describe("BaselineRow — webshop revenue", () => {
     renderRow();
 
     expect(slots("kpi-subtitle")[0]).toHaveTextContent(
-      `vs ${DATA.webshop.comparisonLabel.toLowerCase()}`,
+      `vs ${t(DATA.webshop.comparisonLabelKey).toLowerCase()}`,
     );
   });
 
@@ -266,7 +268,7 @@ describe("BaselineRow — webshop revenue", () => {
     renderRow();
 
     expect(slots("card-subtitle")[0]).toHaveTextContent(
-      DATA.webshop.periodLabel,
+      t(DATA.webshop.periodLabelKey),
     );
   });
 
@@ -333,7 +335,9 @@ describe("BaselineRow — top products", () => {
     renderRow();
 
     const labels = slots("h-bar-label").map((node) => node.textContent);
-    expect(labels).toEqual(PRODUCTS.rows.map((row) => row.product));
+    expect(labels).toEqual(
+      PRODUCTS.rows.map((row) => t(PRODUCT_LABEL_KEY[row.product])),
+    );
   });
 
   it("renders every unit count through the shared number formatter", () => {
@@ -346,7 +350,7 @@ describe("BaselineRow — top products", () => {
   it("scopes the tile with the dataset's period label", () => {
     renderRow();
 
-    expect(slots("card-subtitle")[2]).toHaveTextContent(PRODUCTS.label);
+    expect(slots("card-subtitle")[2]).toHaveTextContent(t(PRODUCTS.labelKey));
   });
 
   it("uses the club-blue series, as H_BAR_SERIES assigns Top Products", () => {
@@ -366,7 +370,10 @@ describe("BaselineRow — top products", () => {
 
     expect(slots("card-action")).toHaveLength(1);
     expect(group).toHaveAttribute("role", "radiogroup");
-    expect(group).toHaveAttribute("aria-label", TOP_PRODUCTS_PERIOD_LABEL);
+    expect(group).toHaveAttribute(
+      "aria-label",
+      t(TOP_PRODUCTS_PERIOD_LABEL_KEY),
+    );
     // Light, not dark: it sits on a white card, not on the navy band.
     expect(group).toHaveAttribute("data-variant", "light");
   });
@@ -376,9 +383,9 @@ describe("BaselineRow — top products", () => {
 
     expect(
       slots("segmented-option").map((option) => option.textContent),
-    ).toEqual(DATA.topProducts.map((period) => period.label));
+    ).toEqual(DATA.topProducts.map((period) => t(period.labelKey)));
     expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
-      PRODUCTS.label,
+      t(PRODUCTS.labelKey),
     );
   });
 
@@ -388,13 +395,17 @@ describe("BaselineRow — top products", () => {
     const user = userEvent.setup();
     const { frames } = renderRow();
 
-    await user.click(screen.getByRole("radio", { name: OTHER_PRODUCTS.label }));
+    await user.click(
+      screen.getByRole("radio", { name: t(OTHER_PRODUCTS.labelKey) }),
+    );
     frames.advance(COUNT_UP_DURATION_MS);
     frames.advance(COUNT_UP_DURATION_MS);
 
-    expect(slots("card-subtitle")[2]).toHaveTextContent(OTHER_PRODUCTS.label);
+    expect(slots("card-subtitle")[2]).toHaveTextContent(
+      t(OTHER_PRODUCTS.labelKey),
+    );
     expect(screen.getByRole("radio", { checked: true })).toHaveTextContent(
-      OTHER_PRODUCTS.label,
+      t(OTHER_PRODUCTS.labelKey),
     );
     expect(slots("h-bar-value").map((node) => node.textContent)).toEqual(
       OTHER_PRODUCTS.rows.map((row) => formatNumber(row.units)),
@@ -408,7 +419,9 @@ describe("BaselineRow — top products", () => {
     const before = slots("h-bar-row");
     const widthsBefore = slots("h-bar-fill").map((fill) => fill.style.width);
 
-    await user.click(screen.getByRole("radio", { name: OTHER_PRODUCTS.label }));
+    await user.click(
+      screen.getByRole("radio", { name: t(OTHER_PRODUCTS.labelKey) }),
+    );
 
     // The SAME elements — `HBars` keys its rows by product name, so the width
     // is a transition rather than a remount from zero.
@@ -493,7 +506,7 @@ describe("BaselineRow — active partners", () => {
     expect(DATA.partners).toHaveLength(6);
     expect(slots("partner-monogram")).toHaveLength(6);
     expect(slots("partner-role").map((node) => node.textContent)).toEqual(
-      DATA.partners.map((partner) => partner.roleLabel),
+      DATA.partners.map((partner) => t(partner.roleLabelKey)),
     );
   });
 
@@ -573,7 +586,7 @@ describe("BaselineRow — no figure is re-typed in a component", () => {
 
   it("names no product and no partner", () => {
     const names = [
-      ...PRODUCTS.rows.map((row) => row.product),
+      ...PRODUCTS.rows.map((row) => t(PRODUCT_LABEL_KEY[row.product])),
       ...DATA.partners.map((partner) => partner.name),
     ];
 

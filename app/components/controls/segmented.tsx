@@ -1,6 +1,8 @@
 import { useRef, type KeyboardEvent } from "react";
 
 import { cn } from "../../lib/cn";
+import { type TranslationKey } from "../../lib/i18n";
+import { useT } from "../../lib/i18n/context";
 import { type PeriodKey } from "../../lib/repositories/enums";
 
 /**
@@ -32,11 +34,13 @@ import { type PeriodKey } from "../../lib/repositories/enums";
  * what lets ONE control drive two tiles (the band) or three (Hero 1) without the
  * button row and the tiles ever disagreeing about which period is showing.
  *
- * THE LABEL IS DATA ON THE ENTRY, NOT A LOOKUP FROM THE KEY.
+ * THE LABEL IS DATA ON THE ENTRY, NOT A LOOKUP FROM THE PERIOD KEY.
  * Hero 1 says "Current month" where the band says "This month" for the very
- * same `THIS_MONTH` key, so the wording travels with the option. `PERIOD_LABEL`
- * in `app/lib/repositories/enums.ts` is the DEFAULT wording, applied by the
- * fixture that builds the entries — never re-derived here.
+ * same `THIS_MONTH` key, so the wording travels with the option — as a
+ * TRANSLATION key since US-049. `PERIOD_LABEL_KEY` in
+ * `app/lib/repositories/enums.ts` is the DEFAULT wording, applied by the
+ * fixture that builds the entries; this control only resolves what it is
+ * given, and re-derives nothing.
  *
  * THE KEYS ARE `PeriodKey`, REUSED — NOT A LOCAL UNION.
  * `PeriodKey` already exists as the single source of truth for these five
@@ -182,7 +186,8 @@ export function nextOptionIndex(
  */
 export interface SegmentedOption {
   readonly key: PeriodKey;
-  readonly label: string;
+  /** The wording THIS consumer uses, as a translation key (US-049). */
+  readonly labelKey: TranslationKey;
 }
 
 export interface SegmentedProps {
@@ -203,7 +208,11 @@ export interface SegmentedProps {
   className?: string;
 }
 
-const DEFAULT_LABEL = "Period";
+/**
+ * The group's fallback accessible name, when a caller does not name what the
+ * control drives. A key, like every other rendered word (US-049).
+ */
+const DEFAULT_LABEL_KEY: TranslationKey = "tiles.segmentedLabel";
 
 /** Addresses one option button inside the group, for arrow-key focus moves. */
 const OPTION_SELECTOR = '[data-slot="segmented-option"]';
@@ -213,10 +222,12 @@ export function Segmented({
   value,
   onChange,
   variant = "light",
-  label = DEFAULT_LABEL,
+  label,
   className,
 }: SegmentedProps) {
+  const t = useT();
   const group = useRef<HTMLDivElement>(null);
+  const groupLabel = label ?? t(DEFAULT_LABEL_KEY);
   const tone = SEGMENTED_VARIANT_CLASS[variant];
 
   if (options.length === 0) return null;
@@ -255,7 +266,7 @@ export function Segmented({
       // A single-choice control, so radiogroup rather than a set of toggles:
       // it is announced as "1 of 4" and the arrows behave as expected.
       role="radiogroup"
-      aria-label={label}
+      aria-label={groupLabel}
       onKeyDown={handleKeyDown}
       className={cn(
         "inline-flex rounded-chip border p-0.5",
@@ -284,7 +295,7 @@ export function Segmented({
               selected ? tone.selected : tone.option,
             )}
           >
-            {option.label}
+            {t(option.labelKey)}
           </button>
         );
       })}

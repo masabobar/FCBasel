@@ -6,16 +6,22 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   CONNECTED_SYSTEM_COUNT,
-  CONNECTION_STATUS_TEXT,
+  CONNECTION_STATUS_KEY,
   TopBar,
 } from "../../app/components/chrome/top-bar";
-import { CREST_LABEL } from "../../app/components/chrome/crest";
+import { CREST_LABEL_KEY } from "../../app/components/chrome/crest";
 import { MOTION_CLASS } from "../../app/lib/motion";
 import {
-  AVATAR_INITIALS,
-  AVATAR_LABEL,
-  WORKSPACE_LABEL,
+  AVATAR_INITIALS_KEY,
+  WORKSPACE_LABEL_KEY,
+  avatarLabel,
 } from "../../app/lib/persona";
+import { t } from "./support/i18n";
+
+/** The status line, resolved the way the bar resolves it. */
+function connectionStatus(): string {
+  return t(CONNECTION_STATUS_KEY, { count: CONNECTED_SYSTEM_COUNT });
+}
 
 const TOP_BAR_SOURCE = readFileSync(
   resolve(__dirname, "../../app/components/chrome/top-bar.tsx"),
@@ -41,7 +47,7 @@ describe("TopBar — identity", () => {
   it("opens with the self-hosted crest at app-bar size", () => {
     render(<TopBar />);
 
-    const crest = screen.getByRole("img", { name: CREST_LABEL });
+    const crest = screen.getByRole("img", { name: t(CREST_LABEL_KEY) });
     expect(screen.getByRole("banner").firstElementChild).toBe(crest);
     expect(crest).toHaveAttribute("height", "32");
     // The crest is committed to `public/`; never a club-CDN URL (US-004).
@@ -51,17 +57,17 @@ describe("TopBar — identity", () => {
   it("shows the workspace label", () => {
     render(<TopBar />);
 
-    expect(slot("workspace-label")).toHaveTextContent(WORKSPACE_LABEL);
-    expect(WORKSPACE_LABEL).toBe("Sales & Marketing");
+    expect(slot("workspace-label")).toHaveTextContent(t(WORKSPACE_LABEL_KEY));
+    expect(t(WORKSPACE_LABEL_KEY)).toBe("Sales & Marketing");
   });
 
   it("shows a generic avatar carrying the workspace initials", () => {
     render(<TopBar />);
 
     const avatar = slot("avatar");
-    expect(avatar).toHaveTextContent(AVATAR_INITIALS);
-    expect(AVATAR_INITIALS).toBe("SM");
-    expect(screen.getByRole("img", { name: AVATAR_LABEL })).toBe(avatar);
+    expect(avatar).toHaveTextContent(t(AVATAR_INITIALS_KEY));
+    expect(t(AVATAR_INITIALS_KEY)).toBe("SM");
+    expect(screen.getByRole("img", { name: avatarLabel(t) })).toBe(avatar);
   });
 
   it("carries no photo — the crest is the only image element", () => {
@@ -69,7 +75,7 @@ describe("TopBar — identity", () => {
 
     const images = container.querySelectorAll("img");
     expect(images).toHaveLength(1);
-    expect(images[0]).toHaveAttribute("alt", CREST_LABEL);
+    expect(images[0]).toHaveAttribute("alt", t(CREST_LABEL_KEY));
   });
 
   it("names no individual anywhere — the persona is a role", () => {
@@ -78,16 +84,19 @@ describe("TopBar — identity", () => {
     // The bar's entire text is accounted for by known role labels, so a
     // personal name cannot have been added without failing here.
     const expected = [
-      WORKSPACE_LABEL,
-      CONNECTION_STATUS_TEXT,
-      "Reset",
-      AVATAR_INITIALS,
+      t(WORKSPACE_LABEL_KEY),
+      connectionStatus(),
+      // The language toggle's two options, then Reset.
+      t("topBar.languageEn"),
+      t("topBar.languageDe"),
+      t("topBar.reset"),
+      t(AVATAR_INITIALS_KEY),
     ].join("");
     expect(screen.getByRole("banner").textContent).toBe(expected);
   });
 
   it("keeps the avatar label derived from the workspace label", () => {
-    expect(AVATAR_LABEL).toBe(`${WORKSPACE_LABEL} workspace`);
+    expect(avatarLabel(t)).toBe(`${t(WORKSPACE_LABEL_KEY)} workspace`);
     expect(PERSONA_SOURCE).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
   });
 });
@@ -97,8 +106,8 @@ describe("TopBar — the connection status is decorative", () => {
     render(<TopBar />);
 
     expect(CONNECTED_SYSTEM_COUNT).toBe(11);
-    expect(CONNECTION_STATUS_TEXT).toBe("Connected · 11 systems");
-    expect(slot("connection-status")).toHaveTextContent(CONNECTION_STATUS_TEXT);
+    expect(connectionStatus()).toBe("Connected · 11 systems");
+    expect(slot("connection-status")).toHaveTextContent(connectionStatus());
   });
 
   it("is marked decorative in the markup", () => {

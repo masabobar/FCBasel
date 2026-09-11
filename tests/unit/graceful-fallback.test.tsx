@@ -37,30 +37,30 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-  PROMPT_INPUT_LABEL,
-  SEND_BUTTON_LABEL,
+  PROMPT_INPUT_LABEL_KEY,
+  SEND_BUTTON_LABEL_KEY,
 } from "../../app/components/chrome/prompt-bar";
 import {
   CHIP_KIND_CLASS,
-  CHIP_ROW_LABEL,
-  FOLLOW_UP_CHIP_HINT,
+  CHIP_ROW_LABEL_KEY,
+  FOLLOW_UP_CHIP_HINT_KEY,
 } from "../../app/components/chrome/suggestion-chips";
 import {
   EMPTY_STATE_BADGE_CLASS,
-  EMPTY_STATE_HEADING,
+  EMPTY_STATE_HEADING_KEY,
   EMPTY_STATE_PANEL_CLASS,
-  EMPTY_STATE_SUBTEXT,
+  EMPTY_STATE_SUBTEXT_KEY,
   EmptyStatePanel,
 } from "../../app/components/heroes/empty-state-panel";
 import {
-  FALLBACK_MESSAGE,
+  FALLBACK_MESSAGE_KEY,
   FALLBACK_PANEL_CLASS,
   FallbackPanel,
 } from "../../app/components/heroes/fallback-panel";
 import {
   ChipKind,
-  FOLLOW_UP_CHIP_LABEL,
-  HERO_CHIP_LABEL,
+  FOLLOW_UP_CHIP_LABEL_KEY,
+  HERO_CHIP_LABEL_KEY,
   HERO_CHIPS,
 } from "../../app/lib/dashboard/chips";
 import {
@@ -83,6 +83,7 @@ import App from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 import { signIn } from "./support/sign-in";
+import { t } from "./support/i18n";
 
 /* ------------------------------------------------------------- SOURCES -- */
 
@@ -168,7 +169,7 @@ function rowChips(): HTMLButtonElement[] {
 
 function promptInput(): HTMLInputElement {
   return screen.getByRole("textbox", {
-    name: PROMPT_INPUT_LABEL,
+    name: t(PROMPT_INPUT_LABEL_KEY),
   }) as HTMLInputElement;
 }
 
@@ -245,41 +246,41 @@ function bytes(value: string): string {
 
 describe("the fallback copy is the contract (criterion 1)", () => {
   it("is byte-identical to the authored string", () => {
-    expect(bytes(FALLBACK_MESSAGE)).toBe(bytes(AUTHORED));
-    expect(FALLBACK_MESSAGE).toHaveLength(AUTHORED.length);
+    expect(bytes(t(FALLBACK_MESSAGE_KEY))).toBe(bytes(AUTHORED));
+    expect(t(FALLBACK_MESSAGE_KEY)).toHaveLength(AUTHORED.length);
   });
 
   it("matches the acceptance criterion in the backlog itself", () => {
     // Two independent copies would drift together; the signed-off document
     // cannot, so the string is checked against it as well.
-    expect(BACKLOG).toContain(FALLBACK_MESSAGE);
+    expect(BACKLOG).toContain(t(FALLBACK_MESSAGE_KEY));
   });
 
   it('uses a STRAIGHT apostrophe in "I\'ve"', () => {
-    expect(FALLBACK_MESSAGE).toContain("I've");
-    expect(FALLBACK_MESSAGE.codePointAt(FALLBACK_MESSAGE.indexOf("'"))).toBe(
-      0x27,
-    );
+    expect(t(FALLBACK_MESSAGE_KEY)).toContain("I've");
+    expect(
+      t(FALLBACK_MESSAGE_KEY).codePointAt(t(FALLBACK_MESSAGE_KEY).indexOf("'")),
+    ).toBe(0x27);
     // No typographic quote of any kind: a smart apostrophe here is the classic
     // silent "improvement" a copy pass makes.
-    expect(FALLBACK_MESSAGE).not.toMatch(/[‘’“”]/u);
+    expect(t(FALLBACK_MESSAGE_KEY)).not.toMatch(/[‘’“”]/u);
   });
 
   it("ends in a plain HYPHEN, never an em or en dash", () => {
     // House style is hyphens only, and this is the character most likely to be
     // "improved" by an editor or a formatter.
-    expect(FALLBACK_MESSAGE.endsWith(" -")).toBe(true);
-    expect(FALLBACK_MESSAGE.codePointAt(FALLBACK_MESSAGE.length - 1)).toBe(
-      0x2d,
-    );
-    expect(FALLBACK_MESSAGE).not.toMatch(/[–—]/);
+    expect(t(FALLBACK_MESSAGE_KEY).endsWith(" -")).toBe(true);
+    expect(
+      t(FALLBACK_MESSAGE_KEY).codePointAt(t(FALLBACK_MESSAGE_KEY).length - 1),
+    ).toBe(0x2d);
+    expect(t(FALLBACK_MESSAGE_KEY)).not.toMatch(/[–—]/);
   });
 
   it("carries no dash outside that hyphen, in either panel's copy", () => {
     for (const copy of [
-      FALLBACK_MESSAGE,
-      EMPTY_STATE_HEADING,
-      EMPTY_STATE_SUBTEXT,
+      t(FALLBACK_MESSAGE_KEY),
+      t(EMPTY_STATE_HEADING_KEY),
+      t(EMPTY_STATE_SUBTEXT_KEY),
     ]) {
       expect(copy).not.toMatch(/[–—]/);
     }
@@ -316,7 +317,7 @@ describe("an off-script question lands on the panel (criteria 1 and 3)", () => {
     ask(question);
 
     expect(fallbackPanel()).not.toBeNull();
-    expect(fallbackMessage()).toBe(FALLBACK_MESSAGE);
+    expect(fallbackMessage()).toBe(t(FALLBACK_MESSAGE_KEY));
     expect(panelChips()).toHaveLength(HERO_IDS.length);
   });
 
@@ -339,14 +340,14 @@ describe("an off-script question lands on the panel (criteria 1 and 3)", () => {
     expect(screen.getByText("child route")).toBeInTheDocument();
     expect(promptInput()).toBeEnabled();
     expect(
-      screen.getByRole("button", { name: SEND_BUTTON_LABEL }),
+      screen.getByRole("button", { name: t(SEND_BUTTON_LABEL_KEY) }),
     ).toBeEnabled();
   });
 
   it("shows the panel BELOW the answers, last on the canvas", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
     ask("show me player injuries");
 
@@ -394,7 +395,7 @@ describe("the panel is immediate — no thinking beat (criterion 3)", () => {
     // stays at its invitation.
     renderApp();
 
-    tap(SEND_BUTTON_LABEL);
+    tap(t(SEND_BUTTON_LABEL_KEY));
 
     expect(fallbackPanel()).toBeNull();
     expect(emptyPanel()).not.toBeNull();
@@ -411,7 +412,7 @@ describe("the panel re-surfaces the three prepared questions", () => {
     ask("show me player injuries");
 
     expect(panelChips().map((chip) => chip.textContent)).toEqual(
-      HERO_IDS.map((heroId) => HERO_CHIP_LABEL[heroId]),
+      HERO_IDS.map((heroId) => t(HERO_CHIP_LABEL_KEY[heroId])),
     );
   });
 
@@ -421,7 +422,7 @@ describe("the panel re-surfaces the three prepared questions", () => {
     // above the field is offering a follow-up as well.
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
     ask("show me player injuries");
 
@@ -432,7 +433,7 @@ describe("the panel re-surfaces the three prepared questions", () => {
     expect(rowChips()).toHaveLength(4);
     expect(
       screen.getAllByRole("button", {
-        name: `${FOLLOW_UP_CHIP_HINT} ${FOLLOW_UP_CHIP_LABEL[HeroId.HERO_1]}`,
+        name: `${t(FOLLOW_UP_CHIP_HINT_KEY)} ${t(FOLLOW_UP_CHIP_LABEL_KEY[HeroId.HERO_1])}`,
       }),
     ).toHaveLength(1);
   });
@@ -475,7 +476,7 @@ describe("the panel re-surfaces the three prepared questions", () => {
 
     expect(
       fallbackPanel()!.querySelector('[data-slot="suggestion-chips"]'),
-    ).toHaveAttribute("aria-label", CHIP_ROW_LABEL);
+    ).toHaveAttribute("aria-label", t(CHIP_ROW_LABEL_KEY));
   });
 
   it("gives the screen a next step that WORKS", () => {
@@ -524,9 +525,9 @@ describe("never an error, never blame (criterion 2)", () => {
 
   it.each(BLAME)("keeps %j out of the copy", (word) => {
     for (const copy of [
-      FALLBACK_MESSAGE,
-      EMPTY_STATE_HEADING,
-      EMPTY_STATE_SUBTEXT,
+      t(FALLBACK_MESSAGE_KEY),
+      t(EMPTY_STATE_HEADING_KEY),
+      t(EMPTY_STATE_SUBTEXT_KEY),
     ]) {
       expect(copy.toLowerCase()).not.toContain(word);
     }
@@ -543,9 +544,11 @@ describe("never an error, never blame (criterion 2)", () => {
   it("says the request is reasonable before it says anything else", () => {
     // The copy opens by accepting the question ("I can pull that together")
     // and frames the limit as a property of the PREVIEW, not of the question.
-    expect(FALLBACK_MESSAGE.startsWith("I can pull that together.")).toBe(true);
-    expect(FALLBACK_MESSAGE).toContain("For this preview");
-    expect(FALLBACK_MESSAGE).toContain("I've prepared");
+    expect(
+      t(FALLBACK_MESSAGE_KEY).startsWith("I can pull that together."),
+    ).toBe(true);
+    expect(t(FALLBACK_MESSAGE_KEY)).toContain("For this preview");
+    expect(t(FALLBACK_MESSAGE_KEY)).toContain("I've prepared");
   });
 
   it("is announced politely, and is never an alert", () => {
@@ -555,7 +558,9 @@ describe("never an error, never blame (criterion 2)", () => {
 
     expect(fallbackPanel()).toHaveAttribute("role", "status");
     expect(fallbackPanel()).toHaveAttribute("aria-live", "polite");
-    expect(screen.getByRole("status")).toHaveTextContent(FALLBACK_MESSAGE);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      t(FALLBACK_MESSAGE_KEY),
+    );
     expect(document.querySelector('[role="alert"]')).toBeNull();
     expect(document.querySelector('[aria-live="assertive"]')).toBeNull();
     expect(document.querySelector("[aria-invalid]")).toBeNull();
@@ -660,11 +665,11 @@ describe("the empty state before any question (criterion 4)", () => {
 
     expect(
       document.querySelector('[data-slot="empty-state-heading"]'),
-    ).toHaveTextContent(EMPTY_STATE_HEADING);
+    ).toHaveTextContent(t(EMPTY_STATE_HEADING_KEY));
     expect(
       document.querySelector('[data-slot="empty-state-subtext"]'),
-    ).toHaveTextContent(EMPTY_STATE_SUBTEXT);
-    expect(EMPTY_STATE_SUBTEXT.split(". ")).toHaveLength(1);
+    ).toHaveTextContent(t(EMPTY_STATE_SUBTEXT_KEY));
+    expect(t(EMPTY_STATE_SUBTEXT_KEY).split(". ")).toHaveLength(1);
   });
 
   it("washes the panel in the club red at 4.5%, DERIVED from the token", () => {
@@ -726,7 +731,9 @@ describe("the empty state before any question (criterion 4)", () => {
     renderApp();
 
     const panel = emptyPanel()!;
-    const heading = screen.getByRole("heading", { name: EMPTY_STATE_HEADING });
+    const heading = screen.getByRole("heading", {
+      name: t(EMPTY_STATE_HEADING_KEY),
+    });
 
     expect(panel.tagName).toBe("SECTION");
     expect(heading.tagName).toBe("H2");
@@ -759,7 +766,7 @@ describe("the empty state before any question (criterion 4)", () => {
   it("goes the moment the first answer arrives", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
     landBeat();
 
     expect(emptyPanel()).toBeNull();
@@ -813,12 +820,16 @@ describe("canvasPanelFor decides which panel, and there is only one", () => {
   /** Each state of the canvas, and the ONE panel that may be on it. */
   const STATES: [string, () => void, string[]][] = [
     ["on load", () => {}, ["empty"]],
-    ["during a beat", () => tap(HERO_CHIP_LABEL[HeroId.HERO_1]), ["thinking"]],
+    [
+      "during a beat",
+      () => tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1])),
+      ["thinking"],
+    ],
     ["after a no-match", () => ask("show me player injuries"), ["fallback"]],
     [
       "with an answer on screen",
       () => {
-        tap(HERO_CHIP_LABEL[HeroId.HERO_1]);
+        tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_1]));
         landBeat();
       },
       [],
@@ -864,7 +875,7 @@ describe("Reset returns the canvas to the empty state", () => {
   it("clears a fallback that was raised over answers", () => {
     renderApp();
 
-    tap(HERO_CHIP_LABEL[HeroId.HERO_2]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_2]));
     landBeat();
     ask("show me player injuries");
     tap("Reset");
@@ -878,7 +889,7 @@ describe("Reset returns the canvas to the empty state", () => {
 
     ask("show me player injuries");
     tap("Reset");
-    tap(HERO_CHIP_LABEL[HeroId.HERO_3]);
+    tap(t(HERO_CHIP_LABEL_KEY[HeroId.HERO_3]));
     landBeat();
 
     expect(sections()).toHaveLength(1);
@@ -1054,9 +1065,9 @@ describe("EmptyStatePanel in isolation", () => {
     render(<EmptyStatePanel />);
 
     expect(
-      screen.getByRole("heading", { name: EMPTY_STATE_HEADING }),
+      screen.getByRole("heading", { name: t(EMPTY_STATE_HEADING_KEY) }),
     ).toBeInTheDocument();
-    expect(screen.getByText(EMPTY_STATE_SUBTEXT)).toBeInTheDocument();
+    expect(screen.getByText(t(EMPTY_STATE_SUBTEXT_KEY))).toBeInTheDocument();
     expect(
       document.querySelector('[data-slot="empty-state-badge"]'),
     ).not.toBeNull();

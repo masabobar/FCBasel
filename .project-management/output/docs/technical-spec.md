@@ -74,6 +74,8 @@ app/
 │   │                           Narrative, Delta, CompareBar
 │   └── heroes/                 Hero1, Hero2, Hero3, HeroSection, SectionHead
 ├── lib/
+│   ├── i18n/                   translate(), the React context, and
+│   │   └── locales/            en.json + de.json — ALL copy, both languages
 │   ├── mock/                   seed datasets (E3) — the swap point for real data
 │   ├── repositories/           interfaces the rest of the app reads through
 │   ├── dashboard/              session state: the {heroId, phase} list  (US-014)
@@ -106,9 +108,40 @@ React state only — no store library, no persistence.
   the canvas grid and re-use its columns via `grid-cols-subgrid` — one grid, never two.
 - Section-level components own their own period filters (hero band, Top Products, Hero 1).
 - Each chart owns local hover / grow / count-up state.
+- **`App` also owns the LANGUAGE** (US-049): `useLocaleState` in `app/lib/i18n/context.tsx`, handed
+  down through `I18nProvider` so every component reads it from context rather than from a prop.
+  The app bar's `LanguageToggle` is the only writer. Memory-only like everything else — no cookie,
+  no storage, no `Accept-Language` — so a reload returns to English.
 
 Everything else derives from these plus the data constants. **No `localStorage`, no
 `sessionStorage`, no IndexedDB** — state resets on reload, which is acceptable and specified.
+
+#### 4.3.1 Copy and the translation layer (US-049)
+
+The product is bilingual (English default, German one press away) and **no display string lives in
+a component or a fixture**. The rule is uniform, and it is what makes the switch total:
+
+| Layer | Holds | Example |
+|---|---|---|
+| `app/lib/i18n/locales/*.json` | the words, in both languages | `"hero1.kitsTitle"` |
+| `app/lib/repositories/enums.ts` | `*_LABEL_KEY` maps per enum | `PERIOD_LABEL_KEY[THIS_MONTH]` |
+| datasets (`app/lib/mock/`) | keys, never text | `narrativeKey`, `scopeLabelKey`, `labelKey` |
+| components | `const t = useT()` and `t(key)` | `t(HERO_1_TILE_TITLE_KEY.kits)` |
+| pure libraries (`derive.ts`) | the translator as a PARAMETER | `monthlySeries(months, t)` |
+
+Consequences worth stating, because each replaced an earlier design:
+
+- **The loader carries keys, not sentences.** The greeting is resolved from the server's clock as a
+  key (`persona.greeting.MORNING`) and said in the browser's language; the rolling month axis is
+  `MonthKey[]` for the same reason (`app/lib/calendar.ts` no longer calls `toLocaleString`).
+- **Departments, products and spend drivers became enums** (`DepartmentKey`, `ProductKey`,
+  `SpendDriverKey`), so a row is looked up and keyed by an identifier rather than by a name that
+  changes with the language.
+- **Figures are untouched by the switch.** `app/lib/format.ts` already formats Swiss-style
+  (`CHF 148’200`) and is locale-independent; a test asserts the same tiles render identical numbers
+  in both languages.
+- **The intent matcher holds both vocabularies** in one keyword set and never reads the locale, so
+  a typed German question resolves exactly as an English one does.
 
 ### 4.4 API Integration
 **None.** Data is imported from server-side seed modules through the repository interface. The
@@ -235,9 +268,15 @@ engage. Effort concentrates where the risk actually is.
 - `badgeSegs` rounding correction — parts must sum exactly to the total
 - Dataset reconciliation: cross-hero figures agree; percentages match absolutes
 
+- **The two dictionaries** (US-049): key parity in both directions, matching shapes and
+  placeholders, nothing left untranslated but proper nouns, and the house rules applied to the
+  German pass too (no em/en dash, no `ß`, Swiss digit grouping)
+
 **Component tests (Testing Library):**
 - Tiles render from E3-shaped props with no live computation
 - Reduced-motion path renders every animated value at final state
+- **The language toggle** (US-049): one press translates chrome, chips, empty state and an answer
+  rendered after the switch; the figures do not change; `<html lang>` follows; nothing is stored
 
 **E2E (Playwright)** — the demo script itself:
 - Each hero start-to-follow-up; follow-up requested before its parent; off-script input; empty input;
