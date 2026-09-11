@@ -65,6 +65,7 @@ import { HERO_IDS, HeroId } from "../../app/lib/repositories/enums";
 import App from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
+import { signIn } from "./support/sign-in";
 
 /* ------------------------------------------------------------- SOURCES -- */
 
@@ -155,6 +156,8 @@ function renderApp({ reducedMotion = false } = {}): void {
       </Routes>
     </MemoryRouter>,
   );
+
+  signIn();
 }
 
 /** Run the fake clock forward, committing whatever the beat lands. */

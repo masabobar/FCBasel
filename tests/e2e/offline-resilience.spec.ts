@@ -17,6 +17,7 @@ import {
   severNetwork,
   type NetworkLog,
 } from "./support/network";
+import { signIn } from "./support/sign-in";
 
 /**
  * US-041 — offline resilience, verified by DISCONNECTING.
@@ -321,6 +322,7 @@ async function runPresenterScript(page: Page): Promise<void> {
  */
 async function loadAndSeal(page: Page, log: NetworkLog): Promise<void> {
   await page.goto("/", { waitUntil: "load" });
+  await signIn(page);
   await expect(emptyState(page)).toBeVisible();
   await expect(cards(page)).toHaveCount(BASELINE_CARD_COUNT);
   await expect(

@@ -82,6 +82,11 @@ graceful fallback, follow-up gating.
 timing polish, brand QA.
 **Stories:** 6 | **Points:** 14 | **Status:** Not Started (0/6)
 
+### [Phase 5: Post-Plan Demo Extras](phase-5-demo-extras.md)
+**Goal:** Requests that arrived after the 45-story plan closed. Optional by the specification, not
+required by it.
+**Stories:** 1 | **Points:** 2 | **Status:** ✅ Completed (1/1)
+
 ### [Future — The Discovery Scope](future.md)
 **Goal:** What is deliberately staged and must be scoped by the Discovery. **Out of prototype scope.**
 **Items:** 9 (not estimated)

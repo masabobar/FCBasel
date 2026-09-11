@@ -52,6 +52,7 @@ import App from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
+import { signIn } from "./support/sign-in";
 
 /**
  * The component's source with comments stripped. Several checks below are about
@@ -393,7 +394,7 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
   });
 
   function renderApp() {
-    return render(
+    const mounted = render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<App loaderData={HEROES} />}>
@@ -402,6 +403,9 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
         </Routes>
       </MemoryRouter>,
     );
+
+    signIn();
+    return mounted;
   }
 
   function sectionCount(): number {
@@ -535,7 +539,16 @@ describe("the chip row on the real screen (US-029 × US-015)", () => {
     // session on every render, so there is nowhere for a stale chip to hide
     // and nothing in the reset path mentions chips.
     expect(ROOT_SOURCE).toMatch(/chips=\{suggestionChips\(sections\)\}/);
-    expect(ROOT_SOURCE).not.toMatch(/useState|setChips/);
+    expect(ROOT_SOURCE).not.toMatch(/setChips/);
+
+    // `useState` was banned outright while the root held none of it, which is
+    // no longer true: the cosmetic sign-in gate holds exactly one. The guard
+    // is therefore the COUNT and its identity rather than the bare literal --
+    // chip state added here still fails, because it would be a second one.
+    expect(ROOT_SOURCE.match(/useState\(/g)).toHaveLength(1);
+    expect(ROOT_SOURCE).toMatch(
+      /\[signedIn, setSignedIn\] = useState\(false\)/,
+    );
     expect(ROOT_SOURCE).toMatch(/onSelect=\{\(chip\) => selectChip\(chip,/);
   });
 });

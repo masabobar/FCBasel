@@ -75,6 +75,7 @@ import {
   stubMatchMedia,
 } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
+import { signIn } from "./support/sign-in";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -675,7 +676,7 @@ describe("Hero 1 follow-up — reduced motion renders the final state", () => {
 
 describe("Hero 1 follow-up — asked for real, from the chip row", () => {
   function renderApp() {
-    return render(
+    const mounted = render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<App loaderData={HEROES} />}>
@@ -684,6 +685,9 @@ describe("Hero 1 follow-up — asked for real, from the chip row", () => {
         </Routes>
       </MemoryRouter>,
     );
+
+    signIn();
+    return mounted;
   }
 
   /**

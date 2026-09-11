@@ -1,4 +1,5 @@
 import { expect, type Browser, type Page } from "@playwright/test";
+import { signIn } from "./sign-in";
 
 /**
  * The dress-rehearsal instrument for US-045.
@@ -681,6 +682,7 @@ export async function measureColdStart(
   page.on("pageerror", (error) => consoleErrors.push(error.message));
 
   await page.goto(url, { waitUntil: "load" });
+  await signIn(page);
 
   // Press until the press is answered. The thinking panel is the app's first
   // reply to any input, so its appearance is the moment hydration has taken.

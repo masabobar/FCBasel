@@ -21,6 +21,7 @@ import {
   throttleCpu,
   waitForScrollRest,
 } from "./support/timing";
+import { signIn } from "./support/sign-in";
 
 /**
  * US-043 — transition and timing polish, MEASURED FRAME BY FRAME.
@@ -79,6 +80,7 @@ const ENTER_MS = 400;
 /** Open the app at the baseline, empty state up, nothing asked yet. */
 async function openBaseline(page: Page) {
   await page.goto("/");
+  await signIn(page);
   await expect(page.locator(EMPTY_STATE)).toBeVisible();
 }
 
@@ -929,6 +931,19 @@ test.describe("KL-3 — a reload lands at the top of the page", () => {
       );
 
       await page.reload();
+
+      // THE COSMETIC GATE RETURNS ON A RELOAD, and that is the documented
+      // consequence of it being memory-only (US-046). KL-3's guarantee is
+      // unchanged and is asserted below exactly as before: what the reload must
+      // never do is restore a scroll offset. The offset is checked on the gate
+      // FIRST, because a restoration would land there, and then again on the
+      // dashboard once it is back.
+      expect(
+        await page.evaluate(() => window.scrollY),
+        `${label}: the reload restored an offset onto the sign-in gate`,
+      ).toBe(0);
+
+      await signIn(page);
       await expect(page.locator(EMPTY_STATE)).toBeVisible();
       await page.waitForTimeout(400);
 

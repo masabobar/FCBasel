@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import { signIn } from "./sign-in";
 
 /**
  * The run-of-show, and the instrument that measures it (US-040).
@@ -109,6 +110,7 @@ const SETTLE_MS = 1_500;
  */
 export async function loadDemoScript(page: Page): Promise<void> {
   await page.goto("/");
+  await signIn(page);
   await expect(page.locator('[data-slot="empty-state-panel"]')).toBeVisible();
 
   let heroes = 0;

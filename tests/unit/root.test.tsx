@@ -13,6 +13,7 @@ import { HeroId } from "../../app/lib/repositories/enums";
 import App, { Layout, shouldRevalidate } from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { settleThinkingBeat } from "./support/thinking-harness";
+import { signIn } from "./support/sign-in";
 
 const ROOT_SOURCE = readFileSync(
   resolve(process.cwd(), "app/root.tsx"),
@@ -90,7 +91,7 @@ describe("App", () => {
   });
 
   function renderApp() {
-    return render(
+    const mounted = render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<App loaderData={HEROES} />}>
@@ -99,7 +100,69 @@ describe("App", () => {
         </Routes>
       </MemoryRouter>,
     );
+
+    signIn();
+    return mounted;
   }
+
+  /**
+   * THE COSMETIC GATE STANDS IN FRONT OF ALL OF IT. Decorative by
+   * `constraints.md` §2, so what is asserted here is not a security property
+   * but the two facts a demo depends on: the dashboard is genuinely absent
+   * until the gate is cleared, and clearing it is what puts the shell up. Every
+   * other suite in this project reaches the dashboard through `signIn()`, so
+   * this is the one place the closed state is looked at directly.
+   */
+  describe("the cosmetic sign-in gate", () => {
+    function mountGated() {
+      return render(
+        <MemoryRouter initialEntries={["/"]}>
+          <Routes>
+            <Route path="/" element={<App loaderData={HEROES} />}>
+              <Route index element={<p>child route</p>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>,
+      );
+    }
+
+    it("shows the login screen and no dashboard before sign-in", () => {
+      mountGated();
+
+      expect(
+        document.querySelector('[data-slot="login-card"]'),
+      ).toBeInTheDocument();
+      expect(document.querySelector('[data-slot="app-shell"]')).toBeNull();
+      expect(document.querySelector('[data-slot="sidebar"]')).toBeNull();
+      expect(screen.queryByText("child route")).toBeNull();
+    });
+
+    it("replaces itself with the shell once the credential is accepted", () => {
+      mountGated();
+      signIn();
+
+      expect(document.querySelector('[data-slot="login-card"]')).toBeNull();
+      expect(
+        document.querySelector('[data-slot="app-shell"]'),
+      ).toBeInTheDocument();
+      expect(screen.getByText("child route")).toBeInTheDocument();
+    });
+
+    /**
+     * MEMORY-ONLY, AND THAT IS THE POINT. US-043 closed KL-3 by making
+     * memory-only literally true of browser storage, and the dead-end sweep
+     * asserts zero `sessionStorage` keys. Remembering a sign-in is exactly the
+     * write that assertion exists to catch.
+     */
+    it("writes nothing to browser storage", () => {
+      mountGated();
+      signIn();
+
+      expect(sessionStorage.length).toBe(0);
+      expect(localStorage.length).toBe(0);
+      expect(document.cookie).toBe("");
+    });
+  });
 
   it("renders the matched child route through the outlet", () => {
     renderApp();

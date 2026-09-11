@@ -106,6 +106,7 @@ import {
   type FrameStub,
 } from "./support/motion-harness";
 import { settleThinkingBeat } from "./support/thinking-harness";
+import { signIn } from "./support/sign-in";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -1021,7 +1022,7 @@ describe("Hero 3 follow-up — reduced motion renders the final state", () => {
 /* ============================================ ⑩ ON THE REAL DASHBOARD === */
 
 function renderApp() {
-  return render(
+  const mounted = render(
     <MemoryRouter initialEntries={["/"]}>
       <Routes>
         <Route path="/" element={<App loaderData={HEROES} />}>
@@ -1030,6 +1031,9 @@ function renderApp() {
       </Routes>
     </MemoryRouter>,
   );
+
+  signIn();
+  return mounted;
 }
 
 /** US-029's visually-hidden "Follow-up:" hint is part of the chip's name. */

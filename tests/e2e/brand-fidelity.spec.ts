@@ -20,6 +20,7 @@ import {
   PROMPT_INPUT_LABEL,
 } from "./support/demo-script";
 import { askFromBaseline, tabRing } from "./support/paths";
+import { signIn } from "./support/sign-in";
 
 /**
  * US-044 — brand fidelity and legibility, MEASURED ON THE RENDERED PAGE.
@@ -493,6 +494,7 @@ test.describe("brand fidelity with the whole demo script on screen", () => {
 test.describe("the moments the full canvas does not contain", () => {
   test("the baseline: on-token, gold-clean, dash-free", async ({ page }) => {
     await page.goto("/");
+    await signIn(page);
     await expect(page.locator('[data-slot="empty-state-panel"]')).toBeVisible();
     await page.waitForTimeout(1_200);
 
@@ -531,6 +533,7 @@ test.describe("the moments the full canvas does not contain", () => {
     page,
   }) => {
     await page.goto("/");
+    await signIn(page);
     await expect(page.locator('[data-slot="empty-state-panel"]')).toBeVisible();
     await page
       .getByRole("button", { name: "Shirt sales by kit & sponsor badges" })
@@ -562,6 +565,7 @@ test.describe("the moments the full canvas does not contain", () => {
     page,
   }) => {
     await page.goto("/");
+    await signIn(page);
     await expect(page.locator('[data-slot="empty-state-panel"]')).toBeVisible();
     await askFromBaseline(page, "what is the weather in basel");
     await expect(page.locator('[data-slot="fallback-panel"]')).toBeVisible();

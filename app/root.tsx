@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Links,
   Meta,
@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import { AppShell } from "./components/chrome/app-shell";
+import { LoginScreen } from "./components/chrome/login-screen";
 import { PromptBar } from "./components/chrome/prompt-bar";
 import { SuggestionChips } from "./components/chrome/suggestion-chips";
 import { EmptyStatePanel } from "./components/heroes/empty-state-panel";
@@ -223,6 +224,28 @@ export default function App({
   const canvas = useCanvasPanel(dashboard, beat !== null);
 
   /**
+   * THE COSMETIC SIGN-IN GATE. Decorative only, by `constraints.md` §2 -- see
+   * `app/lib/demo-access.ts` for what that does and does not mean, and why it
+   * must not be hardened into real authentication.
+   *
+   * IN MEMORY, AND THAT IS NOT AN OVERSIGHT. `constraints.md` §2 also forbids
+   * persistence across sessions, and US-043 closed KL-3 by making memory-only
+   * literally true of the browser's storage too -- the dead-end sweep asserts
+   * ZERO `sessionStorage` keys. Remembering a sign-in is exactly the write that
+   * assertion exists to catch, so a reload legitimately returns to this screen.
+   * If that is ever unwanted, the fix is to drop the gate, NOT to start
+   * persisting it.
+   *
+   * IT IS STATE, NOT A ROUTE. The prototype has one route by design
+   * (`technical-spec.md` §4.2) and the three sidebar items must never become
+   * routes (US-012). Rendering the gate as a state of the root keeps that true:
+   * no path is added, no navigation happens, `shouldRevalidate` still answers
+   * false, and the dashboard the presenter reaches is the same DOM it has
+   * always been.
+   */
+  const [signedIn, setSignedIn] = useState(false);
+
+  /**
    * KL-3, closed (US-043). Told once, on the first client render, and never
    * again — the mode is a property of the history entry, so it holds for the
    * life of the document and for the reload that follows it. It runs here, in
@@ -235,6 +258,15 @@ export default function App({
   useEffect(() => {
     disableScrollRestoration();
   }, []);
+
+  // Every hook above runs on both sides of this branch, so the order is fixed
+  // whichever screen is showing. The gate renders INSTEAD of the shell rather
+  // than over it: the sidebar, app bar and prompt bar are the signed-in
+  // product, and showing them behind a sign-in would be the pretence US-012's
+  // inert placeholders were written to avoid.
+  if (!signedIn) {
+    return <LoginScreen onSignIn={() => setSignedIn(true)} />;
+  }
 
   return (
     <AppShell

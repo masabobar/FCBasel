@@ -31,6 +31,7 @@ import {
   timedBeat,
   waitForRest,
 } from "./support/run-of-show";
+import { signIn } from "./support/sign-in";
 
 /**
  * US-045 — the dress rehearsal, in the browser the demo is guaranteed on.
@@ -97,6 +98,7 @@ const OFF_SCRIPT_QUESTION = "what is the weather in basel";
 async function open(page: Page): Promise<NetworkLog> {
   const log = recordNetwork(page, BASE_URL);
   await page.goto("/", { waitUntil: "load" });
+  await signIn(page);
   await expect(page.locator(EMPTY_STATE)).toBeVisible();
   await expect(page.locator('[data-slot="card"]')).toHaveCount(
     BASELINE_CARD_COUNT,

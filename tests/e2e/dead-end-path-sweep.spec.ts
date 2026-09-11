@@ -32,6 +32,7 @@ import {
   tabRing,
   TIE_BREAKS,
 } from "./support/paths";
+import { signIn } from "./support/sign-in";
 
 /**
  * US-042 — the dead-end path sweep. Every path leads somewhere.
@@ -84,6 +85,7 @@ test.use({ viewport: { width: 1920, height: 1080 } });
 async function open(page: Page): Promise<NetworkLog> {
   const log = recordNetwork(page, BASE_URL);
   await page.goto("/", { waitUntil: "load" });
+  await signIn(page);
   await expect(page.locator('[data-slot="empty-state-panel"]')).toBeVisible();
   await expect(page.locator('[data-slot="card"]')).toHaveCount(
     BASELINE_CARD_COUNT,
@@ -824,6 +826,11 @@ test.describe("browser-level paths", () => {
     await buildFullCanvas(page);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.reload({ waitUntil: "load" });
+    // The cosmetic gate returns on a reload (US-046, memory-only by
+    // `constraints.md` §2). It is part of the path now, so the path is walked
+    // through it: the question this test asks - does a reload leave a WORKING
+    // dashboard - is unchanged, and every assertion below is the original.
+    await signIn(page);
     await page.waitForTimeout(SETTLE_MS);
     await expectBaselineAlive(page, "after a reload");
     // And it is still driveable: the very next question works.
@@ -836,6 +843,7 @@ test.describe("browser-level paths", () => {
     await tapChip(page, HERO_CHIP.tickets);
     await expect(page.locator('[data-slot="thinking-panel"]')).toBeVisible();
     await page.reload({ waitUntil: "load" });
+    await signIn(page);
     await page.waitForTimeout(SETTLE_MS);
     await expectBaselineAlive(page, "after a mid-beat reload");
 
@@ -846,6 +854,7 @@ test.describe("browser-level paths", () => {
     await page.goBack();
     await page.waitForTimeout(SETTLE_MS);
     await page.goForward();
+    await signIn(page);
     await page.waitForTimeout(SETTLE_MS);
     expect(page.url(), "forward did not return to the app").toBe(
       `${BASE_URL}/`,

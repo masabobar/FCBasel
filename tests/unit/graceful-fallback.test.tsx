@@ -82,6 +82,7 @@ import { color, fontSize } from "../../app/lib/tokens";
 import App from "../../app/root";
 import { HEROES } from "./support/hero-data";
 import { restoreMotionStubs, stubMatchMedia } from "./support/motion-harness";
+import { signIn } from "./support/sign-in";
 
 /* ------------------------------------------------------------- SOURCES -- */
 
@@ -201,6 +202,8 @@ function renderApp(): void {
       </Routes>
     </MemoryRouter>,
   );
+
+  signIn();
 }
 
 function advance(ms: number): void {
@@ -887,7 +890,14 @@ describe("Reset returns the canvas to the empty state", () => {
     // Derived, not cleared: the hook holds the section list the miss was asked
     // against, and any answer produces a new list.
     expect(HOOK_CODE).toMatch(/missedFor === sections/);
-    expect(ROOT_CODE).not.toMatch(/clearFallback|setMissed|useState/);
+    expect(ROOT_CODE).not.toMatch(/clearFallback|setMissed/);
+
+    // `useState` was banned outright while the root held none of it, which is
+    // no longer true: the cosmetic sign-in gate holds exactly one. The guard
+    // is therefore the COUNT and its identity rather than the bare literal --
+    // fallback state added here still fails, because it would be a second one.
+    expect(ROOT_CODE.match(/useState\(/g)).toHaveLength(1);
+    expect(ROOT_CODE).toMatch(/\[signedIn, setSignedIn\] = useState\(false\)/);
   });
 
   it("keeps standing while the canvas has not moved on", () => {

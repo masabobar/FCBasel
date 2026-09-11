@@ -78,6 +78,7 @@ import {
   stubFrames,
   stubMatchMedia,
 } from "./support/motion-harness";
+import { signIn } from "./support/sign-in";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -951,7 +952,7 @@ describe("Hero 1 — a dataset that cannot answer degrades rather than lying", (
 
 describe("Hero 1 — asked for real, from the chip row", () => {
   function renderApp() {
-    return render(
+    const mounted = render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<App loaderData={HEROES} />}>
@@ -960,6 +961,9 @@ describe("Hero 1 — asked for real, from the chip row", () => {
         </Routes>
       </MemoryRouter>,
     );
+
+    signIn();
+    return mounted;
   }
 
   async function tapHeroChip(user: UserEvent) {

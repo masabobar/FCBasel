@@ -16,21 +16,26 @@
 
 ## 1. Navigation Hierarchy
 
-The prototype has **exactly one screen**. Every question the user asks *adds to* that screen rather
-than navigating away from it — the dashboard grows, it never clears.
+The prototype has **one working screen**, reached through a **cosmetic sign-in gate**. Every question
+the user asks *adds to* that screen rather than navigating away from it — the dashboard grows, it
+never clears.
 
-### Sales & Marketing Workspace (single persona, no auth)
+### Sales & Marketing Workspace (single persona, no real auth)
 
 ```
-App shell                                       (public — no authentication exists)
-├── Dashboard                          SCREEN-001   ← the only real screen, always active
-├── Reports                            (inert)      ← dimmed, no hover, no navigation
-├── Data Sources                       (inert)      ← dimmed, no hover, no navigation
-└── Settings                           (inert)      ← dimmed, no hover, no navigation
+Cosmetic sign-in gate                  SCREEN-002   ← decorative only; state, NOT a route
+└── App shell                                       (no authentication model exists)
+    ├── Dashboard                      SCREEN-001   ← the only real screen, always active
+    ├── Reports                        (inert)      ← dimmed, no hover, no navigation
+    ├── Data Sources                   (inert)      ← dimmed, no hover, no navigation
+    └── Settings                       (inert)      ← dimmed, no hover, no navigation
 ```
 
 The three inert items are deliberate: they imply a fuller product without pretending to be one.
 **They must never become routes** (US-012).
+
+**Neither does the gate.** SCREEN-002 is a state of `app/root.tsx`, rendered instead of the shell
+while closed, so the single-route architecture is intact — no path, no navigation, no revalidation.
 
 ---
 
@@ -56,6 +61,38 @@ first. A follow-up sharpens that section from *what happened* to *why, and what 
 | Method | Path | Purpose | Source story |
 |--------|------|---------|--------------|
 | — | — | *No endpoints. All data is bundled locally; zero runtime network calls by specification.* | — |
+
+---
+
+### SCREEN-002 — Cosmetic sign-in gate
+
+| Field | Value |
+|-------|-------|
+| **Type** | Web |
+| **Path** | *(none)* — a state of `app/root.tsx`, not a route |
+| **Auth** | **Decorative only.** Permitted by [`../constraints.md`](../constraints.md) §2: "A cosmetic login screen is optional and, if present, decorative only" |
+| **Stories** | US-046 |
+| **Status** | ✅ Complete |
+
+**Description:** A branded front door standing in front of SCREEN-001. Crest, workspace label, a
+username and password field, and a hint printing the credential it accepts (`demo` / `fcb2026`).
+Entering it replaces the gate with the app shell; anything else shows an inline message and stays
+usable.
+
+**It protects nothing, by design.** The credential is committed and in the client bundle, there is no
+server, no cookie and no storage write, and the data behind it is seeded fixtures. See
+[`../../output/docs/technical-spec.md`](../../output/docs/technical-spec.md) §7.1 for why it must not
+be hardened into real authentication.
+
+**Known consequence:** sign-in lives in memory, so **a reload returns to this screen**. That follows
+from `constraints.md` §2 (no persistence across sessions) and US-043's KL-3 fix, which made
+memory-only literally true of browser storage.
+
+**API Endpoints Used:**
+
+| Method | Path | Purpose | Source story |
+|--------|------|---------|--------------|
+| — | — | *No endpoints. The check is a string comparison in the client bundle.* | — |
 
 ---
 

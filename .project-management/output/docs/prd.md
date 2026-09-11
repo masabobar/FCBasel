@@ -191,6 +191,12 @@ one. See [`../../input/screens/screen-map.md`](../../input/screens/screen-map.md
 **None.** One persona, no access model. A cosmetic login screen is optional and, if present,
 decorative only. Explicitly out of scope per the specification.
 
+**A cosmetic gate is now built (US-046)** and stands in front of the dashboard with the credential
+printed on it (`demo` / `fcb2026`). It is **theatre, not access control** — no server, no session, no
+cookie, no stored credential, and trivially bypassable by design. The access model itself remains out
+of scope; see [`technical-spec.md`](technical-spec.md) §7.1 and Phase 5's KL-5 for the reload
+consequence.
+
 ### 7.2 Data Management
 Static local seed files bundled with the app, structured one object per hero with `primary` and
 `followUp` sections. No database, no persistence, no runtime fetch. State lives in memory for a demo

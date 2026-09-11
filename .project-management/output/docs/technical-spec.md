@@ -89,6 +89,10 @@ A **single route**. The prototype has one screen; hero output is inserted into t
 than navigated to. The sidebar's Reports / Data Sources / Settings items are inert by specification —
 they must not be routes.
 
+**The cosmetic sign-in gate adds no route either, deliberately.** It is a state of the root
+(`app/root.tsx`), rendered *instead of* the shell while closed, so no path, no navigation and no
+revalidation are introduced and the single-route property above still holds. See §7.
+
 ### 4.3 State Management Strategy
 React state only — no store library, no persistence.
 
@@ -164,6 +168,25 @@ later means implementing the existing repository interface against the database 
 **Not applicable.** One persona, no access model, no accounts, no sessions. A cosmetic login screen
 is optional and decorative only. The vision's permission-aware model is Discovery scope
 ([`../../input/backlog/future.md`](../../input/backlog/future.md) FUT-004).
+
+### 7.1 The cosmetic sign-in gate (built)
+
+The optional screen that clause permits **is now built** and stands in front of the dashboard.
+**It is theatre, not a security control**, and must not be mistaken for one:
+
+| Property | Value |
+|---|---|
+| Source | `app/lib/demo-access.ts` (the credential + check), `app/components/chrome/login-screen.tsx` (the screen) |
+| Credential | `demo` / `fcb2026` — **printed on the screen it opens**, committed, and present in the client bundle. Not a secret. |
+| Server involvement | **None.** No loader, action, endpoint, status code, cookie, token or hash. §8's empty API table is unchanged. |
+| State | Client memory only (`useState` in `app/root.tsx`). Zero `sessionStorage` / `localStorage` / cookie writes, asserted by test. |
+| Consequence | **A reload returns to the gate**, because `constraints.md` §2 forbids persistence across sessions and US-043 closed KL-3 by making memory-only literally true of browser storage. This is the accepted cost of gating, not a defect. |
+| Naming | The module is `demo-access.ts`, **not** `auth.ts`, so nobody reads it as authentication. |
+
+**Do not "harden" it.** Adding bcrypt, a session cookie or a server action would build the access
+model the specification puts out of scope, and would create a real credential surface in a demo that
+has no user accounts. `technologies.md` still lists `bcryptjs` and `createCookieSessionStorage` as
+expansion-path defaults **not used by the prototype**.
 
 ---
 
