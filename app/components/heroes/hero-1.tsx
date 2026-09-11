@@ -28,7 +28,11 @@ import {
   kitUnitsShare,
   kitUnitsTotal,
 } from "../../lib/repositories/derive";
-import { HeroId, PeriodKey } from "../../lib/repositories/enums";
+import {
+  HeroId,
+  PERIOD_INLINE_LABEL_KEY,
+  PeriodKey,
+} from "../../lib/repositories/enums";
 import {
   type Hero1FollowUp,
   type Hero1Period,
@@ -232,7 +236,7 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
       />
 
       <VBarTile
-        title={kitTileTitle(t, periodLabel)}
+        title={kitTileTitle(t, shown.key)}
         period={kitScopeLine(t, shown)}
         bars={kits.map((kit) => ({
           name: t(kit.labelKey),
@@ -375,8 +379,10 @@ export function Hero1Body({ primary, followUp, phase }: Hero1BodyProps) {
  * is what the room sees; press the filter and the title follows the figures
  * instead of claiming a scope the bars no longer show.
  */
-function kitTileTitle(t: Translator, periodLabel: string): string {
-  return `${t(HERO_1_TILE_TITLE_KEY.kits)} (${periodLabel.toLowerCase()})`;
+function kitTileTitle(t: Translator, period: PeriodKey): string {
+  return `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(
+    PERIOD_INLINE_LABEL_KEY[period],
+  )})`;
 }
 
 /** `38’500 shirts · CHF 3.81M` — both figures derived, neither stored. */

@@ -260,7 +260,7 @@ describe("BaselineRow — webshop revenue", () => {
     renderRow();
 
     expect(slots("kpi-subtitle")[0]).toHaveTextContent(
-      `vs ${t(DATA.webshop.comparisonLabelKey).toLowerCase()}`,
+      `vs ${t(DATA.webshop.comparisonLabelKey)}`,
     );
   });
 

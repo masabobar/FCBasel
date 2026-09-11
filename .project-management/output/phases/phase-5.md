@@ -1,7 +1,7 @@
 # Phase 5: Post-Plan Demo Extras
 
 **Duration:** 2026-09-11 (~6.5 AI-hours)
-**Status:** ✅ Completed (4/4 · 11/11 pts)
+**Status:** ✅ Completed (5/5 · 12/12 pts)
 **Started:** 2026-09-11
 **Target Completion:** 2026-09-11
 **Actual Completion:** 2026-09-11
@@ -31,6 +31,7 @@ US-030, US-044
 | US-047 | Deployment access gate (HTTP Basic) | 3 | **P0** | ✅ Done |
 | US-048 | Club red on the app-bar rule | 1 | P2 | ✅ Done |
 | US-049 | German language pass (EN / DE, via JSON keys) | 5 | P1 | ✅ Done |
+| US-050 | Sign out | 1 | P2 | ✅ Done |
 
 ---
 
@@ -166,6 +167,33 @@ convention, and this demo's whole claim is that those systems are connected.
 in the colour inventory as a token red; the contrast suite asserts floors, so it fails anything
 FAINTER and this improvement cannot silently regress.
 
+### US-050 — Sign out (1 pt) · 2026-09-11 · ✅ Done
+
+**A way back out of the demo**, beside Reset in the app bar. Requested once US-046's gate existed:
+there was a door in but none out.
+
+**IT ENDS THE SESSION, IT DOES NOT ONLY HIDE IT — and that is the whole of the story.** `handleSignOut`
+in `app/root.tsx` calls `reset()` BEFORE lowering the gate. Without it the dashboard's answers survive
+in `useDashboard` (the hook stays mounted; only its rendering is swapped for the login card), so the
+next sign-in would restore the previous presenter's heroes mid-screen. In a room whose whole point is
+building the dashboard up from a clean baseline, that reads as a broken product — the one way "sign
+out" could actively mislead. It is also the honest reading of the word: **the session is the answers.**
+
+**Verified end to end in Chrome, not inferred:** sign in → ask a question → **1 section** → sign out →
+login card back, shell gone → sign back in → **0 sections** and the empty state restored. The German
+pass covers it too: the control reads **"Abmelden"** after one press of the toggle.
+
+**Rendered only when a handler is supplied.** The gate is optional by `constraints.md` §2, so a build
+without it must not show a Sign out that does nothing. `AppShell` forwards the handler and owns none
+of the behaviour, exactly as it does for Reset.
+
+**Nothing is cleared from storage because nothing was ever written to it** (US-046's note, and
+US-043's KL-3): the two state setters are the whole of signing out.
+
+**Placement is deliberate:** between Reset and the monogram, muted against Reset's navy. Reset clears
+the DASHBOARD, this ends the SESSION, and the avatar beside it is the session it ends. Reset is the
+control a presenter reaches for mid-demo and should not have to compete with this one.
+
 ---
 
 ## Known limitations
@@ -228,11 +256,11 @@ returns to English. `<html lang>` is corrected on switch so a screen reader foll
 
 ## Phase Metrics
 
-- **Completed Story Points:** 11 / 11 · **Stories:** 4 / 4
-- **Tests:** 2340 / 2340 unit (59 files) + 3 / 3 new Chrome cases for the German pass · **Commits:** 2
+- **Completed Story Points:** 12 / 12 · **Stories:** 5 / 5
+- **Tests:** **2341 / 2341 unit (59 files)** + the full Chrome suite · **Commits:** 3
 
 ---
 
 **Created:** 2026-09-11 · **Last Updated:** 2026-09-11
-**Phase Status:** ✅ Completed (4/4 · 11/11 pts)
+**Phase Status:** ✅ Completed (5/5 · 12/12 pts)
 **Previous:** [Phase 4](phase-4.md) · **Backlog:** [Master Index](../../input/backlog/README.md)

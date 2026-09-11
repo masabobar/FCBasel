@@ -1,4 +1,4 @@
-import { RotateCcw } from "lucide-react";
+import { LogOut, RotateCcw } from "lucide-react";
 
 import { cn } from "../../lib/cn";
 import { type TranslationKey } from "../../lib/i18n";
@@ -93,10 +93,21 @@ export interface TopBarProps {
    * US-015 supplies the behaviour. Absent, the button is a no-op.
    */
   onReset?: () => void;
+  /**
+   * Invoked when Sign out is pressed (US-050). Same injection rule as
+   * {@link TopBarProps.onReset}: this file renders the affordance and owns none
+   * of the behaviour. `app/root.tsx` supplies the handler, and it does TWO
+   * things — see there for why ending the session is not optional.
+   *
+   * Absent, the control is not rendered at all rather than rendered dead. The
+   * gate is optional (`constraints.md` §2), so a build without it must not show
+   * a Sign out that does nothing.
+   */
+  onSignOut?: () => void;
   className?: string;
 }
 
-export function TopBar({ onReset, className }: TopBarProps) {
+export function TopBar({ onReset, onSignOut, className }: TopBarProps) {
   const t = useT();
 
   return (
@@ -146,6 +157,26 @@ export function TopBar({ onReset, className }: TopBarProps) {
         <RotateCcw size={14} aria-hidden="true" />
         {t("topBar.reset")}
       </button>
+
+      {/*
+       * Sign out (US-050), rendered only when a handler is supplied — see
+       * `TopBarProps.onSignOut`. It sits between Reset and the avatar because
+       * that is what it acts on: Reset clears the DASHBOARD, this ends the
+       * SESSION, and the monogram beside it is the session it ends. Muted
+       * against Reset's navy on purpose; Reset is the control a presenter
+       * reaches for mid-demo, and this one should not compete with it.
+       */}
+      {onSignOut && (
+        <button
+          type="button"
+          data-slot="sign-out"
+          onClick={onSignOut}
+          className="flex shrink-0 items-center gap-1.5 rounded-pill border border-border px-3 py-1.5 text-caption font-medium text-muted"
+        >
+          <LogOut size={14} aria-hidden="true" />
+          {t("topBar.signOut")}
+        </button>
+      )}
 
       {/*
        * Generic monogram. `role="img"` with the workspace as its accessible

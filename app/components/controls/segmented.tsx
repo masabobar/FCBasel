@@ -269,7 +269,14 @@ export function Segmented({
       aria-label={groupLabel}
       onKeyDown={handleKeyDown}
       className={cn(
-        "inline-flex rounded-chip border p-0.5",
+        // WRAPS INSTEAD OF OVERFLOWING. The option labels are copy, and copy
+        // has no fixed width: "Seit Jahresbeginn" is half again as wide as
+        // "Year to date", and four of them on a narrow card would have pushed
+        // the control past the tile's clipped edge (US-049). `max-w-full`
+        // keeps it inside the card and `flex-wrap` folds the options onto a
+        // second row rather than hiding the last one. At the presentation
+        // target the row never wraps.
+        "inline-flex max-w-full flex-wrap rounded-chip border p-0.5",
         tone.group,
         className,
       )}

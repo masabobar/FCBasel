@@ -266,6 +266,27 @@ export default function App({
   const [signedIn, setSignedIn] = useState(false);
 
   /**
+   * SIGNING OUT ENDS THE SESSION, IT DOES NOT ONLY HIDE IT (US-050).
+   *
+   * `reset()` first, then the gate. Without the reset the dashboard's answers
+   * survive in `useDashboard` — the hook stays mounted, only its rendering is
+   * swapped for the login card — so the next sign-in would restore the previous
+   * presenter's three heroes and their follow-ups mid-screen. In a room where
+   * the point is to build the dashboard up from a clean baseline, that reads as
+   * a broken product, and it is the one way "sign out" could actively mislead.
+   *
+   * It is also the honest reading of the word: the session is the answers.
+   *
+   * Nothing is cleared from storage because nothing was ever written to it
+   * (see the gate's note above, and US-043's KL-3) — the two state setters ARE
+   * the whole of signing out.
+   */
+  function handleSignOut() {
+    reset();
+    setSignedIn(false);
+  }
+
+  /**
    * KL-3, closed (US-043). Told once, on the first client render, and never
    * again — the mode is a property of the history entry, so it holds for the
    * life of the document and for the reload that follows it. It runs here, in
@@ -296,6 +317,7 @@ export default function App({
     <I18nProvider locale={locale} setLocale={setLocale}>
       <AppShell
         onReset={reset}
+        onSignOut={handleSignOut}
         promptBar={
           <PromptBar
             key={generation}

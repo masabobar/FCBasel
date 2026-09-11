@@ -3,9 +3,9 @@
 **Goal:** Requests that arrived after the 45-story plan closed. Each one is optional by the
 specification rather than required by it, and each is added deliberately rather than discovered.
 **Duration:** Post-plan, on request
-**Total Stories:** 4
-**Total Points:** 11
-**Status:** ✅ Completed (4/4 · 11/11)
+**Total Stories:** 5
+**Total Points:** 12
+**Status:** ✅ Completed (5/5 · 12/12)
 
 > **Why this is not Phase 4.** Phase 4's own guardrail reads *"Not in this phase: new functionality"*,
 > and it closed complete at 6/6. A login screen is new functionality, so folding it back into a
@@ -16,8 +16,8 @@ specification rather than required by it, and each is added deliberately rather 
 ## Epic 9: E9 — Post-Plan Demo Extras
 
 **Priority:** P0
-**Total Story Points:** 11
-**Status:** ✅ Completed (4/4)
+**Total Story Points:** 12
+**Status:** ✅ Completed (5/5)
 **Source:** Requested by the PM after the plan closed. Permitted (not required) by
 [`../constraints.md`](../constraints.md) §2.
 
@@ -150,16 +150,39 @@ specification rather than required by it, and each is added deliberately rather 
 
   - **API contract status:** ✅ Verified — no endpoint exists or is needed.
 
+- **US-050**: Sign out
+  - **Story Points:** 1
+  - **Priority:** P2
+  - **Component:** [Web]
+  - **Status:** ✅ Completed
+  - **Type:** Frontend (Web)
+  - **Screen:** SCREEN-001 (app shell chrome) → SCREEN-002
+  - **Description:** A way back out of the demo, beside Reset in the app bar. Ends the session; does
+    not merely hide it.
+  - **Acceptance Criteria:**
+    - [x] Sign out sits in the app bar between Reset and the avatar, translated in both languages
+          ("Sign out" / "Abmelden")
+    - [x] Pressing it returns the cosmetic gate (SCREEN-002) and removes the dashboard
+    - [x] **It calls `reset()` first**, so signing back in lands on a clean baseline rather than the
+          previous presenter's answers
+    - [x] Rendered **only when a handler is supplied** — the gate is optional by `constraints.md`
+          §2, so a build without it must not show a dead control
+    - [x] Writes nothing to storage; the two state setters are the whole of signing out
+  - **Dependencies:** US-015, US-046, US-049
+  - **Notes:** ~30 min. Verified end to end in Chrome: ask a question → 1 section → sign out → sign
+    back in → **0 sections**, empty state restored. Without the `reset()` the hook stays mounted and
+    the previous session returns mid-screen, which in a live room reads as a broken product.
+
 ---
 
 ## Phase Summary
 
-**Total Epics:** 1 | **Total Stories:** 4 | **Total Points:** 11
+**Total Epics:** 1 | **Total Stories:** 5 | **Total Points:** 12
 
-**By Priority:** P0: 1 story, 3 points · P1: 1 story, 5 points · P2: 2 stories, 3 points — **all
+**By Priority:** P0: 1 story, 3 points · P1: 1 story, 5 points · P2: 3 stories, 4 points — **all done**
 done**
 
-**By Status:** ✅ 4 stories, 11 points · 🔄 0 · 📋 0 · ⏸️ 0
+**By Status:** ✅ 5 stories, 12 points · 🔄 0 · 📋 0 · ⏸️ 0
 
 ---
 

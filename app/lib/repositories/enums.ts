@@ -50,6 +50,26 @@ export const PERIOD_LABEL_KEY: Record<PeriodKey, TranslationKey> = {
   [PeriodKey.SEASON_TO_DATE]: "enum.period.SEASON_TO_DATE",
 };
 
+/**
+ * The same periods worded for the MIDDLE of a sentence — `vs last month`,
+ * `Shirt sales by kit (season to date)`.
+ *
+ * A SECOND MAP RATHER THAN A `toLowerCase()` CALL (US-049). English lowercases
+ * a period inside a phrase; German does not, because `Monat` and
+ * `Saisonbeginn` are nouns and a noun keeps its capital wherever it stands.
+ * Lowercasing the label at render time produced "vs. letzter monat" on the
+ * webshop tile — correct English typography applied to German, which reads as
+ * a spelling mistake to the room the demo is for. Casing is a property of the
+ * language, so it belongs in the dictionary.
+ */
+export const PERIOD_INLINE_LABEL_KEY: Record<PeriodKey, TranslationKey> = {
+  [PeriodKey.THIS_MONTH]: "enum.periodInline.THIS_MONTH",
+  [PeriodKey.LAST_MONTH]: "enum.periodInline.LAST_MONTH",
+  [PeriodKey.LAST_3_MONTHS]: "enum.periodInline.LAST_3_MONTHS",
+  [PeriodKey.YEAR_TO_DATE]: "enum.periodInline.YEAR_TO_DATE",
+  [PeriodKey.SEASON_TO_DATE]: "enum.periodInline.SEASON_TO_DATE",
+};
+
 /* ------------------------------------------------------------ KIT VARIANTS -- */
 
 /**

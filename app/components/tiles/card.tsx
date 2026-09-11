@@ -163,6 +163,29 @@ export function CardCaption({
   );
 }
 
+/* --------------------------------------------------------------- HEADER -- */
+
+/**
+ * The icon-and-title half of the header, and the whole of the wrap decision.
+ *
+ * `basis-56` (14rem) is a MINIMUM, not a width: with `flex-wrap` on the row
+ * above, it says "a title needs 224px before the action may share this line".
+ * Below that the action wraps to its own row and the title gets the full
+ * width, which is what stops "Verkaufte Einheiten · Dieser Monat" being
+ * rationed one word per line beside a four-option filter. Above it the header
+ * is exactly the single row it always was — at the 1920x1080 presentation
+ * target nothing moves.
+ *
+ * `flex-1` then lets the title take any room the action leaves, and `min-w-0`
+ * is what allows the block to shrink at all inside a flex row (a flex item's
+ * default `min-width: auto` would push the card wider than its grid column).
+ *
+ * The icon lives INSIDE this block rather than beside it so the two wrap as
+ * one thing: an icon stranded on a row of its own is the other way this
+ * header could look broken.
+ */
+const HEADER_TITLE_CLASS = "flex min-w-0 flex-1 basis-56 items-center gap-2.5";
+
 /* ----------------------------------------------------------------- CARD -- */
 
 export interface CardProps {
@@ -228,33 +251,50 @@ export function Card({
           <div
             data-slot="card-header"
             className={cn(
-              "flex items-center gap-2.5",
+              // WRAPS RATHER THAN CRUSHES. The action slot holds a period
+              // filter whose width is copy — four German options are far wider
+              // than four English ones — so a header that could only ever be
+              // one row had to take that width out of the title, one word per
+              // line, and let the control sit over the subtitle. Wrapping
+              // makes the control take its own row instead, at any width and
+              // in any language; see `HEADER_TITLE_CLASS` for what forces it.
+              "flex flex-wrap items-center gap-x-3 gap-y-2.5",
               children != null && children !== false && "mb-4",
             )}
           >
-            {icon && (
-              <span
-                data-slot="card-icon"
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-badge bg-surface text-navy"
-              >
-                {icon}
-              </span>
-            )}
-            {(title || subtitle) && (
-              <div className="min-w-0 flex-1">
-                {title && <Heading className="tile-title">{title}</Heading>}
-                {subtitle && (
-                  <div
-                    data-slot="card-subtitle"
-                    className="text-caption text-muted"
-                  >
-                    {subtitle}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className={HEADER_TITLE_CLASS}>
+              {icon && (
+                <span
+                  data-slot="card-icon"
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-badge bg-surface text-navy"
+                >
+                  {icon}
+                </span>
+              )}
+              {(title || subtitle) && (
+                <div className="min-w-0">
+                  {title && <Heading className="tile-title">{title}</Heading>}
+                  {subtitle && (
+                    <div
+                      data-slot="card-subtitle"
+                      className="text-caption text-muted"
+                    >
+                      {subtitle}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             {action && (
-              <div data-slot="card-action" className="ml-auto shrink-0">
+              // `shrink-0` so a filter sharing the row is never squeezed, and
+              // `max-w-full` so that once it has a row of its own it is capped
+              // by the card rather than by its own content — without the cap
+              // the control's `max-w-full` resolves against an unconstrained
+              // parent and the last option is clipped at the tile's edge.
+              <div
+                data-slot="card-action"
+                className="ml-auto max-w-full shrink-0"
+              >
                 {action}
               </div>
             )}

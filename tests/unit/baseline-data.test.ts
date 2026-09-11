@@ -32,6 +32,7 @@ import {
 } from "../../app/lib/persona";
 import { seriesTotals, trendEndingAt } from "../../app/lib/repositories/derive";
 import {
+  PERIOD_INLINE_LABEL_KEY,
   PERIOD_LABEL_KEY,
   PRODUCT_LABEL_KEY,
   PeriodKey,
@@ -66,9 +67,12 @@ describe("loadBaseline — periods", () => {
     expect(t(data.webshop.periodLabelKey)).toBe(
       t(PERIOD_LABEL_KEY[BASELINE_PERIOD]),
     );
+    // The comparison is read MID-SENTENCE (`vs last month`), so it carries
+    // the inline wording — which English lowercases and German does not.
     expect(t(data.webshop.comparisonLabelKey)).toBe(
-      t(PERIOD_LABEL_KEY[BASELINE_COMPARISON_PERIOD]),
+      t(PERIOD_INLINE_LABEL_KEY[BASELINE_COMPARISON_PERIOD]),
     );
+    expect(de(data.webshop.comparisonLabelKey)).toBe("letzter Monat");
   });
 });
 

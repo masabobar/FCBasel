@@ -75,6 +75,12 @@ export interface AppShellProps {
    */
   onReset?: () => void;
   /**
+   * Sign-out handler, forwarded to the app-bar control (US-050). Forwarded
+   * rather than handled: the shell owns no session state, exactly as it owns no
+   * reset logic. Absent, the app bar renders no Sign out at all.
+   */
+  onSignOut?: () => void;
+  /**
    * The persistent prompt bar (US-028), rendered after the canvas so it comes
    * last in the tab order and is the final thing on the page. It positions
    * itself; the shell's only job is to place it in the tree and to reserve the
@@ -90,6 +96,7 @@ export interface AppShellProps {
 
 export function AppShell({
   onReset,
+  onSignOut,
   promptBar,
   children,
   className,
@@ -105,7 +112,7 @@ export function AppShell({
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar onReset={onReset} />
+        <TopBar onReset={onReset} onSignOut={onSignOut} />
 
         <main
           data-slot="canvas"

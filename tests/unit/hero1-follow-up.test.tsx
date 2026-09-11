@@ -77,6 +77,7 @@ import {
 import { settleThinkingBeat } from "./support/thinking-harness";
 import { signIn } from "./support/sign-in";
 import { t } from "./support/i18n";
+import { PERIOD_INLINE_LABEL_KEY } from "../../app/lib/repositories/enums";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -228,7 +229,7 @@ describe("Hero 1 follow-up — the section GROWS, it does not multiply", () => {
     expect(
       cards().map((card) => card.querySelector("h3")!.textContent),
     ).toEqual([
-      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(PRIMARY.periods[0]!.labelKey).toLowerCase()})`,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(PERIOD_INLINE_LABEL_KEY[PRIMARY.periods[0]!.key])})`,
       t(HERO_1_TILE_TITLE_KEY.badges),
       t(HERO_1_TILE_TITLE_KEY.names),
       t(HERO_1_FOLLOW_UP_TITLE_KEY),

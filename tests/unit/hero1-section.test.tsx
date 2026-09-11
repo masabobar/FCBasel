@@ -80,6 +80,7 @@ import {
 } from "./support/motion-harness";
 import { signIn } from "./support/sign-in";
 import { t } from "./support/i18n";
+import { PERIOD_INLINE_LABEL_KEY } from "../../app/lib/repositories/enums";
 
 /* ----------------------------------------------------------------- DATA -- */
 
@@ -387,7 +388,7 @@ describe("Hero 1 — three tiles, in the defined order (criterion 3)", () => {
 
     const titles = cards().map((card) => card.querySelector("h3")!.textContent);
     expect(titles).toEqual([
-      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(SEASON.labelKey).toLowerCase()})`,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(PERIOD_INLINE_LABEL_KEY[SEASON.key])})`,
       t(HERO_1_TILE_TITLE_KEY.badges),
       t(HERO_1_TILE_TITLE_KEY.names),
     ]);
@@ -592,7 +593,7 @@ describe("Hero 1 — ONE filter drives all three tiles (criterion 5)", () => {
     pressPeriod(frames, t(LAST_3_MONTHS.labelKey));
 
     expect(cards()[0]!.querySelector("h3")).toHaveTextContent(
-      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(LAST_3_MONTHS.labelKey).toLowerCase()})`,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(PERIOD_INLINE_LABEL_KEY[LAST_3_MONTHS.key])})`,
     );
     expect(slot("card-subtitle", cards()[0]!)!.textContent).toBe(
       `${formatNumber(kitUnitsTotal(LAST_3_MONTHS))} shirts · ${formatMoneyMillions(
@@ -1020,7 +1021,7 @@ describe("Hero 1 — asked for real, from the chip row", () => {
     expect(
       cards().map((card) => card.querySelector("h3")!.textContent),
     ).toEqual([
-      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(SEASON.labelKey).toLowerCase()})`,
+      `${t(HERO_1_TILE_TITLE_KEY.kits)} (${t(PERIOD_INLINE_LABEL_KEY[SEASON.key])})`,
       t(HERO_1_TILE_TITLE_KEY.badges),
       t(HERO_1_TILE_TITLE_KEY.names),
     ]);

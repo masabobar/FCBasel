@@ -32,7 +32,7 @@
 import { type Clock, systemClock } from "../calendar";
 import { type TranslationKey } from "../i18n";
 import { type GreetingKey, greetingKeyFor } from "../persona";
-import { PERIOD_LABEL_KEY, PeriodKey } from "../repositories/enums";
+import { PERIOD_INLINE_LABEL_KEY, PeriodKey } from "../repositories/enums";
 import { seriesTotals, trendEndingAt } from "../repositories/derive";
 import {
   type BaselinePeriod,
@@ -92,7 +92,13 @@ export const SPARKLINE_POINTS = 6;
 export interface WebshopHeadline {
   /** `This month` — the period label from the dataset, never a literal. */
   readonly periodLabelKey: TranslationKey;
-  /** `Last month` — what the delta compares against. */
+  /**
+   * `last month` — what the delta compares against, in the MID-SENTENCE form
+   * the tile reads it in (`vs last month` / `vs. letzter Monat`). English and
+   * German case a period differently inside a phrase, so the wording comes
+   * from `PERIOD_INLINE_LABEL_KEY` rather than from a `toLowerCase()` at
+   * render time.
+   */
   readonly comparisonLabelKey: TranslationKey;
   /** Revenue in CHF, the SUM of the period's current series. */
   readonly total: number;
@@ -210,7 +216,7 @@ export async function loadBaseline(
     band: { greeting: greetingKeyFor(clock()), periods },
     webshop: {
       periodLabelKey: baselinePeriod.labelKey,
-      comparisonLabelKey: PERIOD_LABEL_KEY[BASELINE_COMPARISON_PERIOD],
+      comparisonLabelKey: PERIOD_INLINE_LABEL_KEY[BASELINE_COMPARISON_PERIOD],
       total: totals.current,
       deltaPercent: totals.deltaPercent,
       // Ends on the headline figure above, not on whatever the year-to-date

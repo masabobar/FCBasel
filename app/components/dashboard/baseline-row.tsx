@@ -204,7 +204,7 @@ export function BaselineRow({ data }: BaselineRowProps) {
         delta={{ value: webshop.deltaPercent }}
         subtitle={`${t(COMPARISON_PREFIX_KEY)} ${t(
           webshop.comparisonLabelKey,
-        ).toLowerCase()}`}
+        )}`}
         sparkline={webshop.trend}
         isNew
         delayMs={tileDelayMs(0)}

@@ -1,10 +1,11 @@
 # 📊 Project Dashboard
 
 **Last Updated:** 2026-09-11
-**Current Phase:** none — **THE 45-STORY PLAN IS COMPLETE (116/116 points), plus 4 post-plan stories.**
+**Current Phase:** none — **THE 45-STORY PLAN IS COMPLETE (116/116 points), plus 5 post-plan stories.**
 **Post-plan:** [Phase 5](../phases/phase-5.md) holds requests that arrived after the plan closed —
 US-046 cosmetic sign-in gate (2 pts, ✅), US-047 deployment access gate (3 pts, ✅), US-048 club red
-on the app-bar rule (1 pt, ✅) and US-049 German language pass (5 pts, ✅). Totals below cover the
+on the app-bar rule (1 pt, ✅), US-049 German language pass (5 pts, ✅) and US-050 sign out (1 pt,
+✅). Totals below cover the
 original plan; Phase 5 is counted separately on purpose, so "45/45" keeps meaning the plan that was
 estimated and committed to.
 
@@ -20,7 +21,7 @@ estimated and committed to.
 | **Phase 3a** | 100% — Completed (6/6 · 17/17) | 100% | 🟢 Done |
 | **Phase 3b** | 100% — Completed (6/6 · 16/16) | 100% | 🟢 Done |
 | **Phase 4** | 100% — Completed (6/6 · 14/14) | 100% | 🟢 Done |
-| **Phase 5** *(post-plan)* | 100% — Completed (4/4 · 11/11) | 100% | 🟢 Done |
+| **Phase 5** *(post-plan)* | 100% — Completed (5/5 · 12/12) | 100% | 🟢 Done |
 | **Stories Completed** | **45/45** | 45 | 🟢 Done |
 | **Story Points Done** | **116/116** | 116 | 🟢 Done |
 | **Test Coverage** | 100% lines (`app/**`) | 80% | 🟢 Good |

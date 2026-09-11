@@ -16,6 +16,7 @@
   "topBar": {
     "connectionStatus": "Connected · {count} systems",
     "reset": "Reset",
+    "signOut": "Sign out",
     "languageLabel": "Language",
     "languageEn": "EN",
     "languageDe": "DE"
@@ -212,6 +213,13 @@
       "YEAR_TO_DATE": "Year to date",
       "SEASON_TO_DATE": "Season to date",
       "CURRENT_MONTH": "Current month"
+    },
+    "periodInline": {
+      "THIS_MONTH": "current month",
+      "LAST_MONTH": "last month",
+      "LAST_3_MONTHS": "last 3 months",
+      "YEAR_TO_DATE": "year to date",
+      "SEASON_TO_DATE": "season to date"
     },
     "week": {
       "W1": "W1",

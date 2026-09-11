@@ -16,6 +16,7 @@
   "topBar": {
     "connectionStatus": "Verbunden · {count} Systeme",
     "reset": "Zurücksetzen",
+    "signOut": "Abmelden",
     "languageLabel": "Sprache",
     "languageEn": "EN",
     "languageDe": "DE"
@@ -212,6 +213,13 @@
       "YEAR_TO_DATE": "Seit Jahresbeginn",
       "SEASON_TO_DATE": "Seit Saisonbeginn",
       "CURRENT_MONTH": "Aktueller Monat"
+    },
+    "periodInline": {
+      "THIS_MONTH": "aktueller Monat",
+      "LAST_MONTH": "letzter Monat",
+      "LAST_3_MONTHS": "letzte 3 Monate",
+      "YEAR_TO_DATE": "seit Jahresbeginn",
+      "SEASON_TO_DATE": "seit Saisonbeginn"
     },
     "week": {
       "W1": "W1",
