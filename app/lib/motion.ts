@@ -209,6 +209,20 @@ export function animateReflow(update: () => void): void {
  * It is not a timer (`.claude/rules` — the beat's is the only one in the
  * application): it is the transition's own `finished` promise, so the wait is
  * exactly as long as the tween and no longer.
+ *
+ * A SCROLL WAITING ON A SUPERSEDED REFLOW IS ABANDONED — US-045, and it is a
+ * fix, not a tidy-up. `finished` REJECTS when the browser skips a transition,
+ * and a transition is skipped whenever a second one starts before it has
+ * finished — which is exactly what Reset pressed while an answer is landing
+ * does. `then(run, run)` therefore ran the outgoing reveal's queued
+ * `scrollIntoView` immediately, at a hero section the Reset was in the act of
+ * removing, and the two scrolls then fought over the same window. Measured in
+ * real Chrome against the built bundle, Reset pressed ~200ms after an answer
+ * landed: the cleared baseline glided DOWN to its foot (scrollY 0 -> 233, the
+ * whole of the short page) and eased back to the top over ~700ms, in 2 of 3
+ * runs. Skipping the superseded callback is the whole fix: whoever superseded
+ * this reflow has queued a scroll of its own, and that is the one the presenter
+ * asked for.
  */
 export function afterReflow(run: () => void): void {
   const tween = reflowInFlight;
@@ -217,7 +231,16 @@ export function afterReflow(run: () => void): void {
     return;
   }
 
-  void tween.then(run, run);
+  const proceed = () => {
+    // `animateReflow` registered `settle` on this same promise BEFORE this
+    // callback, so by now `reflowInFlight` is `null` if this tween is still the
+    // current one, and a NEWER tween if it is not. Anything else means this
+    // scroll belongs to a screen that has already been replaced.
+    if (reflowInFlight !== null && reflowInFlight !== tween) return;
+    run();
+  };
+
+  void tween.then(proceed, proceed);
 }
 
 /* ----------------------------------------------------------- AUTO-SCROLL -- */
@@ -316,6 +339,33 @@ export function scrollToTop(): void {
   if (typeof window === "undefined" || typeof window.scrollTo !== "function") {
     return;
   }
+
+  /**
+   * STOP WHERE THE PAGE IS, FIRST AND SYNCHRONOUSLY — US-045, and the reason is
+   * that the wait below is 400ms long.
+   *
+   * The reveal's own smooth scroll may STILL BE RUNNING when Reset is pressed,
+   * and a smooth scroll is owned by the scrolling box rather than by the code
+   * that started it: clearing the canvas does not stop it, it merely re-clamps
+   * it to the shorter page. Measured in real Chrome against the built bundle,
+   * Reset pressed while the reveal's scroll was in flight: the FRESHLY CLEARED
+   * baseline glided down to its own foot — scrollY 0 to 233, the whole height of
+   * the short page — arrived there ~110ms after the press, sat there until
+   * Reset's own scroll was released at ~445ms, and eased back to the top at
+   * ~710ms. A ~700ms round trip to the bottom of an empty dashboard, in answer
+   * to the one control a presenter uses to recover.
+   *
+   * A scroll with a non-smooth behaviour aborts a smooth one already running on
+   * the same box (CSSOM View), so scrolling to WHERE THE PAGE ALREADY IS is
+   * exactly "stop", and moves nothing by itself. It has to happen now rather
+   * than inside the callback below, because the 400ms the callback waits out is
+   * the whole of the window in which the stale scroll travels.
+   */
+  window.scrollTo({
+    top: window.scrollY,
+    left: window.scrollX,
+    behavior: "instant",
+  });
 
   // After the reflow tween, for the same reason the reveal's scroll waits —
   // Reset clears sections, which is a reflow like any other.

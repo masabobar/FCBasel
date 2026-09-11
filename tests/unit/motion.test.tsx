@@ -615,9 +615,31 @@ describe("scrollToTop — Reset's half of the scrolling", () => {
     button.remove();
   });
 
-  it("asks the browser to scroll once per call, never stacking two", () => {
+  it("stops the page where it is before it asks for anything else", () => {
+    // US-045. Reset's glide to the top waits out the 400ms reflow tween, and a
+    // smooth scroll started by the REVEAL is owned by the scrolling box rather
+    // than by the code that began it — so those 400ms were a window in which a
+    // stale scroll dragged the freshly cleared baseline down to its own foot
+    // (measured in Chrome: scrollY 0 -> 233, back at the top only at ~710ms).
+    // A non-smooth scroll aborts a smooth one on the same box, so scrolling to
+    // where the page already is IS "stop", and moves nothing by itself.
+    stubReducedMotion(false);
+    const scrollTo = scrollSpy();
+    Object.assign(window, { scrollY: 412, scrollX: 0 });
+
+    scrollToTop();
+
+    expect(scrollTo.mock.calls[0]?.[0]).toEqual({
+      top: 412,
+      left: 0,
+      behavior: "instant",
+    });
+  });
+
+  it("asks the browser to stop and then to glide, once per call", () => {
     // A browser replaces an in-flight smooth scroll, so repeated Resets do not
-    // overlap animations — but each press must still be one request, not none.
+    // overlap animations — but each press must still be one stop and one glide,
+    // not none and not a growing queue.
     stubReducedMotion(false);
     const scrollTo = scrollSpy();
 
@@ -625,7 +647,12 @@ describe("scrollToTop — Reset's half of the scrolling", () => {
     scrollToTop();
     scrollToTop();
 
-    expect(scrollTo).toHaveBeenCalledTimes(3);
+    expect(scrollTo).toHaveBeenCalledTimes(6);
+    expect(
+      scrollTo.mock.calls.filter(
+        (call) => (call[0] as ScrollToOptions).behavior === "smooth",
+      ),
+    ).toHaveLength(3);
   });
 
   it("does nothing where scrollTo is unavailable", () => {
@@ -834,7 +861,14 @@ describe("afterReflow — the scrolls wait for the tween", () => {
     animateReflow(() => {});
     scrollToTop();
 
-    expect(scrollTo).not.toHaveBeenCalled();
+    // The only thing that may happen now is the STOP (US-045) — a scroll to
+    // where the page already is, which aborts a stale smooth scroll without
+    // moving anything. The glide to the top still waits for the tween.
+    expect(
+      scrollTo.mock.calls.filter(
+        (call) => (call[0] as ScrollToOptions).behavior === "smooth",
+      ),
+    ).toHaveLength(0);
 
     finish();
     await Promise.resolve();
@@ -845,6 +879,43 @@ describe("afterReflow — the scrolls wait for the tween", () => {
       left: 0,
       behavior: "smooth",
     });
+  });
+
+  it("abandons a scroll whose reflow was superseded", async () => {
+    // US-045, and the other half of the same defect. A SKIPPED transition
+    // rejects `finished`, and a transition is skipped whenever a second one
+    // starts — which is what Reset pressed while an answer is landing does. The
+    // reveal's queued `scrollIntoView` was therefore run anyway, at a section
+    // the same press was in the act of removing, and the two scrolls fought.
+    // Whoever superseded this reflow has queued the scroll the presenter asked
+    // for; this one belongs to a screen that no longer exists.
+    stubNoPreference();
+    const first = stubPendingTransition();
+    const scrollIntoView = vi.fn();
+
+    animateReflow(() => {});
+    scrollRevealedIntoView({ scrollIntoView } as unknown as Element);
+
+    // A second reflow begins before the first has finished, and only THEN does
+    // the first one settle — the order a skipped transition settles in.
+    const second = stubPendingTransition();
+    animateReflow(() => {});
+    first.finish();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(scrollIntoView).not.toHaveBeenCalled();
+
+    // And the newer reflow's own scroll is unaffected: it still runs.
+    const later = vi.fn();
+    scrollRevealedIntoView({ scrollIntoView: later } as unknown as Element);
+    second.finish();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(later).toHaveBeenCalledTimes(1);
   });
 
   it("does not hold anything back under reduced motion", () => {

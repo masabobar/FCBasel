@@ -414,7 +414,16 @@ test.describe("no flicker", () => {
       // panel's own smooth scroll and the message measures ~115px behind the
       // bar simply because it is still travelling. That reading was taken, and
       // it was the instrument, not the product.
-      await waitForScrollRest(page, 800);
+      //
+      // THE CAP WAS 800ms AND THAT WAS NOT ENOUGH — US-045. `waitForScrollRest`
+      // returns the moment two consecutive samples agree, so a healthy run pays
+      // nothing for a longer cap; but running the whole suite end to end put a
+      // smooth scroll past 800ms on a loaded machine, the cap expired mid-flight
+      // and the case failed at -279.5px against a panel that was merely still
+      // travelling. It passed in isolation on the same build, at +107.5px. The
+      // budget is now generous enough that expiry means the scroll really is
+      // stuck rather than slow.
+      await waitForScrollRest(page, 3_000);
 
       const reading = await page.evaluate(() => {
         const bar = document

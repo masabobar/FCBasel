@@ -183,7 +183,12 @@ describe("App", () => {
       document.querySelectorAll('[data-slot="insight-section"]'),
     ).toHaveLength(0);
     expect(screen.getByText("child route")).toBeInTheDocument();
-    expect(scrollTo).toHaveBeenCalledTimes(1);
+    // Two requests per press since US-045: "stop where you are", which aborts
+    // any stale smooth scroll, then the glide to the top (`app/lib/motion.ts`).
+    expect(scrollTo).toHaveBeenCalledTimes(2);
+    expect(scrollTo).toHaveBeenLastCalledWith(
+      expect.objectContaining({ top: 0 }),
+    );
   });
 
   it("mounts the persistent prompt bar below the canvas", () => {

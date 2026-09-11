@@ -6,7 +6,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 **Duration:** Days 5-6 (of a one-week build)
 **Total Stories:** 6
 **Total Points:** 14
-**Status:** In Progress (5/6 completed)
+**Status:** ✅ Completed (6/6 · 14/14) — **and with it the whole 45-story plan**
 
 > **Not in this phase:** new functionality, or anything that changes a hero's content.
 > A live, high-stakes room is unforgiving; one ugly or wrong render in front of the owner is
@@ -18,7 +18,7 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Priority:** P0
 **Total Story Points:** 14
-**Status:** In Progress (5/6 completed)
+**Status:** ✅ Completed (6/6 completed)
 **Source:** Build Specification E8; Framing §4 principle 4 ("Instant and flawless").
 
 ### Stories:
@@ -102,16 +102,30 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
   - **Story Points:** 2
   - **Priority:** P1
   - **Component:** [Web]
-  - **Status:** Todo
+  - **Status:** ✅ Completed *(criterion 5 ⏸️ deferred)*
   - **Description:** Rehearse the run-of-show on the target browser and hardware.
   - **Acceptance Criteria:**
-    - Runs cleanly in **Chrome** (the demo guarantee); no console errors
-    - Full run-of-show rehearsed: open URL → baseline → three heroes with follow-ups → reset
-    - Reset pressed repeatedly and mid-flow leaves no broken state, no duplicate tiles, no
-      overlapping animations
-    - Rapid repeated submits stay debounced under real use
-    - The deployed shareable URL loads cleanly from a cold start
-  - **Dependencies:** US-001, US-042, US-043
+    - ✅ Runs cleanly in **Chrome** (the demo guarantee); no console errors — rehearsed on **Google
+      Chrome 152.0.7977.83** via `channel: "chrome"`, headed and headless, at 1920×1080; zero
+      console errors across the whole session
+    - ✅ Full run-of-show rehearsed as ONE continuous session: open URL → baseline → three heroes
+      with follow-ups → an off-script question → reset. Press to panel 10-35ms, press to answer
+      1179-1198ms, 1.78-2.08s per question, the whole show 11.9s
+    - ✅ Reset pressed repeatedly and mid-flow leaves no broken state, no duplicate tiles, no
+      overlapping animations — 20 presses over 7 shapes sampled every frame (2,012 frames): 0
+      duplicate sections, 0 duplicate `view-transition-name`s, 0 tiles tweened twice at once, 0
+      frames with two panels, 0 finite animations left running. **This criterion found a real
+      defect:** Reset fought the reveal's in-flight scroll and sent the cleared baseline to its own
+      foot (scrollY 0 → 233 for ~700ms). Fixed in `app/lib/motion.ts`, both halves mutation-verified
+    - ✅ Rapid repeated submits stay debounced under real use — 31 submit attempts by keyboard, held
+      Enter, the send button and during a beat produced **exactly 4 beats for 4 questions**
+    - ⏸️ **DEFERRED — the deployed shareable URL loads cleanly from a cold start.** There is no
+      public URL: US-001's deploy criterion is still open, and `fcbasel.railway.internal` is a
+      PRIVATE Railway name that returns NXDOMAIN. The identical cold start was measured against the
+      local production build so the deployed URL has something to be compared to — first contentful
+      paint 120-140ms, answers a press at 178-385ms, 11 requests / 183.0 KiB, console clean. **Not
+      met, not claimed.** See `../../output/phases/phase-4.md` → "Open at plan close"
+  - **Dependencies:** US-001 *(its deploy criterion is the blocker for criterion 5)*, US-042, US-043
 
 ---
 
@@ -119,9 +133,11 @@ projector, smooth, dead-end-proof, and independent of any network mid-demo. This
 
 **Total Epics:** 1 | **Total Stories:** 6 | **Total Points:** 14
 
-**By Priority:** P0: 4 stories, 9 points (all done) · P1: 2 stories, 5 points (US-043 done) · P2: 0
+**By Priority:** P0: 4 stories, 9 points · P1: 2 stories, 5 points · P2: 0 — **all done**
 
-**By Status:** ✅ 5 stories, 12 points · 🔄 0 · 📋 1 story, 2 points · ⏸️ 0
+**By Status:** ✅ 6 stories, 14 points · 🔄 0 · 📋 0 · ⏸️ 0
+*(one ACCEPTANCE CRITERION, not a story, is deferred: US-045's criterion 5 — it needs the Railway
+deploy that US-001's own deploy criterion still waits on. One gap, counted twice.)*
 
 > **Known limitations** decided out of scope during this phase are recorded in
 > [`../../output/phases/phase-4.md`](../../output/phases/phase-4.md) under "Known limitations",

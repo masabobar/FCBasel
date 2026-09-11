@@ -340,7 +340,12 @@ describe("useDashboard — reset pressed with nothing to reset", () => {
 
     act(() => result.current.reset());
 
-    expect(scrollTo).toHaveBeenCalledTimes(1);
+    // Two requests per press since US-045: the stop that aborts any stale
+    // smooth scroll, then the glide to the top (`app/lib/motion.ts`).
+    expect(scrollTo).toHaveBeenCalledTimes(2);
+    expect(scrollTo).toHaveBeenLastCalledWith(
+      expect.objectContaining({ top: 0 }),
+    );
   });
 
   it("is a no-op again immediately after a real reset", () => {
